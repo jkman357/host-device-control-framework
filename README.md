@@ -1,2 +1,2 @@
 # host-device-control-framework
-Host–Device Control Framework
+A reusable control framework for PC, SoC, or MCU hosts communicating with MCU-based devices.
