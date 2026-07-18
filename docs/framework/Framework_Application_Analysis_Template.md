@@ -4,7 +4,7 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.13  
+**Document Version:** v1.0.14  
 **Status:** Baseline  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
@@ -94,6 +94,7 @@ Other Coordinator/Node applications
 | v1.0.11 | 2026-07-18 | Ray Yang | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 as conditional Product-analysis authorities; added authoring references, Existing Framework Baseline records, Draft-authority approval handling, detailed completion checks, and Baseline decisions so Coordinator and C# applicability, version, evidence, deviation, or `N/A` rationale cannot be omitted. |
 | v1.0.12 | 2026-07-18 | Ray Yang | Updated the Framework authoring reference to v1.0.10 and the Coordinator and C# authoring references to v1.0.2 after Draft-authority, conditional-applicability, and document-version-format clarification; preserved the existing Product-specific compatibility-evidence and approval requirements. |
 | v1.0.13 | 2026-07-18 | Ray Yang | Updated authoring references for Framework v1.0.11 and Draft Coordinator/C# rules v1.0.3; required role classification before language selection; prohibited using implementation language as a role proxy; added repository validation and package-traceability evidence to completion checks; and preserved all Product-specific decisions as unresolved until completed by a Project. |
+| v1.0.14 | 2026-07-18 | Ray Yang | Completed the Authority Boundary table by adding conditional authority ownership for cross-language Coordinator software engineering and Product-owned C# implementation; clarified that Draft authorities require explicit Project adoption or approved deviation; and preserved all existing application-analysis decisions and completion requirements. |
 
 ## 0.3 Template Usage Convention
 
@@ -221,7 +222,9 @@ This template records application-specific analysis and decisions. It shall not 
 | Topic | Authority |
 |---|---|
 | Coordinator/Node roles, architecture, safety placement, timing principles, and governance | `Coordinator_Node_Control_Framework.md` |
+| Cross-language Coordinator software engineering | `Coordinator_Software_Engineering_Rules.md` when approved or explicitly adopted for Project use; otherwise record an approved deviation or `N/A` rationale |
 | Embedded C implementation rules | `Embedded_C_Coding_Rules.md` |
+| Product-owned C# implementation rules | `CSharp_Coding_Rules.md` when approved or explicitly adopted for Project use; otherwise record an approved deviation or `N/A` rationale |
 | Protocol YAML fields, semantics, validation, and compatibility rules | `Protocol_YAML_Definition_Guide.md` |
 | Reusable Project Protocol skeleton | `Protocol_YAML_Template.md` |
 | Product behavior and domain requirements | Application Profile, SRS, Hazard Analysis, and Product specifications |

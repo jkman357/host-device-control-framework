@@ -1,7 +1,7 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.0.1  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
@@ -15,6 +15,7 @@
 | Version | Date | Status | Summary |
 |---|---|---|---|
 | v1.0.0 | 2026-07-18 | Draft for Review | Established automated and human repository checks for canonical paths, document manifests, version and status consistency, links, Markdown structure, evidence claims, role routing, Draft authority handling, and detached-package traceability. |
+| v1.0.1 | 2026-07-18 | Draft for Review | Completed repository-validation enforcement by requiring the GitHub Actions workflow, exact authority-manifest set equality, marker-aware fenced-Code parsing, inline/image/reference-link and Markdown-anchor validation, Version History table-scoped checks, explicit Python runtime requirements, and Authority Boundary coverage for Coordinator and C# rule documents. |
 
 ---
 
@@ -40,25 +41,38 @@ A tool result shall not be relabeled as human approval or Product validation.
 
 # 3. Automated Structural Checks
 
+## 3.1 Runtime
+
+Local execution requires Python 3.10 or later. The repository CI workflow shall use Python 3.12.
+
 Run:
 
 ```bash
 python tools/validate_repository.py
 ```
 
+## 3.2 Required Automated Checks
+
 The automated validator shall check at least:
 
 - UTF-8 readability and final newline.
-- Balanced fenced Code blocks.
-- Existing relative Markdown targets.
+- Fenced Code blocks using marker-aware matching: closing markers shall use the same character and at least the opening-marker length.
+- Existing local targets for inline Markdown links, images, and reference-style links.
+- Existing Markdown heading anchors for local links that contain fragments.
+- Defined and non-duplicated reference-link identifiers.
 - Unique canonical filenames.
-- Document metadata version and status.
-- Current version presence in Version History.
-- Root Current Document Set version/status consistency.
-- AI Active Document Manifest version/status consistency.
+- Complete document metadata for every versioned authority document.
+- Current version presence exactly once in the Version History or Change History table located under the corresponding heading.
+- Version History status and date consistency when those columns are present.
+- Exact set equality between versioned authority documents and the root Current Document Set.
+- Exact set equality between versioned authority documents and the AI Active Document Manifest.
+- Manifest path, version, and status consistency.
 - Draft documents that claim normative authority use `Proposed` wording.
 - Required canonical authority paths exist.
 - Repository-validation workflow and script exist.
+- The GitHub Actions workflow uses Python 3.12 and invokes `python tools/validate_repository.py`.
+
+A passing automated result proves only the checks implemented by the validator. It does not prove semantic correctness, Product suitability, or human approval.
 
 # 4. Human Semantic Checks
 

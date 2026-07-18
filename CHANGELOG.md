@@ -37,6 +37,9 @@ Individual authority documents retain their own internal Version History and app
 - Updated `Framework_Application_Analysis_Template.md` to v1.0.13.
 - Updated `Coordinator_Software_Engineering_Rules.md` to v1.0.3.
 - Updated `CSharp_Coding_Rules.md` to v1.0.3.
+- Updated `AI_Engineering_Usage_Guide.md` to v1.0.12.
+- Updated `Framework_Application_Analysis_Template.md` to v1.0.14.
+- Updated `Repository_Validation_Checklist.md` to v1.0.1.
 - Updated Coordinator, Coding Rules, and Validation directory guidance.
 
 ### Fixed
@@ -58,3 +61,10 @@ Individual authority documents retain their own internal Version History and app
 - Added automated repository consistency checks and a human semantic-validation checklist.
 - Added detached-package identity and file-integrity requirements.
 - Clarified that public visibility is for inspection and does not grant adoption or reuse rights.
+- Added the missing GitHub Actions document-validation workflow to the committed repository content.
+- Enforced exact authority-document set equality across repository files, the root Current Document Set, and the AI Active Document Manifest.
+- Replaced fence-count validation with marker-aware fenced-Code parsing.
+- Extended local reference validation to images, reference-style links, and Markdown heading anchors.
+- Scoped current-version validation to the Version History or Change History table.
+- Completed the Application Analysis Authority Boundary for Coordinator and C# rule documents.
+- Declared Python 3.10 or later for local validation and fixed CI validation to Python 3.12.
