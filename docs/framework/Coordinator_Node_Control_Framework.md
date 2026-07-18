@@ -4,7 +4,7 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.10  
+**Document Version:** v1.0.11  
 **Status:** Baseline  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
@@ -18,6 +18,7 @@
 - `Protocol_YAML_Definition_Guide.md`
 - `Protocol_YAML_Template.md`
 - `Framework_Application_Analysis_Template.md`
+- `Repository_Validation_Checklist.md`
 
 **First Issued:** 2026-07-15  
 **Last Revised:** 2026-07-18  
@@ -179,6 +180,7 @@ docs/protocol/Protocol_YAML_Template.md
 docs/coordinator/Coordinator_Software_Engineering_Rules.md
 docs/coding-rules/Embedded_C_Coding_Rules.md
 docs/coding-rules/CSharp_Coding_Rules.md
+docs/validation/Repository_Validation_Checklist.md
 ```
 
 The document version shall be recorded inside the document:
@@ -265,6 +267,7 @@ Markdown filename.
 | v1.0.8 | 2026-07-18 | Closed the remaining machine-verifiable Protocol-contract gaps by requiring an exact Fragment Header and bounded reassembly policies, concrete named Handshake request/response payloads, explicit Profile allowlists and security-level/deprecation metadata instead of numeric ID ordering, cryptographically authorized Firmware Update resume across Session changes, and a positive data-bearing Fragment payload at every supported minimum MTU. |
 | v1.0.9 | 2026-07-18 | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 into Related Documents, the authority boundary, stable document identity, Baseline decisions, and the Authority Matrix; clarified that reusable Coordinator engineering rules and language-specific implementation rules remain subordinate to this Framework, approved Product requirements, and Project-specific design. |
 | v1.0.10 | 2026-07-18 | Normalized document-version notation for the Coordinator and C# rule references and aligned the active Draft engineering-rule set with v1.0.2; no reusable architecture, Protocol, safety, security, Runtime, or governance semantics changed. |
+| v1.0.11 | 2026-07-18 | Clarified that programming languages do not determine Coordinator, Node, Tool, or Service roles; made the Draft Coordinator and C# rules applicable only after explicit Project adoption or approval; marked their Authority Matrix entries as proposed while Draft; and added repository validation and detached-package traceability expectations without changing Protocol wire semantics. |
 
 ## 0.6 Core Conclusions
 
@@ -2884,9 +2887,11 @@ This Baseline establishes the following decisions:
 65. Profile IDs do not encode security strength; selection uses allowlists, preference, security level, and deprecation state.
 66. Firmware Update resume across Session changes requires cryptographic authorization bound to transaction, Manifest, Device, Host, and security version.
 67. A data-bearing Transport Profile is invalid when its minimum MTU does not exceed the Fragment Header size.
-68. Cross-language Coordinator-owned software engineering is governed by `Coordinator_Software_Engineering_Rules.md` within the architecture and Product authority boundaries defined by this Framework.
-69. Product-owned C# implementation is governed by `CSharp_Coding_Rules.md` in addition to applicable role-level, Product, Protocol, and Project-specific authorities.
-70. Application Analysis records whether each role-level and language-level authority applies, the exact version used, and the evidence or `N/A` rationale.
+68. When `Coordinator_Software_Engineering_Rules.md` is approved or explicitly adopted for Project use, it governs cross-language Coordinator-owned software engineering within the architecture and Product authority boundaries defined by this Framework.
+69. When `CSharp_Coding_Rules.md` is approved or explicitly adopted for Project use, it governs Product-owned C# implementation in addition to applicable role-level, Product, Protocol, and Project-specific authorities.
+70. A programming language shall not be used to infer Coordinator, Node, Tool, Service, or mixed role.
+71. Application Analysis records whether each role-level and language-level authority applies, the exact version and status used, and the approval evidence, deviation, or `N/A` rationale.
+72. Repository structural validation and detached-package integrity checks supplement but do not replace semantic review or human approval.
 
 ## 12.6 Core Design Philosophy
 
@@ -2907,15 +2912,16 @@ This Baseline establishes the following decisions:
 | Message IDs, Payloads, Wire Format, and security fields | Project Protocol YAML |
 | Protocol YAML authoring and validation rules | `Protocol_YAML_Definition_Guide.md` |
 | Reusable YAML skeleton | `Protocol_YAML_Template.md` |
-| Cross-language Coordinator software architecture and engineering rules | `Coordinator_Software_Engineering_Rules.md` |
+| Cross-language Coordinator software architecture and engineering rules | `Coordinator_Software_Engineering_Rules.md` when approved or explicitly adopted for Project use; proposed authority while Draft for Review |
 | Embedded C implementation rules | `Embedded_C_Coding_Rules.md` |
-| C# language and .NET implementation rules | `CSharp_Coding_Rules.md` |
+| C# language and .NET implementation rules | `CSharp_Coding_Rules.md` when approved or explicitly adopted for Project use; proposed authority while Draft for Review |
 | Product command semantics | Application Profile and SRS |
 | UI pages and behavior | UI/UX Specification and Product Profile |
 | Project-specific Coordinator decomposition, threading, references, and approved deviations | Coordinator Design Specification and Reference Implementation |
 | Node Task, Mailbox, Priority, and resource model | Node Design Specification |
 | Hazard and safe state | Hazard Analysis and System Requirements |
 | Test procedure and result | Test Specification and Test Report |
+| Repository structural and package-integrity validation | `Repository_Validation_Checklist.md`, executed validator output, and retained package hashes |
 
 ---
 

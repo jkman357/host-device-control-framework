@@ -1,7 +1,7 @@
 # C# Coding Rules
 
 **Canonical Filename:** `CSharp_Coding_Rules.md`  
-**Document Version:** v1.0.2  
+**Document Version:** v1.0.3  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
@@ -23,6 +23,7 @@ This document is independently authored. Microsoft and other external guidance i
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.3 | 2026-07-18 | Draft for Review | Resolved authority ownership by topic before precedence; added explicit untrusted JSON, XML, and polymorphic deserialization controls, resource bounds, inert DTO mapping, and negative tests; and retained conditional Coordinator applicability and Draft status. |
 | v1.0.2 | 2026-07-18 | Draft for Review | Made Coordinator software engineering authority conditional in the AI required-context rules, scoped the recommended Coordinator project structure to Coordinator-role implementations, clarified the document as proposed normative authority while still under review, and normalized document-version formatting. |
 | v1.0.1 | 2026-07-18 | Draft for Review | Clarified conditional architecture authority, refined formatting and field rules, established the default .NET Framework 4.7.2 / C# 7.3 profile, corrected cancellation and background-worker examples, and separated document review from project implementation validation. |
 | v1.0.0 | 2026-07-18 | Draft for Review | Initial full baseline covering C# source organization, naming, type use, null handling, asynchronous programming, concurrency, errors, resources, UI integration, serialization, security, analyzers, testing, generated code, and a .NET Framework 4.7.2 compatibility profile. |
@@ -48,7 +49,7 @@ It is intended to make C# implementation:
 
 This document controls C# language and .NET implementation practices. It does not independently own product architecture.
 
-When C# code implements or directly supports a Coordinator role, the applicable architecture and lifecycle authority is:
+When C# code implements or directly supports a Coordinator role, and the Draft is explicitly adopted or later approved for Project use, the applicable architecture and lifecycle authority is:
 
 ```text
 Coordinator_Software_Engineering_Rules.md
@@ -104,7 +105,12 @@ Excluded code shall be isolated and identifiable. Product-owned integration code
 
 ## 5. Authority and Precedence
 
-The following precedence shall apply:
+Authority ownership shall be resolved by topic before any precedence list is applied. A document does not gain authority
+over Product behavior, Protocol fields, hazards, architecture, or another language merely because it appears earlier in
+the list below. The precedence list applies only when two applicable authorities govern the same topic and the topic
+boundary does not already resolve the conflict.
+
+The following precedence shall then apply within the same topic:
 
 1. Applicable product, safety, security, and regulatory requirements.
 2. Approved software requirements and architecture.
@@ -1388,6 +1394,38 @@ Insecure or runtime-coupled object serialization mechanisms shall not be used fo
 
 Existing use shall have a removal or isolation plan.
 
+### 115.1 Untrusted Deserialization
+
+External type metadata shall not select arbitrary CLR types.
+
+For Json.NET, `TypeNameHandling` shall remain `None` for untrusted input unless an explicitly approved allowlist
+`ISerializationBinder` restricts every constructible type. Equivalent polymorphic mechanisms in other serializers shall
+use an explicit allowlist and a non-ambiguous discriminator policy.
+
+A type name, assembly name, namespace, or discriminator received from an external source shall not be passed directly
+to `Type.GetType()`, reflection-based construction, dependency injection resolution, or another general-purpose type
+factory.
+
+XML parsing of untrusted input shall prohibit DTD processing and external entity or resource resolution unless an
+approved requirement documents the need, resolver, allowlist, resource limits, and tests. Secure defaults include
+`DtdProcessing.Prohibit` and a null `XmlResolver` where supported.
+
+Every external deserialization path shall define and enforce bounds for:
+
+- Total input bytes.
+- Nesting depth.
+- String and binary value length.
+- Collection length.
+- Object or node count where practical.
+- Numeric range and enum validity.
+
+Untrusted input should be deserialized into inert data-transfer objects without constructors, setters, callbacks, or
+converters that perform I/O, start work, mutate global state, or invoke privileged operations. The DTO shall be validated
+and mapped into domain objects only after trust-boundary checks pass.
+
+Tests shall cover prohibited type metadata, unknown discriminators, excessive depth, oversized values and collections,
+malformed XML, DTD and external-entity attempts, and side-effect prevention.
+
 ## 116. Protocol Encoding
 
 Protocol encoding and decoding shall:
@@ -2150,7 +2188,7 @@ coordinator/
 └── Product.Tests.Integration/
 ```
 
-For a Coordinator implementation, the exact structure may differ and responsibility boundaries are governed by `Coordinator_Software_Engineering_Rules.md`. For non-Coordinator C# code, responsibility boundaries are governed by the applicable Project-approved architecture and software engineering authority.
+For a Coordinator implementation, the exact structure may differ and responsibility boundaries are governed by `Coordinator_Software_Engineering_Rules.md` when that document is approved or explicitly adopted for Project use. For non-Coordinator C# code, responsibility boundaries are governed by the applicable Project-approved architecture and software engineering authority.
 
 # Appendix B — Example Thin UI Handler
 

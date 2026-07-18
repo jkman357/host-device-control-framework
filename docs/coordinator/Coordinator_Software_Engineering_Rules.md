@@ -1,7 +1,7 @@
 # Coordinator Software Engineering Rules
 
 **Canonical Filename:** `Coordinator_Software_Engineering_Rules.md`  
-**Document Version:** v1.0.2  
+**Document Version:** v1.0.3  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
@@ -23,6 +23,7 @@ This document is independently authored. External standards and guidance are ref
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.3 | 2026-07-18 | Draft for Review | Resolved authority ownership by topic before precedence, clarified that Framework and Protocol restatements are derived conformance summaries while Coordinator-specific realization remains owned here, and reinforced role-first implementation routing without changing Project approval status. |
 | v1.0.2 | 2026-07-18 | Draft for Review | Clarified that this Draft is proposed normative authority pending human approval and normalized document-version formatting without changing Coordinator engineering requirements. |
 | v1.0.1 | 2026-07-18 | Draft for Review | Corrected architecture-flow representation, clarified source dependency direction, introduced bootstrap diagnostics during startup, linked the required Project profile to the Framework Application Analysis, and clarified document approval versus implementation conformance. |
 | v1.0.0 | 2026-07-18 | Draft for Review | Initial full baseline covering Coordinator software architecture, concurrency, state ownership, communication integration, diagnostics, configuration, security, testability, release governance, and AI-assisted implementation controls. |
@@ -103,7 +104,12 @@ This document does not replace:
 
 ## 4. Authority and Precedence
 
-The following precedence shall apply when requirements conflict:
+Authority ownership shall be resolved by topic before any precedence list is applied. A document does not gain authority
+over Product behavior, Protocol fields, hazards, architecture, or language syntax merely because it appears earlier in
+the list below. The precedence list applies only when two applicable authorities govern the same topic and the topic
+boundary does not already resolve the conflict.
+
+The following precedence shall then apply when requirements conflict within the same topic:
 
 1. Applicable law, regulation, safety requirements, and approved product requirements.
 2. Approved system and software requirements.
@@ -129,6 +135,10 @@ When this document summarizes a rule owned elsewhere, the summary shall be label
 - `Project-specific profile`
 
 Repeated summaries shall not silently become independent authorities.
+
+Unless a section explicitly states otherwise, statements in this document that repeat Framework role, layering, safety,
+security-boundary, or Protocol ownership are `Derived conformance summary`. Normative `shall` statements owned by this
+document define the Coordinator-specific realization of those upstream requirements.
 
 ## 6. Stable Document Identity
 
@@ -162,6 +172,9 @@ Coordinator and Node are **roles**, not permanent hardware identities.
 The same physical product may perform different roles in different relationships. Software shall not assume that a Coordinator is always a desktop PC or that a Node is always an MCU.
 
 ## 8. Core Engineering Principles
+
+**Derived Framework conformance summary:** The principles below restate reusable Framework objectives. This document
+owns their Coordinator-specific software realization, not the upstream role, safety, or Protocol definition.
 
 Coordinator software shall be designed according to the following principles:
 
@@ -681,6 +694,9 @@ Missed periods shall not automatically cause an uncontrolled burst of catch-up e
 
 ## 33. Protocol Authority
 
+**Derived Protocol ownership summary:** The Project Protocol YAML and its definition guide own the wire contract.
+This section defines the Coordinator-side conformance boundary.
+
 The Project Protocol YAML is the authority for:
 
 - Message identity.
@@ -700,6 +716,9 @@ The Project Protocol YAML is the authority for:
 Handwritten implementation code shall not silently redefine these items.
 
 ## 34. Protocol/Transport Separation
+
+**Derived Framework requirement:** Protocol and Transport are separate responsibilities. The Coordinator-specific
+realization below is normative for software governed by this document.
 
 The Protocol layer shall not depend on a concrete Serial, USB, TCP, or other transport implementation.
 

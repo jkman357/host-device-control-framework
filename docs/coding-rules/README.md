@@ -1,11 +1,11 @@
 # Coding Rules
 
-This directory contains programming-language-specific implementation authorities.
+This directory contains approved and proposed programming-language-specific implementation authorities.
 
 ## Documents
 
-- [`Embedded_C_Coding_Rules.md`](Embedded_C_Coding_Rules.md) — Product-owned Embedded C implementation requirements.
-- [`CSharp_Coding_Rules.md`](CSharp_Coding_Rules.md) — Product-owned C# language and .NET implementation requirements.
+- [`Embedded_C_Coding_Rules.md`](Embedded_C_Coding_Rules.md) — **Final Baseline** Product-owned Embedded C implementation requirements.
+- [`CSharp_Coding_Rules.md`](CSharp_Coding_Rules.md) — **Draft for Review / proposed normative authority** for Product-owned C# language and .NET implementation requirements.
 
 ## Authority Boundary
 

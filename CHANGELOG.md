@@ -13,6 +13,8 @@ Individual authority documents retain their own internal Version History and app
 - Added `CHANGELOG.md`, `LICENSE`, and `NOTICE.md` at the repository root.
 - Added `Coordinator_Software_Engineering_Rules.md` v1.0.1.
 - Added `CSharp_Coding_Rules.md` v1.0.1.
+- Added `Repository_Validation_Checklist.md` v1.0.0.
+- Added `tools/validate_repository.py` and `.github/workflows/document-validation.yml`.
 
 ### Changed
 
@@ -30,6 +32,12 @@ Individual authority documents retain their own internal Version History and app
 - Updated `Framework_Application_Analysis_Template.md` to v1.0.12.
 - Updated `Coordinator_Software_Engineering_Rules.md` to v1.0.2.
 - Updated `CSharp_Coding_Rules.md` to v1.0.2.
+- Updated `AI_Engineering_Usage_Guide.md` to v1.0.11.
+- Updated `Coordinator_Node_Control_Framework.md` to v1.0.11.
+- Updated `Framework_Application_Analysis_Template.md` to v1.0.13.
+- Updated `Coordinator_Software_Engineering_Rules.md` to v1.0.3.
+- Updated `CSharp_Coding_Rules.md` to v1.0.3.
+- Updated Coordinator, Coding Rules, and Validation directory guidance.
 
 ### Fixed
 
@@ -42,3 +50,11 @@ Individual authority documents retain their own internal Version History and app
 - Made Coordinator software engineering context conditional for non-Coordinator C# AI tasks.
 - Scoped the recommended C# `coordinator/` project structure to Coordinator-role implementations.
 - Normalized document-version formatting to lowercase `v` for the Coordinator and C# rule documents.
+- Made implementation routing role-first and language-second; removed language-to-role assumptions.
+- Resolved authority ownership by topic before applying precedence.
+- Prevented the Baseline Framework from silently activating Draft Coordinator or C# authorities.
+- Labeled upstream Framework and Protocol restatements as derived conformance summaries.
+- Added untrusted deserialization controls for type metadata, polymorphism, XML external resources, resource bounds, inert DTO mapping, and negative tests.
+- Added automated repository consistency checks and a human semantic-validation checklist.
+- Added detached-package identity and file-integrity requirements.
+- Clarified that public visibility is for inspection and does not grant adoption or reuse rights.

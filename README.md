@@ -38,14 +38,15 @@ Human reviews decisions and validates actual system behavior
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.10 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
-| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.0.10 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
-| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.0.12 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
+| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.11 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.0.11 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
+| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.0.13 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
 | [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.0.8 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
 | [`Protocol_YAML_Template.md`](docs/protocol/Protocol_YAML_Template.md) | v1.0.8 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
-| [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | v1.0.2 | Draft for Review | Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
+| [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | v1.0.3 | Draft for Review | Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
 | [`Embedded_C_Coding_Rules.md`](docs/coding-rules/Embedded_C_Coding_Rules.md) | v1.0.15 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
-| [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.2 | Draft for Review | Product-owned C# language and .NET implementation rules |
+| [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.3 | Draft for Review | Product-owned C# language and .NET implementation rules |
+| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.0 | Draft for Review | Repository structural, manifest, canonical-reference, evidence-state, and detached-package checks |
 
 ## AI Task Routing
 
@@ -66,34 +67,36 @@ Protocol task
     -> Protocol YAML Template
     -> Completed Application Analysis and Product requirements
 
-Coordinator software architecture or implementation
-    -> AI Engineering Usage Guide
-    -> Coordinator/Node Control Framework
-    -> Coordinator Software Engineering Rules
-    -> Applicable language Coding Rules
-    -> Approved Project Protocol YAML and Coordinator design
+Implementation generation or review
+    -> Identify the actual role for each relationship: Coordinator, Node, Tool/Service, or mixed
+    -> Apply the system and role-level authority for that role
+    -> Apply the Coding Rules for the implementation language
+    -> Apply the approved Project Protocol YAML when communication is in scope
+    -> Apply the approved SDD, platform constraints, and Product requirements
 
 Embedded C generation or review
     -> AI Engineering Usage Guide
-    -> Coordinator/Node Control Framework
     -> Embedded C Coding Rules
-    -> Approved Project Protocol YAML and Node design
+    -> Coordinator/Node Control Framework when a Coordinator/Node boundary is in scope
+    -> Coordinator Software Engineering Rules only when the Embedded C code performs or supports a Coordinator role
+    -> Applicable Project Protocol YAML, SDD, hardware specification, and platform constraints
 
 C# generation or review
     -> AI Engineering Usage Guide
-    -> Applicable architecture or role framework
-    -> Coordinator Software Engineering Rules when the code implements or supports a Coordinator role
     -> C# Coding Rules
+    -> Applicable architecture or role framework
+    -> Coordinator Software Engineering Rules only when the code performs or supports a Coordinator role
     -> Approved Project Protocol YAML and software design when applicable
 
 Validation or conformance task
     -> AI Engineering Usage Guide
+    -> Repository Validation Checklist for repository-level checks
     -> Applicable authority documents
     -> Approved Product requirements and design
     -> Actual build, test, measurement, log, and review evidence
 ```
 
-Coordinator implementation tasks apply both the Coordinator role-level authority and the applicable language-level authority; neither substitutes for the other. A `Draft for Review` authority remains proposed until explicitly accepted or approved for Project use.
+Implementation routing is role-first and language-second. A programming language does not determine whether software is a Coordinator, Node, Tool/Service, or mixed-role component. When a Coordinator role is present, both the Coordinator role-level authority and the applicable language-level authority apply; neither substitutes for the other. A `Draft for Review` authority remains proposed until explicitly accepted or approved for Project use.
 
 While `AI_Engineering_Usage_Guide.md` remains `Draft for Review`, its routing is provisional. Direct human instructions and approved topic authority documents take precedence.
 
@@ -103,13 +106,13 @@ Maintained Markdown authority files inside the controlled Git repository use sta
 
 ```text
 Canonical path:      docs/framework/Coordinator_Node_Control_Framework.md
-Document version:    v1.0.9
+Document version:    vMAJOR.MINOR.PATCH
 Immutable history:   Git commit, tag, or GitHub Release
 ```
 
 A new PATCH or MINOR revision updates the canonical file and its internal `Document Version`; it does not create another parallel maintained authority file.
 
-Immutable release artifacts, audit packages, external deliverables, and detached snapshots include the approved version or a controlled Baseline identifier in the distributed filename. Detached artifacts preserve the canonical source filename and source Git commit, tag, or Release.
+Immutable release artifacts, audit packages, external deliverables, and detached snapshots include the approved version or a controlled Baseline identifier in the distributed filename. Detached artifacts preserve the canonical source filename and source Git commit, tag, or Release. A controlled detached authority-set package shall include package identity, input source identity, document versions and statuses, and a file-integrity hash list.
 
 ## Authority Boundary
 
@@ -149,7 +152,7 @@ Source Code, builds, logs, measurements, and test reports
     Provide as-built evidence; they do not silently override approved authority.
 ```
 
-One normative rule should have one authority location. Repeated text in a non-owning document is a derived conformance summary and does not override the owning authority.
+One normative rule should have one authority location. Authority is resolved by topic before any precedence list is applied. Repeated text in a non-owning document is a derived conformance summary and does not override the owning authority.
 
 ## Engineering Principles
 
@@ -210,25 +213,31 @@ host-device-control-framework/
 ├── CHANGELOG.md
 ├── NOTICE.md
 ├── LICENSE
-└── docs/
-    ├── framework/
-    │   ├── README.md
-    │   ├── AI_Engineering_Usage_Guide.md
-    │   ├── Coordinator_Node_Control_Framework.md
-    │   └── Framework_Application_Analysis_Template.md
-    ├── protocol/
-    │   ├── README.md
-    │   ├── Protocol_YAML_Definition_Guide.md
-    │   └── Protocol_YAML_Template.md
-    ├── coordinator/
-    │   ├── README.md
-    │   └── Coordinator_Software_Engineering_Rules.md
-    ├── coding-rules/
-    │   ├── README.md
-    │   ├── Embedded_C_Coding_Rules.md
-    │   └── CSharp_Coding_Rules.md
-    └── validation/
-        └── README.md
+├── docs/
+│   ├── framework/
+│   │   ├── README.md
+│   │   ├── AI_Engineering_Usage_Guide.md
+│   │   ├── Coordinator_Node_Control_Framework.md
+│   │   └── Framework_Application_Analysis_Template.md
+│   ├── protocol/
+│   │   ├── README.md
+│   │   ├── Protocol_YAML_Definition_Guide.md
+│   │   └── Protocol_YAML_Template.md
+│   ├── coordinator/
+│   │   ├── README.md
+│   │   └── Coordinator_Software_Engineering_Rules.md
+│   ├── coding-rules/
+│   │   ├── README.md
+│   │   ├── Embedded_C_Coding_Rules.md
+│   │   └── CSharp_Coding_Rules.md
+│   └── validation/
+│       ├── README.md
+│       └── Repository_Validation_Checklist.md
+├── tools/
+│   └── validate_repository.py
+└── .github/
+    └── workflows/
+        └── document-validation.yml
 ```
 
 ## Current Status
@@ -247,6 +256,6 @@ Generative AI tools were used to assist with drafting, editing, organization, tr
 
 Copyright © 2026 Ray Yang. All rights reserved.
 
-Public availability does not grant permission to reproduce, modify, redistribute, publish, sublicense, sell, or incorporate the materials into another Project.
+Public visibility is provided for inspection, traceability, and review only. It does not grant permission to reproduce, modify, redistribute, publish, sublicense, sell, adopt, or incorporate the materials into another Project.
 
 See [`LICENSE`](LICENSE) for usage terms and [`NOTICE.md`](NOTICE.md) for repository, AI-assistance, and third-party notices.

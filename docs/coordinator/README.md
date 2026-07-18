@@ -1,10 +1,10 @@
 # Coordinator Engineering Documents
 
-This directory contains cross-language software engineering authority for components that perform or directly support the Coordinator role.
+This directory contains approved and proposed cross-language software engineering authority for components that perform or directly support the Coordinator role.
 
 ## Documents
 
-- [`Coordinator_Software_Engineering_Rules.md`](Coordinator_Software_Engineering_Rules.md) — architecture, state ownership, lifecycle, concurrency, communication integration, diagnostics, configuration, security, testing, and release governance for Coordinator-owned software.
+- [`Coordinator_Software_Engineering_Rules.md`](Coordinator_Software_Engineering_Rules.md) — **Draft for Review / proposed normative authority** for architecture, state ownership, lifecycle, concurrency, communication integration, diagnostics, configuration, security, testing, and release governance for Coordinator-owned software.
 
 ## Authority Boundary
 
