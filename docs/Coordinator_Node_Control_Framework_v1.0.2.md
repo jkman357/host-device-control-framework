@@ -1,0 +1,2881 @@
+# Coordinator/Node Cross-Platform Embedded Control Framework
+
+## Architecture, Communication, Security, Real-Time Behavior, Firmware Update, and Engineering Governance Baseline
+
+**Document Name:** `Coordinator_Node_Control_Framework_v1.0.2.md`  
+**Document ID:** CNCF  
+**Document Version:** v1.0.2  
+**Status:** Baseline  
+**Document Type:** Master Architecture and Engineering Governance Baseline  
+**Primary Narrative Language:** English  
+**Author:** Ray Yang  
+**Maintainer:** Ray Yang  
+**Repository:** `host-device-control-framework`  
+**Related Documents:**
+- `Embedded_C_Coding_Rules_v1.0.13.md`
+- `Protocol_YAML_Definition_Guide_v1.0.3.md`
+- `Protocol_YAML_Template_v1.0.3.md`
+- `Framework_Application_Analysis_Template_v1.0.2.md`
+
+**First Issued:** 2026-07-15  
+**Last Revised:** 2026-07-18  
+
+Copyright © 2026 Ray Yang. All rights reserved.
+
+This document is maintained as part of a personal engineering project. It is not an official
+document of any employer or organization. No license is granted unless otherwise explicitly stated.
+
+All third-party standards, publications, trademarks, source code, licenses, and legal notices remain
+the property of their respective owners. References to third-party materials do not imply ownership,
+endorsement, affiliation, or authorization.
+
+---
+
+# 0. Document Control
+
+## 0.1 Purpose
+
+This document defines the Master Baseline for reusable Coordinator/Node embedded-control systems.
+
+It integrates architecture, communication, timing, security, Firmware Update, Runtime, platform abstraction,
+quality, testing, and governance principles so that the same engineering model can be applied across:
+
+```text
+PC Application <-> MCU
+Linux SBC <-> MCU
+Host MCU <-> Device MCU
+Gateway <-> Multiple Nodes
+Mobile Application <-> Device
+Production Tool <-> Device Under Test
+Service Tool <-> Device
+Automated Test Platform <-> Node
+```
+
+This Framework is not only a PC Application architecture and not only an MCU communication module. It is a
+cross-platform system model in which the following may change:
+
+```text
+Operating System
+RTOS
+MCU Vendor
+Programming Language
+UI Framework
+Device IC
+Transport
+Deployment Topology
+```
+
+while the following remain controlled and traceable:
+
+```text
+Device Contract
+Command and Response Semantics
+State and Ownership
+Event, Alarm, and Fault Semantics
+Timing and Bandwidth Requirements
+Security Boundaries
+Recovery Behavior
+Firmware Update Contract
+Compatibility Policy
+Validation Evidence
+```
+
+## 0.2 Document Position
+
+This document is the authority for:
+
+```text
+Coordinator and Node roles
+System layering
+Responsibility boundaries
+Project structure
+Control and Data Plane separation
+Timing and bandwidth principles
+Secure Session boundaries
+Firmware Update architecture
+RTOS and Bare-metal execution models
+BSP / HAL / Driver / Adapter / Service boundaries
+Code Generation governance
+Testing and acceptance principles
+Reference Implementation scope
+Architecture and release governance
+```
+
+It does not replace:
+
+```text
+Product Requirements
+Software Requirements Specification
+Hardware Design Specification
+Hazard Analysis
+Product-specific State Machines
+UI/UX Specification
+Algorithm Design
+Product Protocol YAML
+C, C#, Java, or other Reference Implementations
+Test Procedures
+Test Reports
+```
+
+The authority boundary is:
+
+```text
+Coordinator_Node_Control_Framework
+    System roles, layering, boundaries, architecture principles,
+    safety placement, timing, security boundaries, and governance.
+
+Protocol_YAML_Definition_Guide
+    Protocol YAML syntax, semantics, validation, Code Generation,
+    compatibility, and Protocol governance rules.
+
+Protocol_YAML_Template
+    Reusable Project Protocol skeleton.
+
+<Application>_protocol.yaml
+    Actual Project-specific wire contract and machine-verifiable
+    Single Source of Truth.
+
+Application Profile / SRS
+    Product behavior, domain semantics, operating flows,
+    state rationale, Alarm behavior, UI intent, and limits.
+
+Reference Implementation
+    Actual source code, platform integration, threading, buffers,
+    Drivers, UI, build configuration, and deployment.
+```
+
+## 0.3 Superseded Source Documents
+
+This Framework integrates and supersedes:
+
+```text
+Embedded_Device_Control_Framework_v1.4.2.md
+Coordinator_Node_Architecture_v1.2.1.md
+```
+
+Those documents may be retained under `docs/archive/` for historical traceability but shall not be extended
+with new normative architecture rules.
+
+## 0.4 Version Rules
+
+Markdown document filenames and document versions use three-part versions without an RC suffix:
+
+```text
+Coordinator_Node_Control_Framework_v1.0.0.md
+Coordinator_Node_Control_Framework_v1.0.1.md
+Coordinator_Node_Control_Framework_v1.0.2.md
+Coordinator_Node_Control_Framework_v1.1.0.md
+Coordinator_Node_Control_Framework_v2.0.0.md
+```
+
+Protocol, Generator, Firmware, Bootloader, Product, or Reference Implementation Code may use:
+
+```text
+VMAJOR.MINOR.PATCHRCxx
+```
+
+Examples:
+
+```text
+V1.0.0RC01
+V2.3.0RC02
+V2.3.0
+```
+
+These identities are independent:
+
+```text
+Document Version
+!= Protocol Version
+!= Generator Version
+!= Firmware Version
+!= Bootloader Version
+!= Product Version
+!= Reference Implementation Version
+```
+
+A single Framework version may govern multiple Code release candidates without creating a new Framework file.
+
+## 0.5 Version History
+
+| Version | Date | Description |
+|---|---|---|
+| v1.0.0 | 2026-07-15 | Integrated `Embedded_Device_Control_Framework_v1.4.2.md` and `Coordinator_Node_Architecture_v1.2.1.md` into one Master Baseline. |
+| v1.0.1 | 2026-07-15 | Removed duplicate Protocol/Transport text, corrected Part XI numbering, removed obsolete normative references, removed the duplicate Baseline conclusion, and completed structural and Markdown validation without changing design semantics. |
+| v1.0.2 | 2026-07-18 | Converted the complete Framework to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned terminology and authority boundaries with `Embedded_C_Coding_Rules_v1.0.13.md`, `Protocol_YAML_Definition_Guide_v1.0.3.md`, and `Protocol_YAML_Template_v1.0.3.md`; clarified Telemetry versus Stream semantics, Protocol/Transport boundaries, Application/Bootloader Session separation, Firmware Update transaction identity, runtime Transport Profiles, structural rewrite governance, and public GitHub publication requirements. |
+
+## 0.6 Core Conclusions
+
+> **Coordinator and Node are platform-independent system roles.**
+
+> **Platforms, MCUs, RTOSes, Device ICs, and Transports may change, but the Device Contract, state ownership,
+> behavior, safety boundary, and recovery rules shall not drift.**
+
+> **Protocol YAML is the Single Source of Truth for the machine-verifiable wire contract; this Framework is the
+> Single Source of Truth for the reusable system architecture and engineering-governance model.**
+
+> **Control may cross platform boundaries, but hard real-time control, fundamental safety protection, and local
+> Fault Reaction shall remain on the Node.**
+
+> **Architecture principles shall be converted into rules that can be checked by Code Generators, compilers,
+> Static Analysis, Test Frameworks, and CI whenever practical.**
+
+---
+
+# Part I. Core Position, System Layering, and Safety Boundary
+
+## 1.1 Framework Position
+
+The Framework defines a replaceable upper control platform and replaceable lower implementation platform while
+preserving stable system semantics.
+
+Possible Coordinator platforms include:
+
+```text
+PC Application
+Linux SBC
+Host or Supervisor MCU
+Mobile Application
+Production Test Tool
+Service Tool
+Automated Test Platform
+Gateway
+```
+
+Possible Node platforms include:
+
+```text
+Device MCU
+Subsystem MCU
+Sensor Controller
+Power Controller
+Motion Controller
+DSP
+FPGA Soft-Core
+Linux SoC
+Dedicated Control Board
+Smart Module
+```
+
+An initial implementation may be:
+
+```text
+PC Application
+    |
+    v
+USB-CDC
+    |
+    v
+Device MCU
+```
+
+The architecture shall also permit later profiles such as:
+
+```text
+Linux SBC  -> Ethernet / Wi-Fi -> Device MCU
+Host MCU   -> UART / CAN FD     -> Device MCU
+Mobile App -> BLE / Wi-Fi       -> Device MCU
+```
+
+The replaceable elements are:
+
+```text
+Execution Platform
+Transport
+Platform Adapter
+Transport Adapter
+Device Adapter
+Specific Driver
+```
+
+The Device Contract and Product behavior are not redesigned merely because a platform or Transport changes.
+
+## 1.2 First-Level Design Goal
+
+The first-level design goal is:
+
+> **One Device Contract, Protocol family, Control Workflow, State Model, Error Model, Security Model, and
+> Firmware Update Contract can be implemented by a PC, Linux SBC, Host MCU, or mobile platform.**
+
+Different platforms need not share identical source code.
+
+The reusable asset is:
+
+```text
+Specification
+Semantics
+State
+Behavior
+Validation Standard
+```
+
+not forced source-level uniformity.
+
+## 1.3 System Layers
+
+The system layering is:
+
+```text
+Application / HMI
+        |
+        v
+Device Controller
+        |
+        v
+Device Contract
+        |
+        v
+Control Workflow
+        |
+        v
++----------------------------------+
+| Control Plane                    |
+| Request / Response               |
+| Event / Alarm / Fault / Heartbeat|
++----------------------------------+
+| Data Plane                       |
+| Telemetry / Stream / Waveform    |
++----------------------------------+
+| Firmware Update Plane            |
+| Bootloader / Manifest / Image    |
++----------------------------------+
+| Protocol Layer                   |
+| Message / Record / Version       |
++----------------------------------+
+| Secure Session Layer             |
+| Authentication / AEAD / Replay   |
++----------------------------------+
+| Transport Abstraction            |
+| USB / UART / CAN / TCP / BLE     |
++----------------------------------+
+```
+
+A Node is internally layered as:
+
+```text
+Product Application
+        |
+        v
+Subsystem Service
+        |
+        v
+Generic Device Interface
+        |
+        v
+Specific Device Adapter
+        |
+        v
+Specific Device Driver
+        |
+        v
+Peripheral HAL
+        |
+        v
+BSP / MCU Vendor Layer
+        |
+        v
+Hardware
+```
+
+Runtime isolation is divided into:
+
+```text
+Core Runtime Abstraction
+├─ Event
+├─ Timer
+├─ Time
+├─ Critical Section
+└─ ISR Notification
+
+RTOS Extension
+├─ Task
+├─ Mailbox
+├─ Semaphore
+└─ Mutex
+```
+
+## 1.4 Layer Responsibilities
+
+Each layer shall solve only its own problem:
+
+```text
+Application shall not directly operate UART, Socket, CAN, or BLE handles.
+UI shall not assemble wire frames.
+Protocol shall not know whether the Transport is USB, CAN, Wi-Fi, or BLE.
+Transport shall not interpret START, STOP, Battery Status, or Sample records.
+Device Service shall not manipulate IC registers.
+Driver shall not own Product control policy.
+```
+
+Dependency direction shall flow toward abstractions and contracts, not upward from Vendor APIs into Product logic.
+
+## 1.5 Device Contract as a Core Asset
+
+A Coordinator shall not need knowledge of:
+
+```text
+MCU vendor
+Register addresses
+GPIO numbers
+RTOS Task names
+Memory addresses
+Vendor HAL handles
+Specific Driver APIs
+```
+
+The Coordinator operates through device semantics such as:
+
+```text
+Initialize
+Start
+Stop
+Set Parameter
+Get Status
+Reset Fault
+Start Stream
+Stop Stream
+Enter Update Mode
+Get Device Information
+```
+
+The Device Contract shall define:
+
+```text
+Command semantics
+Request and Response Payloads
+Parameter units and ranges
+Status definitions
+Event, Alarm, and Fault semantics
+Error codes
+Timeout behavior
+Capabilities
+Version and compatibility rules
+```
+
+A UI action may trigger a command, but a UI control name shall not become the Protocol definition.
+
+## 1.6 Control Role and State Authority
+
+The system shall explicitly identify:
+
+```text
+Who owns control authority
+Who stores the accepted configuration
+Who is the authoritative source of state
+Who starts and stops operation
+Who performs safety protection
+Who reacts to disconnection
+Who synchronizes state after reconnect
+```
+
+The Coordinator may request a target or action. The Node shall report what it actually accepted and its actual
+current state.
+
+`Command sent` does not mean `Command accepted`, and `Command accepted` does not always mean `Operation completed`.
+
+## 1.7 Node Autonomy
+
+The Node shall remain responsible for:
+
+```text
+Hard real-time control
+Basic safety protection
+Fault Detection
+Emergency Stop behavior
+Watchdog
+Output limits
+Communication-loss handling
+Required degraded mode
+Safe-state transition
+```
+
+The Coordinator may provide:
+
+```text
+Operator command
+Target value
+Configuration
+Visualization
+Data logging
+Diagnostics
+Maintenance
+Firmware Update coordination
+```
+
+The Node shall not require a healthy Coordinator connection merely to remain fundamentally safe.
+
+When Hazard Analysis requires an independent emergency path, the Project shall evaluate:
+
+```text
+Dedicated GPIO
+Hardware Interlock
+Dedicated Safety Bus
+Out-of-band Stop Path
+```
+
+A safety mechanism shall not rely solely on USB, Wi-Fi, BLE, or an ordinary in-band STOP command.
+
+---
+
+# Part II. Coordinator/Node Roles and Project Organization
+
+## 2.1 Core Project Structure
+
+The Project root shall use:
+
+```text
+<Product>/
+├─ protocol/
+├─ coordinator/
+├─ node/
+├─ shared/
+├─ tools/
+└─ docs/
+```
+
+The core responsibility directories are:
+
+```text
+protocol/
+coordinator/
+node/
+```
+
+Their meanings are independent of hardware, OS, RTOS, language, and Transport.
+
+## 2.2 Coordinator Role
+
+The Coordinator owns system-level coordination and Node management.
+
+Typical responsibilities include:
+
+```text
+System workflow coordination
+Node discovery and registration
+Identity and Capability acquisition
+Command initiation
+Response correlation
+Event, Alarm, Fault, and Telemetry aggregation
+Session establishment and reconnect coordination
+Configuration synchronization
+Firmware Update coordination
+Multi-Node routing
+UI/HMI integration
+Logging, diagnostics, and external-system integration
+```
+
+Coordinator does not mean permanent Sender, Requester, or Connection Initiator.
+
+## 2.3 Node Role
+
+The Node owns local execution.
+
+Typical responsibilities include:
+
+```text
+Local real-time control
+Data acquisition
+Hardware Drivers
+Command validation and execution
+Status, Event, Alarm, and Fault reporting
+Telemetry and Stream publication
+Watchdog and Fault Reaction
+Local safety protection
+Firmware Update execution
+Disconnect degradation or safe-state behavior
+```
+
+Node does not mean passive slave.
+
+## 2.4 Role Relativity
+
+Roles are relative to one relationship:
+
+```text
+PC Tool
+   |
+   v
+Coordinator MCU
+   |
+   v
+Motor MCU
+```
+
+For the upper link:
+
+```text
+PC Tool         = Coordinator
+Coordinator MCU = Node
+```
+
+For the lower link:
+
+```text
+Coordinator MCU = Coordinator
+Motor MCU       = Node
+```
+
+One physical system may therefore act as a Node toward an upper layer and a Coordinator toward a lower layer.
+
+The architectural model may be reused across levels without requiring identical Command Sets, Security Policies,
+Transports, timing, or failure policies.
+
+## 2.5 Separate System, Message, Event, Transport, and Connection Roles
+
+Do not confuse:
+
+```text
+System Role:      Coordinator / Node
+Message Role:     Requester / Responder
+Event Role:       Publisher / Subscriber
+Transport Role:   Sender / Receiver
+Connection Role:  Initiator / Acceptor
+```
+
+Coordinator may be:
+
+```text
+Command Requester
+Event Subscriber
+Response Receiver
+Telemetry Consumer
+Update Coordinator
+```
+
+Node may be:
+
+```text
+Command Responder
+Event Publisher
+Telemetry Sender
+Alarm Sender
+Update Executor
+```
+
+The system shall be Event-Driven by default, with low-rate health queries when required:
+
+```text
+Event-Driven primary behavior
+Periodic Health Check as support
+Full-state query when reconciliation is required
+```
+
+Avoid continuous high-rate indiscriminate polling. Do not ban all querying.
+
+## 2.6 Coordinator Directory
+
+Recommended structure:
+
+```text
+coordinator/
+├─ application/
+├─ node_management/
+├─ communication/
+├─ workflows/
+├─ platform/
+├─ config/
+└─ tests/
+```
+
+`application/` owns Product-level state and operation.
+
+`node_management/` owns registration, discovery, identity, Capability, state, command, timeout, retry, monitoring,
+and update coordination.
+
+`communication/` is divided into:
+
+```text
+transport/
+protocol/
+protocol_adapter/
+session/
+routing/
+security/
+```
+
+`workflows/` owns cross-module flows such as Startup, Shutdown, Configuration, Calibration, Data Acquisition,
+Log Download, Firmware Update, and Recovery.
+
+`platform/` isolates Windows, Linux, MCU, file-system, thread, timer, USB, UART, CAN, TCP, Wi-Fi, and BLE APIs.
+
+## 2.7 Node Directory
+
+Recommended structure:
+
+```text
+node/
+├─ application/
+├─ control/
+├─ communication/
+├─ platform/
+├─ bootloader/
+├─ config/
+└─ tests/
+```
+
+`application/` owns:
+
+```text
+System State
+Task or Service
+Event or Mailbox handling
+State Machines
+Fault Handling
+Operation Mode
+```
+
+`control/` may contain:
+
+```text
+control/
+├─ motor_ctrl/
+├─ power_ctrl/
+├─ sensor_ctrl/
+├─ battery_ctrl/
+├─ alarm_ctrl/
+└─ safety_ctrl/
+```
+
+`communication/` may contain:
+
+```text
+communication/
+├─ transport/
+├─ protocol/
+├─ protocol_adapter/
+├─ command_dispatcher/
+├─ event_publisher/
+├─ session/
+└─ security/
+```
+
+Command Dispatcher shall validate and translate a Protocol command into an Application Event or Service Request.
+It shall not directly operate hardware.
+
+Not recommended:
+
+```c
+case CMD_MOTOR_START:
+    PWM_ENABLE();
+    MOTOR_DRIVER_START();
+    break;
+```
+
+Recommended:
+
+```c
+case CMD_MOTOR_START:
+    app_event_post(APP_EVENT_MOTOR_START_REQUEST, &request);
+    break;
+```
+
+`platform/` isolates BSP, HAL, Drivers, RTOS, startup, and Vendor APIs.
+
+`bootloader/` is an independent Application and shall have its own communication, security, image, flash,
+platform, and tests.
+
+## 2.8 Node Identity and Capability
+
+The Protocol shall expose at least:
+
+```text
+Node ID
+Node Type
+Hardware Revision
+Firmware Version
+Bootloader Version
+Protocol Version
+Capabilities
+```
+
+Node Type describes identity. Capability describes actual supported behavior.
+
+A Coordinator shall prefer Capability-based decisions over large `switch(node_type)` structures.
+
+Two Nodes with the same Type may expose different Capabilities because of Hardware Revision, Firmware version,
+license, configuration, or Product variant.
+
+## 2.9 Shared Directory
+
+`shared/` is reserved for components that are:
+
+```text
+Independent of Coordinator
+Independent of Node
+Independent of Product workflow
+Independent of specific hardware
+Independent of OS or RTOS
+Used by at least two real consumers
+Independently testable
+```
+
+Examples include CRC, generic Ring Buffers, platform-independent utilities, and generic data structures.
+
+Protocol Generated Code belongs under `protocol/generated/`, not `shared/`.
+
+Premature extraction based only on anticipated reuse is prohibited.
+
+## 2.10 Tools and Documents
+
+Recommended tools:
+
+```text
+tools/
+├─ protocol_codegen/
+├─ protocol_lint/
+├─ compatibility_testgen/
+├─ packet_decoder/
+├─ log_converter/
+├─ firmware_image_packer/
+├─ signing_tool/
+├─ production_test/
+├─ static_analysis/
+├─ fuzzing/
+├─ simulator/
+└─ fault_injection/
+```
+
+Recommended system documents:
+
+```text
+docs/
+├─ system_architecture.md
+├─ role_definition.md
+├─ communication_flow.md
+├─ task_model.md
+├─ state_machines.md
+├─ security_model.md
+├─ firmware_update_flow.md
+├─ compatibility_policy.md
+├─ static_analysis_policy.md
+├─ test_strategy.md
+├─ build_process.md
+└─ release_process.md
+```
+
+`protocol/docs/` stores Protocol-specific documentation. Root `docs/` stores system-level documentation.
+
+## 2.11 Single-Node to Multi-Node Evolution
+
+The first implementation may use:
+
+```text
+One active Node
+Fixed or simplified address
+One outstanding Request
+```
+
+Interfaces and data structures should still preserve:
+
+```text
+Node ID
+Node Address
+Service Domain
+Capability
+Routing Context
+```
+
+Do not implement unnecessary routing complexity in the first release, but do not hard-code the architecture so
+that multiple Nodes can never be introduced.
+
+## 2.12 Build Targets and Physical Directories
+
+Build Target, IDE Project, Solution, and physical directory are separate concepts.
+
+Example directories:
+
+```text
+coordinator/windows/
+coordinator/linux/
+coordinator/mcu/
+node/stm32/
+node/tm4c/
+node/renesas/
+```
+
+Different targets may depend on:
+
+```text
+protocol/generated/
+shared/
+application interfaces
+platform abstractions
+```
+
+A Build Target is a configuration and dependency set, not an architectural role.
+
+Directory migration shall be incremental:
+
+```text
+Create new directory
+-> Create Build Target
+-> Move low-coupling modules
+-> Add Adapter
+-> Update tests
+-> Remove old path
+```
+
+A large unverified directory rewrite without a compilable Baseline and regression tests is prohibited.
+
+---
+
+# Part III. Device Contract, Protocol, and Single Source of Truth
+
+## 3.1 Protocol Directory
+
+The Project-specific Protocol contract belongs under:
+
+```text
+protocol/
+├─ spec/
+│  └─ <Application>_protocol.yaml
+├─ schema/
+├─ docs/
+├─ codegen/
+├─ test_vectors/
+└─ generated/
+```
+
+The exact YAML structure and Protocol authoring rules are defined by:
+
+```text
+Protocol_YAML_Definition_Guide_v1.0.3.md
+Protocol_YAML_Template_v1.0.3.md
+```
+
+This Framework shall not duplicate the complete field-level Protocol definition.
+
+## 3.2 Protocol Contract Content
+
+The Protocol Contract shall define, as applicable:
+
+```text
+Message IDs
+Request and Response relationships
+Event, Alarm, and Fault
+Telemetry and Stream
+Payload Layout
+Data Types, Units, Scale, Range, Enum, and Bitsets
+Endianness
+Length Policy
+Unknown Data Policy
+Timeout and Retry
+Sequence and Correlation
+Execution Environment
+Capability
+Security Attributes
+Protocol Version and Compatibility
+Transport Profiles
+Fragmentation
+Firmware Update contract
+```
+
+It shall not define UI colors, MCU registers, control algorithms, or Product-specific business rationale.
+
+## 3.3 Machine-Readable Specification, Human Documentation, and Test Vectors
+
+The Protocol shall have:
+
+```text
+Machine-Readable Specification
+Human-Readable Documentation
+Test Vectors
+```
+
+The machine-readable specification supports:
+
+```text
+Code Generation
+Field validation
+ID management
+Payload definitions
+Documentation generation
+Compatibility checks
+Boundary tests
+Fuzz seed corpus
+Mock Node
+Packet decoder
+```
+
+Human documentation explains rationale, state, timeout, exceptional behavior, and security context.
+
+Test Vectors prove that different languages and platforms interpret the same Message identically.
+
+## 3.4 Protocol Versioning
+
+Protocol compatibility shall follow MAJOR, MINOR, and PATCH semantics.
+
+Handshake shall evaluate Protocol compatibility and Capability, not only Firmware version.
+
+A new Firmware version does not automatically imply a new Protocol version, and a compatible Protocol MINOR
+version does not require identical Product functionality on every platform.
+
+## 3.5 Safe Payload Decoding
+
+Wire Format and native C struct layout shall remain separate.
+
+Prohibited:
+
+```c
+const motor_command_t *command =
+    (const motor_command_t *)payload;
+```
+
+A decoder shall:
+
+```text
+Validate pointers
+Validate length
+Validate every offset and field size
+Handle endianness explicitly
+Validate multiplication before variable-array access
+Check destination capacity
+Apply Optional Field defaults
+Apply unknown-trailing policy
+Reject invalid Enum, Range, Alignment, or overflow conditions
+```
+
+Field-by-field encoding and decoding is the default.
+
+The Embedded C implementation shall also comply with `Embedded_C_Coding_Rules_v1.0.13.md`.
+
+## 3.6 Message Length and Unknown Data
+
+Every Message shall use one declared Length Policy:
+
+```text
+exact
+minimum
+extensible
+tlv
+```
+
+Only an explicitly extensible Message may ignore unknown trailing fields.
+
+Existing field order, type, size, signedness, and endianness shall not be changed under a compatible MINOR version.
+
+## 3.7 Protocol and Transport Decoupling
+
+One Device command may be carried through:
+
+```text
+USB-CDC
+UART
+RS-232
+RS-485
+RS-422
+CAN
+CAN FD
+SPI
+Ethernet
+TCP
+Wi-Fi
+BLE
+```
+
+Layering shall remain:
+
+```text
+Device Controller
+        |
+        v
+Protocol
+        |
+        v
+Secure Session
+        |
+        v
+Transport Interface
+        |
+        v
+Platform Driver
+```
+
+Protocol shall not contain COM port names, UART registers, Socket handles, CAN Driver APIs, USB Endpoints, SSIDs,
+or BLE Characteristic handles.
+
+Transport owns connection, send, receive, buffering, link errors, MTU, and physical delivery. It does not
+interpret Product commands.
+
+## 3.8 Protocol Evolution
+
+The first release shall account for:
+
+```text
+Protocol Version
+Device Model
+Firmware Version
+Bootloader Version
+Hardware Revision
+Execution Environment
+Capability Query
+Feature Negotiation
+Unsupported Message behavior
+Parameter ranges
+Backward Compatibility
+Deprecation
+Transport Profile
+```
+
+Optional features shall be negotiated by Capability rather than guessed only from model or version.
+
+## 3.9 Telemetry and Stream Boundary
+
+Telemetry and Stream are distinct.
+
+Use Telemetry for:
+
+```text
+Complete summarized state snapshots
+Periodic or change-driven state
+Replaceable older unsent values
+Latest-state consumers
+```
+
+Use Stream for:
+
+```text
+Ordered samples or records
+Raw waveform or acquisition frames
+Loss, duplicate, or reordering detection
+Sequence and timestamp continuity
+Non-replaceable deltas or chunks
+```
+
+Transmission rate alone shall not determine the category.
+
+The authoritative field-level rules are in `Protocol_YAML_Definition_Guide_v1.0.3.md`.
+
+## 3.10 Generated Code
+
+Generated artifacts may include C, C#, and Java types, constants, codecs, validation, dispatch skeletons,
+documentation, tests, and decoder metadata.
+
+Every generated file shall identify:
+
+```text
+Auto-generated status
+Do-not-edit instruction
+Source specification identity
+Protocol version
+Generator name and version
+Source hash when applicable
+```
+
+Generated files shall not become independent design authorities.
+
+---
+
+# Part IV. Control Plane, Data Plane, Streaming, and Timing
+
+## 4.1 Control Plane and Data Plane Separation
+
+The Framework may carry:
+
+```text
+Request / Response
+Event / Alarm / Fault
+Heartbeat
+Telemetry
+Stream
+Waveform
+Bulk Sample Data
+```
+
+Control and continuous data shall not share one blocking processing path.
+
+```text
+Protocol Dispatcher
+├─ Control Plane
+│  ├─ Request
+│  ├─ Response
+│  ├─ Event
+│  ├─ Alarm
+│  ├─ Fault
+│  └─ Heartbeat
+└─ Data Plane
+   ├─ Telemetry
+   ├─ Stream
+   ├─ Waveform
+   └─ Bulk Data
+```
+
+Control and Data may share a Transport but shall have independent scheduling, buffering, and priority behavior.
+
+While Streaming is active, the system shall still process:
+
+```text
+STOP
+RESET_FAULT
+GET_STATUS
+ALARM
+FAULT
+HEARTBEAT
+LINK_RECOVERY
+```
+
+## 4.2 Non-Blocking Request and Response
+
+A Request shall not block Event, Alarm, Fault, Telemetry, or Stream processing.
+
+The first MCU-oriented Baseline may permit only one outstanding Request while Streaming continues.
+
+Multiple outstanding Requests may be added when the correlation, timeout, cancellation, and resource model are
+explicitly defined and tested.
+
+## 4.3 Sample Period and Record Period
+
+Sampling period and record-transmission period are different:
+
+```text
+Sample Period != Record Period
+```
+
+Example:
+
+```text
+Sample Period:       5 ms
+Samples per Record:  4
+Record Period:       20 ms
+```
+
+Aggregation reduces average framing and security overhead but increases record size and waiting time.
+
+Every aggregated profile shall be revalidated for:
+
+```text
+Control blocking time
+Maximum Record Size
+Buffer capacity
+Latency
+Fragmentation
+Loss impact
+Recovery behavior
+```
+
+## 4.4 Timing Budget
+
+A Product shall define end-to-end timing stages:
+
+```text
+Device acquisition
+Node processing
+Record assembly
+Security processing
+Transport waiting
+Serialization or air time
+Coordinator receive
+Decode and validation
+Application dispatch
+UI or external consumer
+```
+
+Average timing is insufficient. Worst-case timing and scheduling interference shall be measured.
+
+## 4.5 Bandwidth Budget
+
+The bandwidth model shall include:
+
+```text
+Channel Count
+Bits per Sample
+Sample Rate
+Samples per Record
+Metadata
+Protocol Header
+Session and Security Header
+Authentication Tag
+Fragmentation overhead
+Retry allowance
+Reserved Control bandwidth
+Serialization or air time
+```
+
+A Transport profile is acceptable only when both average bandwidth and worst-case control latency pass.
+
+## 4.6 115200-Baud Example
+
+A fixed-overhead profile at 115200 baud may become inefficient when each record contains only one small sample
+group. Where a record has approximately 36 bytes of fixed Protocol and security overhead, aggregation such as:
+
+```text
+4 samples per 20 ms record
+```
+
+may be more practical than one encrypted record every 5 ms.
+
+This is an engineering example, not a universal requirement. The Project shall calculate its own exact payload,
+framing, escaping, line-coding, retry, and latency costs.
+
+When the profile cannot satisfy throughput and latency simultaneously, evaluate:
+
+```text
+460800 baud or higher
+USB-CDC
+CAN FD
+Ethernet
+Reduced channel count
+Reduced sample rate
+Different aggregation
+A separate data path
+```
+
+## 4.7 Queue and Buffer Policy
+
+Every producer/consumer path shall define:
+
+```text
+Buffer type
+Static capacity
+Producer
+Consumer
+High-water threshold
+Overflow policy
+Backpressure
+Drop policy
+Sequence-gap behavior
+Recovery action
+```
+
+UI display buffers and recording buffers should be separate when their loss policies differ.
+
+A slow UI shall not silently reduce raw recording integrity.
+
+## 4.8 Priority
+
+Recommended scheduling order is:
+
+```text
+Emergency or safety control
+Fault and Alarm
+Normal control
+Heartbeat and health
+Telemetry
+Stream
+Background bulk transfer
+```
+
+Priority does not bypass security, validation, or state checks.
+
+## 4.9 Stale Data
+
+Every displayed or consumed status shall have a freshness policy.
+
+When data becomes stale, the system shall:
+
+```text
+Mark it stale
+Stop presenting it as current
+Avoid unsafe automatic action
+Request reconciliation when appropriate
+```
+
+Reconnect does not automatically restore Application state. Current Node state shall be queried and reconciled.
+
+---
+
+# Part V. Transport Profiles, Bandwidth Envelope, and Link Management
+
+## 5.1 Transport as a Formal Profile
+
+USB, UART, CAN, TCP, Wi-Fi, and BLE are not merely interchangeable Driver implementations.
+
+Each Transport Profile shall define:
+
+```text
+MTU
+Effective Payload
+Throughput
+Latency
+Fragmentation
+Reassembly
+Retry behavior
+Connection behavior
+Buffer limits
+Failure modes
+Security assumptions
+```
+
+A Product shall not claim Transport support without a bounded and tested profile.
+
+## 5.2 Static Design Envelope
+
+For fixed Transports such as configured UART, USB, or CAN FD, a static profile may be established at design time.
+
+For dynamically negotiated Transports such as BLE or some Wi-Fi modes, the design shall define a supported
+envelope:
+
+```text
+Minimum and Maximum MTU
+Supported connection interval
+Supported PHY
+Data Length Extension capability
+Maximum reassembly buffer
+Permitted channel and sample profiles
+Minimum throughput
+Maximum control latency
+```
+
+The minimum supported negotiated condition shall still produce safe and predictable behavior.
+
+## 5.3 Runtime Effective Profile
+
+After connection negotiation, the system shall calculate an effective runtime profile using actual values such as:
+
+```text
+Negotiated MTU
+Effective payload
+Connection interval
+PHY
+Data length
+Notifications per connection event
+Fragment count
+Record rate
+Control latency budget
+```
+
+If the negotiated profile is insufficient, the system shall perform an explicit controlled action:
+
+```text
+Reduce Samples per Record
+Reduce Record Rate
+Reduce Channel Count
+Reduce Sample Rate
+Switch to lower-rate Telemetry
+Reject the requested Stream profile
+```
+
+Example error results include:
+
+```text
+UNSUPPORTED_TRANSPORT_PROFILE
+INSUFFICIENT_MTU
+INSUFFICIENT_THROUGHPUT
+LATENCY_REQUIREMENT_NOT_MET
+```
+
+## 5.4 Fragmentation
+
+Fragmentation shall be bounded.
+
+The Protocol or Transport Profile shall define:
+
+```text
+Maximum fragments per record
+Maximum record size
+Maximum concurrent reassembly
+Reassembly timeout
+Out-of-order policy
+Duplicate-fragment policy
+Memory requirement
+Abort behavior
+```
+
+The system shall not allocate unbounded memory based on an untrusted announced length.
+
+## 5.5 Maximum Non-Preemptible Transfer Time
+
+Even when average throughput passes, a large non-preemptible record may block critical control.
+
+Each profile shall define a maximum non-preemptible transfer or processing time.
+
+Firmware chunks, file transfer, and large Stream records shall be sized so that STOP, Fault, Alarm, and link
+recovery remain serviceable.
+
+## 5.6 Link Management State Machine
+
+Link Management shall be an explicit State Machine, for example:
+
+```text
+DISCONNECTED
+    |
+    v
+CONNECTING
+    |
+    v
+LINK_ESTABLISHED
+    |
+    v
+HANDSHAKE
+    |
+    v
+SESSION_READY
+    |
+    v
+ACTIVE
+```
+
+Failure and recovery paths shall include:
+
+```text
+DEGRADED
+RECONNECT_WAIT
+RECONNECTING
+REAUTHENTICATING
+STATE_RECONCILIATION
+```
+
+Link state, Secure Session state, Application state, and Firmware Update transaction state shall not be treated as
+one state variable.
+
+## 5.7 Wireless Link Behavior
+
+Wireless communication may experience:
+
+```text
+Jitter
+Packet loss
+Temporary disconnection
+Reconnect
+MTU change
+Throughput variation
+Latency spikes
+```
+
+The Node's local real-time control and safety behavior shall remain valid despite these conditions.
+
+Wi-Fi WPA or BLE pairing does not replace the Framework Secure Session when the Product requires end-to-end
+authentication, authorization, integrity, anti-replay, or Application/Bootloader key separation.
+
+## 5.8 Transport and Protocol Boundary
+
+Transport differences shall not change Device Contract semantics.
+
+A START command remains a START command across USB, CAN, Wi-Fi, and BLE.
+
+Transport-specific constraints may limit which Capability or Stream Profile is available, but shall not create
+undocumented alternate Product semantics.
+
+---
+
+# Part VI. Secure Sessions, Key Contexts, Rekey, and Anti-Replay
+
+## 6.1 Security Architecture
+
+A recommended model is hybrid cryptography:
+
+```text
+Asymmetric cryptography
+    Establishes identity, trust, authentication,
+    and ephemeral Session material.
+
+Symmetric cryptography
+    Protects sustained control and data traffic
+    with practical MCU performance.
+```
+
+The actual algorithms and credential model are Product-specific security decisions and shall be documented.
+
+## 6.2 Application and Bootloader Session Separation
+
+Application and Bootloader are separate Execution Environments.
+
+They may share:
+
+```text
+Long-term Device identity
+Trust anchor
+Approved cryptographic library
+Transport abstraction
+Protocol family
+```
+
+They shall not share:
+
+```text
+Runtime Session ID
+Session Epoch
+Application Session Keys
+Bootloader Session Keys
+Record counters
+Anti-Replay window
+Rekey state
+```
+
+Entering Bootloader invalidates the Application Session.
+
+Application Session keys shall not survive reset or Bootloader entry.
+
+## 6.3 Key Context Separation
+
+At minimum, separate directional and purpose contexts such as:
+
+```text
+Application Control H2D
+Application Control D2H
+Application Data H2D
+Application Data D2H
+Bootloader Update H2D
+Bootloader Response D2H
+```
+
+A key or counter from one context shall not be used by another context.
+
+## 6.4 Nonce and Record Counter
+
+A nonce shall never repeat under the same key.
+
+The exact nonce format is Protocol-specific, but it commonly binds:
+
+```text
+Session or Epoch identity
+Direction
+Key Context
+Security Record Counter
+```
+
+Record counters shall not overflow or silently wrap under the same key.
+
+## 6.5 Counter Limits
+
+Each Execution Environment and Key Context shall define:
+
+```text
+Soft Threshold
+Rekey Deadline
+Hard Limit
+Counter persistence policy
+Failure behavior
+```
+
+Soft Threshold initiates rekey preparation.
+
+Rekey Deadline is the point after which new ordinary traffic should be restricted while rekey completes.
+
+Hard Limit is an uncrossable security boundary. Traffic requiring the exhausted context shall stop before the
+limit is exceeded.
+
+## 6.6 Session-Wide Rekey
+
+Within one Execution Environment and one Session Epoch, the earliest context approaching its security limit may
+trigger Session-wide Rekey.
+
+An atomic cutover shall ensure that sender and receiver agree on:
+
+```text
+Old Epoch acceptance window
+New Epoch activation
+Counter reset for new keys
+Late old-epoch handling
+Failure rollback or disconnect
+```
+
+Application and Bootloader do not perform one atomic cross-reset Rekey because they are separate Sessions.
+
+## 6.7 Anti-Replay
+
+A Sliding Window is appropriate for traffic that may arrive slightly out of order.
+
+Anti-Replay alone does not prove that a state-sensitive command is still appropriate.
+
+A safety-sensitive or state-sensitive command may also require:
+
+```text
+Allowed State
+Maximum Command Age
+Operation ID
+Transaction ID
+One-time token
+Expected current state
+Duplicate policy
+```
+
+A fail-safe command shall not be delayed by an unnecessary extra token round trip when the Hazard Analysis
+requires prompt action.
+
+## 6.8 Authentication and Authorization
+
+Authentication proves an identity or trusted peer.
+
+Authorization determines whether that authenticated peer may execute a specific operation.
+
+Security-sensitive operations include:
+
+```text
+Start or Stop
+Configuration change
+Fault clear
+Credential management
+Bootloader entry
+Firmware Update
+Factory or service operation
+Protected diagnostics
+```
+
+The Protocol shall declare privilege and failure behavior.
+
+## 6.9 Security Failure Policy
+
+The Product shall define behavior for:
+
+```text
+Authentication failure
+Integrity failure
+Replay detection
+Wrong Session ID
+Wrong Key Context
+Expired Session
+Execution Environment mismatch
+Repeated failed authentication
+Credential revocation
+```
+
+Security failures shall be observable and auditable without exposing secret material.
+
+## 6.10 Security Performance
+
+Measure:
+
+```text
+Handshake time
+Per-record encrypt time
+Per-record decrypt time
+Authentication Tag overhead
+Worst-case CPU loading
+DMA and Crypto concurrency
+Wireless Stack loading
+Rekey time
+Worst-case scheduling delay
+```
+
+Application and Bootloader shall be measured separately.
+
+Security design is incomplete if its worst-case timing breaks control, watchdog, or Firmware Update requirements.
+
+---
+
+# Part VII. Firmware Update, Bootloader, Resume, and Rollback
+
+## 7.1 Firmware Update as an Independent Plane
+
+Firmware Update shall be modeled as:
+
+```text
+Firmware Update Plane
+├─ Bootloader Discovery
+├─ Enter Update Mode
+├─ Bootloader Handshake
+├─ Manifest Transfer
+├─ Image Chunk Transfer
+├─ Flow Control and Resume
+├─ Bootloader Rekey
+├─ Image Authentication
+├─ Activation and Confirmation
+└─ Rollback and Recovery
+```
+
+Firmware Update may reuse Transport abstraction, framing, and long-term identity, but shall not reuse Application
+Session keys.
+
+## 7.2 Bootloader-Specific Session
+
+Bootloader shall perform its own Handshake and establish Bootloader-specific Key Contexts.
+
+Wireless reconnect may preserve a valid Update Transaction, but the previous Bootloader Secure Session shall be
+invalidated or resumed only under an explicit approved policy.
+
+After reconnect or Rekey, the Bootloader shall reauthenticate the peer and revalidate the Update Transaction
+identity before accepting more chunks.
+
+## 7.3 Update Transaction versus Secure Session
+
+The Update Transaction is independent of one Secure Session.
+
+Persisted Update Transaction state may include:
+
+```text
+Update Transaction ID
+Image ID
+Manifest hash
+Expected image size
+Expected image hash
+Security version
+Confirmed offset
+Chunk bitmap or next expected offset
+Flash progress
+```
+
+Rekey or reconnect shall not change the Manifest, Image ID, expected hash, security version, or committed progress.
+
+A new Secure Session shall not be allowed to attach to an Update Transaction merely because it knows an offset.
+
+## 7.4 Update State Machine
+
+A representative flow is:
+
+```text
+APPLICATION_RUNNING
+        |
+        v
+PREPARE_UPDATE
+        |
+        v
+ENTER_BOOTLOADER
+        |
+        v
+APPLICATION_SESSION_INVALIDATED
+        |
+        v
+BOOTLOADER_LINK_WAIT
+        |
+        v
+BOOTLOADER_HANDSHAKE
+        |
+        v
+BOOTLOADER_SESSION_ESTABLISHED
+        |
+        v
+AUTHENTICATE_UPDATE_REQUEST
+        |
+        v
+RECEIVE_MANIFEST
+        |
+        v
+CHECK_COMPATIBILITY
+        |
+        v
+CREATE_OR_RESTORE_TRANSACTION
+        |
+        v
+RECEIVE_IMAGE
+        |
+        v
+VERIFY_IMAGE
+        |
+        v
+MARK_PENDING
+        |
+        v
+REBOOT
+        |
+        v
+BOOT_NEW_IMAGE
+        |
+        v
+APPLICATION_SELF_TEST
+        |
+        +--> CONFIRM_AND_COMMIT
+        |
+        +--> ROLLBACK
+```
+
+## 7.5 Manifest and Signature
+
+The Manifest shall include, as applicable:
+
+```text
+Device model
+Hardware Revision range
+Firmware version
+Image type
+Image size
+Load address or partition
+Cryptographic hash
+Digital signature
+Minimum Bootloader version
+Required Protocol version
+Build identifier
+Security version
+```
+
+The Bootloader shall validate compatibility, image boundaries, hash, signature, version policy, and supported
+image type.
+
+CRC may detect accidental transfer corruption. CRC does not prove authenticity and shall not replace digital
+signature verification.
+
+The signing private key shall not be embedded in the Device, PC Application, Linux SBC, Host MCU, or mobile
+Application.
+
+A secure channel does not eliminate the requirement for independent Firmware image signature verification.
+
+## 7.6 Chunking and Resume
+
+Chunk size shall account for:
+
+```text
+Transport MTU
+Fragmentation
+Flash programming unit
+Maximum non-preemptible time
+Security overhead
+Retry behavior
+Buffer capacity
+Rekey cost
+```
+
+Resume shall use confirmed committed progress, not merely the last offset transmitted by the Coordinator.
+
+Duplicate chunks shall be handled idempotently or explicitly rejected according to the transaction contract.
+
+## 7.7 Rekey During Update
+
+Large updates shall evaluate:
+
+```text
+Expected number of Rekeys
+Maximum Rekeys per update
+Total pause time
+Reauthentication time
+Throughput impact
+Transaction timeout
+Retry allowance
+```
+
+A normal maximum-size update should not require excessive Rekey events. Frequent Rekey may indicate unsuitable
+thresholds, record granularity, chunk size, or Transport Profile.
+
+## 7.8 Rollback and Recovery
+
+Preferred layout:
+
+```text
+Bootloader
+Application Slot A
+Application Slot B
+Boot Metadata
+Update Transaction Metadata
+```
+
+The new image shall be written to an inactive location, fully verified, marked pending, booted, and confirmed only
+after self-test.
+
+If the new image:
+
+```text
+Fails to boot
+Triggers Watchdog Reset
+Fails self-test
+Does not confirm in time
+```
+
+the Bootloader shall return to a known valid image.
+
+When A/B storage is impossible, evaluate external staging, ROM Bootloader, hardware programming interface,
+Recovery Pin, or protected emergency update mode.
+
+Do not erase the only valid Application without a reviewed Recovery Path.
+
+## 7.9 Safe State During Update
+
+The Product shall define:
+
+```text
+Allowed outputs during update
+Actuator safe state
+Power-loss behavior
+Watchdog behavior
+Battery or power requirements
+Update interruption behavior
+Recovery-entry method
+Operator feedback
+```
+
+Firmware Update shall not suspend fundamental safety protections.
+
+---
+
+# Part VIII. Runtime, Event-Driven Design, RTOS, Bare-Metal, BSP, HAL, and Drivers
+
+## 8.1 RTOS Abstraction
+
+The Framework may define interfaces for:
+
+```text
+Task
+Mailbox
+Semaphore
+Mutex
+Timer
+Time
+Critical Section
+ISR Notification
+```
+
+Adapters may exist for:
+
+```text
+TI-RTOS
+FreeRTOS
+ThreadX
+Zephyr
+Bare-metal
+PC Mock
+```
+
+The abstraction isolates API differences. It shall not hide:
+
+```text
+Task Priority
+Stack Size
+Execution Period
+Worst-case Execution Time
+Blocking Policy
+ISR restrictions
+Deadline
+Resource ownership
+```
+
+## 8.2 Event-Driven and State-Machine Model
+
+The Baseline execution model is:
+
+```text
+Interrupt / DMA / Timer
+        |
+        v
+Event
+        |
+        v
+Mailbox / Fixed Queue / Ring Buffer
+        |
+        v
+Task or Event Dispatcher
+        |
+        v
+Module State Machine
+        |
+        v
+Bounded non-blocking action
+```
+
+For RTOS:
+
+```text
+Task + Mailbox + State Machine
+```
+
+For Bare-metal:
+
+```text
+Event Dispatcher + Event Queue + State Machine
+```
+
+## 8.3 Bare-Metal Runtime
+
+Recommended Bare-metal components:
+
+```text
+Event Queue
+Event Dispatcher
+Software Timer
+State Machine Engine
+Deferred Work
+Main Idle Loop
+```
+
+Do not recreate an artificial RTOS API with blocking Task Sleep and Semaphore behavior when the system only needs
+Events, timers, and bounded actions.
+
+## 8.4 ISR and Low-Level Callback Rules
+
+ISR shall perform only bounded work such as:
+
+```text
+Read required status
+Clear interrupt flags
+Capture data
+Advance Buffer index
+Post Event or notification
+```
+
+ISR shall not perform:
+
+```text
+Complete frame parsing
+Cryptographic processing
+Full State Machine
+Flash programming
+UI update
+Blocking delay
+Long Device operation
+```
+
+Wi-Fi, BLE, USB, and Vendor Driver callbacks follow the same principle. Convert them to Events, Mailbox Messages,
+or Deferred Work.
+
+The detailed C implementation rules are defined by `Embedded_C_Coding_Rules_v1.0.13.md`.
+
+## 8.5 Static Memory
+
+Product-owned Embedded C shall use static memory configuration unless a controlled exception is explicitly
+approved.
+
+Buffers, queues, Mailboxes, reassembly areas, Protocol workspaces, and update state shall have fixed maximum
+capacities.
+
+Unbounded allocation based on an external length is prohibited.
+
+## 8.6 BSP and HAL
+
+Vendor-specific content shall be isolated:
+
+```text
+Application
+    |
+    v
+Device Service
+    |
+    v
+Generic Device Interface
+    |
+    v
+Specific Device Adapter
+    |
+    v
+Specific Driver
+    |
+    v
+Peripheral HAL
+    |
+    v
+BSP
+    |
+    v
+Vendor HAL / DriverLib
+```
+
+HAL may cover GPIO, ADC, DAC, UART, I2C, SMBus, SPI, CAN, PWM, Timer, DMA, Flash, RTC, Watchdog, CRC,
+Crypto Hardware, Wi-Fi Module, and BLE Module interfaces.
+
+## 8.7 Driver, Adapter, Service, and Control Policy
+
+Driver owns IC- or peripheral-level operations.
+
+Adapter translates a generic interface into a specific Driver.
+
+Service coordinates a subsystem function.
+
+Control owns Product policy and State Machines.
+
+Do not place Product policy into a reusable Driver.
+
+## 8.8 Hard Real-Time Execution
+
+Hard real-time periods shall be guaranteed by:
+
+```text
+Hardware Timer
+Peripheral Trigger
+DMA
+Interrupt
+Dedicated local control path
+```
+
+They shall not depend on UI refresh, wireless delivery, PC thread scheduling, or a Coordinator command loop.
+
+## 8.9 Resource Budget
+
+The Node design shall document:
+
+```text
+Static RAM
+Stack per Task
+Queue or Mailbox depth
+Stream Buffer capacity
+Protocol workspace
+Crypto workspace
+Reassembly Buffer
+Firmware Update metadata
+Flash usage
+Worst-case CPU loading
+```
+
+Resource margin shall be measured, not assumed.
+
+---
+
+# Part IX. Protocol Code Generation, Quality, and Architecture Governance
+
+## 9.1 Generated Code Governance
+
+Generated Code may include:
+
+```text
+C types and codecs
+C# models and serializers
+Java models and codecs
+Message IDs
+Dispatcher skeletons
+Payload validation
+Documentation
+Compatibility tests
+Boundary tests
+Fuzz seeds
+Mock Messages
+Packet-decoder metadata
+```
+
+Generated Code shall:
+
+```text
+Be committed when the Project policy requires reviewable generated artifacts
+Be marked as generated
+Not be edited manually
+Be reproducible from the source Protocol and Generator version
+Be checked by CI
+```
+
+CI shall regenerate and compare. CI shall fail on unexplained differences and shall not silently commit changes.
+
+## 9.2 Generator as Controlled Software
+
+The Generator shall have:
+
+```text
+Version
+Unit Tests
+Golden File Tests
+Schema Validation Tests
+Deterministic output
+Backward Compatibility Tests
+Release Notes
+```
+
+A Generator change that changes wire output, decode behavior, or compatibility is not merely an internal tool fix.
+
+## 9.3 Compatibility Test Generation
+
+Generated tests should include:
+
+```text
+Minimum and maximum length
+Invalid and truncated length
+Boundary values
+Unknown trailing fields
+Unknown Enum and bits
+Optional Field defaults
+Endianness
+Round-trip encode/decode
+Old Decoder / New Encoder
+New Decoder / Old Encoder
+Unsupported MAJOR version
+```
+
+Do not test only current Encoder against current Decoder.
+
+## 9.4 Static Analysis
+
+Static Analysis shall cover, as applicable:
+
+```text
+Out-of-bounds
+Null Pointer
+Use-after-free
+Integer overflow and truncation
+Signed/unsigned conversion
+Uninitialized data
+Dead code
+Unchecked return value
+Forbidden API
+ISR restrictions
+Dynamic-allocation policy
+MISRA C or other selected rules
+Thread and lock policy
+```
+
+Generated Code and handwritten codecs shall both be included.
+
+Suppressions shall be documented, narrow, reviewed, and traceable.
+
+## 9.5 Sanitizers and Fuzzing
+
+Where supported, use:
+
+```text
+Address Sanitizer
+Undefined Behavior Sanitizer
+Thread Sanitizer
+Protocol Fuzzing
+Decoder Fuzzing
+Fragmentation Fuzzing
+Stateful Session Fuzzing
+```
+
+MCU-specific paths may be tested through host-compiled codecs, simulation, or a Mock platform.
+
+## 9.6 CI Quality Gates
+
+A protected Baseline should require:
+
+```text
+Build
+Unit Test
+Schema Validation
+Semantic Lint
+Generated-output comparison
+Static Analysis
+Compatibility tests
+Protocol Test Vectors
+Placeholder scan
+Markdown structure validation
+License and notice check
+```
+
+Security and Firmware Update Projects add their own required evidence.
+
+## 9.7 Code Ownership
+
+Sensitive areas shall have explicit reviewers:
+
+```text
+Protocol
+Security
+Bootloader
+Firmware Update
+Generated Code
+Safety Control
+Platform startup
+Memory layout
+```
+
+A review requirement shall be enforced by repository policy when possible, not only by team convention.
+
+## 9.8 Architecture Decision Records
+
+Significant decisions should be captured under:
+
+```text
+docs/adr/
+├─ ADR-0001-coordinator-node-role.md
+├─ ADR-0002-protocol-schema.md
+├─ ADR-0003-session-boundary.md
+├─ ADR-0004-streaming-buffer.md
+└─ ADR-0005-firmware-update.md
+```
+
+An ADR includes Context, Decision, Alternatives, Consequences, Migration, and Validation.
+
+The Framework stores stable rules. ADRs store why a choice was made.
+
+## 9.9 Structural Rewrite Governance
+
+A structural rewrite, translation, consolidation, or large editorial reorganization shall not be accepted based
+only on successful parsing, balanced code fences, or complete heading numbering.
+
+Review shall prove that:
+
+```text
+Every prior normative rule is preserved or intentionally removed
+Every intentional removal is recorded
+Cross-references remain correct
+Examples still implement the stated rules
+Checklists and Baseline decisions remain synchronized
+Security boundaries remain unchanged unless explicitly approved
+```
+
+A successful syntax check does not prove that a structural rewrite preserved the complete technical Baseline.
+
+## 9.10 Document Governance
+
+One normative rule shall have one authority location.
+
+Other documents shall reference that authority rather than copy an independently editable duplicate.
+
+Protocol field details belong in the Protocol Guide and Project Protocol YAML.
+
+Product requirements belong in the SRS, Application Profile, Hazard Analysis, or UI Specification.
+
+Implementation details belong in the Reference Implementation and design specifications.
+
+---
+
+# Part X. Testing, Observability, and Acceptance
+
+## 10.1 Framework Test Assets
+
+The Framework should provide:
+
+```text
+Mock Node
+Mock Coordinator
+Mock Transport
+Mock wireless link
+Mock Application Session
+Mock Bootloader Session
+Protocol Test Vectors
+Loopback
+Packet recorder
+Packet decoder
+State-transition log
+Fault injection
+Timeout injection
+Buffer overflow tests
+Reset and reconnect tests
+```
+
+## 10.2 Streaming and Telemetry Tests
+
+Test:
+
+```text
+Long-duration transfer
+Maximum Payload
+Different Samples per Record
+Control during Stream
+Near-full Buffer
+Alarm burst
+Record loss
+Duplicate and reordering
+Sequence wrap
+Slow Coordinator
+Slow UI
+Wireless jitter and disconnect
+Telemetry replacement behavior
+Stream gap behavior
+```
+
+Telemetry tests shall verify latest-value replacement only when the Payload is a complete independently usable
+snapshot.
+
+Stream tests shall verify ordering, loss, duplicate, timestamp, and maximum-size behavior.
+
+## 10.3 Application Security Tests
+
+Test:
+
+```text
+Invalid Authentication Tag
+Duplicate counter
+Wrong Application Session ID
+Wrong Key Context
+Old Session replay
+Replay after reset
+Application record after Bootloader entry
+Rekey threshold and deadline
+Hard Limit
+Delayed safety command
+Authorization failure
+```
+
+## 10.4 Bootloader Security Tests
+
+Test:
+
+```text
+Wrong Bootloader Session ID
+Application key used for update data
+Old Bootloader Session chunk replay
+Bootloader Rekey boundary
+Bootloader Hard Limit
+Wrong Update Transaction ID
+Unauthorized resume
+Wrong or reused one-time ticket
+Execution Environment mismatch
+```
+
+## 10.5 Firmware Update Tests
+
+Test:
+
+```text
+Valid update
+Invalid signature
+Invalid hash
+Wrong model or Hardware Revision
+Anti-rollback rejection
+Power loss at each stage
+Disconnect and resume
+Rekey and resume
+Duplicate chunk
+Out-of-order chunk
+Flash write failure
+Pending-image timeout
+Self-test failure
+Automatic rollback
+Recovery entry
+```
+
+CRC failure tests do not replace signature-failure tests.
+
+## 10.6 Timing and Load Tests
+
+Measure:
+
+```text
+Control response latency
+Stream latency and jitter
+Worst-case CPU loading
+Buffer high-water level
+Crypto time
+Rekey pause
+Firmware Update throughput
+Transport serialization or air time
+Recovery time
+```
+
+Test worst-case simultaneous activity, not only isolated functions.
+
+## 10.7 State and Recovery Tests
+
+Each State Machine shall have tests for:
+
+```text
+Valid transition
+Invalid transition
+Timeout
+Duplicate Event
+Late Event
+Reset during transition
+Disconnect during transition
+Fault entry
+Safe-state entry
+Recovery success
+Recovery failure
+```
+
+## 10.8 Observability
+
+Logs and traces shall permit reconstruction of:
+
+```text
+Link state
+Session state and Epoch
+Node state
+Command Request and Result
+Event, Alarm, and Fault occurrence
+Sequence gap
+Buffer overflow
+Rekey
+Firmware Update transaction
+Rollback
+Security failure
+```
+
+Secrets and raw key material shall never be logged.
+
+## 10.9 Acceptance Evidence
+
+A Baseline shall retain:
+
+```text
+Requirements traceability
+Architecture review
+Protocol validation
+Generated-output comparison
+Static Analysis result
+Test Vector result
+Interoperability result
+Timing measurement
+Resource measurement
+Security test result
+Firmware Update test result
+Open issue disposition
+Approval record
+```
+
+---
+
+# Part XI. First Reference Implementation Baseline
+
+## 11.1 Purpose
+
+The first Reference Implementation demonstrates that the architecture can be implemented without violating its
+boundaries.
+
+It is not intended to prove every future platform or Product variation.
+
+## 11.2 Initial Recommended Scope
+
+A practical first scope is:
+
+```text
+Windows PC Coordinator
+C# / .NET Framework 4.7.2
+USB-CDC Transport
+MCU Node
+Embedded C
+RTOS or Event-Driven Runtime
+One active Node
+One outstanding Request
+Telemetry
+Stream
+Event / Alarm / Fault
+Basic Secure Session
+Mock Node and packet tools
+```
+
+Firmware Update may be added after the Application communication and validation path is stable, or included from
+the beginning when the Product requires it.
+
+## 11.3 Coordinator Demonstration
+
+The Coordinator Reference Implementation should demonstrate:
+
+```text
+Layered Project structure
+Transport abstraction
+Protocol-generated models
+Non-blocking receive path
+Command correlation
+State reconciliation
+Telemetry and Stream consumers
+UI/rendering decoupling
+Mock Transport
+Logging and packet capture
+```
+
+## 11.4 Node Demonstration
+
+The Node Reference Implementation should demonstrate:
+
+```text
+Static memory
+Event-Driven dispatch
+State Machine ownership
+Command validation
+Protocol Adapter
+Local safety reaction
+ISR deferral
+Transport abstraction
+Generated codecs
+Resource measurement
+```
+
+## 11.5 Cross-Language Interoperability
+
+At minimum:
+
+```text
+C# encodes -> C decodes
+C encodes -> C# decodes
+```
+
+When Java is in scope:
+
+```text
+Java encodes -> C decodes
+C encodes -> Java decodes
+C# and Java decode the same Golden Frame
+```
+
+## 11.6 Reference Implementation Version
+
+The Reference Implementation uses its own Code version such as:
+
+```text
+V1.0.0RC01
+```
+
+It does not inherit the Framework document version as its release identity.
+
+---
+
+# Part XII. Adoption, Migration, and Baseline Decisions
+
+## 12.1 Adoption Sequence
+
+A new Project should proceed in this order:
+
+```text
+1. Complete Framework Application Analysis
+2. Define Coordinator and Node roles
+3. Establish Product responsibility boundaries
+4. Define Application Profile and Product requirements
+5. Create Project Protocol YAML from the Template
+6. Run Schema Validation and Semantic Lint
+7. Generate Protocol artifacts
+8. Implement Mock Coordinator and Mock Node
+9. Implement Transport and Protocol Adapter
+10. Implement Product State Machines
+11. Integrate Device Drivers and platform code
+12. Measure timing, bandwidth, memory, and CPU
+13. Implement security and Firmware Update as required
+14. Execute compatibility and interoperability tests
+15. Approve the Project Baseline
+```
+
+## 12.2 Reuse versus Extension
+
+A Project shall classify each Framework area as:
+
+```text
+Reuse
+Extend
+Replace
+Not Applicable
+Gap
+```
+
+A Product-specific need shall not automatically become a Framework rule.
+
+A rule should move into the Framework only when it is reusable across multiple applications and does not contain
+one Product's semantics.
+
+## 12.3 Migration from Existing Code
+
+Migration should be incremental:
+
+```text
+Establish a compiling Baseline
+Add tests around current behavior
+Create Protocol and platform boundaries
+Move low-coupling modules
+Introduce Adapters
+Replace direct hardware access
+Introduce generated Protocol artifacts
+Measure regressions
+Remove obsolete paths
+```
+
+A complete rewrite without behavioral evidence is high risk.
+
+## 12.4 Framework Compatibility Revalidation
+
+When the Framework changes:
+
+| Change | Required Application Action |
+|---|---|
+| PATCH | Review corrections for impact on existing gaps, Protocol, and tests. |
+| MINOR | Reassess reuse classification, responsibility boundaries, Protocol extensions, and migration. |
+| MAJOR | Repeat full Application Analysis and establish a new compatibility plan. |
+| Security model change | Revalidate authentication, authorization, Session, Rekey, Anti-Replay, audit, and Bootloader boundaries. |
+| Protocol compatibility change | Regenerate artifacts and rerun backward-compatibility and interoperability tests. |
+| State or Fault model change | Revalidate state ownership, recovery, safe state, and UI behavior. |
+
+## 12.5 Baseline Decision Summary
+
+This Baseline establishes the following decisions:
+
+1. Coordinator and Node are platform-independent and relationship-relative roles.
+2. System role, message role, event role, Transport direction, and connection role are distinct.
+3. `protocol/`, `coordinator/`, and `node/` are the core responsibility directories.
+4. Build Target is a configuration and dependency set, not an architecture role.
+5. Device Contract is the stable cross-platform asset.
+6. Protocol YAML is the machine-verifiable Single Source of Truth for the wire contract.
+7. This Framework is the Single Source of Truth for reusable system architecture and engineering governance.
+8. Protocol and Transport remain decoupled.
+9. UI and Application code do not assemble wire frames directly.
+10. Node owns hard real-time control, fundamental safety protection, and local Fault Reaction.
+11. Command Dispatcher validates and converts commands into Application events or service requests; it does not directly operate hardware.
+12. Capability determines actual supported behavior; Node Type alone is insufficient.
+13. Event-Driven behavior is primary; low-rate health queries are allowed.
+14. Control Plane and Data Plane may share a Transport but not a blocking processing path.
+15. Telemetry is replaceable summarized state; Stream is an ordered non-replaceable record sequence.
+16. Transmission frequency alone does not determine Telemetry versus Stream.
+17. Sample Period and Record Period are separate.
+18. Aggregation improves average efficiency but shall be revalidated for latency, blocking, Buffer, and loss impact.
+19. Average bandwidth does not prove acceptable worst-case control latency.
+20. Every Transport is a formal bounded profile.
+21. Dynamically negotiated Transports require a Runtime Effective Profile.
+22. Link, Secure Session, Application, and Update Transaction are separate state domains.
+23. Hybrid security uses asymmetric mechanisms for trust and Session establishment and symmetric mechanisms for sustained traffic.
+24. Application Session and Bootloader Session are separate.
+25. Application Session keys do not survive reset or Bootloader entry.
+26. Key Context, direction, counter, and Anti-Replay state are separated.
+27. Nonce reuse and counter overflow under one key are prohibited.
+28. Soft Threshold, Rekey Deadline, and Hard Limit are explicit and context-specific.
+29. Hard Limit is an uncrossable security boundary.
+30. Anti-Replay does not replace state, freshness, authorization, or Operation-ID validation.
+31. Firmware Update uses a Bootloader-specific Secure Session and Key Context.
+32. Firmware Update Transaction identity is separate from Secure Session identity.
+33. Rekey or reconnect shall not silently change Manifest, Image ID, expected hash, or committed update progress.
+34. Firmware images require independent authenticity verification; CRC does not replace digital signature.
+35. Bootloader shall support verification, resume, rollback, and recovery.
+36. RTOS and Bare-metal use the same Event and State-Machine semantics through different runtime mechanisms.
+37. ISR and low-level callbacks perform bounded work and defer complex processing.
+38. Product-owned Embedded C uses static bounded memory unless a controlled exception is approved.
+39. BSP, HAL, Driver, Adapter, Service, and Product Control responsibilities remain separated.
+40. Generated Code is deterministic, traceable, and not edited manually.
+41. Generator changes that alter wire behavior require Protocol impact analysis.
+42. Compatibility tests include old/new Encoder and Decoder combinations.
+43. Architecture principles shall be enforced by tools and CI whenever practical.
+44. A structural rewrite is not accepted solely because syntax and Markdown structure pass.
+45. One normative rule has one authority location.
+46. Testing, observability, timing, resource measurement, security validation, and update recovery evidence are part of the Baseline.
+47. Reference Implementations have independent Code versions.
+48. Project adoption begins with Application Analysis and a Project-specific Protocol YAML.
+49. Product-specific rules shall not pollute the reusable Framework unless they are proven reusable.
+50. Migration shall be incremental and evidence-based.
+
+## 12.6 Core Design Philosophy
+
+> **Programming languages change, MCUs change, RTOSes change, Devices change, and Transports change; the Device
+> Contract, Event-Driven behavior, State Machines, real-time properties, security boundaries, and recovery capability
+> shall not drift with them.**
+
+---
+
+# Appendix A. Authority Matrix
+
+| Topic | Authority |
+|---|---|
+| Coordinator/Node roles | This Framework |
+| System layering and responsibility boundaries | This Framework |
+| Project directories and dependency rules | This Framework |
+| Timing, bandwidth, and safety placement | This Framework plus Product Requirements and Hazard Analysis |
+| Message IDs, Payloads, Wire Format, and security fields | Project Protocol YAML |
+| Protocol YAML authoring and validation rules | `Protocol_YAML_Definition_Guide_v1.0.3.md` |
+| Reusable YAML skeleton | `Protocol_YAML_Template_v1.0.3.md` |
+| Embedded C implementation rules | `Embedded_C_Coding_Rules_v1.0.13.md` |
+| Product command semantics | Application Profile and SRS |
+| UI pages and behavior | UI/UX Specification and Product Profile |
+| Coordinator threading and Project references | Coordinator Design Specification and Reference Implementation |
+| Node Task, Mailbox, Priority, and resource model | Node Design Specification |
+| Hazard and safe state | Hazard Analysis and System Requirements |
+| Test procedure and result | Test Specification and Test Report |
+
+---
+
+# Appendix B. Source Document Mapping
+
+```text
+Embedded_Device_Control_Framework_v1.4.2.md
+    Primarily contributed the original content now represented by
+    Parts I, IV, V, VI, VII, VIII, X, XI, and XII.
+
+Coordinator_Node_Architecture_v1.2.1.md
+    Primarily contributed the original content now represented by
+    Parts II, III, IX, and the version and governance rules.
+```
+
+After consolidation:
+
+```text
+Do not maintain two independent architecture Master documents.
+Do not duplicate Security, Protocol, or Capability rules across documents.
+Keep Project Protocol YAML independent.
+Keep Product Profile independent.
+Keep Reference Implementation independent.
+Keep historical source documents archived as Superseded.
+```
+
+---
+
+# Conclusion
+
+The Framework provides a reusable architecture for systems in which a Coordinator manages one or more Nodes while
+the Node preserves local control, safety, and real-time responsibility.
+
+The operating model is:
+
+```text
+Framework Application Analysis
+        |
+        v
+Coordinator and Node Responsibility Boundary
+        |
+        v
+Application Profile and Product Requirements
+        |
+        v
+Project Protocol YAML
+        |
+        +--> Schema Validation
+        +--> Semantic Lint
+        +--> Code Generation
+        +--> Compatibility Tests
+        +--> Test Vectors
+        |
+        v
+Coordinator and Node Reference Implementations
+        |
+        v
+Timing / Resource / Security / Recovery Validation
+        |
+        v
+Project Baseline
+```
+
+The architecture is successful when platform replacement does not require reinvention of the Device Contract,
+state ownership, safety boundary, security model, or recovery rules.
