@@ -2,7 +2,7 @@
 
 A reusable engineering framework for Host-Device control systems in which a PC, SoC, or MCU Host communicates with and controls an MCU-based Device.
 
-The framework defines reusable architecture, protocol, implementation, and engineering-governance practices for embedded control systems.
+The framework defines reusable architecture, Protocol, implementation, validation, and engineering-governance practices for embedded control systems.
 
 ## Scope
 
@@ -11,15 +11,15 @@ The framework is intended for systems such as:
 * PC Host to MCU Device
 * SoC Host to MCU Device
 * MCU Host to MCU Device
-* Command and response communication
-* Event, alarm, and fault reporting
-* Continuous or periodic data streaming
+* Command and Response communication
+* Event, Alarm, and Fault reporting
 * Telemetry and status reporting
+* Continuous ordered data Streaming
 * Capability discovery and feature negotiation
 * Session and connection management
-* Firmware update and Bootloader integration
-* Embedded C firmware implementation
-* Protocol-driven code generation and validation
+* Firmware Update and Bootloader integration
+* Embedded C Firmware implementation
+* Protocol-driven Code Generation and validation
 
 ## Terminology
 
@@ -81,6 +81,37 @@ Defines the reusable Protocol YAML authoring and governance baseline for:
 
 **Status:** Baseline
 
+### Protocol YAML Template
+
+[`Protocol_YAML_Template_v1.0.3.md`](docs/Protocol_YAML_Template_v1.0.3.md)
+
+Provides a reusable Project Protocol YAML skeleton aligned with the Protocol YAML Definition Guide, including:
+
+* Protocol metadata and Wire Format
+* Message ID allocation ranges
+* Namespace and Service definitions
+* Type, Enum, Bitset, Error, and Capability Registries
+* Command and Response examples
+* Event, Alarm, and Fault examples
+* Distinct Telemetry and Streaming examples
+* Sequence and Timestamp policies
+* Transport Profiles and Fragmentation
+* Security Model and Key Context separation
+* Firmware Update and Bootloader Messages
+* Compatibility and Code Generation configuration
+* Schema Validation and Semantic Lint checklists
+* Compatibility Review and Baseline Readiness checklists
+
+The Template also defines an explicit consistency rule for ordered sample records:
+
+```text
+sample_count == channel_count × samples_per_channel
+```
+
+The decoder shall verify the relationship using overflow-checked arithmetic and validate Payload length and destination capacity before accessing the sample array.
+
+**Status:** Baseline
+
 Additional framework documents will be added after public-release review.
 
 ## Current Status
@@ -99,8 +130,8 @@ The following documents are planned for later publication after review:
 
 * Coordinator/Node Control Framework
 * Framework Application Analysis Template
-* Protocol YAML Template
 * Reference Implementation documentation
+* Protocol Schema and Semantic Lint documentation
 * Code Generator design and validation documentation
 
 The planned-document list is informational only and does not indicate a committed release schedule.
@@ -113,7 +144,8 @@ host-device-control-framework/
 ├─ COPYRIGHT.md
 └─ docs/
    ├─ Embedded_C_Coding_Rules_v1.0.13.md
-   └─ Protocol_YAML_Definition_Guide_v1.0.3.md
+   ├─ Protocol_YAML_Definition_Guide_v1.0.3.md
+   └─ Protocol_YAML_Template_v1.0.3.md
 ```
 
 ## Intended Workflow
@@ -121,31 +153,60 @@ host-device-control-framework/
 The intended engineering flow is:
 
 ```text
-Coordinator/Node Framework
-    |
-    v
+Coordinator/Node Control Framework
+        |
+        v
 Application Analysis
-    |
-    v
-Protocol YAML
-    |
-    +--> Schema Validation
-    |
-    +--> Semantic Lint
-    |
-    +--> Code Generation
-    |
-    +--> Documentation
-    |
-    +--> Test Vectors
-    |
-    v
+        |
+        v
+Protocol YAML Definition Guide
+        |
+        v
+Protocol YAML Template
+        |
+        | copy, tailor, and complete
+        v
+<Application>_protocol.yaml
+        |
+        +--> Schema Validation
+        |
+        +--> Semantic Lint
+        |
+        +--> Compatibility Review
+        |
+        +--> Code Generation
+        |
+        +--> Documentation
+        |
+        +--> Test Vectors
+        |
+        v
 Host and Device Reference Implementations
 ```
 
-Protocol YAML is intended to serve as the Single Source of Truth for the machine-verifiable wire contract.
+The Project-specific Protocol YAML is intended to serve as the Single Source of Truth for the machine-verifiable wire contract.
 
 Generated artifacts are not intended to become independent design authorities.
+
+## Protocol YAML Responsibility Boundary
+
+```text
+Protocol YAML Definition Guide
+    Defines the normative rules, design principles,
+    validation requirements, and governance model.
+
+Protocol YAML Template
+    Provides a reusable Project skeleton that can be
+    copied, tailored, and completed.
+
+<Application>_protocol.yaml
+    Defines the formal Project-specific wire contract
+    and serves as Code Generation input.
+```
+
+The Template shall not redefine a rule differently from the Definition Guide.
+
+A Project-specific Protocol YAML shall replace all illustrative values, placeholder identifiers, sample IDs, limits, rates, security settings, and Transport Profiles before Baseline approval.
 
 ## Reference Implementation Direction
 
@@ -154,7 +215,9 @@ Future Reference Implementations are expected to exercise:
 * PC, SoC, or MCU Host roles
 * MCU-based Device roles
 * Command and Response processing
-* Event, Alarm, Fault, Telemetry, and Streaming flows
+* Event, Alarm, and Fault reporting
+* Replaceable summarized Telemetry
+* Continuous ordered Streaming
 * Static-memory Embedded C
 * Event-Driven dispatch
 * State Machines
@@ -165,6 +228,27 @@ Future Reference Implementations are expected to exercise:
 * Firmware Update and Bootloader boundaries
 
 Reference Implementations will be used to evaluate whether the published rules remain practical under real implementation constraints.
+
+## Validation Direction
+
+The framework is intended to support:
+
+* YAML Schema Validation
+* Duplicate-key detection
+* Semantic Lint
+* Message ID and Registry validation
+* Length and range validation
+* Arithmetic-overflow validation
+* Compatibility Review
+* Deterministic Code Generation
+* Generated-output comparison
+* Golden Test Vectors
+* Cross-language interoperability testing
+* Firmware Update recovery and rollback testing
+
+A successful syntax check does not prove that a structural rewrite preserved the complete technical baseline.
+
+Document review, semantic validation, Test Vectors, and implementation evidence remain necessary.
 
 ## Contributions and Discussion
 
