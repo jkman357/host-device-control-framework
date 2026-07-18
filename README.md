@@ -34,6 +34,33 @@ Host and Device describe deployment roles. Coordinator and Node describe archite
 
 ## Documents
 
+### Coordinator/Node Control Framework
+
+[`Coordinator_Node_Control_Framework_v1.0.2.md`](docs/Coordinator_Node_Control_Framework_v1.0.2.md)
+
+Defines the master architecture and engineering-governance baseline for:
+
+* Coordinator and Node roles
+* System layering and responsibility boundaries
+* Device Contract and Protocol authority
+* Project structure and dependency direction
+* Control Plane and Data Plane separation
+* Telemetry and Streaming semantics
+* Timing, bandwidth, buffering, and priority
+* Transport Profiles and link management
+* Secure Sessions, Key Contexts, Rekey, and Anti-Replay
+* Firmware Update, Bootloader, resume, rollback, and recovery
+* RTOS and Bare-Metal execution models
+* Event-Driven architecture and State Machine ownership
+* ISR and callback boundaries
+* BSP, HAL, Driver, Adapter, Service, and Control boundaries
+* Protocol Code Generation and CI governance
+* Static Analysis, compatibility, and interoperability
+* Testing, observability, and acceptance evidence
+* Reference Implementation and Project adoption
+
+**Status:** Baseline
+
 ### Embedded C Coding Rules
 
 [`Embedded_C_Coding_Rules_v1.0.13.md`](docs/Embedded_C_Coding_Rules_v1.0.13.md)
@@ -108,7 +135,7 @@ The Template also defines an explicit consistency rule for ordered sample record
 sample_count == channel_count × samples_per_channel
 ```
 
-The decoder shall verify the relationship using overflow-checked arithmetic and validate Payload length and destination capacity before accessing the sample array.
+The decoder shall verify this relationship using overflow-checked arithmetic and validate Payload length and destination capacity before accessing the sample array.
 
 **Status:** Baseline
 
@@ -128,7 +155,6 @@ Practical validation through Reference Implementations and real Project applicat
 
 The following documents are planned for later publication after review:
 
-* Coordinator/Node Control Framework
 * Framework Application Analysis Template
 * Reference Implementation documentation
 * Protocol Schema and Semantic Lint documentation
@@ -143,6 +169,7 @@ host-device-control-framework/
 ├─ README.md
 ├─ COPYRIGHT.md
 └─ docs/
+   ├─ Coordinator_Node_Control_Framework_v1.0.2.md
    ├─ Embedded_C_Coding_Rules_v1.0.13.md
    ├─ Protocol_YAML_Definition_Guide_v1.0.3.md
    └─ Protocol_YAML_Template_v1.0.3.md
@@ -156,7 +183,10 @@ The intended engineering flow is:
 Coordinator/Node Control Framework
         |
         v
-Application Analysis
+Framework Application Analysis
+        |
+        v
+Application Profile and Product Requirements
         |
         v
 Protocol YAML Definition Guide
@@ -181,12 +211,76 @@ Protocol YAML Template
         +--> Test Vectors
         |
         v
-Host and Device Reference Implementations
+Coordinator and Node Reference Implementations
+        |
+        v
+Timing / Resource / Security / Recovery Validation
+        |
+        v
+Project Baseline
 ```
 
 The Project-specific Protocol YAML is intended to serve as the Single Source of Truth for the machine-verifiable wire contract.
 
+The Coordinator/Node Control Framework is intended to serve as the Single Source of Truth for the reusable system architecture and engineering-governance model.
+
 Generated artifacts are not intended to become independent design authorities.
+
+## Document Responsibility Boundary
+
+```text
+Coordinator/Node Control Framework
+    Defines system roles, layering, architecture boundaries,
+    timing, safety placement, security boundaries,
+    Firmware Update architecture, and governance.
+
+Embedded C Coding Rules
+    Defines Embedded C implementation rules,
+    runtime boundaries, memory policy, and code quality.
+
+Protocol YAML Definition Guide
+    Defines Protocol YAML syntax, semantics,
+    validation, compatibility, and governance rules.
+
+Protocol YAML Template
+    Provides a reusable Project skeleton that can be
+    copied, tailored, and completed.
+
+<Application>_protocol.yaml
+    Defines the formal Project-specific wire contract
+    and serves as Code Generation input.
+
+Application Profile / SRS
+    Defines Product-specific behavior, operating flows,
+    state rationale, limits, Alarm behavior, and UI intent.
+
+Reference Implementation
+    Defines actual source code, platform integration,
+    threading, buffers, Drivers, UI, build, and deployment.
+```
+
+One normative rule should have one authority location.
+
+Other documents should reference that authority instead of maintaining independently editable duplicate rules.
+
+## Architecture Principles
+
+The framework is based on the following principles:
+
+* Coordinator and Node are platform-independent system roles.
+* System Role, Message Role, Event Role, Transport Role, and Connection Role are distinct.
+* The Device Contract remains stable when the platform, MCU, RTOS, UI Framework, or Transport changes.
+* Protocol and Transport remain decoupled.
+* The Node retains local hard real-time control, basic safety protection, and Fault Reaction.
+* UI and Application code do not assemble wire frames directly.
+* Command Dispatchers translate validated Protocol commands into Application events or Service requests.
+* Telemetry represents replaceable summarized state.
+* Streaming represents ordered records whose loss, duplication, reordering, or timing discontinuity matters.
+* Transmission frequency alone does not determine Telemetry versus Streaming.
+* Application and Bootloader use separate Secure Sessions, Key Contexts, counters, and Anti-Replay state.
+* Firmware Update Transaction identity remains separate from Secure Session identity.
+* Generated Code is deterministic, traceable, and not edited manually.
+* Structural rewrites require semantic preservation review, not only syntax validation.
 
 ## Protocol YAML Responsibility Boundary
 
@@ -212,8 +306,8 @@ A Project-specific Protocol YAML shall replace all illustrative values, placehol
 
 Future Reference Implementations are expected to exercise:
 
-* PC, SoC, or MCU Host roles
-* MCU-based Device roles
+* PC, SoC, or MCU Coordinator roles
+* MCU-based Node roles
 * Command and Response processing
 * Event, Alarm, and Fault reporting
 * Replaceable summarized Telemetry
@@ -225,7 +319,9 @@ Future Reference Implementations are expected to exercise:
 * RTOS and non-RTOS entry points
 * Protocol YAML generated contracts
 * Cross-language interoperability
+* Secure Session behavior
 * Firmware Update and Bootloader boundaries
+* Reconnect, recovery, and state reconciliation
 
 Reference Implementations will be used to evaluate whether the published rules remain practical under real implementation constraints.
 
@@ -242,11 +338,15 @@ The framework is intended to support:
 * Compatibility Review
 * Deterministic Code Generation
 * Generated-output comparison
+* Static Analysis
 * Golden Test Vectors
 * Cross-language interoperability testing
+* Timing and bandwidth measurement
+* Resource and Buffer measurement
+* Secure Session and Anti-Replay testing
 * Firmware Update recovery and rollback testing
 
-A successful syntax check does not prove that a structural rewrite preserved the complete technical baseline.
+A successful syntax check does not prove that a structural rewrite preserved the complete technical Baseline.
 
 Document review, semantic validation, Test Vectors, and implementation evidence remain necessary.
 
