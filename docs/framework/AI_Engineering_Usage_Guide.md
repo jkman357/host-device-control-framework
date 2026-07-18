@@ -4,20 +4,22 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`  
 **Document ID:** AIEUG  
-**Document Version:** v1.0.8  
+**Document Version:** v1.0.9  
 **Status:** Draft for Review  
 **Document Type:** AI Usage and Authority Routing Guide  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
-**Supersedes Document Version:** v1.0.7  
+**Supersedes Document Version:** v1.0.8  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
 - `Protocol_YAML_Definition_Guide.md`
 - `Protocol_YAML_Template.md`
+- `Coordinator_Software_Engineering_Rules.md`
 - `Embedded_C_Coding_Rules.md`
+- `CSharp_Coding_Rules.md`
 
 **First Issued:** 2026-07-18  
 **Last Revised:** 2026-07-18  
@@ -100,6 +102,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 | v1.0.6 | 2026-07-18 | Updated the Active Document Manifest for Application Analysis Template v1.0.8; clarified that Template authoring-reference versions do not prove Project compatibility; required AI to leave minimum-compatible versions unresolved until supported by comparison evidence; and retained Draft for Review status. |
 | v1.0.7 | 2026-07-18 | Updated routing for Framework v1.0.7, Application Analysis v1.0.9, Protocol Guide v1.0.7, and Protocol Template v1.0.7; required AI to reject unresolved security sentinels, public permanent identity disclosure, incomplete Counter/Rekey lifecycle, Handshake Profile confusion or downgrade, ambiguous signature encoding, conflicting `minimum_length`, and conflated plaintext/secured/Transport size domains; retained Draft for Review status. |
 | v1.0.8 | 2026-07-18 | Updated routing for Framework v1.0.8, Application Analysis v1.0.10, Protocol Guide v1.0.8, and Protocol Template v1.0.8; required AI to reject incomplete Fragment wire contracts, opaque security-critical Handshake payloads, numeric Profile-ID strength ordering, unauthorised Update resume across Session changes, and zero-byte minimum-MTU Fragment payloads; retained Draft for Review status. |
+| v1.0.9 | 2026-07-18 | Integrated `Coordinator_Software_Engineering_Rules.md` V1.0.1 and `CSharp_Coding_Rules.md` V1.0.1 into Related Documents, the Active Document Manifest, canonical repository paths, topic authority routing, Coordinator and C# implementation workflows, engineering-tooling routing, completion checks, and Draft decisions; retained Draft for Review status pending human approval. |
 
 ## 0.2 Active Document Manifest
 
@@ -107,39 +110,45 @@ This Draft is the proposed version-routing entry point for AI use of this reposi
 Baseline, its routing is provisional and shall not override direct human instructions or the approved topic authority
 of the documents listed below.
 
-| Document | Canonical File | Active Version | Status | Routing Role |
+| Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| Coordinator/Node Control Framework | `Coordinator_Node_Control_Framework.md` | `v1.0.8` | Baseline | Reusable architecture and governance |
-| Framework Application Analysis Template | `Framework_Application_Analysis_Template.md` | `v1.0.10` | Baseline | Application-analysis method and required records |
-| Protocol YAML Definition Guide | `Protocol_YAML_Definition_Guide.md` | `v1.0.8` | Baseline | Protocol YAML semantics and validation rules |
-| Protocol YAML Template | `Protocol_YAML_Template.md` | `v1.0.8` | Baseline | Reusable Project Protocol starting structure |
-| Embedded C Coding Rules | `Embedded_C_Coding_Rules.md` | `v1.0.15` | Final Baseline | Product-owned Embedded C implementation rules |
-| AI Engineering Usage Guide | `AI_Engineering_Usage_Guide.md` | `v1.0.8` | Draft for Review | AI authority routing and operating controls |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.9` | Draft for Review | AI authority routing and operating controls |
+| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.0.9` | Baseline | Reusable architecture and governance |
+| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.0.11` | Baseline | Application-analysis method and required records |
+| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.0.8` | Baseline | Protocol YAML semantics and validation rules |
+| Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.0.8` | Baseline | Reusable Project Protocol starting structure |
+| Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `V1.0.1` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
+| Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.15` | Final Baseline | Product-owned Embedded C implementation rules |
+| C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `V1.0.1` | Draft for Review | Product-owned C# language and .NET implementation rules |
 
 Version-routing rules:
 
 1. Use the exact active versions unless a newer approved manifest is available.
-2. Resolve each authority through its stable canonical filename.
+2. Resolve each authority through its stable canonical repository path.
 3. Do not silently mix an older document snapshot with the active set.
 4. If an active file is missing, inaccessible, truncated, or available only as an excerpt, report the limitation.
 5. When any active authority changes, revalidate this Guide, dependent documents, Protocols, generated artifacts,
    implementation, and tests as applicable.
 6. Record the repository branch, tag, commit, or other source identity when it is available.
+7. A `Draft for Review` entry is proposed authority, not an approved Product Baseline. Its use and status shall be
+   disclosed, and human acceptance or an approved deviation shall be recorded when the Project relies on it.
 
 ## 0.3 Stable Filename Policy
 
-Maintained Markdown documents shall use canonical filenames without an embedded version number.
+Maintained Markdown documents shall use stable canonical repository paths without an embedded version number.
 
 ```text
-AI_Engineering_Usage_Guide.md
-Coordinator_Node_Control_Framework.md
-Framework_Application_Analysis_Template.md
-Protocol_YAML_Definition_Guide.md
-Protocol_YAML_Template.md
-Embedded_C_Coding_Rules.md
+docs/framework/AI_Engineering_Usage_Guide.md
+docs/framework/Coordinator_Node_Control_Framework.md
+docs/framework/Framework_Application_Analysis_Template.md
+docs/protocol/Protocol_YAML_Definition_Guide.md
+docs/protocol/Protocol_YAML_Template.md
+docs/coordinator/Coordinator_Software_Engineering_Rules.md
+docs/coding-rules/Embedded_C_Coding_Rules.md
+docs/coding-rules/CSharp_Coding_Rules.md
 ```
 
-The canonical filename identifies the maintained repository document. The `Document Version` metadata identifies
+The canonical repository path identifies the maintained authority document. The `Document Version` metadata identifies
 the content revision. Git history, tags, Releases, and release-package names preserve immutable snapshots.
 
 An AI shall not infer the current authority version from a maintained filename and shall not create a second
@@ -203,8 +212,10 @@ Authority is assigned by topic rather than by document length, recency alone, or
 | Protocol YAML syntax, field semantics, Message categories, security attributes, compatibility, validation, and Protocol governance | `Protocol_YAML_Definition_Guide.md` |
 | Reusable starting structure for a Project Protocol YAML | `Protocol_YAML_Template.md` |
 | Actual Project wire contract | Approved `<Application>_protocol.yaml` |
+| Cross-language Coordinator architecture, lifecycle, state ownership, concurrency, communication integration, diagnostics, configuration, security, testing, and release behavior | `Coordinator_Software_Engineering_Rules.md` |
 | Product-owned Embedded C implementation, naming, static memory, arithmetic, ISR, callback, `main()`, RTOS, and review rules | `Embedded_C_Coding_Rules.md` |
-| Coordinator design | Approved Coordinator SDD and applicable Project standards |
+| Product-owned C# language and .NET implementation rules | `CSharp_Coding_Rules.md` |
+| Project-specific Coordinator design, decomposition, selected platform, and approved deviations | Approved Coordinator SDD and applicable Project standards |
 | Node Task, Mailbox, Priority, State Machine, and resource design | Approved Node SDD and Product constraints |
 | UI pages and behavior | Approved UI/UX Specification, Application Profile, and Product requirements |
 | Hazard and safe state | Approved Hazard Analysis and System Requirements |
@@ -507,32 +518,38 @@ Cross-implementation interoperability and cross-language interoperability for la
 
 ## 3.9 Coordinator or Non-C Implementation Task
 
-For C#, Java, Python, C++, or another Coordinator-side or tooling implementation:
+For C#, Java, Python, C++, or another Coordinator-side implementation:
 
 ```text
 Read:
-1. Coordinator_Node_Control_Framework.md
-2. Approved Project Protocol YAML
-3. Coordinator SDD or Tool Design Specification
-4. Completed Application Analysis and Product requirements
-5. Applicable Project language, platform, security, UI, and test standards
+1. This Guide
+2. Coordinator_Node_Control_Framework.md when a Coordinator/Node role or Protocol boundary is in scope
+3. Coordinator_Software_Engineering_Rules.md when the implementation performs or supports a Coordinator role
+4. Applicable language Coding Rules
+5. CSharp_Coding_Rules.md when Product-owned C# is in scope
+6. Approved Project Protocol YAML when communication is in scope
+7. Approved Coordinator SDD, Tool Design Specification, or other applicable software design
+8. Completed Application Analysis and Product requirements
+9. Applicable platform, security, UI, and test standards
 ```
 
 Required output:
 
 ```text
-Clear layer and thread ownership
-Generated Protocol contract use
-Bounded receive, decode, dispatch, logging, recording, and UI paths
-State reconciliation and stale-data behavior
-Cancellation, timeout, error, and reconnect handling
-Build instructions
+Clear architecture-layer, state, task, thread, timer, queue, and lifecycle ownership
+Generated Protocol contract use and generated-code boundary
+Bounded receive, decode, dispatch, logging, recording, persistence, and UI paths
+State reconciliation, stale-data, reconnect, cancellation, timeout, and shutdown behavior
+Configuration, security, diagnostics, and exception boundaries
+Build and deployment instructions
 Tests and executed validation state
-Known platform-specific constraints
+Known platform-specific constraints and approved deviations
 ```
 
-The Embedded C Coding Rules shall not be applied mechanically to another language. Equivalent safety and
-maintainability objectives shall be implemented through the applicable language and Project standards.
+Coordinator software requires both the role-level engineering authority and the applicable language-level authority.
+Neither document replaces the other. The Embedded C Coding Rules shall not be applied mechanically to another
+language. Equivalent safety and maintainability objectives shall be implemented through the applicable language and
+Project authorities.
 
 ## 3.10 Engineering Tooling Task
 
@@ -545,8 +562,10 @@ Read:
 2. Coordinator_Node_Control_Framework.md
 3. Protocol_YAML_Definition_Guide.md
 4. Protocol_YAML_Template.md
-5. Embedded_C_Coding_Rules.md when generating or validating C artifacts
-6. Approved Project Protocol YAML and Test Vectors
+5. Coordinator_Software_Engineering_Rules.md when the tool implements, simulates, or validates Coordinator behavior
+6. Embedded_C_Coding_Rules.md when generating or validating C artifacts
+7. CSharp_Coding_Rules.md when generating or validating C# artifacts
+8. Approved Project Protocol YAML and Test Vectors
 ```
 
 Required output:
@@ -973,6 +992,8 @@ Before declaring an AI task complete:
 - [ ] Facts, assumptions, unknowns, and potentially stale inputs are separated.
 - [ ] Responsibility and authority boundaries are preserved.
 - [ ] The requested artifact is complete for the stated scope.
+- [ ] Applicable role-level and language-level authorities are identified and applied, or an explicit `N/A` rationale is recorded.
+- [ ] Use of any `Draft for Review` authority is disclosed and is not represented as an approved Product Baseline.
 - [ ] Relevant Protocol, memory, timing, security, compatibility, recovery, and language rules are applied.
 - [ ] Examples and implementation match the stated rules.
 - [ ] Every reported validation result has an Evidence State.
@@ -996,7 +1017,7 @@ This Draft for Review proposes the following decisions:
 2. Human engineers are not expected to memorize and manually apply every rule before implementation.
 3. AI shall read the complete applicable authorities when available before design, generation, modification, or review.
 4. AI shall disclose when only excerpts, snippets, search results, or summaries were available.
-5. Maintained Markdown documents use stable canonical filenames without embedded document versions.
+5. Maintained Markdown documents use stable canonical repository paths without embedded document versions.
 6. Document versions are recorded in metadata and Version History; Git history, tags, and Releases preserve snapshots.
 7. AI shall resolve authorities through canonical paths and shall not create parallel maintained versioned copies.
 8. This Guide routes active document versions and statuses but does not replace each document's topic authority.
@@ -1024,16 +1045,16 @@ subordinate to the owning authority and shall not be used to create a competing 
 27. AI-generated or materially rewritten artifacts default to Draft for Review.
 28. AI shall not self-approve a Baseline, Final Baseline, Deviation, residual risk, or release.
 29. AI shall not claim real-system correctness without target evidence.
-30. Coordinator and non-C implementation tasks require applicable language and Project standards rather than mechanical use of Embedded C rules.
+30. Coordinator and non-C implementation tasks apply role-level and language-level authorities conditionally rather than mechanically transferring Embedded C rules.
 31. Engineering tools shall be deterministic, traceable, tested, and explicit about unsupported rules.
 32. Human responsibility centers on Product intent, approval, measurement, validation, deviation, and residual-risk acceptance.
 33. Manual Code entry is not the primary human value in this operating model.
 34. The AI operating model is authority routing, constrained generation, automated review, explicit evidence states, and human approval.
-35. This Guide remains Draft for Review until human approval and stable-filename migration verification are complete.
+35. This Guide remains Draft for Review until human approval, authority-set integration, and canonical-path verification are complete.
 36. Routing from this Draft is provisional and cannot override direct human instructions or approved topic authorities.
 37. Cross-implementation interoperability applies to every implementation; cross-language interoperability applies only to language pairs in scope.
 38. Repeated non-owning requirements are derived conformance summaries and do not override the authority source.
-39. Maintained repository documents use stable canonical filenames, while immutable detached release, audit, and external-delivery artifacts use versioned or Baseline-identified distributed filenames.
+39. Maintained repository documents use stable canonical repository paths, while immutable detached release, audit, and external-delivery artifacts use versioned or Baseline-identified distributed filenames.
 40. Detached artifacts preserve canonical source identity and Git commit, tag, or Release traceability and do not become parallel maintained authorities.
 41. Template authoring-reference versions are not evidence of Product compatibility.
 42. AI shall not populate a Project minimum-compatible version without explicit compatibility evidence.
@@ -1050,6 +1071,9 @@ subordinate to the owning authority and shall not be used to create a competing 
 53. AI shall not infer security strength from numeric Profile-ID ordering.
 54. AI shall reject Firmware Update resume that is authorized only by Transaction ID, offset, or possession of stale Session state.
 55. AI shall reject a Transport Profile whose minimum MTU leaves no positive Fragment payload.
+56. Coordinator Software Engineering Rules govern cross-language Coordinator-owned software architecture and engineering behavior.
+57. C# Coding Rules govern Product-owned C# language and .NET implementation.
+58. Coordinator C# tasks apply both the Coordinator role authority and the C# language authority; neither substitutes for the other.
 
 ---
 

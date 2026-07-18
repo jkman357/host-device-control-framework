@@ -4,7 +4,7 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.8  
+**Document Version:** v1.0.9  
 **Status:** Baseline  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
@@ -12,7 +12,9 @@
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
 **Related Documents:**
+- `Coordinator_Software_Engineering_Rules.md`
 - `Embedded_C_Coding_Rules.md`
+- `CSharp_Coding_Rules.md`
 - `Protocol_YAML_Definition_Guide.md`
 - `Protocol_YAML_Template.md`
 - `Framework_Application_Analysis_Template.md`
@@ -124,6 +126,14 @@ Coordinator_Node_Control_Framework
     System roles, layering, boundaries, architecture principles,
     safety placement, timing, security boundaries, and governance.
 
+Coordinator_Software_Engineering_Rules
+    Cross-language Coordinator software architecture, lifecycle,
+    state ownership, concurrency, communication integration,
+    diagnostics, configuration, security, testing, and release behavior.
+
+CSharp_Coding_Rules
+    Product-owned C# language and .NET implementation rules.
+
 Protocol_YAML_Definition_Guide
     Protocol YAML syntax, semantics, validation, Code Generation,
     compatibility, and Protocol governance rules.
@@ -158,15 +168,17 @@ shall not remain as parallel maintained authority files and shall not be extende
 
 ## 0.4 Document Filename and Version Rules
 
-Maintained Markdown documents shall use stable canonical filenames without a version suffix:
+Maintained Markdown documents shall use stable canonical repository paths without a version suffix:
 
 ```text
-Coordinator_Node_Control_Framework.md
-Embedded_C_Coding_Rules.md
-Protocol_YAML_Definition_Guide.md
-Protocol_YAML_Template.md
-Framework_Application_Analysis_Template.md
-AI_Engineering_Usage_Guide.md
+docs/framework/Coordinator_Node_Control_Framework.md
+docs/framework/AI_Engineering_Usage_Guide.md
+docs/framework/Framework_Application_Analysis_Template.md
+docs/protocol/Protocol_YAML_Definition_Guide.md
+docs/protocol/Protocol_YAML_Template.md
+docs/coordinator/Coordinator_Software_Engineering_Rules.md
+docs/coding-rules/Embedded_C_Coding_Rules.md
+docs/coding-rules/CSharp_Coding_Rules.md
 ```
 
 The document version shall be recorded inside the document:
@@ -202,7 +214,7 @@ Smart_Battery_Framework_Application_Analysis_v1.2.0.pdf
 Smart_Battery_Engineering_Baseline_v1.2.0.zip
 ```
 
-A detached artifact shall also identify its source repository, canonical maintained filename, `Document Version`,
+A detached artifact shall also identify its source repository, canonical maintained repository path, `Document Version`,
 Status, and source Git commit, tag, or Release. A downstream SRS, SDD, Test Protocol, or audit record shall cite the
 approved document identity and version rather than relying only on a mutable canonical path.
 
@@ -251,6 +263,7 @@ Markdown filename.
 | v1.0.6 | 2026-07-18 | Refined filename governance into a two-layer policy: maintained Markdown authority paths remain stable inside controlled Git repositories, while immutable release artifacts, audit packages, external deliverables, and detached snapshots include an approved document version or Baseline identifier in the distributed filename; required detached artifacts to carry source commit, tag, or Release traceability; and preserved all architecture and Protocol semantics. |
 | v1.0.7 | 2026-07-18 | Closed the remaining machine-verifiable security and Transport-envelope gaps: required minimal ephemeral public Discovery and authenticated revalidation; bound Handshake Profile selection and complete canonical transcripts against downgrade and profile confusion; required per-Key-Context Record Counter/Rekey profiles; defined exact canonical Firmware signature encodings; clarified fixed-prefix `minimum_length`; and separated plaintext Message, security overhead, secured Record, reassembly, and Fragment size domains. |
 | v1.0.8 | 2026-07-18 | Closed the remaining machine-verifiable Protocol-contract gaps by requiring an exact Fragment Header and bounded reassembly policies, concrete named Handshake request/response payloads, explicit Profile allowlists and security-level/deprecation metadata instead of numeric ID ordering, cryptographically authorized Firmware Update resume across Session changes, and a positive data-bearing Fragment payload at every supported minimum MTU. |
+| v1.0.9 | 2026-07-18 | Integrated `Coordinator_Software_Engineering_Rules.md` V1.0.1 and `CSharp_Coding_Rules.md` V1.0.1 into Related Documents, the authority boundary, stable document identity, Baseline decisions, and the Authority Matrix; clarified that reusable Coordinator engineering rules and language-specific implementation rules remain subordinate to this Framework, approved Product requirements, and Project-specific design. |
 
 ## 0.6 Core Conclusions
 
@@ -2870,6 +2883,9 @@ This Baseline establishes the following decisions:
 65. Profile IDs do not encode security strength; selection uses allowlists, preference, security level, and deprecation state.
 66. Firmware Update resume across Session changes requires cryptographic authorization bound to transaction, Manifest, Device, Host, and security version.
 67. A data-bearing Transport Profile is invalid when its minimum MTU does not exceed the Fragment Header size.
+68. Cross-language Coordinator-owned software engineering is governed by `Coordinator_Software_Engineering_Rules.md` within the architecture and Product authority boundaries defined by this Framework.
+69. Product-owned C# implementation is governed by `CSharp_Coding_Rules.md` in addition to applicable role-level, Product, Protocol, and Project-specific authorities.
+70. Application Analysis records whether each role-level and language-level authority applies, the exact version used, and the evidence or `N/A` rationale.
 
 ## 12.6 Core Design Philosophy
 
@@ -2890,10 +2906,12 @@ This Baseline establishes the following decisions:
 | Message IDs, Payloads, Wire Format, and security fields | Project Protocol YAML |
 | Protocol YAML authoring and validation rules | `Protocol_YAML_Definition_Guide.md` |
 | Reusable YAML skeleton | `Protocol_YAML_Template.md` |
+| Cross-language Coordinator software architecture and engineering rules | `Coordinator_Software_Engineering_Rules.md` |
 | Embedded C implementation rules | `Embedded_C_Coding_Rules.md` |
+| C# language and .NET implementation rules | `CSharp_Coding_Rules.md` |
 | Product command semantics | Application Profile and SRS |
 | UI pages and behavior | UI/UX Specification and Product Profile |
-| Coordinator threading and Project references | Coordinator Design Specification and Reference Implementation |
+| Project-specific Coordinator decomposition, threading, references, and approved deviations | Coordinator Design Specification and Reference Implementation |
 | Node Task, Mailbox, Priority, and resource model | Node Design Specification |
 | Hazard and safe state | Hazard Analysis and System Requirements |
 | Test procedure and result | Test Specification and Test Report |

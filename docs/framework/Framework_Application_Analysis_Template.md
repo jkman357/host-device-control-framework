@@ -4,7 +4,7 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.10  
+**Document Version:** v1.0.11  
 **Status:** Baseline  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
@@ -13,7 +13,9 @@
 **Repository:** `host-device-control-framework`  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
+- `Coordinator_Software_Engineering_Rules.md`
 - `Embedded_C_Coding_Rules.md`
+- `CSharp_Coding_Rules.md`
 - `Protocol_YAML_Definition_Guide.md`
 - `Protocol_YAML_Template.md`
 
@@ -88,6 +90,7 @@ Other Coordinator/Node applications
 | v1.0.8 | 2026-07-18 | Ray Yang | Clarified that authority versions shown by the reusable Template are authoring references rather than automatic Product compatibility decisions; changed Project minimum-compatible and version-used fields to explicit completion-time inputs; required compatibility evidence before claiming an earlier minimum version; and corrected review-package traceability without changing the analysis architecture or dual filename policy. |
 | v1.0.9 | 2026-07-18 | Ray Yang | Added Product-analysis records for public Discovery privacy, rate limiting, transcript binding, and authenticated revalidation; concrete Handshake and downgrade policy; per-Key-Context Record Counter/Rekey lifecycle; exact Firmware signature encoding; fixed-prefix `minimum_length`; and distinct plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets. Updated authoring-reference versions without changing the Project-specific compatibility-evidence rule. |
 | v1.0.10 | 2026-07-18 | Ray Yang | Added Product-analysis records and acceptance questions for exact Fragment Header and reassembly behavior, concrete named Handshake wire structs, Profile allowlist/security-level/deprecation selection, Firmware Update resume authorization bound to transaction/Manifest/Device/Host, and positive minimum-MTU Fragment payload; synchronized authoring-reference versions. |
+| v1.0.11 | 2026-07-18 | Ray Yang | Integrated `Coordinator_Software_Engineering_Rules.md` V1.0.1 and `CSharp_Coding_Rules.md` V1.0.1 as conditional Product-analysis authorities; added authoring references, Existing Framework Baseline records, Draft-authority approval handling, detailed completion checks, and Baseline decisions so Coordinator and C# applicability, version, evidence, deviation, or `N/A` rationale cannot be omitted. |
 
 ## 0.3 Template Usage Convention
 
@@ -147,12 +150,14 @@ appear in the Open Question or Action Item Register with an Owner and target con
 The following versions identify the authority set used to author and self-check this reusable Template. They are
 authoring references, not automatic compatibility decisions for every Product:
 
-| Authority | Template Authoring Reference Version |
-|---|---:|
-| `Coordinator_Node_Control_Framework.md` | `v1.0.8` |
-| `Embedded_C_Coding_Rules.md` | `v1.0.15` |
-| `Protocol_YAML_Definition_Guide.md` | `v1.0.8` |
-| `Protocol_YAML_Template.md` | `v1.0.8` |
+| Authority | Template Authoring Reference Version | Status at Authoring |
+|---|---:|---|
+| `Coordinator_Node_Control_Framework.md` | `v1.0.9` | Baseline |
+| `Protocol_YAML_Definition_Guide.md` | `v1.0.8` | Baseline |
+| `Protocol_YAML_Template.md` | `v1.0.8` | Baseline |
+| `Coordinator_Software_Engineering_Rules.md` | `V1.0.1` | Draft for Review |
+| `Embedded_C_Coding_Rules.md` | `v1.0.15` | Final Baseline |
+| `CSharp_Coding_Rules.md` | `V1.0.1` | Draft for Review |
 
 Every completed Application Analysis shall separately record:
 
@@ -329,10 +334,17 @@ State the criteria used to decide whether the application can proceed.
 
 | Item | Minimum Compatible Version | Version Used for This Analysis | Source Commit, Tag, or Release | Compatibility Evidence |
 |---|---:|---:|---|---|
-| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
-| `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.15>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
+| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.9>` | `<TBD>` | `<Evidence>` |
 | `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
 | `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
+| `Coordinator_Software_Engineering_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: V1.0.1>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.15>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
+| `CSharp_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: V1.0.1>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+
+`Coordinator_Software_Engineering_Rules.md` is required when Coordinator-owned software is in scope.
+`CSharp_Coding_Rules.md` is required when Product-owned C# is in scope. If either authority remains `Draft for Review`,
+the completed analysis shall record whether the Project explicitly accepts that Draft, applies an approved deviation,
+or marks it `N/A` with rationale. A Draft authority shall not be represented as an approved Product Baseline silently.
 
 Additional input artifacts:
 
@@ -2355,6 +2367,9 @@ Acceptance Evidence:
 - [ ] Configured and Extended Reuse items are identified.
 - [ ] Existing Transport, Session, Command, and Protocol mechanisms were not duplicated.
 - [ ] Framework and related-document version dependencies are recorded.
+- [ ] Coordinator role-level engineering authority applicability, version, status, and evidence or `N/A` rationale are recorded.
+- [ ] Applicable language Coding Rules are identified; Product-owned C# explicitly records `CSharp_Coding_Rules.md` applicability, version, status, and evidence or `N/A` rationale.
+- [ ] Draft for Review authorities are not silently treated as approved Product Baselines.
 - [ ] Revalidation was completed after applicable Framework changes.
 - [ ] Affected compatibility, integration, and regression tests were rerun.
 - [ ] Validated versions, review date, and Revalidation Status were updated.
@@ -2497,6 +2512,9 @@ This baseline establishes the following decisions:
 61. Profile selection uses explicit allowed, preferred, prohibited, security-level, and deprecation decisions rather than numeric ID ordering.
 62. Persisted Firmware Update resume requires cryptographic authorization bound to transaction, Manifest, Device, Host, and security version.
 63. Every supported minimum MTU provides a positive data-bearing Fragment payload.
+64. Coordinator-owned software analysis records applicability and evidence for `Coordinator_Software_Engineering_Rules.md`.
+65. Product-owned C# analysis records applicability and evidence for `CSharp_Coding_Rules.md`.
+66. Role-level and language-level authorities are both applied when relevant; a Draft authority requires explicit Project acceptance, approved deviation, or `N/A` rationale and is not silently promoted by this analysis.
 
 ---
 
