@@ -2,12 +2,14 @@
 
 ## Coordinator/Node Protocol Schema Authoring, Validation, Code Generation, and Governance Baseline
 
-**Document Name:** `Protocol_YAML_Definition_Guide_v1.0.3.md`  
+**Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.0.3  
+**Document Version:** v1.0.5  
 **Status:** Baseline  
 **Document Type:** Reusable Definition Guide  
-**Related Framework:** `Coordinator_Node_Control_Framework_v1.0.1.md`  
+**Related Framework:** `Coordinator_Node_Control_Framework.md`  
+**Related Template:** `Protocol_YAML_Template.md`  
+**Related Application Analysis:** `Framework_Application_Analysis_Template.md`  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
@@ -169,11 +171,11 @@ A specific Device IC register
 The complete JSON Schema file
 ```
 
-Separate artifacts may be created later:
+Companion artifacts include or may be created separately:
 
 ```text
+Protocol_YAML_Template.md
 Protocol_YAML_Schema_v1.0.0.json
-Protocol_YAML_Template_v1.0.1.md
 Protocol_Code_Generator_V1.0.0RCxx
 ```
 
@@ -198,6 +200,8 @@ The keywords in this document have the following meanings:
 | v1.0.1 | 2026-07-15 | Corrected the inconsistency between a Framework Message ID example and the recommended allocation range; explicitly separated the Message, Capability, Service, Namespace, Error, Enum, and Bitset registries and their uniqueness scopes; and strengthened Semantic Lint, quick-reference, and Baseline decisions. |
 | v1.0.2 | 2026-07-18 | Converted the complete guide to English; established Ray Yang as Author and Maintainer; added repository identity, copyright, personal-project clarification, and third-party-material notice; normalized terminology, punctuation, headings, examples, and checklists; and preserved the v1.0.1 technical baseline decisions. |
 | v1.0.3 | 2026-07-18 | Defined the normative decision boundary between `telemetry` and `stream`; added a complete `category: telemetry` YAML example; required telemetry cadence, replacement, priority, and maximum-record-size policies; clarified when sequence and timestamp fields are required; and synchronized Semantic Lint, Project Adoption Checklist, Quick Reference, and Baseline Decision Summary. |
+| v1.0.4 | 2026-07-18 | Updated the active Framework, Template, and Application Analysis references to `Coordinator_Node_Control_Framework.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; corrected the companion-artifact wording now that the Template exists; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
+| v1.0.5 | 2026-07-18 | Adopted the stable canonical filename `Protocol_YAML_Definition_Guide.md`; updated active Framework, Template, and Application Analysis references to canonical paths; retained version identity in document metadata and Git history; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
 
 ---
 

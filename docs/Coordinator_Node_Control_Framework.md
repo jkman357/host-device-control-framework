@@ -2,9 +2,9 @@
 
 ## Architecture, Communication, Security, Real-Time Behavior, Firmware Update, and Engineering Governance Baseline
 
-**Document Name:** `Coordinator_Node_Control_Framework_v1.0.2.md`  
+**Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.2  
+**Document Version:** v1.0.4  
 **Status:** Baseline  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
@@ -12,10 +12,10 @@
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
 **Related Documents:**
-- `Embedded_C_Coding_Rules_v1.0.13.md`
-- `Protocol_YAML_Definition_Guide_v1.0.3.md`
-- `Protocol_YAML_Template_v1.0.3.md`
-- `Framework_Application_Analysis_Template_v1.0.2.md`
+- `Embedded_C_Coding_Rules.md`
+- `Protocol_YAML_Definition_Guide.md`
+- `Protocol_YAML_Template.md`
+- `Framework_Application_Analysis_Template.md`
 
 **First Issued:** 2026-07-15  
 **Last Revised:** 2026-07-18  
@@ -149,24 +149,46 @@ Reference Implementation
 This Framework integrates and supersedes:
 
 ```text
-Embedded_Device_Control_Framework_v1.4.2.md
-Coordinator_Node_Architecture_v1.2.1.md
+Embedded Device Control Framework, document version v1.4.2
+Coordinator/Node Architecture, document version v1.2.1
 ```
 
-Those documents may be retained under `docs/archive/` for historical traceability but shall not be extended
-with new normative architecture rules.
+Historical snapshots shall be preserved through Git history, tags, Releases, or external archival records. They
+shall not remain as parallel maintained authority files and shall not be extended with new normative architecture rules.
 
-## 0.4 Version Rules
+## 0.4 Document Filename and Version Rules
 
-Markdown document filenames and document versions use three-part versions without an RC suffix:
+Maintained Markdown documents shall use stable canonical filenames without a version suffix:
 
 ```text
-Coordinator_Node_Control_Framework_v1.0.0.md
-Coordinator_Node_Control_Framework_v1.0.1.md
-Coordinator_Node_Control_Framework_v1.0.2.md
-Coordinator_Node_Control_Framework_v1.1.0.md
-Coordinator_Node_Control_Framework_v2.0.0.md
+Coordinator_Node_Control_Framework.md
+Embedded_C_Coding_Rules.md
+Protocol_YAML_Definition_Guide.md
+Protocol_YAML_Template.md
+Framework_Application_Analysis_Template.md
+AI_Engineering_Usage_Guide.md
 ```
+
+The document version shall be recorded inside the document:
+
+```text
+Document Version: vMAJOR.MINOR.PATCH
+Status: Draft for Review / Baseline / Final Baseline
+```
+
+Version history and immutable identity shall be provided by:
+
+```text
+Document metadata and Version History
+Git commit history
+Git tags
+GitHub Releases
+Release-package or archive names when required
+```
+
+A maintained Markdown file shall not be copied beside itself under a new versioned filename for each PATCH or
+MINOR revision. The stable path is the current authority path. Historical snapshots shall be preserved through Git
+history, tags, Releases, or controlled archives rather than parallel versioned Markdown filenames.
 
 Protocol, Generator, Firmware, Bootloader, Product, or Reference Implementation Code may use:
 
@@ -194,15 +216,18 @@ Document Version
 != Reference Implementation Version
 ```
 
-A single Framework version may govern multiple Code release candidates without creating a new Framework file.
+A single Framework document version may govern multiple Code release candidates without changing the canonical
+Markdown filename.
 
 ## 0.5 Version History
 
 | Version | Date | Description |
 |---|---|---|
-| v1.0.0 | 2026-07-15 | Integrated `Embedded_Device_Control_Framework_v1.4.2.md` and `Coordinator_Node_Architecture_v1.2.1.md` into one Master Baseline. |
+| v1.0.0 | 2026-07-15 | Integrated the Embedded Device Control Framework v1.4.2 and Coordinator/Node Architecture v1.2.1 into one Master Baseline. |
 | v1.0.1 | 2026-07-15 | Removed duplicate Protocol/Transport text, corrected Part XI numbering, removed obsolete normative references, removed the duplicate Baseline conclusion, and completed structural and Markdown validation without changing design semantics. |
-| v1.0.2 | 2026-07-18 | Converted the complete Framework to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned terminology and authority boundaries with `Embedded_C_Coding_Rules_v1.0.13.md`, `Protocol_YAML_Definition_Guide_v1.0.3.md`, and `Protocol_YAML_Template_v1.0.3.md`; clarified Telemetry versus Stream semantics, Protocol/Transport boundaries, Application/Bootloader Session separation, Firmware Update transaction identity, runtime Transport Profiles, structural rewrite governance, and public GitHub publication requirements. |
+| v1.0.2 | 2026-07-18 | Converted the complete Framework to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned terminology and authority boundaries with `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; clarified Telemetry versus Stream semantics, Protocol/Transport boundaries, Application/Bootloader Session separation, Firmware Update transaction identity, runtime Transport Profiles, structural rewrite governance, and public GitHub publication requirements. |
+| v1.0.3 | 2026-07-18 | Updated the active related-document references to `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; synchronized current authority references and version examples without changing architecture, Protocol, safety, security, Runtime, or governance semantics. |
+| v1.0.4 | 2026-07-18 | Adopted stable canonical Markdown filenames without embedded versions; moved document identity to metadata, Version History, Git history, tags, and Releases; updated all active cross-document references and examples to stable paths; moved historical snapshot preservation to Git and controlled archives rather than parallel versioned Markdown filenames; and preserved all architecture, Protocol, safety, security, Runtime, and governance semantics except for the filename-governance rule itself. |
 
 ## 0.6 Core Conclusions
 
@@ -939,8 +964,8 @@ protocol/
 The exact YAML structure and Protocol authoring rules are defined by:
 
 ```text
-Protocol_YAML_Definition_Guide_v1.0.3.md
-Protocol_YAML_Template_v1.0.3.md
+Protocol_YAML_Definition_Guide.md
+Protocol_YAML_Template.md
 ```
 
 This Framework shall not duplicate the complete field-level Protocol definition.
@@ -1037,7 +1062,7 @@ Reject invalid Enum, Range, Alignment, or overflow conditions
 
 Field-by-field encoding and decoding is the default.
 
-The Embedded C implementation shall also comply with `Embedded_C_Coding_Rules_v1.0.13.md`.
+The Embedded C implementation shall also comply with `Embedded_C_Coding_Rules.md`.
 
 ## 3.6 Message Length and Unknown Data
 
@@ -1144,7 +1169,7 @@ Non-replaceable deltas or chunks
 
 Transmission rate alone shall not determine the category.
 
-The authoritative field-level rules are in `Protocol_YAML_Definition_Guide_v1.0.3.md`.
+The authoritative field-level rules are in `Protocol_YAML_Definition_Guide.md`.
 
 ## 3.10 Generated Code
 
@@ -2094,7 +2119,7 @@ Long Device operation
 Wi-Fi, BLE, USB, and Vendor Driver callbacks follow the same principle. Convert them to Events, Mailbox Messages,
 or Deferred Work.
 
-The detailed C implementation rules are defined by `Embedded_C_Coding_Rules_v1.0.13.md`.
+The detailed C implementation rules are defined by `Embedded_C_Coding_Rules.md`.
 
 ## 8.5 Static Memory
 
@@ -2805,9 +2830,9 @@ This Baseline establishes the following decisions:
 | Project directories and dependency rules | This Framework |
 | Timing, bandwidth, and safety placement | This Framework plus Product Requirements and Hazard Analysis |
 | Message IDs, Payloads, Wire Format, and security fields | Project Protocol YAML |
-| Protocol YAML authoring and validation rules | `Protocol_YAML_Definition_Guide_v1.0.3.md` |
-| Reusable YAML skeleton | `Protocol_YAML_Template_v1.0.3.md` |
-| Embedded C implementation rules | `Embedded_C_Coding_Rules_v1.0.13.md` |
+| Protocol YAML authoring and validation rules | `Protocol_YAML_Definition_Guide.md` |
+| Reusable YAML skeleton | `Protocol_YAML_Template.md` |
+| Embedded C implementation rules | `Embedded_C_Coding_Rules.md` |
 | Product command semantics | Application Profile and SRS |
 | UI pages and behavior | UI/UX Specification and Product Profile |
 | Coordinator threading and Project references | Coordinator Design Specification and Reference Implementation |
@@ -2820,11 +2845,11 @@ This Baseline establishes the following decisions:
 # Appendix B. Source Document Mapping
 
 ```text
-Embedded_Device_Control_Framework_v1.4.2.md
+Embedded Device Control Framework, document version v1.4.2
     Primarily contributed the original content now represented by
     Parts I, IV, V, VI, VII, VIII, X, XI, and XII.
 
-Coordinator_Node_Architecture_v1.2.1.md
+Coordinator/Node Architecture, document version v1.2.1
     Primarily contributed the original content now represented by
     Parts II, III, IX, and the version and governance rules.
 ```

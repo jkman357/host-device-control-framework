@@ -1,6 +1,7 @@
 # Embedded C Coding Rules
 
-**Document Version:** v1.0.13  
+**Document Name:** `Embedded_C_Coding_Rules.md`  
+**Document Version:** v1.0.15  
 **Status:** Final Baseline  
 **Applicable Domain:** Coordinator/Node Framework - Embedded C Firmware  
 **Primary Narrative Language:** English  
@@ -41,10 +42,10 @@ Framework Baseline documents. It is part of the Framework Implementation Governa
 
 This document shall be used with the following baseline documents:
 
-- `Coordinator_Node_Control_Framework_v1.0.1.md`
-- `Framework_Application_Analysis_Template_v1.0.2.md`
-- `Protocol_YAML_Definition_Guide_v1.0.1.md`
-- `Protocol_YAML_Template_v1.0.1.md`
+- `Coordinator_Node_Control_Framework.md`
+- `Framework_Application_Analysis_Template.md`
+- `Protocol_YAML_Definition_Guide.md`
+- `Protocol_YAML_Template.md`
 
 The responsibility boundary is:
 
@@ -4062,3 +4063,5 @@ Record requirements:
 | v1.0.11 | Required a complete Function Header immediately before every Product-owned function declaration and definition; standardized the mandatory Function, Purpose, Input Parameters, Output Parameters, and Return Value fields; required explicit `None` entries when a field is not applicable; defined in/out parameter and failure-output documentation; and synchronized Function Rules, automated checks, baseline review, confirmed rules, review checklists, prohibited patterns, and Appendix D templates. |
 | v1.0.12 | Restored normative rules that were unintentionally lost during the v1.0.10 English structural rewrite: reinstated the Embedded Firmware entry-point and `main()` responsibility boundary as a formal chapter; restored concrete callback prohibitions, bounded Adapter behavior, parameter-lifetime control, registration and unregistration hazard prevention, and ISR-context linkage; and synchronized automated checks, baseline review, confirmed rules, review checklists, prohibited patterns, and chapter numbering. |
 | v1.0.13 | Removed the duplicated and weaker `main()` example from Appendix C.5; established Section 25 as the single normative source for Embedded Firmware entry-point behavior; replaced the appendix implementation with explicit non-RTOS and RTOS application guidance and cross-references; and eliminated the risk of future example drift between the normative chapter and the reference appendix. |
+| v1.0.14 | Updated the active baseline-document references to `Coordinator_Node_Control_Framework.md`, `Framework_Application_Analysis_Template.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; added the canonical Document Name metadata; and preserved all existing Embedded C coding-rule semantics without technical change. |
+| v1.0.15 | Adopted the stable canonical filename `Embedded_C_Coding_Rules.md`; updated active cross-document references to canonical paths; retained the document version in metadata and Version History; and preserved all Embedded C coding-rule semantics without technical change. |

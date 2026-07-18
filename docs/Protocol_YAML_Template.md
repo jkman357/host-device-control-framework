@@ -2,9 +2,9 @@
 
 ## Coordinator/Node Application Protocol Project Template
 
-**Document Name:** `Protocol_YAML_Template_v1.0.3.md`  
+**Document Name:** `Protocol_YAML_Template.md`  
 **Document ID:** PYT  
-**Document Version:** v1.0.3  
+**Document Version:** v1.0.5  
 **Status:** Baseline  
 **Document Type:** Reusable Project Template  
 **Primary Narrative Language:** English  
@@ -12,8 +12,9 @@
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
 **Related Documents:**
-- `Coordinator_Node_Control_Framework_v1.0.1.md`
-- `Protocol_YAML_Definition_Guide_v1.0.3.md`
+- `Coordinator_Node_Control_Framework.md`
+- `Protocol_YAML_Definition_Guide.md`
+- `Framework_Application_Analysis_Template.md`
 
 **First Issued:** 2026-07-15  
 **Last Revised:** 2026-07-18  
@@ -71,6 +72,8 @@ Schema Validation / Semantic Lint / Code Generation / Test Vectors
 | v1.0.1 | 2026-07-15 | Corrected the Message ID allocation example; aligned the required and conditional top-level keys with the Definition Guide; separated Registry scopes; and strengthened validation, compatibility, and Baseline checklists. |
 | v1.0.2 | 2026-07-18 | Converted the complete template to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned the template with `Protocol_YAML_Definition_Guide_v1.0.3`; replaced native-layout-oriented Wire Format settings with field-by-field encoding and prohibited implicit padding; added distinct Telemetry and Stream examples and policies; and normalized checklists, appendices, and Baseline decisions for public GitHub publication. |
 | v1.0.3 | 2026-07-18 | Defined the intentional redundancy and normative consistency rule for `SAMPLE_STREAM_RECORD.sample_count`; required the sender to encode and the decoder to verify `sample_count == channel_count × samples_per_channel` using widened, overflow-checked arithmetic before reading the sample array; corrected the Stream record minimum length from 18 to 19 bytes; and synchronized Schema Validation, Semantic Lint, Baseline Readiness, and Baseline Decision Summary. |
+| v1.0.4 | 2026-07-18 | Updated the active Framework, Definition Guide, and Application Analysis references to `Coordinator_Node_Control_Framework.md`, `Protocol_YAML_Definition_Guide.md`, and `Framework_Application_Analysis_Template.md`; updated the illustrative YAML minimum-version metadata and Appendix responsibility references; and preserved the YAML structure and all Protocol semantics without technical change. |
+| v1.0.5 | 2026-07-18 | Adopted the stable canonical filename `Protocol_YAML_Template.md`; updated all active Framework, Definition Guide, Application Analysis, and illustrative Project document references to canonical paths; aligned the illustrative minimum-version metadata with the current document set; and preserved the YAML structure and all Protocol semantics without technical change. |
 
 ---
 
@@ -339,18 +342,18 @@ document:
 
   related_framework:
     name: Coordinator_Node_Control_Framework
-    minimum_version: v1.0.1
+    minimum_version: v1.0.4
 
   related_definition_guide:
     name: Protocol_YAML_Definition_Guide
-    minimum_version: v1.0.3
+    minimum_version: v1.0.5
 
-  related_application_analysis: EXAMPLE_Framework_Application_Analysis_v1.0.0.md
-  related_application_profile: EXAMPLE_Application_Profile_v1.0.0.md
-  related_srs: EXAMPLE_SRS_v1.0.0.md
-  related_node_sdd: EXAMPLE_Node_SDD_v1.0.0.md
-  related_coordinator_sdd: EXAMPLE_Coordinator_SDD_v1.0.0.md
-  related_test_plan: EXAMPLE_Test_Plan_v1.0.0.md
+  related_application_analysis: EXAMPLE_Framework_Application_Analysis.md
+  related_application_profile: EXAMPLE_Application_Profile.md
+  related_srs: EXAMPLE_SRS.md
+  related_node_sdd: EXAMPLE_Node_SDD.md
+  related_coordinator_sdd: EXAMPLE_Coordinator_SDD.md
+  related_test_plan: EXAMPLE_Test_Plan.md
 
 protocol:
   name: example_device_protocol
@@ -2155,12 +2158,12 @@ EXAMPLE_DEVICE_protocol
 EXAMPLE_DEVICE
 example_device_protocol
 protocol_team
-EXAMPLE_Framework_Application_Analysis_v1.0.0.md
-EXAMPLE_Application_Profile_v1.0.0.md
-EXAMPLE_SRS_v1.0.0.md
-EXAMPLE_Node_SDD_v1.0.0.md
-EXAMPLE_Coordinator_SDD_v1.0.0.md
-EXAMPLE_Test_Plan_v1.0.0.md
+EXAMPLE_Framework_Application_Analysis.md
+EXAMPLE_Application_Profile.md
+EXAMPLE_SRS.md
+EXAMPLE_Node_SDD.md
+EXAMPLE_Coordinator_SDD.md
+EXAMPLE_Test_Plan.md
 Example.Protocol
 com.example.protocol
 ```
@@ -2373,11 +2376,11 @@ protocol/
 # Appendix B. Template and Guide Responsibility Boundary
 
 ```text
-Protocol_YAML_Definition_Guide_v1.0.3.md
+Protocol_YAML_Definition_Guide.md
     Defines why the Protocol YAML is structured this way,
     which rules are normative, and how validation and governance work.
 
-Protocol_YAML_Template_v1.0.3.md
+Protocol_YAML_Template.md
     Provides the complete reusable Project skeleton that can be copied,
     tailored, and completed.
 
