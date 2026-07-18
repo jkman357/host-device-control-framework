@@ -4,7 +4,7 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.0.6  
+**Document Version:** v1.0.7  
 **Status:** Baseline  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
@@ -199,10 +199,11 @@ The keywords in this document have the following meanings:
 | v1.0.0 | 2026-07-15 | Established the general Protocol YAML Definition Guide, including data models, Messages, versioning, security, Transport, Code Generation, Lint, Test Vectors, and governance rules. |
 | v1.0.1 | 2026-07-15 | Corrected the inconsistency between a Framework Message ID example and the recommended allocation range; explicitly separated the Message, Capability, Service, Namespace, Error, Enum, and Bitset registries and their uniqueness scopes; and strengthened Semantic Lint, quick-reference, and Baseline decisions. |
 | v1.0.2 | 2026-07-18 | Converted the complete guide to English; established Ray Yang as Author and Maintainer; added repository identity, copyright, personal-project clarification, and third-party-material notice; normalized terminology, punctuation, headings, examples, and checklists; and preserved the v1.0.1 technical baseline decisions. |
-| v1.0.3 | 2026-07-18 | Defined the normative decision boundary between `telemetry` and `stream`; added a complete `category: telemetry` YAML example; required telemetry cadence, replacement, priority, and maximum-record-size policies; clarified when sequence and timestamp fields are required; and synchronized Semantic Lint, Project Adoption Checklist, Quick Reference, and Baseline Decision Summary. |
+| v1.0.3 | 2026-07-18 | Defined the normative decision boundary between `telemetry` and `stream`; added a complete `category: telemetry` YAML example; required telemetry cadence, replacement, priority, and maximum-plaintext-message-size policies; clarified when sequence and timestamp fields are required; and synchronized Semantic Lint, Project Adoption Checklist, Quick Reference, and Baseline Decision Summary. |
 | v1.0.4 | 2026-07-18 | Updated the active Framework, Template, and Application Analysis references to `Coordinator_Node_Control_Framework.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; corrected the companion-artifact wording now that the Template exists; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
 | v1.0.5 | 2026-07-18 | Adopted the stable canonical filename `Protocol_YAML_Definition_Guide.md`; updated active Framework, Template, and Application Analysis references to canonical paths; retained version identity in document metadata and Git history; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
 | v1.0.6 | 2026-07-18 | Corrected the Telemetry replacement model by separating replacement semantics from queue discipline; required explicit per-Message security and deterministic direction/environment Key Context mapping; defined Application and Bootloader Handshake profiles and pre-Session protection; made signed canonical Firmware Manifest transfer mandatory when Firmware Update is in scope; added computed minimum/maximum length and Runtime Effective Profile Lint rules; and clarified cross-implementation versus cross-language interoperability. |
+| v1.0.7 | 2026-07-18 | Closed the remaining security and sizing ambiguities: required unresolved-security sentinel rejection; defined privacy-preserving bounded public Discovery and authenticated revalidation; made Record Counter and Rekey lifecycle machine-verifiable per Key Context; bound Handshake Profile selection and canonical transcript fields to prevent profile confusion and downgrade; required exact canonical Firmware signature encodings; fixed `minimum_length` to the fixed decoding prefix; and separated plaintext Message, secured Record, Transport reassembly, and Fragment payload limits. |
 
 ---
 
@@ -1254,7 +1255,7 @@ Maximum rate
 Replacement policy
 Timestamp policy
 Priority
-Maximum record size
+Maximum plaintext Message size
 Loss policy
 ```
 
@@ -1311,7 +1312,7 @@ Example:
   delivery_queue_policy: single_pending
   loss_policy: latest_value_only
   priority: status
-  maximum_record_size: 32
+  maximum_plaintext_message_size: 32
   timestamp_policy:
     field: sample_timestamp_us
     epoch: device_boot
@@ -1368,7 +1369,7 @@ Sequence scope
 Sequence reset conditions
 Timestamp source and meaning
 Loss policy
-Maximum record size
+Maximum plaintext Message size
 Fragmentation behavior when required
 ```
 
@@ -1384,10 +1385,10 @@ Example:
   execution_environment: application
   description: Timestamped acquisition sample record.
   length_policy: minimum
-  minimum_length: 18
+  minimum_length: 19
   unknown_trailing_policy: reject
   priority: data
-  maximum_record_size: 512
+  maximum_plaintext_message_size: 512
   loss_policy: detectable_drop_allowed
   sequence_policy:
     field: record_sequence
@@ -1570,28 +1571,42 @@ requests controlled recovery.
 
 ## 13. Length Policy and Unknown Data Handling
 
-### 13.1 `exact`
+### 13.1 Length Scope
 
-The Payload length shall match exactly:
+`length_policy`, `minimum_length`, and Message-level size limits apply to the encoded plaintext `payload.fields`
+only. They exclude the outer Protocol Record header, Security header, Authentication Tag, and Fragment headers.
+
+`minimum_length` has one normative meaning:
+
+```text
+The fixed decoding prefix required before the first variable-length field or optional trailing field.
+```
+
+It does not include minimum variable-array content. The decoder shall separately validate:
+
+```text
+Count or length field range
+Calculated total plaintext Message length
+Actual received plaintext Message length
+Remaining input bytes
+Destination capacity
+Overflow-safe arithmetic
+```
+
+### 13.2 `exact`
+
+The plaintext Payload length shall match the size derived from the declared fields exactly:
 
 ```yaml
 length_policy: exact
 unknown_trailing_policy: reject
 ```
 
-Suitable for:
+Suitable for fixed-format control, Authentication, Key exchange, and fixed Firmware Update records.
 
-```text
-Safety-critical command
-Authentication
-Key exchange
-Fixed-format Update header
-Short control command not intended for extension
-```
+### 13.3 `minimum`
 
-### 13.2 `minimum`
-
-The Payload shall contain at least the declared minimum length:
+The Payload shall contain at least the fixed decoding prefix:
 
 ```yaml
 length_policy: minimum
@@ -1599,11 +1614,10 @@ minimum_length: 8
 unknown_trailing_policy: reject
 ```
 
-This policy is suitable for a bounded variable array or another Payload whose size is calculated from a count.
+This policy is suitable for a bounded variable array or another Payload whose total size is calculated from a
+count. A count minimum of one does not increase `minimum_length`; it is validated as a separate field constraint.
 
-The decoder shall still verify the calculated total length.
-
-### 13.3 `extensible`
+### 13.4 `extensible`
 
 Only trailing Optional Fields may be added:
 
@@ -1625,69 +1639,20 @@ Change endianness
 Change existing semantics incompatibly
 ```
 
-These changes require a MAJOR Protocol version change or a new Message.
-
-### 13.4 `tlv`
+### 13.5 `tlv`
 
 ```yaml
 length_policy: tlv
 unknown_tlv_policy: skip
 ```
 
-Suitable for:
+Every TLV shall define Type, Length, Value, maximum length, duplicate policy, ordering policy, and unknown-type
+policy. An unknown TLV may be skipped only after its length is proven to fit the remaining plaintext Message.
 
-```text
-Capability description
-Diagnostics
-Extended Device information
-Low-frequency configuration
-Log metadata
-```
+### 13.6 Unknown Handling
 
-Every TLV shall define:
-
-```text
-Type
-Length
-Value
-Maximum length
-Duplicate policy
-Ordering policy
-Unknown type policy
-```
-
-An unknown TLV may be skipped only after the decoder validates that its declared length fits within the remaining
-Payload.
-
-### 13.5 Unknown Handling
-
-The Protocol shall define behavior for:
-
-```text
-Unknown Message
-Unknown Command
-Unknown Event
-Unknown Capability
-Unknown Enum Value
-Unknown Bit
-Unknown Field
-Unknown TLV Type
-Unknown Trailing Data
-```
-
-Recommended defaults:
-
-| Type | Recommended Policy |
-|---|---|
-| Unknown command request | Return `ERROR_UNSUPPORTED_MESSAGE` |
-| Unknown event | Record the raw ID and preserve the Session |
-| Unknown capability | Preserve or ignore according to the negotiated rule |
-| Unknown enum value | Preserve the raw value or map to an explicit UNKNOWN representation |
-| Unknown bit | Preserve the raw mask |
-| Unknown trailing data | Ignore only for an explicitly extensible Message |
-| Unknown TLV | Skip only when the Message declares extension support; otherwise reject |
-
-Unknown data shall not be treated as successful known processing.
+Unknown Message, Command, Event, Capability, Enum value, bit, field, TLV, and trailing-data behavior shall be
+explicit. Unknown data shall not be treated as successful known processing.
 
 ---
 
@@ -1824,170 +1789,109 @@ explicitly justifies that dependency.
 
 ### 16.1 Explicit Per-Message Security
 
-Every Message shall define an explicit `security` block, including public Discovery, pre-Session Handshake,
-Heartbeat, Error, Event, Alarm, Fault, Telemetry, Stream, and Firmware Update Messages.
+Every Message shall define an explicit `security` block. Omission shall not imply inheritance. Public Discovery,
+pre-Session Handshake, Heartbeat, Error, Event, Alarm, Fault, Telemetry, Stream, and Firmware Update Messages are
+all included.
 
-Omission shall not imply inheritance.
+### 16.2 Key Context Separation
 
-```yaml
-security_model:
-  message_security_policy:
-    mode: explicit_per_message
-    omitted_security_block_policy: reject
-```
+Application and Bootloader, direction, and purpose Key Contexts remain separate. `key_context`,
+`key_context_by_environment`, and `key_context_by_direction_and_environment` are mutually exclusive.
 
-A Session-protected Message should define:
+### 16.3 Record Counter and Rekey Profiles
 
-```yaml
-security:
-  authentication_required: true
-  confidentiality_required: false
-  integrity_required: true
-  anti_replay_required: true
-  allowed_before_session: false
-  privilege: control
-  key_context: application_control_h2d
-```
-
-A public Message shall state that fact explicitly:
-
-```yaml
-security:
-  authentication_required: false
-  confidentiality_required: false
-  integrity_required: false
-  anti_replay_required: false
-  allowed_before_session: true
-  privilege: public_read
-```
-
-The Project shall not use one vague `secure: true` flag as a substitute for explicit attributes.
-
-### 16.2 Key Context Separation and Mapping
-
-Application and Bootloader Messages shall not share an ambiguous Key Context.
-
-Recommended separation includes:
+Every Key Context shall reference one machine-verifiable Record Counter/Rekey Profile defining:
 
 ```text
-application_control_h2d
-application_control_d2h
-application_data_h2d
-application_data_d2h
-bootloader_update_h2d
-bootloader_response_d2h
+Counter width and initial value
+Soft Threshold
+Rekey Deadline
+Hard Limit
+Persistence policy
+Reset conditions
+Receive gap and out-of-order policy
+Counter-exhaustion behavior
+Atomic Rekey cutover
+Old-Epoch acceptance and late-record behavior
 ```
 
-A Bootloader Message shall not use an Application Key Context.
-
-A unidirectional single-environment Message may use:
-
-```yaml
-key_context: application_control_h2d
-```
-
-A Message that is valid in multiple Execution Environments shall define:
-
-```yaml
-key_context_by_environment:
-  application: application_control_h2d
-  bootloader: bootloader_update_h2d
-```
-
-A bidirectional Message shall define a deterministic mapping:
-
-```yaml
-key_context_by_direction_and_environment:
-  coordinator_to_node:
-    application: application_control_h2d
-    bootloader: bootloader_update_h2d
-  node_to_coordinator:
-    application: application_control_d2h
-    bootloader: bootloader_response_d2h
-```
-
-`key_context`, `key_context_by_environment`, and `key_context_by_direction_and_environment` are mutually
-exclusive for one Message.
-
-### 16.3 Handshake Profiles
-
-When the Security Model requires a Secure Session, the Protocol shall define bounded `category: handshake`
-Messages for Application and Bootloader Session establishment or shall reference a separately versioned and
-deterministically merged Session Protocol.
-
-A Handshake Profile shall define:
+The required ordering is:
 
 ```text
-Profile ID
+initial_value < soft_threshold < rekey_deadline < hard_limit <= maximum representable value
+```
+
+The Hard Limit is uncrossable. Protected transmission shall stop before overflow or nonce reuse under the same key.
+A counter shall reset only after new keys and a new Session Epoch are atomically activated.
+
+### 16.4 Handshake Profiles and Downgrade Protection
+
+When a Secure Session is required, Application and Bootloader shall define separate bounded Handshake Profiles and
+Messages or a separately versioned, deterministically merged Session Protocol.
+
+A Profile shall define concrete Key Agreement, KDF, cipher suite, proof format, transcript hash, nonce source,
+maximum payload, derived Key Contexts, and failure behavior. Unresolved security sentinels are forbidden in a
+Product Baseline.
+
+When both a Message declaration and a wire field identify the Profile:
+
+```text
+payload.handshake_profile_id == referenced handshake_profile.profile_id
+```
+
+Mismatch, unsupported Profile, or a Profile below the approved minimum shall cause explicit rejection. Silent
+fallback is prohibited.
+
+The canonical transcript shall bind at least:
+
+```text
+Protocol family and version
+Discovery ID when public Discovery was used
+Handshake Profile ID
 Execution Environment
-Authentication mode
-Transcript hash
-Key-agreement method
-Proof format
-Nonce and Anti-Replay source
-Derived direction-specific Key Contexts
-Maximum Handshake payload
-Failure behavior
+Initiator and responder roles
+Both authenticated identities
+Both nonces
+Both ephemeral public keys
+Negotiated algorithms
+Assigned Session ID
+Derived Key Context list
 ```
 
-Handshake Messages are allowed before a Session exists, but they are not unauthenticated discovery traffic.
-Their authentication, integrity, and Anti-Replay properties are provided by the declared Handshake Profile and
-canonical transcript.
+Proof validation covers the complete canonical transcript.
 
-Example:
+### 16.5 Privacy-Preserving Public Discovery
 
-```yaml
-security:
-  authentication_required: true
-  authentication_source: handshake_profile
-  integrity_required: true
-  integrity_source: handshake_profile
-  anti_replay_required: true
-  anti_replay_source: nonce_and_handshake_transcript
-  allowed_before_session: true
-  privilege: session_establishment
-  handshake_profile: APPLICATION_MUTUAL_AUTH_V1
-```
+Unauthenticated Discovery shall expose only the minimum information needed to select an approved Handshake path.
+It shall not expose a permanent Device UUID or authoritative Product Capability state.
 
-Application and Bootloader Handshake Profiles, Sessions, counters, and Key Contexts shall remain separate.
-
-### 16.4 Unauthenticated Discovery Messages
-
-Only necessary identity or Capability Discovery Messages may be unauthenticated.
-
-The reason, information exposure, rate limit, and failure behavior shall be documented.
-
-Configuration, control, state-sensitive status, Event, Alarm, Fault, Telemetry, Stream, and Firmware Update
-Messages shall not be made unauthenticated for development convenience.
-
-### 16.5 Security Failures
-
-The Security Model shall define behavior for:
+Every public Discovery policy shall define:
 
 ```text
-Authentication Failure
-Handshake proof failure
-Integrity Failure
-Replay Detected
-Wrong Session ID
-Wrong Key Context
-Counter Gap
-Expired Session
-Execution Environment Mismatch
-Manifest hash failure
-Firmware signature failure
+Exposure rationale
+Ephemeral Discovery identifier and rotation
+Permitted fields
+Rate-limit window, burst, and excess behavior
+Failure behavior
+Whether results are authoritative
+Handshake transcript binding
+Authenticated post-Session revalidation
 ```
 
-The Project shall define whether each failure causes an error response, disconnect, diagnostic counter, rate
-limit, lockout, or another controlled action.
+Unauthenticated versions, environment, Profile lists, or other hints shall not authorize downgrade or Product
+behavior. Permanent identity and authoritative Capability information require an authenticated Message.
 
-### 16.6 Security Compatibility
+### 16.6 Security Failures
 
-A security-attribute, Handshake Profile, Key Context mapping, Manifest format, trust-anchor, or signature-policy
-change may alter Session or Firmware Update compatibility even when the ordinary Payload layout is unchanged.
+The Security Model shall define Authentication, Handshake proof, Integrity, Replay, wrong Session, wrong Key
+Context, Counter gap, Counter exhaustion, Rekey deadline, expired Session, environment mismatch, downgrade attempt,
+Manifest hash, and Firmware signature failure behavior.
 
-Compatibility Review shall include authentication, integrity, Anti-Replay, privilege, Key Context, Handshake,
-Manifest, trust-anchor, and signature changes.
+### 16.7 Security Compatibility
+
+Changes to security attributes, Counter/Rekey Profiles, Handshake Profiles, transcript fields, Key Context mapping,
+Discovery exposure, Manifest format, trust anchors, signature encoding, or downgrade policy require Compatibility
+Review and security revalidation.
 
 ---
 
@@ -2055,87 +1959,73 @@ A Node shall not return success while ignoring an unsupported request.
 
 ## 18. Transport Profiles and Fragmentation
 
-### 18.1 Transport Profile
+### 18.1 Distinct Size Domains
+
+The Protocol shall not use one ambiguous `maximum_record_size` for different layers. The following quantities are
+distinct:
+
+```text
+maximum_plaintext_message_size
+protocol_record_header_bytes
+security_header_bytes
+authentication_tag_bytes
+maximum_security_overhead_bytes
+maximum_secured_record_size
+maximum_transport_reassembly_size
+fragment_header_bytes
+maximum_fragment_payload
+```
+
+The normative relationship is:
+
+```text
+maximum_secured_record_size
+    = maximum_plaintext_message_size
+    + protocol_record_header_bytes
+    + security_header_bytes
+    + authentication_tag_bytes
+```
+
+The Transport reassembly Buffer shall be at least the maximum secured Record size. Fragment capacity shall satisfy:
+
+```text
+maximum_fragments_per_record * maximum_fragment_payload
+    >= maximum_secured_record_size
+```
+
+### 18.2 Transport Profile Example
 
 ```yaml
 transport_profiles:
   - name: USB_CDC_BASELINE
     transport: usb_cdc
     minimum_mtu: 64
-    maximum_record_size: 4096
-    expected_minimum_throughput_bps: 100000
-    maximum_control_latency_ms: 100
+    maximum_plaintext_message_size: 4096
+    protocol_record_header_bytes: 12
+    security_header_bytes: 12
+    authentication_tag_bytes: 16
+    maximum_security_overhead_bytes: 40
+    maximum_secured_record_size: 4136
+    maximum_transport_reassembly_size: 4136
     fragmentation:
       mode: protocol_record_fragmentation
+      fragment_header_bytes: 8
+      maximum_fragment_payload: 56
       maximum_fragments_per_record: 128
 ```
 
-### 18.2 Static Design Envelope
+### 18.3 Static and Runtime Effective Profiles
 
-The design shall define:
-
-```text
-Minimum supported MTU
-Maximum supported MTU
-Maximum record size
-Minimum throughput
-Maximum control latency
-Maximum reassembly buffer
-Maximum fragment count
-Allowed channel and sample profile
-```
-
-The Project shall demonstrate predictable behavior under the worst supported conditions.
-
-Semantic Lint shall derive every maximum encoded Message length from fixed fields, nested Types, and maximum
-variable-array bounds. The derived value shall not exceed the Message maximum, Transport Profile maximum record,
-or bounded reassembly Buffer.
-
-### 18.3 Runtime Effective Profile
-
-A dynamically negotiated Transport such as BLE or Wi-Fi should establish an effective runtime profile:
-
-```text
-Negotiated MTU
-Effective payload
-Connection interval
-PHY
-Expected throughput
-Fragment count
-Reassembly buffer
-Control latency
-```
-
-If the effective Transport cannot carry the requested profile, the system shall take an explicit action:
-
-```text
-Reduce samples per record
-Reduce record rate
-Reduce channel count
-Reduce sample rate
-Use lower-rate Telemetry
-Reject the requested Streaming profile
-```
-
-The rejection or downgrade reason shall be explicit.
+A static or negotiated Profile shall bound MTU, plaintext Message size, secured Record size, reassembly, fragment
+count and payload, throughput, control latency, channel/sample settings, and all Buffers. The usable Runtime
+Effective Profile is the most restrictive applicable Product, Node, Transport, Buffer, security-overhead, and
+negotiated limit.
 
 ### 18.4 Fragmentation
 
-Fragmentation shall define:
-
-```text
-Record ID
-Fragment index
-Fragment count
-Original record length
-Reassembly timeout
-Duplicate-fragment policy
-Out-of-order policy
-Maximum concurrent reassembly
-Integrity scope
-```
-
-The Protocol shall not assume that one Transport operation always carries one complete Protocol Record.
+Fragmentation applies to the secured Record unless the approved architecture explicitly defines another integrity
+scope. Record ID, Fragment index/count, original secured Record length, timeout, duplicate/out-of-order policy,
+maximum concurrent reassembly, and integrity scope shall be explicit and bounded.
 
 ---
 
@@ -2190,48 +2080,39 @@ All sizes and offsets shall be bounded and range-checked.
 
 ### 19.4 Signed Canonical Manifest and Image Verification
 
-When Firmware Update is in scope, a canonical signed Firmware Manifest shall be transferred before image
-acceptance.
+When Firmware Update is in scope, the Protocol shall transfer a canonical signed Manifest before image acceptance.
+The Manifest binds target compatibility, version, image size and hash, signing-key identity, signature algorithm,
+security version, and Update Transaction identity.
 
-The Manifest shall include:
-
-```text
-Manifest format version
-Device model
-Hardware revision range
-Firmware version
-Image type
-Image size
-Load address or partition when applicable
-Complete-image cryptographic hash
-Signing-key identifier
-Signature algorithm
-Minimum Bootloader version
-Required Protocol version
-Build identifier
-Security version
-```
-
-The Protocol shall define:
+Every accepted signature algorithm shall define a concrete Signature Profile with:
 
 ```text
-Canonical field order and encoding
-Manifest hash algorithm
-Signature input and domain separation
-Maximum signature length
-Accepted signature algorithms
-Trust-anchor or signing-key selection
-Manifest-to-Update-Transaction binding
-Failure and audit behavior
+Signature primitive
+Exact message-preparation rule
+Exact wire encoding
+Exact signature length
+Canonicality rule
+Malleability rule
 ```
 
-The Bootloader shall recompute the Manifest hash from the canonical fields, compare the transferred hash, verify
-the signature with the approved signing key, validate target compatibility and anti-rollback policy, and bind the
-accepted Manifest identity to the Update Transaction.
+For the illustrative Profiles:
 
-Transport integrity does not replace complete-image hash and independent Manifest signature verification.
+```text
+ECDSA P-256:
+    message preparation = SHA-256(domain_separator || manifest_hash)
+    wire encoding = IEEE P1363 fixed-width r || s, big-endian
+    exact length = 64 bytes
+    DER encoding prohibited
+    low-S required
 
-A CRC may detect accidental transmission corruption but does not establish a trusted Firmware origin.
+Ed25519:
+    message preparation = domain_separator || manifest_hash
+    wire encoding = RFC 8032 64-octet signature
+    exact length = 64 bytes
+```
+
+A variable DER ECDSA signature shall not be accepted when the Protocol declares fixed IEEE P1363 encoding.
+Transport integrity and CRC do not replace complete-image hash and independent signature verification.
 
 ### 19.5 Resume and Rekey
 
@@ -2490,17 +2371,17 @@ A safety-critical command is not unauthenticated
 A non-idempotent command is not retried without a controlled identity
 A deprecated symbol does not reuse an ID
 A Bootloader Message does not use an Application Key Context
-Every declared minimum_length equals the computed required fixed prefix before optional or variable trailing data
-Every derived maximum encoded Message length remains within its declared maximum_record_size when present
-A Transport Profile can carry or fragment the maximum record within its bounded reassembly Buffer
+Every declared minimum_length equals the fixed decoding prefix before the first variable or optional tail; variable minimums are checked separately
+Every derived maximum encoded plaintext Message length remains within its declared maximum_plaintext_message_size when present
+Plaintext, security overhead, secured Record, reassembly, Fragment payload, and Fragment-count relationships are arithmetically consistent
 Declared ranges fit the wire type
 Invalid values do not overlap normal ranges
 Unit and scale are complete when required
-Telemetry has cadence or trigger, replacement, timestamp, priority, loss, and maximum-record-size policies
+Telemetry has cadence or trigger, replacement, timestamp, priority, loss, and maximum-plaintext-message-size policies
 A `latest_value_only` Telemetry Payload is a complete independently usable snapshot
 A Message categorized as Telemetry does not require every intermediate record for correct interpretation
 A Message categorized as Stream defines sequence continuity and loss or ordering behavior
-Streaming has sequence, timestamp, loss, and maximum-record-size policies
+Streaming has sequence, timestamp, loss, and maximum-plaintext-message-size policies
 Signed Firmware Update defines canonical Manifest hashing, signing-key identity, signature algorithm, bounded signature, and transaction binding
 Published and reserved identifiers are not reused
 ```
@@ -2518,19 +2399,27 @@ Reserved prefixes are not used without authorization
 No example placeholder remains in a Product Baseline
 ```
 
-### 22.4 Placeholder Lint
+### 22.4 Placeholder and Unresolved-Security Lint
 
-A Product Baseline shall not contain unresolved placeholders such as:
+A Product Baseline shall reject case-insensitive unresolved values including:
 
 ```text
 EXAMPLE_
+example_device
+protocol_team
 TODO
 TBD
 PLACEHOLDER
+UNRESOLVED_PROJECT_DECISION
+PROJECT_DEFINED_BEFORE_BASELINE
 your_company
 com.example
 Example.Protocol
 ```
+
+Lint shall scan YAML scalar values, generated identifiers, generated comments, configuration, documentation, and
+test vectors. Security-critical fields shall additionally use an allowlist of approved concrete Key Agreement, KDF,
+proof, cipher, credential, Counter/Rekey, trust-anchor, and signature-profile values.
 
 ---
 
@@ -2908,9 +2797,9 @@ Hazard Analysis defines risk controls
 - [ ] Unknown-data behavior is explicit.
 - [ ] Timeout, Retry, and Idempotency are defined.
 - [ ] Telemetry and Stream categories follow the normative decision boundary.
-- [ ] Telemetry defines cadence or trigger, Replacement Policy, Timestamp Policy, Priority, Loss Policy, and Maximum Record Size.
+- [ ] Telemetry defines cadence or trigger, Replacement Policy, Timestamp Policy, Priority, Loss Policy, and Maximum Plaintext Message Size.
 - [ ] A latest-value-only Telemetry Payload is a complete independently usable snapshot.
-- [ ] Streaming defines Sequence, Timestamp, Loss Policy, and Maximum Record Size.
+- [ ] Streaming defines Sequence, Timestamp, Loss Policy, and Maximum Plaintext Message Size.
 - [ ] Event, Alarm, and Fault semantics are separated.
 - [ ] Capabilities are defined where feature negotiation is required.
 - [ ] Security attributes are defined.
@@ -2984,7 +2873,7 @@ Length Policy
 Sequence Policy
 Timestamp Policy
 Loss Policy
-Maximum Record Size
+Maximum Plaintext Message Size
 Payload
 Security Attributes when required
 ```
@@ -3070,9 +2959,9 @@ This baseline establishes the following decisions:
 16. Unknown-data behavior is explicit and is not globally permissive.
 17. Retry is bounded; non-idempotent commands require controlled identity and duplicate handling.
 18. Telemetry and Stream use an explicit semantic decision boundary rather than transmission frequency alone.
-19. Telemetry represents a complete summarized state snapshot and defines cadence or trigger, Replacement Policy, Timestamp Policy, Priority, Loss Policy, and Maximum Record Size.
+19. Telemetry represents a complete summarized state snapshot and defines cadence or trigger, Replacement Policy, Timestamp Policy, Priority, Loss Policy, and Maximum Plaintext Message Size.
 20. A latest-value-only Telemetry Payload is independently usable and does not require every intermediate record.
-21. Streaming represents a continuous ordered sequence and defines Sequence, Timestamp, Loss Policy, and Maximum Record Size.
+21. Streaming represents a continuous ordered sequence and defines Sequence, Timestamp, Loss Policy, and Maximum Plaintext Message Size.
 22. Event, Alarm, and Fault are distinct semantic categories.
 23. Security-sensitive Messages define authentication, integrity, anti-replay, privilege, and Key Context.
 24. Application and Bootloader shall not share one ambiguous Key Context.
@@ -3095,6 +2984,15 @@ This baseline establishes the following decisions:
 41. Firmware Update transfers and verifies a canonical signed Manifest bound to the Update Transaction.
 42. Cross-implementation interoperability applies to all implementations; cross-language testing applies to language pairs in scope.
 43. Repeated rules outside their owning document are derived conformance summaries and shall not override the authority source.
+44. Product Baselines reject unresolved security sentinels with case-insensitive scans and security-field allowlists.
+45. Public Discovery is minimal, ephemeral, rate-limited, non-authoritative, transcript-bound, and followed by authenticated revalidation.
+46. Permanent Device identity and authoritative Capabilities are not exposed by unauthenticated Discovery.
+47. Every Key Context references a concrete machine-verifiable Record Counter and Rekey Profile.
+48. Handshake Profile identity has one canonical binding; mismatches and downgrade attempts are explicitly rejected without silent fallback.
+49. Canonical Handshake transcripts bind Protocol, environment, roles, identities, nonces, ephemeral keys, negotiated algorithms, Session ID, and Key Contexts.
+50. Every Firmware signature algorithm defines exact message preparation, exact wire encoding, exact length, and canonicality or malleability rules.
+51. `minimum_length` is the fixed decoding prefix only; variable-content minimum and actual length are separate validations.
+52. Plaintext Message size, security overhead, secured Record size, Transport reassembly size, and Fragment payload are distinct bounded quantities.
 
 ---
 

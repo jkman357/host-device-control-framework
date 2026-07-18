@@ -4,7 +4,7 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.6  
+**Document Version:** v1.0.7  
 **Status:** Baseline  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
@@ -249,6 +249,7 @@ Markdown filename.
 | v1.0.4 | 2026-07-18 | Adopted stable canonical Markdown filenames without embedded versions; moved document identity to metadata, Version History, Git history, tags, and Releases; updated all active cross-document references and examples to stable paths; moved historical snapshot preservation to Git and controlled archives rather than parallel versioned Markdown filenames; and preserved all architecture, Protocol, safety, security, Runtime, and governance semantics except for the filename-governance rule itself. |
 | v1.0.5 | 2026-07-18 | Clarified that generated Dispatcher output is Protocol plumbing and shall not contain Product control, state ownership, or hardware access; operationalized the one-authority rule through derived conformance summaries; and generalized interoperability requirements from fixed language pairs to all implementations and language pairs actually in scope. |
 | v1.0.6 | 2026-07-18 | Refined filename governance into a two-layer policy: maintained Markdown authority paths remain stable inside controlled Git repositories, while immutable release artifacts, audit packages, external deliverables, and detached snapshots include an approved document version or Baseline identifier in the distributed filename; required detached artifacts to carry source commit, tag, or Release traceability; and preserved all architecture and Protocol semantics. |
+| v1.0.7 | 2026-07-18 | Closed the remaining machine-verifiable security and Transport-envelope gaps: required minimal ephemeral public Discovery and authenticated revalidation; bound Handshake Profile selection and complete canonical transcripts against downgrade and profile confusion; required per-Key-Context Record Counter/Rekey profiles; defined exact canonical Firmware signature encodings; clarified fixed-prefix `minimum_length`; and separated plaintext Message, security overhead, secured Record, reassembly, and Fragment size domains. |
 
 ## 0.6 Core Conclusions
 
@@ -1096,6 +1097,13 @@ extensible
 tlv
 ```
 
+Message length fields apply to the encoded plaintext Payload defined by the Protocol YAML and exclude outer Record
+headers, Security headers, Authentication Tags, and Fragment headers.
+
+`minimum_length` is the fixed decoding prefix before the first variable-length or optional trailing field. Minimum
+variable count, calculated total length, actual received length, remaining bytes, destination capacity, and arithmetic
+overflow are validated separately.
+
 Only an explicitly extensible Message may ignore unknown trailing fields.
 
 Existing field order, type, size, signedness, and endianness shall not be changed under a compatible MINOR version.
@@ -1428,100 +1436,50 @@ Reconnect does not automatically restore Application state. Current Node state s
 
 ## 5.1 Transport as a Formal Profile
 
-USB, UART, CAN, TCP, Wi-Fi, and BLE are not merely interchangeable Driver implementations.
-
-Each Transport Profile shall define:
+Each Transport Profile shall distinguish and bound:
 
 ```text
-MTU
-Effective Payload
-Throughput
-Latency
-Fragmentation
-Reassembly
-Retry behavior
-Connection behavior
-Buffer limits
-Failure modes
-Security assumptions
+MTU and Fragment payload
+Maximum plaintext Message size
+Protocol Record header
+Security header
+Authentication Tag
+Maximum security overhead
+Maximum secured Record size
+Maximum Transport reassembly size
+Maximum Fragment count
+Throughput and latency
+Retry, connection, Buffer, and failure behavior
 ```
 
-A Product shall not claim Transport support without a bounded and tested profile.
+A Product shall not claim Transport support without a bounded and tested Profile.
 
-## 5.2 Static Design Envelope
+## 5.2 Size-Domain Relationship
 
-For fixed Transports such as configured UART, USB, or CAN FD, a static profile may be established at design time.
-
-For dynamically negotiated Transports such as BLE or some Wi-Fi modes, the design shall define a supported
-envelope:
+The following are different engineering quantities:
 
 ```text
-Minimum and Maximum MTU
-Supported connection interval
-Supported PHY
-Data Length Extension capability
-Maximum reassembly buffer
-Permitted channel and sample profiles
-Minimum throughput
-Maximum control latency
+Plaintext Message
+Secured Record
+Transport-reassembled Record
+Transport Fragment
 ```
 
-The minimum supported negotiated condition shall still produce safe and predictable behavior.
+The maximum secured Record is the maximum plaintext Message plus the declared Protocol and security overhead. The
+reassembly Buffer shall hold the maximum secured Record. Fragment capacity shall cover that secured Record within
+the bounded maximum Fragment count. One ambiguous `maximum_record_size` shall not be used for all layers.
 
-## 5.3 Runtime Effective Profile
+## 5.3 Static and Runtime Effective Profile
 
-After connection negotiation, the system shall calculate an effective runtime profile using actual values such as:
-
-```text
-Negotiated MTU
-Effective payload
-Connection interval
-PHY
-Data length
-Notifications per connection event
-Fragment count
-Record rate
-Control latency budget
-```
-
-If the negotiated profile is insufficient, the system shall perform an explicit controlled action:
-
-```text
-Reduce Samples per Record
-Reduce Record Rate
-Reduce Channel Count
-Reduce Sample Rate
-Switch to lower-rate Telemetry
-Reject the requested Stream profile
-```
-
-Example error results include:
-
-```text
-UNSUPPORTED_TRANSPORT_PROFILE
-INSUFFICIENT_MTU
-INSUFFICIENT_THROUGHPUT
-LATENCY_REQUIREMENT_NOT_MET
-```
+Fixed and dynamically negotiated Transports shall define a safe supported envelope. Runtime negotiation uses the
+most restrictive Product, Node, Transport, Buffer, security-overhead, and negotiated limit. If insufficient, the
+system explicitly reduces the requested profile or rejects it; it shall not silently exceed a Buffer or latency bound.
 
 ## 5.4 Fragmentation
 
-Fragmentation shall be bounded.
-
-The Protocol or Transport Profile shall define:
-
-```text
-Maximum fragments per record
-Maximum record size
-Maximum concurrent reassembly
-Reassembly timeout
-Out-of-order policy
-Duplicate-fragment policy
-Memory requirement
-Abort behavior
-```
-
-The system shall not allocate unbounded memory based on an untrusted announced length.
+Fragmentation shall define Fragment header size, maximum Fragment payload, Fragment count, secured original Record
+length, reassembly timeout, duplicate and out-of-order policy, maximum concurrent reassembly, integrity scope, memory
+requirement, and abort behavior. Untrusted announced lengths shall never cause unbounded allocation.
 
 ## 5.5 Maximum Non-Preemptible Transfer Time
 
@@ -1661,7 +1619,27 @@ Bootloader Response D2H
 
 A key or counter from one context shall not be used by another context.
 
-## 6.4 Nonce and Record Counter
+## 6.4 Public Discovery and Authenticated Revalidation
+
+Unauthenticated Discovery shall expose only the minimum ephemeral information needed to select an approved
+Handshake path. It shall not expose a permanent Device UUID or authoritative Capability state.
+
+The Discovery policy shall define an ephemeral identifier and rotation, exposure rationale, permitted fields,
+rate limit, excess behavior, failure behavior, transcript binding, and authenticated post-Session revalidation.
+Unauthenticated hints shall not authorize downgrade or Product behavior.
+
+## 6.5 Handshake Profile and Transcript Binding
+
+A Handshake Profile shall use concrete approved Key Agreement, KDF, cipher suite, proof format, and credential model.
+Product Baselines shall not retain unresolved security sentinels.
+
+A wire `handshake_profile_id` shall equal the Profile referenced by the Message. Mismatch, unsupported Profile, or a
+Profile below the approved minimum shall be explicitly rejected without silent fallback.
+
+The canonical transcript binds Protocol family/version, Discovery ID, Profile ID, Execution Environment, roles,
+identities, nonces, ephemeral public keys, negotiated algorithms, Session ID, and derived Key Contexts.
+
+## 6.6 Nonce and Record Counter
 
 A nonce shall never repeat under the same key.
 
@@ -1676,15 +1654,20 @@ Security Record Counter
 
 Record counters shall not overflow or silently wrap under the same key.
 
-## 6.5 Counter Limits
+## 6.7 Counter Limits
 
-Each Execution Environment and Key Context shall define:
+Each Execution Environment and Key Context shall reference a machine-verifiable Record Counter/Rekey Profile defining:
 
 ```text
+Counter width and initial value
 Soft Threshold
 Rekey Deadline
 Hard Limit
 Counter persistence policy
+Reset conditions
+Receive gap and out-of-order policy
+Counter-exhaustion behavior
+Atomic Rekey cutover and old-Epoch acceptance
 Failure behavior
 ```
 
@@ -1695,7 +1678,7 @@ Rekey Deadline is the point after which new ordinary traffic should be restricte
 Hard Limit is an uncrossable security boundary. Traffic requiring the exhausted context shall stop before the
 limit is exceeded.
 
-## 6.6 Session-Wide Rekey
+## 6.8 Session-Wide Rekey
 
 Within one Execution Environment and one Session Epoch, the earliest context approaching its security limit may
 trigger Session-wide Rekey.
@@ -1712,7 +1695,7 @@ Failure rollback or disconnect
 
 Application and Bootloader do not perform one atomic cross-reset Rekey because they are separate Sessions.
 
-## 6.7 Anti-Replay
+## 6.9 Anti-Replay
 
 A Sliding Window is appropriate for traffic that may arrive slightly out of order.
 
@@ -1733,7 +1716,7 @@ Duplicate policy
 A fail-safe command shall not be delayed by an unnecessary extra token round trip when the Hazard Analysis
 requires prompt action.
 
-## 6.8 Authentication and Authorization
+## 6.10 Authentication and Authorization
 
 Authentication proves an identity or trusted peer.
 
@@ -1754,25 +1737,32 @@ Protected diagnostics
 
 The Protocol shall declare privilege and failure behavior.
 
-## 6.9 Security Failure Policy
+## 6.11 Security Failure Policy
 
 The Product shall define behavior for:
 
 ```text
 Authentication failure
+Handshake proof failure
 Integrity failure
 Replay detection
 Wrong Session ID
 Wrong Key Context
+Counter gap
+Counter exhaustion
+Rekey deadline reached
 Expired Session
 Execution Environment mismatch
+Security downgrade attempt
+Manifest hash failure
+Firmware signature failure
 Repeated failed authentication
 Credential revocation
 ```
 
 Security failures shall be observable and auditable without exposing secret material.
 
-## 6.10 Security Performance
+## 6.12 Security Performance
 
 Measure:
 
@@ -1929,7 +1919,9 @@ Security version
 ```
 
 The Bootloader shall validate compatibility, image boundaries, hash, signature, version policy, and supported
-image type.
+image type. Every accepted signature algorithm shall define exact message preparation, exact wire encoding, exact
+length, canonicality requirements, and malleability policy. For ECDSA P-256, a fixed IEEE P1363 `r || s` encoding
+and low-S rule avoid DER-length ambiguity and malleability differences across implementations.
 
 CRC may detect accidental transfer corruption. CRC does not prove authenticity and shall not replace digital
 signature verification.
@@ -2849,6 +2841,13 @@ This Baseline establishes the following decisions:
 51. Generated dispatch skeletons are Protocol plumbing and shall not contain Product control, State Machine ownership, or direct hardware access.
 52. Repeated non-owning rules are derived conformance summaries and remain subordinate to the owning authority.
 53. Cross-implementation interoperability applies to every implementation; cross-language interoperability applies to language pairs in scope.
+54. Public Discovery is minimal, ephemeral, rate-limited, non-authoritative, transcript-bound, and followed by authenticated revalidation.
+55. Product Baselines contain concrete cryptographic selections and no unresolved security sentinel.
+56. Handshake Profile identity and canonical transcript binding prevent profile confusion and silent downgrade.
+57. Every Key Context references a machine-verifiable Record Counter/Rekey Profile and stops before Hard Limit.
+58. Firmware signature Profiles define exact preparation, wire encoding, length, and canonicality or malleability rules.
+59. `minimum_length` means the fixed decoding prefix; variable content is validated separately.
+60. Plaintext Message, security overhead, secured Record, Transport reassembly, and Fragment sizes remain distinct.
 54. Maintained repository Markdown files use stable canonical paths, while immutable detached release, audit, and external-delivery artifacts include an approved version or Baseline identifier in the distributed filename.
 55. A detached artifact identifies its source canonical file and Git commit, tag, or Release and shall not become a parallel maintained authority.
 

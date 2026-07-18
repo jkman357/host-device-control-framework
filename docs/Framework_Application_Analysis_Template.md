@@ -4,7 +4,7 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.8  
+**Document Version:** v1.0.9  
 **Status:** Baseline  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
@@ -86,6 +86,7 @@ Other Coordinator/Node applications
 | v1.0.6 | 2026-07-18 | Ray Yang | Corrected the completed-analysis stable filename rule; separated Telemetry replacement semantics from delivery queue policy; split Secure Session responsibility into peer-local Coordinator, Node, and Bootloader ownership; updated active Framework and Protocol versions; clarified cross-implementation and cross-language validation; and labeled repeated non-owning requirements as derived conformance summaries. |
 | v1.0.7 | 2026-07-18 | Ray Yang | Distinguished minimum-compatible authority versions from the actual authority versions used for an analysis; separated the stable repository working filename from immutable release, audit, external-delivery, and detached-snapshot filenames; added source commit/tag/Release traceability fields; synchronized the default current Framework Baseline to v1.0.6; and clarified downstream citation requirements without changing the analysis method. |
 | v1.0.8 | 2026-07-18 | Ray Yang | Clarified that authority versions shown by the reusable Template are authoring references rather than automatic Product compatibility decisions; changed Project minimum-compatible and version-used fields to explicit completion-time inputs; required compatibility evidence before claiming an earlier minimum version; and corrected review-package traceability without changing the analysis architecture or dual filename policy. |
+| v1.0.9 | 2026-07-18 | Ray Yang | Added Product-analysis records for public Discovery privacy, rate limiting, transcript binding, and authenticated revalidation; concrete Handshake and downgrade policy; per-Key-Context Record Counter/Rekey lifecycle; exact Firmware signature encoding; fixed-prefix `minimum_length`; and distinct plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets. Updated authoring-reference versions without changing the Project-specific compatibility-evidence rule. |
 
 ## 0.3 Template Usage Convention
 
@@ -147,10 +148,10 @@ authoring references, not automatic compatibility decisions for every Product:
 
 | Authority | Template Authoring Reference Version |
 |---|---:|
-| `Coordinator_Node_Control_Framework.md` | `v1.0.6` |
+| `Coordinator_Node_Control_Framework.md` | `v1.0.7` |
 | `Embedded_C_Coding_Rules.md` | `v1.0.15` |
-| `Protocol_YAML_Definition_Guide.md` | `v1.0.6` |
-| `Protocol_YAML_Template.md` | `v1.0.6` |
+| `Protocol_YAML_Definition_Guide.md` | `v1.0.7` |
+| `Protocol_YAML_Template.md` | `v1.0.7` |
 
 Every completed Application Analysis shall separately record:
 
@@ -327,10 +328,10 @@ State the criteria used to decide whether the application can proceed.
 
 | Item | Minimum Compatible Version | Version Used for This Analysis | Source Commit, Tag, or Release | Compatibility Evidence |
 |---|---:|---:|---|---|
-| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.6>` | `<TBD>` | `<Evidence>` |
+| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.7>` | `<TBD>` | `<Evidence>` |
 | `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.15>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
-| `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.6>` | `<TBD>` | `<Evidence>` |
-| `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.6>` | `<TBD>` | `<Evidence>` |
+| `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.7>` | `<TBD>` | `<Evidence>` |
+| `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.7>` | `<TBD>` | `<Evidence>` |
 
 Additional input artifacts:
 
@@ -1033,9 +1034,16 @@ For every candidate aggregation profile, record:
 | Effective Payload | `<TBD>` |
 | Minimum throughput | `<TBD>` |
 | Maximum control latency | `<TBD>` |
-| Maximum record size | `<TBD>` |
-| Maximum reassembly Buffer | `<TBD>` |
-| Maximum fragments per record | `<TBD>` |
+| Maximum plaintext Message size | `<TBD>` |
+| Protocol Record header | `<TBD>` bytes |
+| Security header | `<TBD>` bytes |
+| Authentication Tag | `<TBD>` bytes |
+| Maximum security overhead | `<TBD>` bytes |
+| Maximum secured Record size | `<TBD>` |
+| Maximum Transport reassembly Buffer | `<TBD>` |
+| Fragment header | `<TBD>` bytes |
+| Maximum Fragment payload | `<TBD>` |
+| Maximum Fragments per secured Record | `<TBD>` |
 | Reassembly timeout | `<TBD>` |
 | Link-loss behavior | `<TBD>` |
 
@@ -1326,40 +1334,54 @@ Application and Bootloader separation
 | Firmware Update | Required | Updater | Product-defined | Required | Required | Yes | Abort safely |
 | Credential management | Required | Administrator | Required | Required | Required | Yes | Reject and security event |
 
-## 12.4 Application Session
+## 12.4 Public Discovery and Authenticated Identity
+
+| Item | Requirement |
+|---|---|
+| Public Discovery required | Yes / No |
+| Exposure rationale | `<TBD>` |
+| Permitted unauthenticated fields | `<TBD>` |
+| Permanent Device identifier exposed publicly | Prohibited / `<Approved exception>` |
+| Ephemeral Discovery ID length and rotation | `<TBD>` |
+| Rate-limit window and burst | `<TBD>` |
+| Excess-request behavior | `<TBD>` |
+| Discovery result authoritative | No |
+| Handshake transcript binding | Required / `<TBD>` |
+| Authenticated post-Session identity revalidation | Required / `<TBD>` |
+| Authenticated Capability revalidation | Required / `<TBD>` |
+
+Unauthenticated Discovery hints shall not authorize downgrade, Product behavior, or permanent Device tracking.
+
+## 12.5 Application Session and Handshake
 
 | Item | Requirement |
 |---|---|
 | Authentication method | `<TBD>` |
-| Session establishment | `<TBD>` |
+| Key Agreement | `<Concrete approved value>` |
+| KDF | `<Concrete approved value>` |
+| Cipher suite | `<Concrete approved value>` |
+| Proof format | `<Concrete approved value>` |
+| Credential model | `<Concrete approved value>` |
+| Profile ID equality rule | Required |
+| Minimum approved Profile | `<TBD>` |
+| Silent fallback | Prohibited |
+| Canonical transcript fields | `<TBD against Framework minimum>` |
 | Session timeout | `<TBD>` |
-| Rekey Soft Threshold | `<TBD>` |
-| Rekey Deadline | `<TBD>` |
-| Hard Limit | `<TBD>` |
-| Anti-Replay window | `<TBD>` |
-| Maximum failed authentications | `<TBD>` |
-| Lockout or backoff | `<TBD>` |
 | Session resumption | Allowed / Prohibited / Conditional |
 | Multiple Coordinator policy | `<TBD>` |
 | Time synchronization dependency | `<TBD>` |
 
-## 12.5 Key Contexts
+## 12.6 Record Counter and Rekey Profiles
 
-Evaluate at least:
+For every Application and Bootloader Key Context, record:
 
-```text
-Application Control H2D
-Application Control D2H
-Application Data H2D
-Application Data D2H
-Bootloader Update H2D
-Bootloader Response D2H
-```
+| Key Context | Width | Initial | Soft Threshold | Rekey Deadline | Hard Limit | Persistence | Gap Policy | Exhaustion | Atomic Cutover |
+|---|---:|---:|---:|---:|---:|---|---|---|---|
+| `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` |
 
-A Key Context, counter, nonce, or Anti-Replay state shall not be reused across another direction, purpose,
-or Execution Environment.
+The Hard Limit is uncrossable. Counter reset is allowed only after new keys and a new Epoch are atomically active.
 
-## 12.6 Application and Bootloader Boundary
+## 12.7 Application and Bootloader Boundary
 
 Define:
 
@@ -1376,7 +1398,7 @@ Define:
 
 Application runtime Session keys shall not be used by Bootloader.
 
-## 12.7 Security Audit
+## 12.8 Security Audit
 
 Each record should include:
 
@@ -1442,6 +1464,11 @@ The Update Transaction shall not be identified only by the current Secure Sessio
 | Image size | Yes | Partition and capacity |
 | Image hash | Yes | Complete-image verification |
 | Digital signature | Required when Firmware Update is in scope | Trust anchor and approved signature policy |
+| Signature algorithm | Yes | `<TBD>` |
+| Message preparation | Yes | `<TBD>` |
+| Exact wire encoding | Yes | `<TBD>` |
+| Exact signature length | Yes | `<TBD>` bytes |
+| Canonicality / ECDSA low-S policy | Conditional | `<TBD>` |
 | Minimum Bootloader version | Conditional | Compatibility |
 | Protocol requirement | Conditional | Compatibility |
 | Security version | Conditional | Anti-rollback |
@@ -2269,7 +2296,10 @@ Acceptance Evidence:
 
 - Are Authentication, Authorization, Confidentiality, and Integrity requirements explicit?
 - Are privileges and roles defined by operation risk?
-- Are Anti-Replay, Rekey, Session timeout, and Hard Limit policies explicit?
+- Are Anti-Replay, per-Key-Context Counter width, Soft Threshold, Rekey Deadline, Hard Limit, persistence, gap, exhaustion, and atomic-cutover policies explicit?
+- Is public Discovery minimal, ephemeral, rate-limited, transcript-bound, non-authoritative, and revalidated after authentication?
+- Are concrete Handshake Profile, KDF, cipher, proof, downgrade, and transcript-binding decisions complete?
+- Is every Firmware signature encoding and exact length unambiguous across implementations?
 - Are Security Events and Audit Records sufficient?
 - Are Application and Bootloader Sessions and Key Contexts separated?
 - Does Firmware Update require independent signed-image verification?
@@ -2314,7 +2344,11 @@ Acceptance Evidence:
 - [ ] Services, commands, responses, Telemetry, Stream, Events, Alarms, Faults, and data models are defined.
 - [ ] Compatibility and Capability policies are defined.
 - [ ] Project Protocol YAML is planned or complete.
-- [ ] Authentication, Session Security, privilege, role, Anti-Replay, Rekey, timeout, audit, and credential lifecycle are defined.
+- [ ] Authentication, Session Security, privilege, role, Anti-Replay, per-Key-Context Counter/Rekey lifecycle, timeout, audit, and credential lifecycle are defined.
+- [ ] Public Discovery privacy, rate limiting, transcript binding, and authenticated revalidation are defined.
+- [ ] Concrete Handshake algorithms, Profile binding, canonical transcript, and downgrade rejection are defined.
+- [ ] Firmware signature preparation, exact wire encoding, exact length, and canonicality or low-S rule are defined.
+- [ ] Plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets are separately calculated.
 - [ ] Application and Bootloader security boundaries are defined.
 - [ ] Schema Validation, Semantic Lint, Code Generation, and Test Vector targets are defined.
 
@@ -2430,6 +2464,13 @@ This baseline establishes the following decisions:
 49. Authority versions shown as Template authoring references are not automatic Product compatibility decisions.
 50. Every completed analysis records the exact authority version used, source Git identity, and compatibility evidence.
 51. A claimed minimum-compatible version is Project-specific and shall not precede the version used without documented comparison evidence.
+52. Public Discovery exposes no permanent identifier and is minimal, ephemeral, rate-limited, non-authoritative, transcript-bound, and revalidated after authentication.
+53. Product Handshake Profiles use concrete approved cryptography and reject mismatch, unsupported Profile, and downgrade without fallback.
+54. Canonical Handshake transcripts bind both parties, both nonces, ephemeral keys, negotiated algorithms, Session ID, and Key Contexts.
+55. Every Key Context has an explicit Counter/Rekey lifecycle and uncrossable Hard Limit.
+56. Firmware signature Profiles define exact preparation, exact wire encoding, exact length, and canonicality or low-S policy.
+57. `minimum_length` is a fixed decoding prefix and does not include minimum variable content.
+58. Plaintext Message, security overhead, secured Record, Transport reassembly, and Fragment size budgets remain distinct.
 
 ---
 

@@ -30,11 +30,11 @@ Human reviews decisions and validates actual system behavior
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/AI_Engineering_Usage_Guide.md) | v1.0.6 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
-| [`Coordinator_Node_Control_Framework.md`](docs/Coordinator_Node_Control_Framework.md) | v1.0.6 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
-| [`Framework_Application_Analysis_Template.md`](docs/Framework_Application_Analysis_Template.md) | v1.0.8 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
-| [`Protocol_YAML_Definition_Guide.md`](docs/Protocol_YAML_Definition_Guide.md) | v1.0.6 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
-| [`Protocol_YAML_Template.md`](docs/Protocol_YAML_Template.md) | v1.0.6 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
+| [`AI_Engineering_Usage_Guide.md`](docs/AI_Engineering_Usage_Guide.md) | v1.0.7 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`Coordinator_Node_Control_Framework.md`](docs/Coordinator_Node_Control_Framework.md) | v1.0.7 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
+| [`Framework_Application_Analysis_Template.md`](docs/Framework_Application_Analysis_Template.md) | v1.0.9 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
+| [`Protocol_YAML_Definition_Guide.md`](docs/Protocol_YAML_Definition_Guide.md) | v1.0.7 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
+| [`Protocol_YAML_Template.md`](docs/Protocol_YAML_Template.md) | v1.0.7 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
 | [`Embedded_C_Coding_Rules.md`](docs/Embedded_C_Coding_Rules.md) | v1.0.15 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 
 ## AI Task Routing
@@ -134,6 +134,9 @@ conformance summary and does not override the owning authority.
 - UI and Application code do not assemble wire frames directly.
 - Telemetry is replaceable complete summarized state; Stream is ordered non-replaceable records or samples.
 - Application and Bootloader use separate Secure Sessions, Key Contexts, counters, and Anti-Replay state.
+- Public Discovery is minimal, ephemeral, rate-limited, non-authoritative, transcript-bound, and revalidated after authentication.
+- Handshake Profiles reject mismatch and downgrade without silent fallback; every Key Context has an explicit Counter/Rekey lifecycle.
+- Plaintext Message, security overhead, secured Record, reassembly, and Fragment size domains remain distinct.
 - Firmware Update Transaction identity remains separate from Secure Session identity.
 - Protocol-generated artifacts are deterministic, traceable, and not edited manually.
 - Every queue, Buffer, record, Fragmentation path, and reassembly path is bounded.
