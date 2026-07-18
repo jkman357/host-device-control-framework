@@ -1,5 +1,7 @@
 # Validation Documents
 
+**Repository Role:** Non-normative directory index
+
 This directory contains validation methods, evidence guidance, conformance checklists, structural review reports,
 compatibility reports, and controlled validation records that apply across the repository.
 
@@ -13,8 +15,16 @@ compatibility reports, and controlled validation records that apply across the r
 The repository-level automated checks are implemented by:
 
 ```text
+requirements-validation.txt
 tools/validate_repository.py
+tests/test_validate_repository.py
 .github/workflows/document-validation.yml
+```
+
+Install the pinned dependency before local execution:
+
+```bash
+python -m pip install --disable-pip-version-check -r requirements-validation.txt
 ```
 
 The script checks deterministic structural properties. It does not prove semantic correctness, Product suitability,

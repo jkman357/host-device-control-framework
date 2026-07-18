@@ -4,14 +4,14 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`  
 **Document ID:** AIEUG  
-**Document Version:** v1.0.13  
+**Document Version:** v1.0.14  
 **Status:** Draft for Review  
 **Document Type:** AI Usage and Authority Routing Guide  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
-**Supersedes Document Version:** v1.0.12  
+**Supersedes Document Version:** v1.0.13  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -23,8 +23,7 @@
 - `Repository_Validation_Checklist.md`
 
 **First Issued:** 2026-07-18  
-**Last Revised:** 2026-07-18  
-
+**Last Revised:** 2026-07-19  
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -108,6 +107,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 | v1.0.11 | 2026-07-18 | Made implementation routing role-first and language-second; removed the Embedded C equals Node and non-C equals Coordinator assumptions; clarified topic ownership before precedence; made Draft Coordinator and C# authorities conditional on explicit Project adoption; integrated repository validation tooling and checklist routing; added detached-package manifest and hash requirements; and retained Draft for Review status pending human approval. |
 | v1.0.12 | 2026-07-18 | Updated active routing for Framework Application Analysis Template v1.0.14 and Repository Validation Checklist v1.0.1 after completing Authority Boundary coverage and repository-validation enforcement; retained Draft for Review status pending human approval. |
 | v1.0.13 | 2026-07-18 | Updated active routing for Repository Validation Checklist v1.0.2 after hardening metadata governance, semantic-version and declared Supersedes-chain checks, Python 3.10 and 3.12 CI coverage, current GitHub Action versions, and validator regression tests; retained Draft for Review status pending human approval. |
+| v1.0.14 | 2026-07-19 | Updated the active authority manifest after adding mandatory Supersedes metadata across governed documents and strengthening fenced-content, metadata-region, Workflow YAML, Markdown-link, directory-index, extension, and validator-regression controls; retained Draft for Review status pending human approval. |
 
 ## 0.2 Active Document Manifest
 
@@ -117,15 +117,15 @@ of the documents listed below.
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.13` | Draft for Review | AI authority routing and operating controls |
-| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.0.11` | Baseline | Reusable architecture and governance |
-| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.0.14` | Baseline | Application-analysis method and required records |
-| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.0.8` | Baseline | Protocol YAML semantics and validation rules |
-| Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.0.8` | Baseline | Reusable Project Protocol starting structure |
-| Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.0.3` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
-| Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.15` | Final Baseline | Product-owned Embedded C implementation rules |
-| C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.3` | Draft for Review | Product-owned C# language and .NET implementation rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.2` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.14` | Draft for Review | AI authority routing and operating controls |
+| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.0.12` | Baseline | Reusable architecture and governance |
+| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.0.15` | Baseline | Application-analysis method and required records |
+| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.0.9` | Baseline | Protocol YAML semantics and validation rules |
+| Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.0.9` | Baseline | Reusable Project Protocol starting structure |
+| Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.0.4` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
+| Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.16` | Final Baseline | Product-owned Embedded C implementation rules |
+| C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.3` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
 
 Version-routing rules:
 

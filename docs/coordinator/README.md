@@ -1,5 +1,7 @@
 # Coordinator Engineering Documents
 
+**Repository Role:** Non-normative directory index
+
 This directory contains approved and proposed cross-language software engineering authority for components that perform or directly support the Coordinator role.
 
 ## Documents

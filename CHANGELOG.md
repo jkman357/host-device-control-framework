@@ -17,6 +17,8 @@ Individual authority documents retain their own internal Version History and app
 - Added `tools/validate_repository.py` and `.github/workflows/document-validation.yml`.
 - Added `tests/test_validate_repository.py` with end-to-end validator regression and mutation tests.
 
+- Added `requirements-validation.txt` with the pinned PyYAML validation dependency.
+
 ### Changed
 
 - Reorganized Framework and application-analysis documents under `docs/framework/`.
@@ -44,6 +46,17 @@ Individual authority documents retain their own internal Version History and app
 - Updated `AI_Engineering_Usage_Guide.md` to v1.0.13.
 - Updated `Repository_Validation_Checklist.md` to v1.0.2.
 - Updated Coordinator, Coding Rules, and Validation directory guidance.
+
+- Updated all governed authority documents with explicit immediate-prior `Supersedes Document Version` metadata and corresponding version-history entries.
+- Updated `AI_Engineering_Usage_Guide.md` to v1.0.14.
+- Updated `Coordinator_Node_Control_Framework.md` to v1.0.12.
+- Updated `Framework_Application_Analysis_Template.md` to v1.0.15.
+- Updated `Protocol_YAML_Definition_Guide.md` to v1.0.9.
+- Updated `Protocol_YAML_Template.md` to v1.0.9.
+- Updated `Coordinator_Software_Engineering_Rules.md` to v1.0.4.
+- Updated `Embedded_C_Coding_Rules.md` to v1.0.16.
+- Updated `CSharp_Coding_Rules.md` to v1.0.4.
+- Updated `Repository_Validation_Checklist.md` to v1.0.3.
 
 ### Fixed
 
@@ -76,3 +89,10 @@ Individual authority documents retain their own internal Version History and app
 - Prevented non-README Markdown files under `docs/` from bypassing authority governance by omitting all metadata.
 - Added semantic-version format, Version History uniqueness and monotonic-order, highest-current-version, and declared Supersedes-chain checks.
 - Added persistent regression tests for metadata omission, invalid and stale versions, Supersedes-chain errors, obsolete Action versions, and incomplete Python matrices.
+- Excluded fenced examples from metadata, Version History, Current Document Set, and Active Document Manifest parsing.
+- Required unique metadata within the opening metadata region and mandatory immediate-prior Supersedes declarations for non-initial versions.
+- Replaced Workflow token searches with YAML and job-structure validation.
+- Pinned GitHub Actions to immutable release commit SHAs.
+- Added explicit directory-index allowlisting and lowercase Markdown-extension enforcement.
+- Added balanced-parenthesis Markdown link, HTML link/image, and Setext-heading anchor validation.
+- Expanded validator regression coverage for parsing and governance bypasses.

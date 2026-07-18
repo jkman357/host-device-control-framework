@@ -1,8 +1,9 @@
 # Coordinator Software Engineering Rules
 
 **Canonical Filename:** `Coordinator_Software_Engineering_Rules.md`  
-**Document Version:** v1.0.3  
+**Document Version:** v1.0.4  
 **Status:** Draft for Review  
+**Supersedes Document Version:** v1.0.3  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
@@ -23,6 +24,7 @@ This document is independently authored. External standards and guidance are ref
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.4 | 2026-07-19 | Draft for Review | Added explicit Supersedes metadata required by repository governance; no normative Coordinator engineering requirements changed. |
 | v1.0.3 | 2026-07-18 | Draft for Review | Resolved authority ownership by topic before precedence, clarified that Framework and Protocol restatements are derived conformance summaries while Coordinator-specific realization remains owned here, and reinforced role-first implementation routing without changing Project approval status. |
 | v1.0.2 | 2026-07-18 | Draft for Review | Clarified that this Draft is proposed normative authority pending human approval and normalized document-version formatting without changing Coordinator engineering requirements. |
 | v1.0.1 | 2026-07-18 | Draft for Review | Corrected architecture-flow representation, clarified source dependency direction, introduced bootstrap diagnostics during startup, linked the required Project profile to the Framework Application Analysis, and clarified document approval versus implementation conformance. |

@@ -4,8 +4,9 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.11  
+**Document Version:** v1.0.12  
 **Status:** Baseline  
+**Supersedes Document Version:** v1.0.11  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -21,8 +22,7 @@
 - `Repository_Validation_Checklist.md`
 
 **First Issued:** 2026-07-15  
-**Last Revised:** 2026-07-18  
-
+**Last Revised:** 2026-07-19  
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -268,6 +268,7 @@ Markdown filename.
 | v1.0.9 | 2026-07-18 | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 into Related Documents, the authority boundary, stable document identity, Baseline decisions, and the Authority Matrix; clarified that reusable Coordinator engineering rules and language-specific implementation rules remain subordinate to this Framework, approved Product requirements, and Project-specific design. |
 | v1.0.10 | 2026-07-18 | Normalized document-version notation for the Coordinator and C# rule references and aligned the active Draft engineering-rule set with v1.0.2; no reusable architecture, Protocol, safety, security, Runtime, or governance semantics changed. |
 | v1.0.11 | 2026-07-18 | Clarified that programming languages do not determine Coordinator, Node, Tool, or Service roles; made the Draft Coordinator and C# rules applicable only after explicit Project adoption or approval; marked their Authority Matrix entries as proposed while Draft; and added repository validation and detached-package traceability expectations without changing Protocol wire semantics. |
+| v1.0.12 | 2026-07-19 | Added explicit Supersedes metadata required by repository governance; no normative Framework architecture requirements changed. |
 
 ## 0.6 Core Conclusions
 

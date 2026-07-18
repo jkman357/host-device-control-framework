@@ -1,8 +1,9 @@
 # C# Coding Rules
 
 **Canonical Filename:** `CSharp_Coding_Rules.md`  
-**Document Version:** v1.0.3  
+**Document Version:** v1.0.4  
 **Status:** Draft for Review  
+**Supersedes Document Version:** v1.0.3  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
@@ -23,6 +24,7 @@ This document is independently authored. Microsoft and other external guidance i
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.4 | 2026-07-19 | Draft for Review | Added explicit Supersedes metadata required by repository governance; no normative C# implementation requirements changed. |
 | v1.0.3 | 2026-07-18 | Draft for Review | Resolved authority ownership by topic before precedence; added explicit untrusted JSON, XML, and polymorphic deserialization controls, resource bounds, inert DTO mapping, and negative tests; and retained conditional Coordinator applicability and Draft status. |
 | v1.0.2 | 2026-07-18 | Draft for Review | Made Coordinator software engineering authority conditional in the AI required-context rules, scoped the recommended Coordinator project structure to Coordinator-role implementations, clarified the document as proposed normative authority while still under review, and normalized document-version formatting. |
 | v1.0.1 | 2026-07-18 | Draft for Review | Clarified conditional architecture authority, refined formatting and field rules, established the default .NET Framework 4.7.2 / C# 7.3 profile, corrected cancellation and background-worker examples, and separated document review from project implementation validation. |

@@ -2,6 +2,7 @@
 """Deterministic structural validation for the documentation repository.
 
 Runtime requirement: Python 3.10 or later.
+Validation dependency: PyYAML 6.0.3.
 CI validation runtimes: Python 3.10 and Python 3.12.
 """
 from __future__ import annotations
@@ -9,12 +10,43 @@ from __future__ import annotations
 import re
 import sys
 import unicodedata
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+
+try:
+    import yaml
+except ImportError:
+    print(
+        "Repository validation: FAIL\n"
+        "- PyYAML 6.0.3 is required; run "
+        "'python -m pip install -r requirements-validation.txt'"
+    )
+    sys.exit(2)
 
 MIN_PYTHON = (3, 10)
 ROOT = Path(__file__).resolve().parents[1]
 ERRORS: list[str] = []
+
+CHECKOUT_ACTION = "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0"
+SETUP_PYTHON_ACTION = "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1"
+VALIDATION_REQUIREMENT = "PyYAML==6.0.3"
+DIRECTORY_INDEX_ALLOWLIST = {
+    "docs/framework/README.md",
+    "docs/protocol/README.md",
+    "docs/coordinator/README.md",
+    "docs/coding-rules/README.md",
+    "docs/validation/README.md",
+}
+DIRECTORY_INDEX_ROLE = "Non-normative directory index"
+METADATA_KEYS = (
+    "Canonical Filename",
+    "Document Name",
+    "Document Version",
+    "Status",
+    "Supersedes Document Version",
+    "Repository Role",
+)
 
 if sys.version_info < MIN_PYTHON:
     required = ".".join(str(part) for part in MIN_PYTHON)
@@ -41,11 +73,6 @@ def read_text(path: Path) -> str:
     if text and not text.endswith("\n"):
         error(f"{rel(path)}: missing final newline")
     return text
-
-
-def metadata(text: str, key: str) -> str | None:
-    match = re.search(rf"^\*\*{re.escape(key)}:\*\*\s*`?([^`\n]+?)`?\s*$", text, re.MULTILINE)
-    return match.group(1).strip() if match else None
 
 
 def fence_free_text(path: Path, text: str) -> str:
@@ -87,6 +114,48 @@ def remove_inline_code(text: str) -> str:
     return re.sub(r"(`+)(.+?)\1", lambda match: " " * len(match.group(0)), text)
 
 
+def parse_metadata(path: Path, searchable: str) -> dict[str, str]:
+    """Parse unique metadata from the opening document region only."""
+    lines = searchable.splitlines()
+    patterns = {
+        key: re.compile(rf"^\*\*{re.escape(key)}:\*\*\s*`?([^`\n]+?)`?\s*$", re.MULTILINE)
+        for key in METADATA_KEYS
+    }
+    matches_by_key = {key: list(pattern.finditer(searchable)) for key, pattern in patterns.items()}
+    first_metadata_line = min(
+        (searchable.count("\n", 0, match.start()) for matches in matches_by_key.values() for match in matches),
+        default=0,
+    )
+    first_h2_after_metadata = next(
+        (
+            index
+            for index, line in enumerate(lines)
+            if index > first_metadata_line and re.match(r"^ {0,3}##\s+", line)
+        ),
+        len(lines),
+    )
+    opening_limit = min(first_h2_after_metadata, 80)
+    values: dict[str, str] = {}
+
+    for key in METADATA_KEYS:
+        matches = matches_by_key[key]
+        if len(matches) > 1:
+            error(f"{rel(path)}: metadata key {key!r} must appear exactly once")
+            continue
+        if not matches:
+            continue
+        match = matches[0]
+        line_index = searchable.count("\n", 0, match.start())
+        if line_index >= opening_limit:
+            error(
+                f"{rel(path)}:{line_index + 1}: metadata key {key!r} must appear "
+                "within the opening metadata region before the next level-2 heading and line 80"
+            )
+            continue
+        values[key] = match.group(1).strip()
+    return values
+
+
 def github_slug(raw_heading: str) -> str:
     text = re.sub(r"<[^>]+>", "", raw_heading)
     text = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", text)
@@ -102,13 +171,21 @@ def github_slug(raw_heading: str) -> str:
 
 
 def heading_anchors(text: str) -> set[str]:
+    headings: list[tuple[int, str]] = []
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        atx = re.match(r"^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$", line)
+        if atx:
+            headings.append((index, atx.group(2)))
+        if index + 1 < len(lines) and line.strip():
+            setext = re.match(r"^ {0,3}(=+|-+)\s*$", lines[index + 1])
+            if setext and "|" not in line:
+                headings.append((index, line.strip()))
+
     anchors: set[str] = set()
     duplicates: dict[str, int] = {}
-    for line in text.splitlines():
-        match = re.match(r"^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$", line)
-        if not match:
-            continue
-        base = github_slug(match.group(2))
+    for _, raw in sorted(headings):
+        base = github_slug(raw)
         if not base:
             continue
         count = duplicates.get(base, 0)
@@ -148,10 +225,71 @@ def validate_target(source: Path, raw_target: str, anchors_by_path: dict[Path, s
         error(f"{rel(source)}: missing link or image target: {path_part or target}")
         return
 
-    if fragment and resolved.is_file() and resolved.suffix.lower() == ".md":
+    if fragment and resolved.is_file() and resolved.suffix == ".md":
         available = anchors_by_path.get(resolved, set())
         if fragment not in available:
             error(f"{rel(source)}: missing heading anchor in {rel(resolved)}: #{fragment}")
+
+
+def inline_link_targets(text: str) -> list[str]:
+    """Extract inline Markdown link/image targets with balanced parentheses."""
+    targets: list[str] = []
+    index = 0
+    while True:
+        marker = text.find("](", index)
+        if marker < 0:
+            break
+        cursor = marker + 2
+        if cursor < len(text) and text[cursor] == "<":
+            end = cursor + 1
+            escaped = False
+            while end < len(text):
+                char = text[end]
+                if char == ">" and not escaped:
+                    targets.append(text[cursor : end + 1])
+                    cursor = end + 1
+                    break
+                escaped = char == "\\" and not escaped
+                if char != "\\":
+                    escaped = False
+                end += 1
+            index = max(cursor, marker + 2)
+            continue
+
+        depth = 1
+        end = cursor
+        escaped = False
+        while end < len(text):
+            char = text[end]
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == "(":
+                depth += 1
+            elif char == ")":
+                depth -= 1
+                if depth == 0:
+                    targets.append(text[cursor:end])
+                    end += 1
+                    break
+            end += 1
+        index = max(end, marker + 2)
+    return targets
+
+
+class LocalTargetHTMLParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.targets: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        attribute = "href" if tag.casefold() == "a" else "src" if tag.casefold() == "img" else None
+        if attribute is None:
+            return
+        for key, value in attrs:
+            if key.casefold() == attribute and value:
+                self.targets.append(value)
 
 
 def check_links(path: Path, text: str, anchors_by_path: dict[Path, set[str]]) -> None:
@@ -169,14 +307,22 @@ def check_links(path: Path, text: str, anchors_by_path: dict[Path, set[str]]) ->
         definitions[label] = target
         validate_target(path, target, anchors_by_path)
 
-    for match in re.finditer(r"!?\[[^\]]*\]\(([^)]+)\)", searchable):
-        validate_target(path, match.group(1), anchors_by_path)
+    for target in inline_link_targets(searchable):
+        validate_target(path, target, anchors_by_path)
 
     for match in re.finditer(r"!?\[([^\]]+)\]\[([^\]]*)\]", searchable):
         label = match.group(2).strip() or match.group(1).strip()
         normalized = re.sub(r"\s+", " ", label).casefold()
         if normalized not in definitions:
             error(f"{rel(path)}: undefined reference-style link: [{label}]")
+
+    html_parser = LocalTargetHTMLParser()
+    try:
+        html_parser.feed(searchable)
+    except Exception as exc:
+        error(f"{rel(path)}: HTML link parsing failed: {exc}")
+    for target in html_parser.targets:
+        validate_target(path, target, anchors_by_path)
 
 
 def parse_markdown_table(text: str, heading: str) -> list[list[str]]:
@@ -232,10 +378,14 @@ def parse_version_history(
         r"^(#{1,6})\s+.*(?:Version|Change)\s+History\s*$",
         re.IGNORECASE | re.MULTILINE,
     )
-    heading = heading_re.search(text)
-    if not heading:
-        error(f"{rel(path)}: Version History or Change History heading not found")
+    headings = list(heading_re.finditer(text))
+    if len(headings) != 1:
+        error(
+            f"{rel(path)}: exactly one Version History or Change History heading is required; "
+            f"found {len(headings)}"
+        )
         return
+    heading = headings[0]
 
     level = len(heading.group(1))
     section = text[heading.end() :]
@@ -318,47 +468,147 @@ def parse_version_history(
             if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", history_date):
                 error(f"{rel(path)}: Version History date for {version} must use YYYY-MM-DD")
 
-    if supersedes is not None:
-        supersedes_semver = parse_semver(supersedes)
-        if supersedes_semver is None:
-            error(f"{rel(path)}: Supersedes Document Version {supersedes!r} must match vMAJOR.MINOR.PATCH")
-            return
-        if supersedes not in history_values:
-            error(f"{rel(path)}: Supersedes Document Version {supersedes} is not present in Version History")
-        if current_semver is not None and supersedes_semver >= current_semver:
-            error(f"{rel(path)}: Supersedes Document Version {supersedes} must be lower than {version}")
-        if current_semver is not None:
-            prior_versions = [item for item in history_semvers if item < current_semver]
-            if prior_versions:
-                expected = max(prior_versions)
-                if supersedes_semver != expected:
-                    expected_text = "v" + ".".join(str(part) for part in expected)
-                    error(
-                        f"{rel(path)}: Supersedes Document Version {supersedes} must identify "
-                        f"the immediate prior listed version {expected_text}"
-                    )
+    if len(history_values) <= 1:
+        if supersedes is not None:
+            error(f"{rel(path)}: Supersedes Document Version must be absent for an initial version")
+        return
+
+    if supersedes is None:
+        error(f"{rel(path)}: Supersedes Document Version is required when Version History has multiple entries")
+        return
+
+    supersedes_semver = parse_semver(supersedes)
+    if supersedes_semver is None:
+        error(f"{rel(path)}: Supersedes Document Version {supersedes!r} must match vMAJOR.MINOR.PATCH")
+        return
+    if supersedes not in history_values:
+        error(f"{rel(path)}: Supersedes Document Version {supersedes} is not present in Version History")
+    if current_semver is not None and supersedes_semver >= current_semver:
+        error(f"{rel(path)}: Supersedes Document Version {supersedes} must be lower than {version}")
+    if current_semver is not None:
+        prior_versions = [item for item in history_semvers if item < current_semver]
+        if prior_versions:
+            expected = max(prior_versions)
+            if supersedes_semver != expected:
+                expected_text = "v" + ".".join(str(part) for part in expected)
+                error(
+                    f"{rel(path)}: Supersedes Document Version {supersedes} must identify "
+                    f"the immediate prior listed version {expected_text}"
+                )
+
+
+def load_workflow(path: Path) -> dict[str, object] | None:
+    text = read_text(path)
+    try:
+        data = yaml.load(text, Loader=yaml.BaseLoader)
+    except yaml.YAMLError as exc:
+        error(f"{rel(path)}: invalid YAML: {exc}")
+        return None
+    if not isinstance(data, dict):
+        error(f"{rel(path)}: workflow root must be a YAML mapping")
+        return None
+    return data
 
 
 def check_workflow() -> None:
     workflow = ROOT / ".github/workflows/document-validation.yml"
     if not workflow.exists():
         return
-    text = read_text(workflow)
-    if "actions/checkout@v7" not in text:
-        error(f"{rel(workflow)}: actions/checkout@v7 is required")
-    if "actions/setup-python@v6" not in text:
-        error(f"{rel(workflow)}: actions/setup-python@v6 is required")
-    if not re.search(r"python-version:\s*\[[^\]]*['\"]3\.10['\"][^\]]*['\"]3\.12['\"][^\]]*\]", text):
-        error(f"{rel(workflow)}: Python matrix must include 3.10 and 3.12")
-    if not re.search(r"python-version:\s*\$\{\{\s*matrix\.python-version\s*\}\}", text):
-        error(f"{rel(workflow)}: setup-python must use matrix.python-version")
-    if "python tools/validate_repository.py" not in text:
-        error(f"{rel(workflow)}: validator invocation is missing")
-    if "python -m unittest discover -s tests -v" not in text:
-        error(f"{rel(workflow)}: validator regression-test invocation is missing")
+    data = load_workflow(workflow)
+    if data is None:
+        return
+
+    triggers = data.get("on")
+    if not isinstance(triggers, dict) or not {"push", "pull_request"}.issubset(triggers):
+        error(f"{rel(workflow)}: on must enable both push and pull_request")
+
+    permissions = data.get("permissions")
+    if not isinstance(permissions, dict) or permissions.get("contents") != "read":
+        error(f"{rel(workflow)}: permissions.contents must be read")
+
+    jobs = data.get("jobs")
+    if not isinstance(jobs, dict):
+        error(f"{rel(workflow)}: jobs mapping is required")
+        return
+
+    valid_job_found = False
+    for job_name, job in jobs.items():
+        if not isinstance(job, dict):
+            continue
+        strategy = job.get("strategy")
+        matrix = strategy.get("matrix") if isinstance(strategy, dict) else None
+        versions = matrix.get("python-version") if isinstance(matrix, dict) else None
+        if not isinstance(versions, list) or set(versions) != {"3.10", "3.12"}:
+            continue
+        if job.get("runs-on") != "ubuntu-latest":
+            continue
+        steps = job.get("steps")
+        if not isinstance(steps, list):
+            continue
+
+        checkout_index = setup_index = install_index = validator_index = tests_index = None
+        for index, step in enumerate(steps):
+            if not isinstance(step, dict):
+                continue
+            uses = step.get("uses")
+            run = step.get("run")
+            if uses == CHECKOUT_ACTION:
+                checkout_index = index
+            if uses == SETUP_PYTHON_ACTION:
+                with_values = step.get("with")
+                if isinstance(with_values, dict) and with_values.get("python-version") == "${{ matrix.python-version }}":
+                    setup_index = index
+            if isinstance(run, str):
+                if "python -m pip install --disable-pip-version-check -r requirements-validation.txt" in run:
+                    install_index = index
+                if "python tools/validate_repository.py" in run:
+                    validator_index = index
+                if "python -m unittest discover -s tests -v" in run:
+                    tests_index = index
+
+        indices = [checkout_index, setup_index, install_index, validator_index, tests_index]
+        if all(item is not None for item in indices) and indices == sorted(indices):
+            valid_job_found = True
+            break
+
+    if not valid_job_found:
+        error(
+            f"{rel(workflow)}: one ubuntu-latest job must contain the exact SHA-pinned checkout and "
+            "setup-python actions, Python 3.10/3.12 matrix, dependency installation, validator, "
+            "and regression tests in execution order"
+        )
 
 
-md_files = sorted(ROOT.rglob("*.md"))
+def validate_markdown_extensions() -> None:
+    docs = ROOT / "docs"
+    if not docs.exists():
+        return
+    for path in docs.rglob("*"):
+        if not path.is_file():
+            continue
+        suffix = path.suffix
+        if suffix.casefold() in {".md", ".markdown"} and suffix != ".md":
+            error(f"{rel(path)}: governed Markdown files must use the lowercase .md extension")
+
+
+def check_validation_requirements() -> None:
+    requirement_file = ROOT / "requirements-validation.txt"
+    if not requirement_file.exists():
+        return
+    lines = [
+        line.strip()
+        for line in read_text(requirement_file).splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    if lines != [VALIDATION_REQUIREMENT]:
+        error(
+            f"{rel(requirement_file)}: must contain exactly {VALIDATION_REQUIREMENT!r} "
+            "to keep validation dependency resolution deterministic"
+        )
+
+
+validate_markdown_extensions()
+md_files = sorted(path for path in ROOT.rglob("*") if path.is_file() and path.suffix == ".md")
 contents: dict[Path, str] = {}
 searchable_contents: dict[Path, str] = {}
 anchors_by_path: dict[Path, set[str]] = {}
@@ -373,42 +623,55 @@ for path in md_files:
     anchors_by_path[path.resolve()] = heading_anchors(remove_inline_code(searchable))
 
 for path in md_files:
-    text = contents[path]
     searchable = searchable_contents[path]
     check_links(path, searchable, anchors_by_path)
-    name = metadata(text, "Canonical Filename") or metadata(text, "Document Name")
-    version = metadata(text, "Document Version")
-    status = metadata(text, "Status")
-    supersedes = metadata(text, "Supersedes Document Version")
-    role = metadata(text, "Repository Role")
-    is_docs_authority = path.is_relative_to(ROOT / "docs") and path.name != "README.md"
+    metadata = parse_metadata(path, searchable)
+    name = metadata.get("Canonical Filename") or metadata.get("Document Name")
+    version = metadata.get("Document Version")
+    status = metadata.get("Status")
+    supersedes = metadata.get("Supersedes Document Version")
+    role = metadata.get("Repository Role")
+    relative = rel(path)
+    is_directory_index = relative in DIRECTORY_INDEX_ALLOWLIST
+    is_docs_markdown = path.is_relative_to(ROOT / "docs")
 
-    if is_docs_authority and not (name and version and status):
+    if path.name == "README.md" and is_docs_markdown and not is_directory_index:
+        error(f"{relative}: docs directory README is not in the approved non-normative index allowlist")
+
+    if is_directory_index:
+        if role != DIRECTORY_INDEX_ROLE:
+            error(f"{relative}: Repository Role must be {DIRECTORY_INDEX_ROLE!r}")
+        if name or version or status or supersedes:
+            error(f"{relative}: non-normative directory indexes must not declare authority metadata")
+        continue
+
+    if is_docs_markdown and not (name and version and status):
         error(
-            f"{rel(path)}: every non-README Markdown document under docs must declare "
+            f"{relative}: every governed Markdown document under docs must declare "
             "Canonical Filename or Document Name, Document Version, and Status"
         )
 
     if name:
         if name != path.name:
-            error(f"{rel(path)}: canonical filename {name!r} must match the actual filename")
+            error(f"{relative}: canonical filename {name!r} must match the actual filename")
         if name in canonical:
-            error(f"duplicate canonical filename {name}: {rel(canonical[name])} and {rel(path)}")
+            error(f"duplicate canonical filename {name}: {rel(canonical[name])} and {relative}")
         canonical[name] = path
 
     if name and version and status:
         documents[name] = (path, version, status)
-        parse_version_history(path, text, version, status, supersedes)
+        parse_version_history(path, searchable, version, status, supersedes)
         if status == "Draft for Review" and role and "normative" in role.lower() and "proposed" not in role.lower():
-            error(f"{rel(path)}: Draft normative role must say Proposed")
+            error(f"{relative}: Draft normative role must say Proposed")
     elif version or status or name or supersedes:
-        error(f"{rel(path)}: incomplete document metadata")
+        error(f"{relative}: incomplete document metadata")
 
 required = [
     "README.md",
     "CHANGELOG.md",
     "LICENSE",
     "NOTICE.md",
+    "requirements-validation.txt",
     "docs/framework/AI_Engineering_Usage_Guide.md",
     "docs/framework/Coordinator_Node_Control_Framework.md",
     "docs/framework/Framework_Application_Analysis_Template.md",
@@ -422,12 +685,13 @@ required = [
     "tests/test_validate_repository.py",
     ".github/workflows/document-validation.yml",
 ]
+required.extend(sorted(DIRECTORY_INDEX_ALLOWLIST))
 for required_path in required:
     if not (ROOT / required_path).exists():
         error(f"missing required path: {required_path}")
 
-# Root Current Document Set consistency and completeness.
-readme = contents.get(ROOT / "README.md", "")
+# Root Current Document Set consistency and completeness. Fenced examples are excluded.
+readme = searchable_contents.get(ROOT / "README.md", "")
 readme_rows = parse_markdown_table(readme, "## Current Document Set")
 if not readme_rows:
     error("README.md: Current Document Set table is missing or empty")
@@ -453,9 +717,9 @@ if missing_from_readme:
 if extra_in_readme:
     error(f"README Current Document Set has non-authority entries: {', '.join(sorted(extra_in_readme))}")
 
-# AI Active Document Manifest consistency and completeness.
+# AI Active Document Manifest consistency and completeness. Fenced examples are excluded.
 guide_path = ROOT / "docs/framework/AI_Engineering_Usage_Guide.md"
-guide = contents.get(guide_path, "")
+guide = searchable_contents.get(guide_path, "")
 manifest_rows = parse_markdown_table(guide, "## 0.2 Active Document Manifest")
 if not manifest_rows:
     error(f"{rel(guide_path)}: Active Document Manifest table is missing or empty")
@@ -484,6 +748,7 @@ if missing_from_manifest:
 if extra_in_manifest:
     error(f"AI Active Document Manifest has non-authority entries: {', '.join(sorted(extra_in_manifest))}")
 
+check_validation_requirements()
 check_workflow()
 
 if ERRORS:
@@ -492,4 +757,7 @@ if ERRORS:
         print(f"- {item}")
     sys.exit(1)
 
-print(f"Repository validation: PASS ({len(md_files)} Markdown files checked, Python {sys.version_info.major}.{sys.version_info.minor})")
+print(
+    f"Repository validation: PASS ({len(md_files)} Markdown files checked, "
+    f"Python {sys.version_info.major}.{sys.version_info.minor}, PyYAML {yaml.__version__})"
+)

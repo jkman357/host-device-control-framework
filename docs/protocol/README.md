@@ -1,5 +1,7 @@
 # Protocol Documents
 
+**Repository Role:** Non-normative directory index
+
 This directory contains authority documents for the machine-verifiable Coordinator/Node Protocol definition.
 
 ## Documents

@@ -1,5 +1,7 @@
 # Framework Documents
 
+**Repository Role:** Non-normative directory index
+
 This directory contains cross-platform, cross-language authority documents for the Coordinator/Node engineering framework and its application to Product development.
 
 ## Documents

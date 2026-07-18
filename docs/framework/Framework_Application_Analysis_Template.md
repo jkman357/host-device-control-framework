@@ -4,8 +4,9 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.14  
+**Document Version:** v1.0.15  
 **Status:** Baseline  
+**Supersedes Document Version:** v1.0.14  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -21,8 +22,7 @@
 - `Repository_Validation_Checklist.md`
 
 **First Issued:** 2026-07-15  
-**Last Revised:** 2026-07-18  
-
+**Last Revised:** 2026-07-19  
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -95,6 +95,7 @@ Other Coordinator/Node applications
 | v1.0.12 | 2026-07-18 | Ray Yang | Updated the Framework authoring reference to v1.0.10 and the Coordinator and C# authoring references to v1.0.2 after Draft-authority, conditional-applicability, and document-version-format clarification; preserved the existing Product-specific compatibility-evidence and approval requirements. |
 | v1.0.13 | 2026-07-18 | Ray Yang | Updated authoring references for Framework v1.0.11 and Draft Coordinator/C# rules v1.0.3; required role classification before language selection; prohibited using implementation language as a role proxy; added repository validation and package-traceability evidence to completion checks; and preserved all Product-specific decisions as unresolved until completed by a Project. |
 | v1.0.14 | 2026-07-18 | Ray Yang | Completed the Authority Boundary table by adding conditional authority ownership for cross-language Coordinator software engineering and Product-owned C# implementation; clarified that Draft authorities require explicit Project adoption or approved deviation; and preserved all existing application-analysis decisions and completion requirements. |
+| v1.0.15 | 2026-07-19 | Ray Yang | Updated authoring-reference versions after repository-wide Supersedes metadata completion; no Product-specific analysis conclusion was added. |
 
 ## 0.3 Template Usage Convention
 
@@ -156,12 +157,12 @@ authoring references, not automatic compatibility decisions for every Product:
 
 | Authority | Template Authoring Reference Version | Status at Authoring |
 |---|---:|---|
-| `Coordinator_Node_Control_Framework.md` | `v1.0.11` | Baseline |
-| `Protocol_YAML_Definition_Guide.md` | `v1.0.8` | Baseline |
-| `Protocol_YAML_Template.md` | `v1.0.8` | Baseline |
-| `Coordinator_Software_Engineering_Rules.md` | `v1.0.3` | Draft for Review |
-| `Embedded_C_Coding_Rules.md` | `v1.0.15` | Final Baseline |
-| `CSharp_Coding_Rules.md` | `v1.0.3` | Draft for Review |
+| `Coordinator_Node_Control_Framework.md` | `v1.0.12` | Baseline |
+| `Protocol_YAML_Definition_Guide.md` | `v1.0.9` | Baseline |
+| `Protocol_YAML_Template.md` | `v1.0.9` | Baseline |
+| `Coordinator_Software_Engineering_Rules.md` | `v1.0.4` | Draft for Review |
+| `Embedded_C_Coding_Rules.md` | `v1.0.16` | Final Baseline |
+| `CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review |
 
 Every completed Application Analysis shall separately record:
 
@@ -340,12 +341,12 @@ State the criteria used to decide whether the application can proceed.
 
 | Item | Minimum Compatible Version | Version Used for This Analysis | Source Commit, Tag, or Release | Compatibility Evidence |
 |---|---:|---:|---|---|
-| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.11>` | `<TBD>` | `<Evidence>` |
-| `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
-| `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
-| `Coordinator_Software_Engineering_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.3>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
-| `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.15>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
-| `CSharp_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.3>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.12>` | `<TBD>` | `<Evidence>` |
+| `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.9>` | `<TBD>` | `<Evidence>` |
+| `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.9>` | `<TBD>` | `<Evidence>` |
+| `Coordinator_Software_Engineering_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.4>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.16>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
+| `CSharp_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.4>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
 
 `Coordinator_Software_Engineering_Rules.md` is required when Coordinator-owned software is in scope.
 `CSharp_Coding_Rules.md` is required when Product-owned C# is in scope. If either authority remains `Draft for Review`,

@@ -4,8 +4,9 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.0.8  
+**Document Version:** v1.0.9  
 **Status:** Baseline  
+**Supersedes Document Version:** v1.0.8  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
@@ -15,8 +16,7 @@
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
 **First Issued:** 2026-07-15  
-**Last Revised:** 2026-07-18  
-
+**Last Revised:** 2026-07-19  
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -205,6 +205,7 @@ The keywords in this document have the following meanings:
 | v1.0.6 | 2026-07-18 | Corrected the Telemetry replacement model by separating replacement semantics from queue discipline; required explicit per-Message security and deterministic direction/environment Key Context mapping; defined Application and Bootloader Handshake profiles and pre-Session protection; made signed canonical Firmware Manifest transfer mandatory when Firmware Update is in scope; added computed minimum/maximum length and Runtime Effective Profile Lint rules; and clarified cross-implementation versus cross-language interoperability. |
 | v1.0.7 | 2026-07-18 | Closed the remaining security and sizing ambiguities: required unresolved-security sentinel rejection; defined privacy-preserving bounded public Discovery and authenticated revalidation; made Record Counter and Rekey lifecycle machine-verifiable per Key Context; bound Handshake Profile selection and canonical transcript fields to prevent profile confusion and downgrade; required exact canonical Firmware signature encodings; fixed `minimum_length` to the fixed decoding prefix; and separated plaintext Message, secured Record, Transport reassembly, and Fragment payload limits. |
 | v1.0.8 | 2026-07-18 | Required an exact machine-verifiable Fragment Header and complete reassembly behavior; prohibited opaque security-critical Handshake payloads and required named canonical request/response structs; replaced numeric Profile-ID downgrade ordering with explicit allowlists, preference, security level, and deprecation state; defined Device-issued Firmware Update resume authorization bound to transaction, Manifest, Device, Host, and security version; and required a positive data-bearing payload at the minimum MTU. |
+| v1.0.9 | 2026-07-19 | Added explicit Supersedes metadata required by repository governance; no normative Protocol YAML definition rules changed. |
 
 ---
 

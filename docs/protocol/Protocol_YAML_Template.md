@@ -4,8 +4,9 @@
 
 **Document Name:** `Protocol_YAML_Template.md`  
 **Document ID:** PYT  
-**Document Version:** v1.0.8  
+**Document Version:** v1.0.9  
 **Status:** Baseline  
+**Supersedes Document Version:** v1.0.8  
 **Document Type:** Reusable Project Template  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -17,8 +18,7 @@
 - `Framework_Application_Analysis_Template.md`
 
 **First Issued:** 2026-07-15  
-**Last Revised:** 2026-07-18  
-
+**Last Revised:** 2026-07-19  
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -77,6 +77,7 @@ Schema Validation / Semantic Lint / Code Generation / Test Vectors
 | v1.0.6 | 2026-07-18 | Corrected computed Message minimum lengths; made Stream, Firmware chunk, Capability, and Transport envelopes mutually consistent; added explicit per-Message security, direction/environment Key Context mappings, Application and Bootloader Handshake contracts, sender-local Heartbeat timestamp semantics, and a signed canonical Firmware Manifest transfer; separated Telemetry replacement semantics from queue discipline; updated interoperability wording; and expanded Schema, Semantic Lint, security, Firmware Update, and Baseline checks. |
 | v1.0.7 | 2026-07-18 | Closed the remaining security-contract and size-model gaps: strengthened unresolved-placeholder Lint; replaced public permanent identity and Capability disclosure with bounded ephemeral Discovery plus authenticated revalidation; added machine-verifiable Record Counter, Rekey, failure, and atomic-cutover policies; bound Handshake Profile selection and canonical transcript fields to reject downgrade and profile confusion; defined exact canonical Firmware signature encodings; fixed `minimum_length` to mean the fixed decoding prefix only; and separated plaintext Message size, security overhead, secured Record size, Transport reassembly size, and Fragment payload limits. |
 | v1.0.8 | 2026-07-18 | Defined a concrete 16-byte Fragment Header and complete reassembly policies; replaced opaque Handshake payloads with four named fixed-capacity wire structs and explicit transcript assembly; replaced numeric Profile-strength comparison with allowlists, preference order, security level, and deprecation state; added Device-issued Firmware Update resume authorization bound to transaction, Manifest, Device, Host, and security version; corrected CAN FD minimum data-bearing MTU; and synchronized all machine-verifiable checks. |
+| v1.0.9 | 2026-07-19 | Added explicit Supersedes metadata required by repository governance; no normative Protocol YAML template semantics changed. |
 
 ---
 

@@ -1,5 +1,7 @@
 # Coding Rules
 
+**Repository Role:** Non-normative directory index
+
 This directory contains approved and proposed programming-language-specific implementation authorities.
 
 ## Documents

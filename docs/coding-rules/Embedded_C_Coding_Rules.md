@@ -1,8 +1,9 @@
 # Embedded C Coding Rules
 
 **Document Name:** `Embedded_C_Coding_Rules.md`  
-**Document Version:** v1.0.15  
+**Document Version:** v1.0.16  
 **Status:** Final Baseline  
+**Supersedes Document Version:** v1.0.15  
 **Applicable Domain:** Coordinator/Node Framework - Embedded C Firmware  
 **Primary Narrative Language:** English  
 **Primary Programming Language:** C  
@@ -4065,3 +4066,4 @@ Record requirements:
 | v1.0.13 | Removed the duplicated and weaker `main()` example from Appendix C.5; established Section 25 as the single normative source for Embedded Firmware entry-point behavior; replaced the appendix implementation with explicit non-RTOS and RTOS application guidance and cross-references; and eliminated the risk of future example drift between the normative chapter and the reference appendix. |
 | v1.0.14 | Updated the active baseline-document references to `Coordinator_Node_Control_Framework.md`, `Framework_Application_Analysis_Template.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; added the canonical Document Name metadata; and preserved all existing Embedded C coding-rule semantics without technical change. |
 | v1.0.15 | Adopted the stable canonical filename `Embedded_C_Coding_Rules.md`; updated active cross-document references to canonical paths; retained the document version in metadata and Version History; and preserved all Embedded C coding-rule semantics without technical change. |
+| v1.0.16 | Added explicit Supersedes metadata required by repository governance; no normative Embedded C implementation requirements changed. |
