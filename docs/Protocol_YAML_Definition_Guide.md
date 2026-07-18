@@ -4,7 +4,7 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.0.7  
+**Document Version:** v1.0.8  
 **Status:** Baseline  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
@@ -204,6 +204,7 @@ The keywords in this document have the following meanings:
 | v1.0.5 | 2026-07-18 | Adopted the stable canonical filename `Protocol_YAML_Definition_Guide.md`; updated active Framework, Template, and Application Analysis references to canonical paths; retained version identity in document metadata and Git history; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
 | v1.0.6 | 2026-07-18 | Corrected the Telemetry replacement model by separating replacement semantics from queue discipline; required explicit per-Message security and deterministic direction/environment Key Context mapping; defined Application and Bootloader Handshake profiles and pre-Session protection; made signed canonical Firmware Manifest transfer mandatory when Firmware Update is in scope; added computed minimum/maximum length and Runtime Effective Profile Lint rules; and clarified cross-implementation versus cross-language interoperability. |
 | v1.0.7 | 2026-07-18 | Closed the remaining security and sizing ambiguities: required unresolved-security sentinel rejection; defined privacy-preserving bounded public Discovery and authenticated revalidation; made Record Counter and Rekey lifecycle machine-verifiable per Key Context; bound Handshake Profile selection and canonical transcript fields to prevent profile confusion and downgrade; required exact canonical Firmware signature encodings; fixed `minimum_length` to the fixed decoding prefix; and separated plaintext Message, secured Record, Transport reassembly, and Fragment payload limits. |
+| v1.0.8 | 2026-07-18 | Required an exact machine-verifiable Fragment Header and complete reassembly behavior; prohibited opaque security-critical Handshake payloads and required named canonical request/response structs; replaced numeric Profile-ID downgrade ordering with explicit allowlists, preference, security level, and deprecation state; defined Device-issued Firmware Update resume authorization bound to transaction, Manifest, Device, Host, and security version; and required a positive data-bearing payload at the minimum MTU. |
 
 ---
 
@@ -1839,8 +1840,12 @@ When both a Message declaration and a wire field identify the Profile:
 payload.handshake_profile_id == referenced handshake_profile.profile_id
 ```
 
-Mismatch, unsupported Profile, or a Profile below the approved minimum shall cause explicit rejection. Silent
-fallback is prohibited.
+Mismatch, an unlisted or prohibited Profile, a deprecated Profile, or an unregistered algorithm set shall cause
+explicit rejection. Silent fallback is prohibited.
+
+A Profile ID is an identifier, not a security-strength rank. Downgrade policy shall use explicit
+`allowed_profile_ids`, `preferred_profile_order`, `prohibited_profile_ids`, `security_level`, and `deprecated`
+attributes. Numeric less-than or greater-than comparison of Profile IDs shall not determine security strength.
 
 The canonical transcript shall bind at least:
 
@@ -1858,7 +1863,16 @@ Assigned Session ID
 Derived Key Context list
 ```
 
-Proof validation covers the complete canonical transcript.
+The initiator proof shall authenticate the canonical request without its own proof slot. The responder proof shall
+authenticate the complete request and canonical response without the responder-proof slot. The first valid secured
+initiator Record under the newly derived Key Context provides initiator key confirmation. A request proof shall not
+claim to cover responder fields that did not yet exist.
+
+Security-critical Handshake data shall be represented by named request and response structs. The wire contract shall
+explicitly type and bound the Profile ID, Protocol context, Discovery ID, roles, identities, nonces, ephemeral public
+keys, algorithm-set IDs, Session ID, derived Key Context set, request transcript hash, and proofs. A generic opaque
+`handshake_payload` byte array shall not be used as the authoritative Product Baseline contract. Fixed-capacity slots
+shall carry an explicit meaningful length; unused bytes shall be zero and transcript-bound.
 
 ### 16.5 Privacy-Preserving Public Discovery
 
@@ -1986,12 +2000,35 @@ maximum_secured_record_size
     + authentication_tag_bytes
 ```
 
-The Transport reassembly Buffer shall be at least the maximum secured Record size. Fragment capacity shall satisfy:
+The Transport reassembly Buffer shall be at least the maximum secured Record size.
+
+Fragmentation shall define one exact Header wire struct containing at least:
 
 ```text
-maximum_fragments_per_record * maximum_fragment_payload
-    >= maximum_secured_record_size
+Record ID
+Zero-based Fragment index
+Fragment count
+Original secured Record length
+Fragment payload length
+Header corruption-detection field
 ```
+
+The profile shall also define Record-ID scope, duplicate policy, conflicting-Fragment behavior, out-of-order policy,
+complete-record integrity scope, timeout, oversize rejection, incomplete-record discard, maximum concurrent
+reassembly, and resource-exhaustion behavior.
+
+For every Runtime MTU:
+
+```text
+runtime_fragment_payload = runtime_mtu - fragment_header_bytes
+runtime_fragment_payload > 0
+required_fragment_count = ceil(original_secured_record_length / runtime_fragment_payload)
+required_fragment_count <= maximum_fragments_per_record
+```
+
+The complete secured Record Authentication Tag shall be verified only after reassembly when Fragmentation occurs
+outside the secured Record. A Fragment Header CRC may detect accidental corruption but shall not be described as
+cryptographic authentication.
 
 ### 18.2 Transport Profile Example
 
@@ -2009,10 +2046,15 @@ transport_profiles:
     maximum_transport_reassembly_size: 4136
     fragmentation:
       mode: protocol_record_fragmentation
-      fragment_header_bytes: 8
-      maximum_fragment_payload: 56
-      maximum_fragments_per_record: 128
+      header_struct: SecuredRecordFragmentHeaderV1
+      fragment_header_bytes: 16
+      minimum_fragment_payload: 48
+      maximum_fragment_payload: 4080
+      maximum_fragments_per_record: 87
 ```
+
+`minimum_mtu` shall be strictly greater than `fragment_header_bytes`. A Transport Profile that produces a zero-byte
+Fragment payload at its minimum MTU is invalid. The CAN FD Baseline in this authority set uses a 64-byte MTU.
 
 ### 18.3 Static and Runtime Effective Profiles
 
@@ -2127,6 +2169,25 @@ Confirmed offset or chunk bitmap
 ```
 
 Application Session keys shall not be reused by the Bootloader Session.
+
+When an Update Transaction may survive reconnect, Rekey, or restart, the Protocol shall define a concrete resume
+authorization object. The authorization shall bind at least:
+
+```text
+Update Transaction ID
+Manifest hash
+Authenticated Device identity
+Authorized Host identity
+Security version
+Monotonic resume generation
+Fresh authorization nonce
+Cryptographic MAC or signature
+```
+
+A new Bootloader Session shall present and validate that authorization before reading persisted offset state or
+accepting more chunks. Knowledge of the Transaction ID or confirmed offset is insufficient. The token shall define
+its key scope, persistence, canonical MAC/signature input, invalidation conditions, replay/stale-generation behavior,
+and reissue policy.
 
 ### 19.6 Finalization, Recovery, and Rollback
 
@@ -2993,6 +3054,11 @@ This baseline establishes the following decisions:
 50. Every Firmware signature algorithm defines exact message preparation, exact wire encoding, exact length, and canonicality or malleability rules.
 51. `minimum_length` is the fixed decoding prefix only; variable-content minimum and actual length are separate validations.
 52. Plaintext Message size, security overhead, secured Record size, Transport reassembly size, and Fragment payload are distinct bounded quantities.
+53. Fragmentation defines one exact Header wire struct and deterministic bounded reassembly behavior for every Runtime MTU.
+54. Security-critical Handshake fields use named concrete structs, not opaque payload blobs.
+55. Profile IDs are identifiers; downgrade prevention uses explicit allowlists, preference, security level, and deprecation state.
+56. Persisted Firmware Update resume requires a cryptographic authorization bound to transaction, Manifest, Device, Host, and security version.
+57. Every data-bearing Transport Profile has a positive Fragment payload at its minimum MTU.
 
 ---
 

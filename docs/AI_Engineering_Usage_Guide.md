@@ -4,14 +4,14 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`  
 **Document ID:** AIEUG  
-**Document Version:** v1.0.7  
+**Document Version:** v1.0.8  
 **Status:** Draft for Review  
 **Document Type:** AI Usage and Authority Routing Guide  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
-**Supersedes Document Version:** v1.0.6  
+**Supersedes Document Version:** v1.0.7  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -99,6 +99,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 | v1.0.5 | 2026-07-18 | Updated active Framework and Application Analysis versions; refined stable filename routing to distinguish maintained repository authority paths from immutable versioned release, audit, external-delivery, and detached-snapshot filenames; required source commit/tag/Release traceability for detached artifacts; and preserved Draft for Review status. |
 | v1.0.6 | 2026-07-18 | Updated the Active Document Manifest for Application Analysis Template v1.0.8; clarified that Template authoring-reference versions do not prove Project compatibility; required AI to leave minimum-compatible versions unresolved until supported by comparison evidence; and retained Draft for Review status. |
 | v1.0.7 | 2026-07-18 | Updated routing for Framework v1.0.7, Application Analysis v1.0.9, Protocol Guide v1.0.7, and Protocol Template v1.0.7; required AI to reject unresolved security sentinels, public permanent identity disclosure, incomplete Counter/Rekey lifecycle, Handshake Profile confusion or downgrade, ambiguous signature encoding, conflicting `minimum_length`, and conflated plaintext/secured/Transport size domains; retained Draft for Review status. |
+| v1.0.8 | 2026-07-18 | Updated routing for Framework v1.0.8, Application Analysis v1.0.10, Protocol Guide v1.0.8, and Protocol Template v1.0.8; required AI to reject incomplete Fragment wire contracts, opaque security-critical Handshake payloads, numeric Profile-ID strength ordering, unauthorised Update resume across Session changes, and zero-byte minimum-MTU Fragment payloads; retained Draft for Review status. |
 
 ## 0.2 Active Document Manifest
 
@@ -108,12 +109,12 @@ of the documents listed below.
 
 | Document | Canonical File | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| Coordinator/Node Control Framework | `Coordinator_Node_Control_Framework.md` | `v1.0.7` | Baseline | Reusable architecture and governance |
-| Framework Application Analysis Template | `Framework_Application_Analysis_Template.md` | `v1.0.9` | Baseline | Application-analysis method and required records |
-| Protocol YAML Definition Guide | `Protocol_YAML_Definition_Guide.md` | `v1.0.7` | Baseline | Protocol YAML semantics and validation rules |
-| Protocol YAML Template | `Protocol_YAML_Template.md` | `v1.0.7` | Baseline | Reusable Project Protocol starting structure |
+| Coordinator/Node Control Framework | `Coordinator_Node_Control_Framework.md` | `v1.0.8` | Baseline | Reusable architecture and governance |
+| Framework Application Analysis Template | `Framework_Application_Analysis_Template.md` | `v1.0.10` | Baseline | Application-analysis method and required records |
+| Protocol YAML Definition Guide | `Protocol_YAML_Definition_Guide.md` | `v1.0.8` | Baseline | Protocol YAML semantics and validation rules |
+| Protocol YAML Template | `Protocol_YAML_Template.md` | `v1.0.8` | Baseline | Reusable Project Protocol starting structure |
 | Embedded C Coding Rules | `Embedded_C_Coding_Rules.md` | `v1.0.15` | Final Baseline | Product-owned Embedded C implementation rules |
-| AI Engineering Usage Guide | `AI_Engineering_Usage_Guide.md` | `v1.0.7` | Draft for Review | AI authority routing and operating controls |
+| AI Engineering Usage Guide | `AI_Engineering_Usage_Guide.md` | `v1.0.8` | Draft for Review | AI authority routing and operating controls |
 
 Version-routing rules:
 
@@ -1044,6 +1045,11 @@ subordinate to the owning authority and shall not be used to create a competing 
 48. AI requires exact per-algorithm Firmware signature preparation, wire encoding, length, and canonicality or low-S policy.
 49. AI treats `minimum_length` as the fixed decoding prefix and validates variable content separately.
 50. AI separately calculates plaintext Message, security overhead, secured Record, Transport reassembly, and Fragment limits.
+51. AI shall reject Fragmentation without an exact Header wire struct and complete bounded reassembly policies.
+52. AI shall reject opaque security-critical Handshake payload blobs when transcript fields lack typed wire locations.
+53. AI shall not infer security strength from numeric Profile-ID ordering.
+54. AI shall reject Firmware Update resume that is authorized only by Transaction ID, offset, or possession of stale Session state.
+55. AI shall reject a Transport Profile whose minimum MTU leaves no positive Fragment payload.
 
 ---
 

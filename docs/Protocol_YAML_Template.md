@@ -4,7 +4,7 @@
 
 **Document Name:** `Protocol_YAML_Template.md`  
 **Document ID:** PYT  
-**Document Version:** v1.0.7  
+**Document Version:** v1.0.8  
 **Status:** Baseline  
 **Document Type:** Reusable Project Template  
 **Primary Narrative Language:** English  
@@ -76,6 +76,7 @@ Schema Validation / Semantic Lint / Code Generation / Test Vectors
 | v1.0.5 | 2026-07-18 | Adopted the stable canonical filename `Protocol_YAML_Template.md`; updated all active Framework, Definition Guide, Application Analysis, and illustrative Project document references to canonical paths; aligned the illustrative minimum-version metadata with the current document set; and preserved the YAML structure and all Protocol semantics without technical change. |
 | v1.0.6 | 2026-07-18 | Corrected computed Message minimum lengths; made Stream, Firmware chunk, Capability, and Transport envelopes mutually consistent; added explicit per-Message security, direction/environment Key Context mappings, Application and Bootloader Handshake contracts, sender-local Heartbeat timestamp semantics, and a signed canonical Firmware Manifest transfer; separated Telemetry replacement semantics from queue discipline; updated interoperability wording; and expanded Schema, Semantic Lint, security, Firmware Update, and Baseline checks. |
 | v1.0.7 | 2026-07-18 | Closed the remaining security-contract and size-model gaps: strengthened unresolved-placeholder Lint; replaced public permanent identity and Capability disclosure with bounded ephemeral Discovery plus authenticated revalidation; added machine-verifiable Record Counter, Rekey, failure, and atomic-cutover policies; bound Handshake Profile selection and canonical transcript fields to reject downgrade and profile confusion; defined exact canonical Firmware signature encodings; fixed `minimum_length` to mean the fixed decoding prefix only; and separated plaintext Message size, security overhead, secured Record size, Transport reassembly size, and Fragment payload limits. |
+| v1.0.8 | 2026-07-18 | Defined a concrete 16-byte Fragment Header and complete reassembly policies; replaced opaque Handshake payloads with four named fixed-capacity wire structs and explicit transcript assembly; replaced numeric Profile-strength comparison with allowlists, preference order, security level, and deprecation state; added Device-issued Firmware Update resume authorization bound to transaction, Manifest, Device, Host, and security version; corrected CAN FD minimum data-bearing MTU; and synchronized all machine-verifiable checks. |
 
 ---
 
@@ -360,11 +361,11 @@ document:
 
   related_framework:
     name: Coordinator_Node_Control_Framework
-    minimum_version: v1.0.7
+    minimum_version: v1.0.8
 
   related_definition_guide:
     name: Protocol_YAML_Definition_Guide
-    minimum_version: v1.0.7
+    minimum_version: v1.0.8
 
   related_application_analysis: EXAMPLE_Framework_Application_Analysis.md
   related_application_profile: EXAMPLE_Application_Profile.md
@@ -399,6 +400,10 @@ record_size_model:
   variable_content_validation: count_range_then_exact_received_length_then_destination_capacity
   secured_record_formula: plaintext_message_size_plus_protocol_header_plus_security_header_plus_authentication_tag
   fragmentation_scope: secured_record
+  fragment_header_struct: SecuredRecordFragmentHeaderV1
+  runtime_fragment_payload_formula: runtime_mtu_minus_fragment_header_bytes
+  required_fragment_count_formula: ceil(original_secured_record_length_div_runtime_fragment_payload)
+  fragment_integrity_scope: complete_secured_record_aead_verified_after_reassembly
 id_allocation:
   message_ranges:
     - range_start: 0x0000
@@ -498,6 +503,31 @@ services:
     description: Firmware Update transaction and image transfer.
 
 types:
+  - name: SecuredRecordFragmentHeaderV1
+    kind: struct
+    description: Exact 16-byte Fragment Header. The CRC detects accidental Header corruption; authenticity is 
+      established only after complete secured-Record reassembly and AEAD verification.
+    fields:
+      - name: record_id
+        type: uint32
+        description: Sender-Session-Epoch-unique secured-Record identifier.
+      - name: fragment_index
+        type: uint16
+        description: Zero-based Fragment index.
+      - name: fragment_count
+        type: uint16
+        minimum: 1
+        description: Total Fragment count for the secured Record.
+      - name: original_secured_record_length
+        type: uint32
+        description: Exact secured-Record length before Fragmentation.
+      - name: fragment_payload_length
+        type: uint16
+        description: Number of secured-Record bytes carried after this Header.
+      - name: header_crc16
+        type: uint16
+        description: CRC-16/CCITT-FALSE over the preceding 14 Header bytes; corruption detection only, not 
+          authentication.
   - name: ProtocolVersion
     kind: struct
     description: Semantic Protocol version.
@@ -549,6 +579,332 @@ types:
     base_type: uint64
     unit: us
     description: Sender-local monotonic microseconds; the sender-specific epoch is defined by the Message policy.
+  - name: ApplicationHandshakeRequestV1
+    kind: struct
+    description: Concrete fixed-capacity Application Handshake wire payload. Length fields define meaningful bytes; 
+      unused slot bytes shall be zero and are transcript-bound.
+    fields:
+      - name: handshake_id
+        type: alias
+        alias: TransactionId
+        description: Handshake transaction identifier.
+      - name: protocol_family_id
+        type: uint32
+        description: Approved Protocol-family identifier.
+      - name: protocol_version
+        type: struct
+        struct: ProtocolVersion
+        description: Protocol version proposed by the initiator.
+      - name: discovery_id
+        type: uint8
+        description: Ephemeral Discovery identifier; all zero only when public Discovery was not used.
+        array:
+          length: 8
+      - name: handshake_profile_id
+        type: uint16
+        description: Selected Handshake Profile identifier.
+      - name: execution_environment
+        type: enum
+        enum: ExecutionEnvironment
+        description: Must encode APPLICATION.
+      - name: initiator_role
+        type: enum
+        enum: HandshakeRole
+        description: Must encode COORDINATOR.
+      - name: responder_role
+        type: enum
+        enum: HandshakeRole
+        description: Must encode NODE.
+      - name: initiator_identity_length
+        type: uint8
+        minimum: 1
+        maximum: 32
+        description: Meaningful initiator-identity bytes in the fixed slot.
+      - name: initiator_identity
+        type: uint8
+        description: Fixed 32-byte identity slot; bytes beyond initiator_identity_length shall be zero.
+        array:
+          length: 32
+      - name: initiator_nonce
+        type: uint8
+        description: Fresh 32-byte nonce.
+        array:
+          length: 32
+      - name: initiator_ephemeral_public_key_length
+        type: uint16
+        minimum: 1
+        maximum: 128
+        description: Meaningful public-key bytes in the fixed slot.
+      - name: initiator_ephemeral_public_key
+        type: uint8
+        description: Fixed 128-byte public-key slot; unused bytes shall be zero.
+        array:
+          length: 128
+      - name: offered_algorithm_set_id
+        type: uint16
+        description: Registered algorithm-set identifier offered by the initiator.
+      - name: initiator_proof_length
+        type: uint16
+        minimum: 1
+        maximum: 128
+        description: Meaningful proof bytes in the fixed slot.
+      - name: initiator_proof
+        type: uint8
+        description: Fixed 128-byte initiator-proof slot; unused bytes shall be zero.
+        array:
+          length: 128
+  - name: ApplicationHandshakeResponseV1
+    kind: struct
+    description: Concrete fixed-capacity Application Handshake wire payload. Length fields define meaningful bytes; 
+      unused slot bytes shall be zero and are transcript-bound.
+    fields:
+      - name: result
+        type: enum
+        enum: CommandResult
+        description: Handshake result.
+      - name: handshake_id
+        type: alias
+        alias: TransactionId
+        description: Handshake transaction identifier.
+      - name: protocol_family_id
+        type: uint32
+        description: Accepted Protocol-family identifier.
+      - name: protocol_version
+        type: struct
+        struct: ProtocolVersion
+        description: Accepted Protocol version.
+      - name: discovery_id
+        type: uint8
+        description: Echo of the transcript-bound ephemeral Discovery identifier.
+        array:
+          length: 8
+      - name: handshake_profile_id
+        type: uint16
+        description: Accepted Handshake Profile identifier.
+      - name: execution_environment
+        type: enum
+        enum: ExecutionEnvironment
+        description: Must encode APPLICATION.
+      - name: initiator_role
+        type: enum
+        enum: HandshakeRole
+        description: Must encode COORDINATOR.
+      - name: responder_role
+        type: enum
+        enum: HandshakeRole
+        description: Must encode NODE.
+      - name: responder_identity_length
+        type: uint8
+        minimum: 1
+        maximum: 32
+        description: Meaningful responder-identity bytes in the fixed slot.
+      - name: responder_identity
+        type: uint8
+        description: Fixed 32-byte identity slot; bytes beyond responder_identity_length shall be zero.
+        array:
+          length: 32
+      - name: responder_nonce
+        type: uint8
+        description: Fresh 32-byte nonce.
+        array:
+          length: 32
+      - name: responder_ephemeral_public_key_length
+        type: uint16
+        minimum: 1
+        maximum: 128
+        description: Meaningful public-key bytes in the fixed slot.
+      - name: responder_ephemeral_public_key
+        type: uint8
+        description: Fixed 128-byte public-key slot; unused bytes shall be zero.
+        array:
+          length: 128
+      - name: selected_algorithm_set_id
+        type: uint16
+        description: Registered algorithm-set identifier selected from the request.
+      - name: session_id
+        type: uint32
+        description: New Session identifier; zero when the Handshake failed.
+      - name: derived_key_context_set_id
+        type: uint16
+        description: Registered set of derived direction-specific Key Contexts.
+      - name: request_transcript_hash
+        type: uint8
+        description: SHA-256 of the canonical request struct.
+        array:
+          length: 32
+      - name: responder_proof_length
+        type: uint16
+        minimum: 1
+        maximum: 128
+        description: Meaningful proof bytes in the fixed slot.
+      - name: responder_proof
+        type: uint8
+        description: Fixed 128-byte responder-proof slot; unused bytes shall be zero.
+        array:
+          length: 128
+  - name: BootloaderHandshakeRequestV1
+    kind: struct
+    description: Concrete fixed-capacity Bootloader Handshake wire payload. Length fields define meaningful bytes; 
+      unused slot bytes shall be zero and are transcript-bound.
+    fields:
+      - name: handshake_id
+        type: alias
+        alias: TransactionId
+        description: Handshake transaction identifier.
+      - name: protocol_family_id
+        type: uint32
+        description: Approved Protocol-family identifier.
+      - name: protocol_version
+        type: struct
+        struct: ProtocolVersion
+        description: Protocol version proposed by the initiator.
+      - name: discovery_id
+        type: uint8
+        description: Ephemeral Discovery identifier; all zero only when public Discovery was not used.
+        array:
+          length: 8
+      - name: handshake_profile_id
+        type: uint16
+        description: Selected Handshake Profile identifier.
+      - name: execution_environment
+        type: enum
+        enum: ExecutionEnvironment
+        description: Must encode BOOTLOADER.
+      - name: initiator_role
+        type: enum
+        enum: HandshakeRole
+        description: Must encode COORDINATOR.
+      - name: responder_role
+        type: enum
+        enum: HandshakeRole
+        description: Must encode NODE.
+      - name: initiator_identity_length
+        type: uint8
+        minimum: 1
+        maximum: 32
+        description: Meaningful initiator-identity bytes in the fixed slot.
+      - name: initiator_identity
+        type: uint8
+        description: Fixed 32-byte identity slot; bytes beyond initiator_identity_length shall be zero.
+        array:
+          length: 32
+      - name: initiator_nonce
+        type: uint8
+        description: Fresh 32-byte nonce.
+        array:
+          length: 32
+      - name: initiator_ephemeral_public_key_length
+        type: uint16
+        minimum: 1
+        maximum: 128
+        description: Meaningful public-key bytes in the fixed slot.
+      - name: initiator_ephemeral_public_key
+        type: uint8
+        description: Fixed 128-byte public-key slot; unused bytes shall be zero.
+        array:
+          length: 128
+      - name: offered_algorithm_set_id
+        type: uint16
+        description: Registered algorithm-set identifier offered by the initiator.
+      - name: initiator_proof_length
+        type: uint16
+        minimum: 1
+        maximum: 128
+        description: Meaningful proof bytes in the fixed slot.
+      - name: initiator_proof
+        type: uint8
+        description: Fixed 128-byte initiator-proof slot; unused bytes shall be zero.
+        array:
+          length: 128
+  - name: BootloaderHandshakeResponseV1
+    kind: struct
+    description: Concrete fixed-capacity Bootloader Handshake wire payload. Length fields define meaningful bytes; 
+      unused slot bytes shall be zero and are transcript-bound.
+    fields:
+      - name: result
+        type: enum
+        enum: CommandResult
+        description: Handshake result.
+      - name: handshake_id
+        type: alias
+        alias: TransactionId
+        description: Handshake transaction identifier.
+      - name: protocol_family_id
+        type: uint32
+        description: Accepted Protocol-family identifier.
+      - name: protocol_version
+        type: struct
+        struct: ProtocolVersion
+        description: Accepted Protocol version.
+      - name: discovery_id
+        type: uint8
+        description: Echo of the transcript-bound ephemeral Discovery identifier.
+        array:
+          length: 8
+      - name: handshake_profile_id
+        type: uint16
+        description: Accepted Handshake Profile identifier.
+      - name: execution_environment
+        type: enum
+        enum: ExecutionEnvironment
+        description: Must encode BOOTLOADER.
+      - name: initiator_role
+        type: enum
+        enum: HandshakeRole
+        description: Must encode COORDINATOR.
+      - name: responder_role
+        type: enum
+        enum: HandshakeRole
+        description: Must encode NODE.
+      - name: responder_identity_length
+        type: uint8
+        minimum: 1
+        maximum: 32
+        description: Meaningful responder-identity bytes in the fixed slot.
+      - name: responder_identity
+        type: uint8
+        description: Fixed 32-byte identity slot; bytes beyond responder_identity_length shall be zero.
+        array:
+          length: 32
+      - name: responder_nonce
+        type: uint8
+        description: Fresh 32-byte nonce.
+        array:
+          length: 32
+      - name: responder_ephemeral_public_key_length
+        type: uint16
+        minimum: 1
+        maximum: 128
+        description: Meaningful public-key bytes in the fixed slot.
+      - name: responder_ephemeral_public_key
+        type: uint8
+        description: Fixed 128-byte public-key slot; unused bytes shall be zero.
+        array:
+          length: 128
+      - name: selected_algorithm_set_id
+        type: uint16
+        description: Registered algorithm-set identifier selected from the request.
+      - name: session_id
+        type: uint32
+        description: New Session identifier; zero when the Handshake failed.
+      - name: derived_key_context_set_id
+        type: uint16
+        description: Registered set of derived direction-specific Key Contexts.
+      - name: request_transcript_hash
+        type: uint8
+        description: SHA-256 of the canonical request struct.
+        array:
+          length: 32
+      - name: responder_proof_length
+        type: uint16
+        minimum: 1
+        maximum: 128
+        description: Meaningful proof bytes in the fixed slot.
+      - name: responder_proof
+        type: uint8
+        description: Fixed 128-byte responder-proof slot; unused bytes shall be zero.
+        array:
+          length: 128
   - name: FirmwareManifestV1
     kind: struct
     description: Canonical signed Firmware Manifest fields encoded field by field without implicit padding.
@@ -605,6 +961,46 @@ types:
         type: enum
         enum: FirmwareSignatureAlgorithm
         description: Algorithm used to sign the canonical Manifest hash.
+  - name: UpdateResumeAuthorizationV1
+    kind: struct
+    description: Device-issued fixed 156-byte authorization permitting one authenticated Host identity to attach a new 
+      Bootloader Session to a persisted Update Transaction.
+    fields:
+      - name: update_transaction_id
+        type: alias
+        alias: TransactionId
+        description: Persisted Update Transaction identifier.
+      - name: manifest_hash
+        type: uint8
+        description: Accepted canonical Manifest hash.
+        array:
+          length: 32
+      - name: device_identity_hash
+        type: uint8
+        description: SHA-256 of the authenticated Device identity.
+        array:
+          length: 32
+      - name: authorized_host_identity_hash
+        type: uint8
+        description: SHA-256 of the authenticated Host identity authorized to resume.
+        array:
+          length: 32
+      - name: security_version
+        type: uint32
+        description: Accepted anti-rollback security version.
+      - name: resume_generation
+        type: uint32
+        description: Monotonic generation incremented whenever a new token is issued.
+      - name: authorization_nonce
+        type: uint8
+        description: Fresh token nonce.
+        array:
+          length: 16
+      - name: token_mac
+        type: uint8
+        description: HMAC-SHA-256 over every preceding field in canonical order and the domain separator.
+        array:
+          length: 32
   - name: TransactionId
     kind: alias
     base_type: uint32
@@ -714,6 +1110,15 @@ enums:
       - name: FACTORY
         value: 3
 
+  - name: HandshakeRole
+    base_type: uint8
+    unknown_value_policy: reject
+    description: Role bound into the canonical Handshake transcript.
+    values:
+      - name: COORDINATOR
+        value: 0
+      - name: NODE
+        value: 1
   - name: DeviceHealth
     base_type: uint8
     unknown_value_policy: preserve_raw
@@ -998,12 +1403,27 @@ transport_profiles:
     maximum_control_latency_ms: 100
     fragmentation:
       mode: protocol_record_fragmentation
-      maximum_fragments_per_record: 128
+      maximum_fragments_per_record: 87
       maximum_concurrent_reassembly: 1
       reassembly_timeout_ms: 1000
 
-      fragment_header_bytes: 8
-      maximum_fragment_payload: 56
+      fragment_header_bytes: 16
+      maximum_fragment_payload: 4080
+      header_struct: SecuredRecordFragmentHeaderV1
+      minimum_data_bearing_mtu: 64
+      minimum_fragment_payload: 48
+      record_id_policy: unique_per_sender_session_epoch_until_reassembly_timeout
+      fragment_index_base: 0
+      duplicate_policy: ignore_identical_reject_conflicting_and_abort_reassembly
+      out_of_order_policy: accept_within_one_bounded_active_reassembly
+      integrity_scope: complete_secured_record_aead_verified_after_reassembly
+      fragment_header_integrity: crc16_ccitt_false_accidental_corruption_only
+      incomplete_record_behavior: discard_on_timeout_and_count
+      conflicting_fragment_behavior: abort_reassembly_disconnect_and_count
+      oversized_record_behavior: reject_before_allocation_and_count
+      zero_payload_behavior: reject_transport_profile
+      runtime_fragment_payload_formula: runtime_mtu_minus_fragment_header_bytes
+      required_fragment_count_formula: ceil(original_secured_record_length_div_runtime_fragment_payload)
     maximum_plaintext_message_size: 4096
     protocol_record_header_bytes: 12
     security_header_bytes: 12
@@ -1013,18 +1433,33 @@ transport_profiles:
     maximum_transport_reassembly_size: 4136
   - name: CAN_FD_BASELINE
     transport: can_fd
-    minimum_mtu: 8
+    minimum_mtu: 64
     maximum_mtu: 64
     expected_minimum_throughput_bps: 10000
     maximum_control_latency_ms: 100
     fragmentation:
       mode: protocol_record_fragmentation
-      maximum_fragments_per_record: 32
+      maximum_fragments_per_record: 23
       maximum_concurrent_reassembly: 1
       reassembly_timeout_ms: 500
 
-      fragment_header_bytes: 8
-      maximum_fragment_payload: 56
+      fragment_header_bytes: 16
+      maximum_fragment_payload: 48
+      header_struct: SecuredRecordFragmentHeaderV1
+      minimum_data_bearing_mtu: 64
+      minimum_fragment_payload: 48
+      record_id_policy: unique_per_sender_session_epoch_until_reassembly_timeout
+      fragment_index_base: 0
+      duplicate_policy: ignore_identical_reject_conflicting_and_abort_reassembly
+      out_of_order_policy: accept_within_one_bounded_active_reassembly
+      integrity_scope: complete_secured_record_aead_verified_after_reassembly
+      fragment_header_integrity: crc16_ccitt_false_accidental_corruption_only
+      incomplete_record_behavior: discard_on_timeout_and_count
+      conflicting_fragment_behavior: abort_reassembly_disconnect_and_count
+      oversized_record_behavior: reject_before_allocation_and_count
+      zero_payload_behavior: reject_transport_profile
+      runtime_fragment_payload_formula: runtime_mtu_minus_fragment_header_bytes
+      required_fragment_count_formula: ceil(original_secured_record_length_div_runtime_fragment_payload)
     maximum_plaintext_message_size: 1024
     protocol_record_header_bytes: 12
     security_header_bytes: 12
@@ -1059,14 +1494,19 @@ security_model:
       kdf: UNRESOLVED_PROJECT_DECISION
       cipher_suite: UNRESOLVED_PROJECT_DECISION
       profile_selection_policy:
+        allowed_profile_ids:
+          - 0x0001
+        preferred_profile_order:
+          - 0x0001
+        prohibited_profile_ids: []
+        reject_unlisted_profile_ids: true
         payload_profile_id_must_equal_profile_id: true
+        security_level_comparison_field: security_level
+        deprecated_profile_behavior: explicit_reject
         unsupported_profile_behavior: explicit_reject
         silent_fallback_prohibited: true
-        downgrade_behavior: reject_below_minimum_approved_profile
-        minimum_approved_profile_id: 0x0001
       canonical_transcript:
         encoding: protocol_wire_format_field_by_field_without_padding
-        proof_covers_full_transcript: true
         required_fields:
           - protocol_family
           - protocol_version
@@ -1084,6 +1524,17 @@ security_model:
           - negotiated_algorithms
           - session_id
           - derived_key_contexts
+        request_struct: ApplicationHandshakeRequestV1
+        response_struct: ApplicationHandshakeResponseV1
+        assembly: 
+          domain_separator_then_request_struct_then_response_struct_without_responder_proof_slot_then_derived_context_registry
+        initiator_proof_scope: domain_separator_then_request_struct_without_initiator_proof_slot
+        responder_proof_scope: 
+          domain_separator_then_complete_request_struct_then_response_struct_without_responder_proof_slot_then_derived_context_registry
+        initiator_key_confirmation: first_valid_secured_record_under_new_initiator_key_context
+        zero_padding_required: true
+      security_level: 100
+      deprecated: false
     - name: BOOTLOADER_MUTUAL_AUTH_V1
       profile_id: 0x0002
       execution_environment: bootloader
@@ -1098,14 +1549,19 @@ security_model:
       kdf: UNRESOLVED_PROJECT_DECISION
       cipher_suite: UNRESOLVED_PROJECT_DECISION
       profile_selection_policy:
+        allowed_profile_ids:
+          - 0x0002
+        preferred_profile_order:
+          - 0x0002
+        prohibited_profile_ids: []
+        reject_unlisted_profile_ids: true
         payload_profile_id_must_equal_profile_id: true
+        security_level_comparison_field: security_level
+        deprecated_profile_behavior: explicit_reject
         unsupported_profile_behavior: explicit_reject
         silent_fallback_prohibited: true
-        downgrade_behavior: reject_below_minimum_approved_profile
-        minimum_approved_profile_id: 0x0002
       canonical_transcript:
         encoding: protocol_wire_format_field_by_field_without_padding
-        proof_covers_full_transcript: true
         required_fields:
           - protocol_family
           - protocol_version
@@ -1123,6 +1579,17 @@ security_model:
           - negotiated_algorithms
           - session_id
           - derived_key_contexts
+        request_struct: BootloaderHandshakeRequestV1
+        response_struct: BootloaderHandshakeResponseV1
+        assembly: 
+          domain_separator_then_request_struct_then_response_struct_without_responder_proof_slot_then_derived_context_registry
+        initiator_proof_scope: domain_separator_then_request_struct_without_initiator_proof_slot
+        responder_proof_scope: 
+          domain_separator_then_complete_request_struct_then_response_struct_without_responder_proof_slot_then_derived_context_registry
+        initiator_key_confirmation: first_valid_secured_record_under_new_initiator_key_context
+        zero_padding_required: true
+      security_level: 100
+      deprecated: false
   firmware_update_manifest:
     struct: FirmwareManifestV1
     canonical_encoding: protocol_wire_format_field_by_field_without_padding
@@ -1170,6 +1637,8 @@ security_model:
     manifest_hash_failure: reject_update_abort_and_count
     firmware_signature_failure: reject_update_lock_transaction_and_count
     security_downgrade_attempt: reject_disconnect_and_count
+    unauthorized_update_resume: reject_resume_disconnect_and_count
+    fragment_header_conflict: abort_reassembly_disconnect_and_count
   discovery_policies:
     - name: PUBLIC_DISCOVERY_V1
       allowed_messages:
@@ -1221,6 +1690,28 @@ security_model:
       record_counter_profile: DEFAULT_RECORD_COUNTER_V1
     - key_context: bootloader_response_d2h
       record_counter_profile: DEFAULT_RECORD_COUNTER_V1
+  firmware_update_transaction_binding:
+    mode: device_issued_resume_authorization_token
+    struct: UpdateResumeAuthorizationV1
+    domain_separator: EXAMPLE_DEVICE_UPDATE_RESUME_AUTH_V1
+    mac_algorithm: hmac_sha256
+    token_key_scope: bootloader_persistent_update_authorization_key
+    token_key_persistence: survives_reconnect_rekey_and_restart_until_transaction_terminal_state
+    authorized_host_identity_source: authenticated_bootloader_session_identity
+    device_identity_source: authenticated_device_identity
+    mac_input: domain_separator_then_all_struct_fields_before_token_mac
+    new_transaction_absent_encoding: resume_authorization_present_false_and_all_zero_struct
+    resume_validation_required: true
+    resume_generation_must_not_decrease: true
+    reissue_on_every_accepted_begin_or_resume: true
+    invalid_token_behavior: reject_resume_disconnect_and_count
+    invalidation_conditions:
+      - successful_activation
+      - explicit_abort
+      - manifest_change
+      - host_authorization_revocation
+      - anti_rollback_rejection
+      - terminal_update_failure
 reserved_message_ids:
   - range_start: 0x00F0
     range_end: 0x00FF
@@ -1593,8 +2084,7 @@ messages:
     direction: coordinator_to_node
     execution_environment: application
     description: Establish the Application Secure Session using the declared Handshake Profile.
-    length_policy: minimum
-    minimum_length: 8
+    length_policy: exact
     unknown_trailing_policy: reject
     timeout_ms: 3000
     retry_policy:
@@ -1617,31 +2107,17 @@ messages:
       handshake_profile: APPLICATION_MUTUAL_AUTH_V1
     payload:
       fields:
-        - name: handshake_id
-          type: alias
-          alias: TransactionId
-          description: Handshake transaction identifier.
-        - name: handshake_profile_id
-          type: uint16
-          description: Selected Handshake Profile identifier.
-        - name: handshake_payload_length
-          type: uint16
-          minimum: 1
-          maximum: 256
-          description: Length of profile-defined canonical handshake_payload.
-        - name: handshake_payload
-          type: uint8
-          description: Bounded profile-defined handshake data, including required nonce and proof material.
-          array:
-            length_from: handshake_payload_length
-            maximum_length: 256
+        - name: handshake
+          type: struct
+          struct: ApplicationHandshakeRequestV1
+          description: Concrete canonical Handshake wire payload.
     profile_binding:
-      payload_field: handshake_profile_id
+      payload_field: handshake.handshake_profile_id
       handshake_profile: APPLICATION_MUTUAL_AUTH_V1
       equality_required: true
       mismatch_behavior: explicit_reject_no_fallback
       transcript_binding_required: true
-    maximum_plaintext_message_size: 264
+    maximum_plaintext_message_size: 352
   - name: APPLICATION_HANDSHAKE_RESPONSE
     id: 0x000a
     namespace: framework
@@ -1651,8 +2127,7 @@ messages:
     response_to: APPLICATION_HANDSHAKE_REQUEST
     execution_environment: application
     description: Establish the Application Secure Session using the declared Handshake Profile.
-    length_policy: minimum
-    minimum_length: 14
+    length_policy: exact
     unknown_trailing_policy: reject
     timeout_ms: 3000
     retry_policy:
@@ -1675,38 +2150,17 @@ messages:
       handshake_profile: APPLICATION_MUTUAL_AUTH_V1
     payload:
       fields:
-        - name: result
-          type: enum
-          enum: CommandResult
-          description: Handshake result.
-        - name: handshake_id
-          type: alias
-          alias: TransactionId
-          description: Handshake transaction identifier.
-        - name: handshake_profile_id
-          type: uint16
-          description: Accepted Handshake Profile identifier.
-        - name: session_id
-          type: uint32
-          description: Newly established Session identifier; zero when the Handshake failed.
-        - name: handshake_payload_length
-          type: uint16
-          minimum: 1
-          maximum: 256
-          description: Length of profile-defined canonical handshake_payload.
-        - name: handshake_payload
-          type: uint8
-          description: Bounded profile-defined response data, including required nonce and proof material.
-          array:
-            length_from: handshake_payload_length
-            maximum_length: 256
+        - name: handshake
+          type: struct
+          struct: ApplicationHandshakeResponseV1
+          description: Concrete canonical Handshake wire payload.
     profile_binding:
-      payload_field: handshake_profile_id
+      payload_field: handshake.handshake_profile_id
       handshake_profile: APPLICATION_MUTUAL_AUTH_V1
       equality_required: true
       mismatch_behavior: explicit_reject_no_fallback
       transcript_binding_required: true
-    maximum_plaintext_message_size: 270
+    maximum_plaintext_message_size: 392
   - name: BOOTLOADER_HANDSHAKE_REQUEST
     id: 0x000b
     namespace: framework
@@ -1715,8 +2169,7 @@ messages:
     direction: coordinator_to_node
     execution_environment: bootloader
     description: Establish the Bootloader Secure Session using the declared Handshake Profile.
-    length_policy: minimum
-    minimum_length: 8
+    length_policy: exact
     unknown_trailing_policy: reject
     timeout_ms: 3000
     retry_policy:
@@ -1739,31 +2192,17 @@ messages:
       handshake_profile: BOOTLOADER_MUTUAL_AUTH_V1
     payload:
       fields:
-        - name: handshake_id
-          type: alias
-          alias: TransactionId
-          description: Handshake transaction identifier.
-        - name: handshake_profile_id
-          type: uint16
-          description: Selected Handshake Profile identifier.
-        - name: handshake_payload_length
-          type: uint16
-          minimum: 1
-          maximum: 256
-          description: Length of profile-defined canonical handshake_payload.
-        - name: handshake_payload
-          type: uint8
-          description: Bounded profile-defined handshake data, including required nonce and proof material.
-          array:
-            length_from: handshake_payload_length
-            maximum_length: 256
+        - name: handshake
+          type: struct
+          struct: BootloaderHandshakeRequestV1
+          description: Concrete canonical Handshake wire payload.
     profile_binding:
-      payload_field: handshake_profile_id
+      payload_field: handshake.handshake_profile_id
       handshake_profile: BOOTLOADER_MUTUAL_AUTH_V1
       equality_required: true
       mismatch_behavior: explicit_reject_no_fallback
       transcript_binding_required: true
-    maximum_plaintext_message_size: 264
+    maximum_plaintext_message_size: 352
   - name: BOOTLOADER_HANDSHAKE_RESPONSE
     id: 0x000c
     namespace: framework
@@ -1773,8 +2212,7 @@ messages:
     response_to: BOOTLOADER_HANDSHAKE_REQUEST
     execution_environment: bootloader
     description: Establish the Bootloader Secure Session using the declared Handshake Profile.
-    length_policy: minimum
-    minimum_length: 14
+    length_policy: exact
     unknown_trailing_policy: reject
     timeout_ms: 3000
     retry_policy:
@@ -1797,38 +2235,17 @@ messages:
       handshake_profile: BOOTLOADER_MUTUAL_AUTH_V1
     payload:
       fields:
-        - name: result
-          type: enum
-          enum: CommandResult
-          description: Handshake result.
-        - name: handshake_id
-          type: alias
-          alias: TransactionId
-          description: Handshake transaction identifier.
-        - name: handshake_profile_id
-          type: uint16
-          description: Accepted Handshake Profile identifier.
-        - name: session_id
-          type: uint32
-          description: Newly established Session identifier; zero when the Handshake failed.
-        - name: handshake_payload_length
-          type: uint16
-          minimum: 1
-          maximum: 256
-          description: Length of profile-defined canonical handshake_payload.
-        - name: handshake_payload
-          type: uint8
-          description: Bounded profile-defined response data, including required nonce and proof material.
-          array:
-            length_from: handshake_payload_length
-            maximum_length: 256
+        - name: handshake
+          type: struct
+          struct: BootloaderHandshakeResponseV1
+          description: Concrete canonical Handshake wire payload.
     profile_binding:
-      payload_field: handshake_profile_id
+      payload_field: handshake.handshake_profile_id
       handshake_profile: BOOTLOADER_MUTUAL_AUTH_V1
       equality_required: true
       mismatch_behavior: explicit_reject_no_fallback
       transcript_binding_required: true
-    maximum_plaintext_message_size: 270
+    maximum_plaintext_message_size: 392
   - name: GET_AUTHENTICATED_DEVICE_INFO_REQUEST
     id: 0x000d
     namespace: framework
@@ -2561,7 +2978,8 @@ messages:
     category: firmware_update
     direction: coordinator_to_node
     execution_environment: bootloader
-    description: Transfer the signed canonical Firmware Manifest and begin or resume an Update transaction.
+    description: Transfer the signed canonical Firmware Manifest and either create a new Update Transaction or resume 
+      one using a Device-issued authorization token.
 
     length_policy: exact
     unknown_trailing_policy: reject
@@ -2604,7 +3022,19 @@ messages:
           description: Exact 64-byte signature encoded according to the Manifest signature profile.
           array:
             length: 64
-    maximum_plaintext_message_size: 188
+        - name: resume_authorization_present
+          type: boolean
+          description: False for a new transaction; true when attaching this Session to persisted Update state.
+        - name: resume_authorization
+          type: struct
+          struct: UpdateResumeAuthorizationV1
+          description: All zero when absent; otherwise a valid Device-issued authorization token.
+    maximum_plaintext_message_size: 345
+    resume_binding:
+      new_transaction_policy: present_false_and_all_zero_token
+      resume_policy: present_true_and_validate_complete_token_before_offset_or_flash_access
+      session_identity_must_match_authorized_host_identity: true
+      transaction_manifest_and_security_version_must_match: true
   - name: BEGIN_UPDATE_RESPONSE
     id: 0x5002
     namespace: bootloader
@@ -2613,7 +3043,8 @@ messages:
     direction: node_to_coordinator
     response_to: BEGIN_UPDATE_REQUEST
     execution_environment: bootloader
-    description: Update transaction acceptance and resume state.
+    description: Return Update acceptance, resume state, and a fresh authorization token bound to the authenticated Host
+      and persisted transaction.
 
     length_policy: exact
     unknown_trailing_policy: reject
@@ -2648,6 +3079,11 @@ messages:
 
           minimum: 1
           maximum: 1014
+        - name: resume_authorization
+          type: struct
+          struct: UpdateResumeAuthorizationV1
+          description: Fresh Device-issued token for any later reconnect or Rekey resume.
+    maximum_plaintext_message_size: 168
   - name: WRITE_UPDATE_CHUNK_REQUEST
     id: 0x5003
     namespace: bootloader
@@ -3040,7 +3476,8 @@ The reusable template file may contain documented placeholders. The Product Base
 - [ ] Every maximum plaintext Telemetry, Stream, Handshake, and Firmware Update Message fits the Transport Profile plaintext limit.
 - [ ] `maximum_secured_record_size` equals plaintext Message limit plus Protocol header, Security header, and Authentication Tag overhead.
 - [ ] `maximum_transport_reassembly_size` is at least the maximum secured Record size.
-- [ ] Fragment count multiplied by maximum Fragment payload can carry the maximum secured Record.
+- [ ] Every Fragmentation profile references the exact `SecuredRecordFragmentHeaderV1` wire struct and defines duplicate, out-of-order, integrity, timeout, conflict, oversize, and abort behavior.
+- [ ] For every allowed Runtime MTU, `runtime_mtu - fragment_header_bytes > 0` and the required Fragment count is within the declared maximum.
 - [ ] Capability parameters are bounded by the Runtime Effective Profile.
 - [ ] Every variable array and Fragmentation path has a bounded memory requirement.
 - [ ] No published or reserved Message ID is reused.
@@ -3092,9 +3529,10 @@ The reusable template file may contain documented placeholders. The Product Base
 - [ ] Streaming loss, duplicate, ordering, wrap, and maximum-size tests pass.
 - [ ] Inconsistent `channel_count`, `samples_per_channel`, and `sample_count` vectors are rejected before sample-array access.
 - [ ] Stream minimum-length boundary vectors include the 19-byte fixed header and truncated variants.
-- [ ] Application and Bootloader Handshake, wrong-profile, transcript, proof, replay, and Key Context vectors pass when applicable.
+- [ ] Application and Bootloader Handshake structs contain every transcript-bound identity, nonce, ephemeral key, algorithm, role, Session, and proof field.
+- [ ] Wrong-profile, unlisted-profile, deprecated-profile, transcript, proof, replay, nonzero-padding, and Key Context vectors pass when applicable.
 - [ ] Security golden vectors pass when applicable.
-- [ ] Firmware Update Manifest-hash, wrong-key, signature-failure, anti-rollback, resume, duplicate-chunk, interruption, and rollback vectors pass when applicable.
+- [ ] Firmware Update Manifest-hash, wrong-key, signature-failure, anti-rollback, valid-resume-token, wrong-Host-token, wrong-Device-token, stale-generation, modified-transaction, modified-Manifest, duplicate-chunk, interruption, and rollback vectors pass when applicable.
 - [ ] No published or reserved identifier was reused.
 - [ ] No Product-specific placeholder remains.
 - [ ] Human-readable Protocol documentation is current.
@@ -3215,6 +3653,11 @@ This baseline establishes the following decisions:
 44. Firmware signature profiles define exact wire encoding, exact length, message preparation, and canonicality requirements.
 45. `minimum_length` is the fixed decoding prefix only; variable-content bounds and received length are validated separately.
 46. Plaintext Message size, security overhead, secured Record size, Transport reassembly size, and Fragment payload are distinct bounded quantities.
+47. Fragmentation uses one exact 16-byte Header struct and deterministic bounded duplicate, ordering, integrity, timeout, conflict, and abort behavior.
+48. Handshake wire payloads are named concrete structs; security-critical transcript fields shall not be hidden in opaque byte arrays.
+49. Profile selection uses explicit allowed, preferred, prohibited, security-level, and deprecation data; Profile IDs are identifiers, not security-strength ranks.
+50. Firmware Update resume requires a Device-issued token bound to transaction, Manifest, Device identity, authorized Host identity, security version, generation, and nonce.
+51. Every data-bearing Transport Profile has `minimum_mtu > fragment_header_bytes`; CAN FD Baseline requires a 64-byte MTU.
 
 ---
 

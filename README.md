@@ -30,11 +30,11 @@ Human reviews decisions and validates actual system behavior
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/AI_Engineering_Usage_Guide.md) | v1.0.7 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
-| [`Coordinator_Node_Control_Framework.md`](docs/Coordinator_Node_Control_Framework.md) | v1.0.7 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
-| [`Framework_Application_Analysis_Template.md`](docs/Framework_Application_Analysis_Template.md) | v1.0.9 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
-| [`Protocol_YAML_Definition_Guide.md`](docs/Protocol_YAML_Definition_Guide.md) | v1.0.7 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
-| [`Protocol_YAML_Template.md`](docs/Protocol_YAML_Template.md) | v1.0.7 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
+| [`AI_Engineering_Usage_Guide.md`](docs/AI_Engineering_Usage_Guide.md) | v1.0.8 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`Coordinator_Node_Control_Framework.md`](docs/Coordinator_Node_Control_Framework.md) | v1.0.8 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
+| [`Framework_Application_Analysis_Template.md`](docs/Framework_Application_Analysis_Template.md) | v1.0.10 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
+| [`Protocol_YAML_Definition_Guide.md`](docs/Protocol_YAML_Definition_Guide.md) | v1.0.8 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
+| [`Protocol_YAML_Template.md`](docs/Protocol_YAML_Template.md) | v1.0.8 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
 | [`Embedded_C_Coding_Rules.md`](docs/Embedded_C_Coding_Rules.md) | v1.0.15 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 
 ## AI Task Routing
@@ -72,7 +72,7 @@ Maintained Markdown authority files inside the controlled Git repository use sta
 
 ```text
 Canonical path:      docs/Coordinator_Node_Control_Framework.md
-Document version:    v1.0.6
+Document version:    v1.0.8
 Immutable history:   Git commit, tag, or GitHub Release
 ```
 

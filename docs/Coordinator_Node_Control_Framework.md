@@ -4,7 +4,7 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.7  
+**Document Version:** v1.0.8  
 **Status:** Baseline  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
@@ -250,6 +250,7 @@ Markdown filename.
 | v1.0.5 | 2026-07-18 | Clarified that generated Dispatcher output is Protocol plumbing and shall not contain Product control, state ownership, or hardware access; operationalized the one-authority rule through derived conformance summaries; and generalized interoperability requirements from fixed language pairs to all implementations and language pairs actually in scope. |
 | v1.0.6 | 2026-07-18 | Refined filename governance into a two-layer policy: maintained Markdown authority paths remain stable inside controlled Git repositories, while immutable release artifacts, audit packages, external deliverables, and detached snapshots include an approved document version or Baseline identifier in the distributed filename; required detached artifacts to carry source commit, tag, or Release traceability; and preserved all architecture and Protocol semantics. |
 | v1.0.7 | 2026-07-18 | Closed the remaining machine-verifiable security and Transport-envelope gaps: required minimal ephemeral public Discovery and authenticated revalidation; bound Handshake Profile selection and complete canonical transcripts against downgrade and profile confusion; required per-Key-Context Record Counter/Rekey profiles; defined exact canonical Firmware signature encodings; clarified fixed-prefix `minimum_length`; and separated plaintext Message, security overhead, secured Record, reassembly, and Fragment size domains. |
+| v1.0.8 | 2026-07-18 | Closed the remaining machine-verifiable Protocol-contract gaps by requiring an exact Fragment Header and bounded reassembly policies, concrete named Handshake request/response payloads, explicit Profile allowlists and security-level/deprecation metadata instead of numeric ID ordering, cryptographically authorized Firmware Update resume across Session changes, and a positive data-bearing Fragment payload at every supported minimum MTU. |
 
 ## 0.6 Core Conclusions
 
@@ -1782,6 +1783,12 @@ Application and Bootloader shall be measured separately.
 
 Security design is incomplete if its worst-case timing breaks control, watchdog, or Firmware Update requirements.
 
+## 6.13 Machine-Verifiable Fragmentation Contract
+
+Fragmentation shall use one exact wire Header containing Record identity, Fragment index and count, original secured-Record length, Fragment payload length, and corruption detection. Duplicate, conflicting, out-of-order, integrity, timeout, oversize, incomplete-record, abort, and resource-exhaustion behavior shall be bounded and explicit.
+
+For every Runtime MTU, `runtime_mtu > fragment_header_bytes`, the Fragment payload shall be positive, and the required Fragment count shall not exceed the declared maximum.
+
 ---
 
 # Part VII. Firmware Update, Bootloader, Resume, and Rollback
@@ -1811,6 +1818,10 @@ Session keys.
 
 Bootloader shall perform its own Handshake and establish Bootloader-specific Key Contexts.
 
+Application and Bootloader Handshakes shall use named concrete wire structs. Profile selection shall use explicit
+allowlists, preference order, security level, and deprecation status; numeric Profile-ID ordering shall not represent
+security strength.
+
 Wireless reconnect may preserve a valid Update Transaction, but the previous Bootloader Secure Session shall be
 invalidated or resumed only under an explicit approved policy.
 
@@ -1838,6 +1849,10 @@ Flash progress
 Rekey or reconnect shall not change the Manifest, Image ID, expected hash, security version, or committed progress.
 
 A new Secure Session shall not be allowed to attach to an Update Transaction merely because it knows an offset.
+It shall present a cryptographic resume authorization bound to the Update Transaction ID, Manifest hash, authenticated
+Device identity, authorized Host identity, security version, monotonic resume generation, and fresh nonce. The
+Bootloader shall validate the token before exposing persisted progress or accepting chunks, and shall define token
+key scope, persistence, replay handling, reissue, and terminal invalidation conditions.
 
 ## 7.4 Update State Machine
 
@@ -2848,8 +2863,13 @@ This Baseline establishes the following decisions:
 58. Firmware signature Profiles define exact preparation, wire encoding, length, and canonicality or malleability rules.
 59. `minimum_length` means the fixed decoding prefix; variable content is validated separately.
 60. Plaintext Message, security overhead, secured Record, Transport reassembly, and Fragment sizes remain distinct.
-54. Maintained repository Markdown files use stable canonical paths, while immutable detached release, audit, and external-delivery artifacts include an approved version or Baseline identifier in the distributed filename.
-55. A detached artifact identifies its source canonical file and Git commit, tag, or Release and shall not become a parallel maintained authority.
+61. Maintained repository Markdown files use stable canonical paths, while immutable detached release, audit, and external-delivery artifacts include an approved version or Baseline identifier in the distributed filename.
+62. A detached artifact identifies its source canonical file and Git commit, tag, or Release and shall not become a parallel maintained authority.
+63. Fragmentation uses one exact wire Header and bounded deterministic reassembly behavior for every supported Runtime MTU.
+64. Handshake request and response Payloads are named concrete structs; opaque security-critical payload blobs are prohibited.
+65. Profile IDs do not encode security strength; selection uses allowlists, preference, security level, and deprecation state.
+66. Firmware Update resume across Session changes requires cryptographic authorization bound to transaction, Manifest, Device, Host, and security version.
+67. A data-bearing Transport Profile is invalid when its minimum MTU does not exceed the Fragment Header size.
 
 ## 12.6 Core Design Philosophy
 

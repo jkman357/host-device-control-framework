@@ -4,7 +4,7 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.9  
+**Document Version:** v1.0.10  
 **Status:** Baseline  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
@@ -87,6 +87,7 @@ Other Coordinator/Node applications
 | v1.0.7 | 2026-07-18 | Ray Yang | Distinguished minimum-compatible authority versions from the actual authority versions used for an analysis; separated the stable repository working filename from immutable release, audit, external-delivery, and detached-snapshot filenames; added source commit/tag/Release traceability fields; synchronized the default current Framework Baseline to v1.0.6; and clarified downstream citation requirements without changing the analysis method. |
 | v1.0.8 | 2026-07-18 | Ray Yang | Clarified that authority versions shown by the reusable Template are authoring references rather than automatic Product compatibility decisions; changed Project minimum-compatible and version-used fields to explicit completion-time inputs; required compatibility evidence before claiming an earlier minimum version; and corrected review-package traceability without changing the analysis architecture or dual filename policy. |
 | v1.0.9 | 2026-07-18 | Ray Yang | Added Product-analysis records for public Discovery privacy, rate limiting, transcript binding, and authenticated revalidation; concrete Handshake and downgrade policy; per-Key-Context Record Counter/Rekey lifecycle; exact Firmware signature encoding; fixed-prefix `minimum_length`; and distinct plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets. Updated authoring-reference versions without changing the Project-specific compatibility-evidence rule. |
+| v1.0.10 | 2026-07-18 | Ray Yang | Added Product-analysis records and acceptance questions for exact Fragment Header and reassembly behavior, concrete named Handshake wire structs, Profile allowlist/security-level/deprecation selection, Firmware Update resume authorization bound to transaction/Manifest/Device/Host, and positive minimum-MTU Fragment payload; synchronized authoring-reference versions. |
 
 ## 0.3 Template Usage Convention
 
@@ -148,10 +149,10 @@ authoring references, not automatic compatibility decisions for every Product:
 
 | Authority | Template Authoring Reference Version |
 |---|---:|
-| `Coordinator_Node_Control_Framework.md` | `v1.0.7` |
+| `Coordinator_Node_Control_Framework.md` | `v1.0.8` |
 | `Embedded_C_Coding_Rules.md` | `v1.0.15` |
-| `Protocol_YAML_Definition_Guide.md` | `v1.0.7` |
-| `Protocol_YAML_Template.md` | `v1.0.7` |
+| `Protocol_YAML_Definition_Guide.md` | `v1.0.8` |
+| `Protocol_YAML_Template.md` | `v1.0.8` |
 
 Every completed Application Analysis shall separately record:
 
@@ -328,10 +329,10 @@ State the criteria used to decide whether the application can proceed.
 
 | Item | Minimum Compatible Version | Version Used for This Analysis | Source Commit, Tag, or Release | Compatibility Evidence |
 |---|---:|---:|---|---|
-| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.7>` | `<TBD>` | `<Evidence>` |
+| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
 | `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.15>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
-| `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.7>` | `<TBD>` | `<Evidence>` |
-| `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.7>` | `<TBD>` | `<Evidence>` |
+| `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
+| `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
 
 Additional input artifacts:
 
@@ -2070,6 +2071,26 @@ Rationale:
 
 ---
 
+## 8.12 Fragmentation, Handshake, and Update-Resume Contract
+
+| Item | Project Decision and Evidence |
+|---|---|
+| Fragment Header struct, exact byte length, and field order | `<TBD>` |
+| Record-ID scope and maximum concurrent reassembly | `<TBD>` |
+| Duplicate, conflict, out-of-order, timeout, oversize, integrity, and abort policies | `<TBD>` |
+| Minimum and maximum Runtime MTU; positive Fragment payload proof | `<TBD>` |
+| Application Handshake request/response structs | `<TBD>` |
+| Bootloader Handshake request/response structs | `<TBD>` |
+| Profile allowed/preferred/prohibited IDs, security level, and deprecation policy | `<TBD>` |
+| Algorithm-set registry and unresolved-decision closure | `<TBD>` |
+| Update resume authorization structure and cryptographic method | `<TBD>` |
+| Transaction, Manifest, Device, Host, security-version, generation, nonce binding | `<TBD>` |
+| Resume-token persistence, reissue, replay, revocation, and terminal invalidation | `<TBD>` |
+
+Acceptance requires generated or independently calculated evidence that all supported MTUs carry a positive Fragment
+payload, all Handshake transcript fields have typed wire locations, Profile selection cannot silently downgrade, and a
+new Bootloader Session cannot attach to persisted Update state using only a Transaction ID or offset.
+
 # Appendix A. Quick-Start Analysis Sequence
 
 ```text
@@ -2471,6 +2492,11 @@ This baseline establishes the following decisions:
 56. Firmware signature Profiles define exact preparation, exact wire encoding, exact length, and canonicality or low-S policy.
 57. `minimum_length` is a fixed decoding prefix and does not include minimum variable content.
 58. Plaintext Message, security overhead, secured Record, Transport reassembly, and Fragment size budgets remain distinct.
+59. Product analysis records one exact Fragment Header and complete bounded reassembly behavior.
+60. Product analysis maps every security-critical Handshake transcript field to a named typed wire struct.
+61. Profile selection uses explicit allowed, preferred, prohibited, security-level, and deprecation decisions rather than numeric ID ordering.
+62. Persisted Firmware Update resume requires cryptographic authorization bound to transaction, Manifest, Device, Host, and security version.
+63. Every supported minimum MTU provides a positive data-bearing Fragment payload.
 
 ---
 
