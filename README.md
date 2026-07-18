@@ -30,9 +30,9 @@ Human reviews decisions and validates actual system behavior
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/AI_Engineering_Usage_Guide.md) | v1.0.4 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
-| [`Coordinator_Node_Control_Framework.md`](docs/Coordinator_Node_Control_Framework.md) | v1.0.5 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
-| [`Framework_Application_Analysis_Template.md`](docs/Framework_Application_Analysis_Template.md) | v1.0.6 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
+| [`AI_Engineering_Usage_Guide.md`](docs/AI_Engineering_Usage_Guide.md) | v1.0.6 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`Coordinator_Node_Control_Framework.md`](docs/Coordinator_Node_Control_Framework.md) | v1.0.6 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
+| [`Framework_Application_Analysis_Template.md`](docs/Framework_Application_Analysis_Template.md) | v1.0.8 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
 | [`Protocol_YAML_Definition_Guide.md`](docs/Protocol_YAML_Definition_Guide.md) | v1.0.6 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
 | [`Protocol_YAML_Template.md`](docs/Protocol_YAML_Template.md) | v1.0.6 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
 | [`Embedded_C_Coding_Rules.md`](docs/Embedded_C_Coding_Rules.md) | v1.0.15 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
@@ -66,19 +66,30 @@ Embedded C generation or review
 While `AI_Engineering_Usage_Guide.md` remains `Draft for Review`, this routing is provisional. Direct human
 instructions and the approved topic authority documents take precedence.
 
-## Stable Filename Policy
+## Filename and Release Artifact Policy
 
-Maintained Markdown filenames do not contain document versions.
+Maintained Markdown authority files inside the controlled Git repository use stable canonical filenames.
 
 ```text
-File identity:       docs/Coordinator_Node_Control_Framework.md
-Document version:    v1.0.4
+Canonical path:      docs/Coordinator_Node_Control_Framework.md
+Document version:    v1.0.6
 Immutable history:   Git commit, tag, or GitHub Release
 ```
 
 This keeps AI prompts, links, automation, and cross-document references stable. A new PATCH or MINOR revision updates
-the file content and its internal `Document Version`; it does not create another maintained Markdown filename.
-Historical snapshots are preserved through Git history, tags, Releases, or controlled archives.
+the canonical file and its internal `Document Version`; it does not create another parallel maintained authority file.
+
+Immutable release artifacts, audit packages, external deliverables, and detached snapshots include the approved
+version or a controlled Baseline identifier in the distributed filename:
+
+```text
+Smart_Battery_Framework_Application_Analysis_v1.2.0.md
+Smart_Battery_Framework_Application_Analysis_v1.2.0.pdf
+Smart_Battery_Engineering_Baseline_v1.2.0.zip
+```
+
+Detached artifacts preserve the canonical source filename and source Git commit, tag, or Release. They are immutable
+distribution copies and do not become parallel maintained authorities.
 
 ## Authority Boundary
 

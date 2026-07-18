@@ -4,7 +4,7 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.6  
+**Document Version:** v1.0.8  
 **Status:** Baseline  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
@@ -84,6 +84,8 @@ Other Coordinator/Node applications
 | v1.0.4 | 2026-07-18 | Ray Yang | Restored and modernized the reusable Command, Data Field, State, UI Page, Framework Gap, Review Question, and detailed completion-checklist appendices that were unintentionally omitted during the v1.0.3 structural rewrite; added the Bootloader/Update responsibility column; made signed Firmware image verification mandatory whenever Firmware Update is in scope; expanded placeholder guidance and source-input coverage; and synchronized the Baseline Decision Summary and structural validation. |
 | v1.0.5 | 2026-07-18 | Ray Yang | Adopted the stable canonical filename `Framework_Application_Analysis_Template.md`; updated all active authority and example-document references to canonical paths; aligned the default validated document versions with the current document set; and preserved the analysis method, templates, completion gates, and technical decisions without behavioral change. |
 | v1.0.6 | 2026-07-18 | Ray Yang | Corrected the completed-analysis stable filename rule; separated Telemetry replacement semantics from delivery queue policy; split Secure Session responsibility into peer-local Coordinator, Node, and Bootloader ownership; updated active Framework and Protocol versions; clarified cross-implementation and cross-language validation; and labeled repeated non-owning requirements as derived conformance summaries. |
+| v1.0.7 | 2026-07-18 | Ray Yang | Distinguished minimum-compatible authority versions from the actual authority versions used for an analysis; separated the stable repository working filename from immutable release, audit, external-delivery, and detached-snapshot filenames; added source commit/tag/Release traceability fields; synchronized the default current Framework Baseline to v1.0.6; and clarified downstream citation requirements without changing the analysis method. |
+| v1.0.8 | 2026-07-18 | Ray Yang | Clarified that authority versions shown by the reusable Template are authoring references rather than automatic Product compatibility decisions; changed Project minimum-compatible and version-used fields to explicit completion-time inputs; required compatibility evidence before claiming an earlier minimum version; and corrected review-package traceability without changing the analysis architecture or dual filename policy. |
 
 ## 0.3 Template Usage Convention
 
@@ -105,7 +107,7 @@ The following placeholders shall be replaced in a completed Application Analysis
 | `<TBD>` | Not yet decided |
 | `<N/A>` | Not applicable, with rationale |
 
-Save a completed analysis as:
+Maintain a completed analysis in a controlled Git repository under a stable canonical filename:
 
 ```text
 <Application_Name>_Framework_Application_Analysis.md
@@ -119,6 +121,19 @@ ECG_Framework_Application_Analysis.md
 Motion_Control_Framework_Application_Analysis.md
 ```
 
+When the approved analysis is exported as an immutable release artifact, audit package, external deliverable, or
+detached snapshot, the distributed filename shall include the approved Analysis Version or a controlled Baseline
+identifier:
+
+```text
+Smart_Battery_Framework_Application_Analysis_v1.2.0.md
+Smart_Battery_Framework_Application_Analysis_v1.2.0.pdf
+Smart_Battery_Engineering_Baseline_v1.2.0.zip
+```
+
+The detached artifact shall record the canonical repository filename and source Git commit, tag, or Release. It is
+an immutable distribution copy and shall not become a parallel maintained authority file.
+
 Angle-bracketed examples such as `<START>`, `<READY>`, `<DeviceStatus>`, or `<uint8>` are also placeholders
 and shall be replaced or removed when the completed analysis is baselined.
 
@@ -127,15 +142,35 @@ appear in the Open Question or Action Item Register with an Owner and target con
 
 ## 0.4 Framework Compatibility and Revalidation
 
-Every completed Application Analysis shall record the Framework version it evaluated.
+The following versions identify the authority set used to author and self-check this reusable Template. They are
+authoring references, not automatic compatibility decisions for every Product:
+
+| Authority | Template Authoring Reference Version |
+|---|---:|
+| `Coordinator_Node_Control_Framework.md` | `v1.0.6` |
+| `Embedded_C_Coding_Rules.md` | `v1.0.15` |
+| `Protocol_YAML_Definition_Guide.md` | `v1.0.6` |
+| `Protocol_YAML_Template.md` | `v1.0.6` |
+
+Every completed Application Analysis shall separately record:
+
+```text
+Minimum Compatible Version
+Version Used for This Analysis
+Source Git Commit, Tag, or Release
+Compatibility evidence and rationale
+```
+
+`Version Used for This Analysis` is the exact authority version actually read and applied.
+
+`Minimum Compatible Version` is the earliest authority version for which the completed Product analysis has
+evidence that all required rules, structures, and features remain valid. It shall not be copied from this reusable
+Template without compatibility review. It may equal the version used for the analysis. Claiming an earlier minimum
+requires documented comparison evidence.
 
 | Item | Value |
 |---|---|
-| Minimum Framework Version | `v1.0.5` |
-| Validated Framework Version | `v1.0.5` |
-| Embedded C Coding Rules Version | `v1.0.15` or `<N/A>` |
-| Protocol YAML Definition Guide Version | `v1.0.6` |
-| Protocol YAML Template Version | `v1.0.6` |
+| Source Git Commit, Tag, or Release | `<TBD>` |
 | Last Compatibility Review | `<YYYY-MM-DD>` |
 | Revalidation Status | Valid / Review Required / Invalid |
 | Revalidation Owner | `<Owner>` |
@@ -157,7 +192,9 @@ Revalidation rules:
 After revalidation, update:
 
 ```text
-Validated Framework Version
+Analysis Baseline Framework Version
+Analysis Baseline related-document versions
+Source Git Commit, Tag, or Release
 Last Compatibility Review
 Revalidation Status
 Affected Reuse Classifications
@@ -215,7 +252,11 @@ This analysis is complete only when:
 | Application Name | `<Application Name>` |
 | Application Domain | `<Application Domain>` |
 | Product or Project | `<TBD>` |
+| Repository Working Filename | `<Application_Name>_Framework_Application_Analysis.md` |
 | Analysis Version | `v1.0.0` |
+| Document Status | Draft for Review / Baseline / Superseded |
+| Source Git Commit, Tag, or Release | `<TBD>` |
+| Immutable Deliverable Filename | `<N/A until released>` |
 | Analysis Owner | `<Owner>` |
 | Reviewers | `<TBD>` |
 | Target Baseline Date | `<YYYY-MM-DD>` |
@@ -284,12 +325,17 @@ State the criteria used to decide whether the application can proceed.
 
 ## 2.1 Existing Framework Baseline
 
+| Item | Minimum Compatible Version | Version Used for This Analysis | Source Commit, Tag, or Release | Compatibility Evidence |
+|---|---:|---:|---|---|
+| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.6>` | `<TBD>` | `<Evidence>` |
+| `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.15>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
+| `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.6>` | `<TBD>` | `<Evidence>` |
+| `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.6>` | `<TBD>` | `<Evidence>` |
+
+Additional input artifacts:
+
 | Item | Value |
 |---|---|
-| Framework | `Coordinator_Node_Control_Framework.md` v1.0.4 |
-| Embedded C Coding Rules | `Embedded_C_Coding_Rules.md` v1.0.15 or `<N/A>` |
-| Protocol YAML Definition Guide | `Protocol_YAML_Definition_Guide.md` v1.0.5 |
-| Protocol YAML Template | `Protocol_YAML_Template.md` v1.0.5 |
 | Existing Project Protocol | `<TBD>` |
 | Existing Reference Implementation | `<TBD>` |
 | Existing Mock or Simulator | `<TBD>` |
@@ -546,7 +592,8 @@ No generated-file manual edit
 | Profile Name | `<Application Name> Application Profile` |
 | Profile ID | `<TBD>` |
 | Profile Version | `v1.0.0` |
-| Minimum Framework Version | `v1.0.4` |
+| Minimum Compatible Framework Version | `<copy the approved minimum from Section 2.1>` |
+| Analysis Baseline Framework Version | `<copy the actual version used from Section 2.1>` |
 | Protocol YAML | `<Application_Name>_protocol.yaml` |
 | Protocol Version | `V1.0.0RC01` |
 | Compatibility Policy | `<TBD>` |
@@ -2372,11 +2419,17 @@ This baseline establishes the following decisions:
 38. Final approval requires an explicit Go, Conditional Go, or No-Go decision.
 39. Reusable Command, Data Field, State, UI Page, and Framework Gap mini-templates remain part of the analysis method.
 40. Detailed Review Questions and completion checklists remain part of Baseline acceptance evidence.
-41. Maintained completed-analysis filenames are stable and do not contain document versions.
+41. Maintained completed-analysis files use stable canonical repository filenames; immutable detached release, audit, and external-delivery artifacts include an approved Analysis Version or Baseline identifier in the distributed filename.
 42. Telemetry replacement semantics are separate from delivery queue policy.
 43. Each peer is accountable for its own local Secure Session state.
 44. Cross-implementation validation applies to every implementation; cross-language validation applies to language pairs in scope.
 45. Repeated non-owning requirements are derived conformance summaries and remain subordinate to their authority source.
+46. Minimum-compatible authority versions are distinct from the actual authority versions used for one analysis.
+47. A detached analysis artifact records its canonical source filename and Git commit, tag, or Release and shall not become a parallel maintained authority.
+48. Downstream SRS, SDD, Test Protocol, and audit records cite the approved Analysis Version and Baseline identity rather than relying only on a mutable canonical path.
+49. Authority versions shown as Template authoring references are not automatic Product compatibility decisions.
+50. Every completed analysis records the exact authority version used, source Git identity, and compatibility evidence.
+51. A claimed minimum-compatible version is Project-specific and shall not precede the version used without documented comparison evidence.
 
 ---
 

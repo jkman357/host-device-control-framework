@@ -4,14 +4,14 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`  
 **Document ID:** AIEUG  
-**Document Version:** v1.0.4  
+**Document Version:** v1.0.6  
 **Status:** Draft for Review  
 **Document Type:** AI Usage and Authority Routing Guide  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
-**Supersedes Document Version:** v1.0.3  
+**Supersedes Document Version:** v1.0.5  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -96,6 +96,8 @@ materially rewritten by AI shall begin as `Draft for Review`.
 | v1.0.2 | 2026-07-18 | Adopted stable canonical Markdown filenames and the rule that document versions belong in metadata, Version History, Git history, tags, and Releases rather than maintained filenames; updated the Active Baseline Manifest and all task-routing examples to canonical paths; and retained Draft for Review status pending human approval. |
 | v1.0.3 | 2026-07-18 | Renamed the current-version table from Active Baseline Manifest to Active Document Manifest so it may accurately include Draft for Review material; clarified that only Baseline and Final Baseline artifacts have completed human approval; synchronized README and copyright approval wording; and retained Draft for Review status pending human approval. |
 | v1.0.4 | 2026-07-18 | Updated the Active Document Manifest for the corrected Framework, Application Analysis, Protocol Guide, and Protocol Template versions; made the Guide's routing effect explicitly provisional while its status remains Draft for Review; added derived-conformance-summary handling; and replaced generic cross-language wording with cross-implementation validation plus language-pair testing when applicable. |
+| v1.0.5 | 2026-07-18 | Updated active Framework and Application Analysis versions; refined stable filename routing to distinguish maintained repository authority paths from immutable versioned release, audit, external-delivery, and detached-snapshot filenames; required source commit/tag/Release traceability for detached artifacts; and preserved Draft for Review status. |
+| v1.0.6 | 2026-07-18 | Updated the Active Document Manifest for Application Analysis Template v1.0.8; clarified that Template authoring-reference versions do not prove Project compatibility; required AI to leave minimum-compatible versions unresolved until supported by comparison evidence; and retained Draft for Review status. |
 
 ## 0.2 Active Document Manifest
 
@@ -105,12 +107,12 @@ of the documents listed below.
 
 | Document | Canonical File | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| Coordinator/Node Control Framework | `Coordinator_Node_Control_Framework.md` | `v1.0.5` | Baseline | Reusable architecture and governance |
-| Framework Application Analysis Template | `Framework_Application_Analysis_Template.md` | `v1.0.6` | Baseline | Application-analysis method and required records |
+| Coordinator/Node Control Framework | `Coordinator_Node_Control_Framework.md` | `v1.0.6` | Baseline | Reusable architecture and governance |
+| Framework Application Analysis Template | `Framework_Application_Analysis_Template.md` | `v1.0.8` | Baseline | Application-analysis method and required records |
 | Protocol YAML Definition Guide | `Protocol_YAML_Definition_Guide.md` | `v1.0.6` | Baseline | Protocol YAML semantics and validation rules |
 | Protocol YAML Template | `Protocol_YAML_Template.md` | `v1.0.6` | Baseline | Reusable Project Protocol starting structure |
 | Embedded C Coding Rules | `Embedded_C_Coding_Rules.md` | `v1.0.15` | Final Baseline | Product-owned Embedded C implementation rules |
-| AI Engineering Usage Guide | `AI_Engineering_Usage_Guide.md` | `v1.0.4` | Draft for Review | AI authority routing and operating controls |
+| AI Engineering Usage Guide | `AI_Engineering_Usage_Guide.md` | `v1.0.6` | Draft for Review | AI authority routing and operating controls |
 
 Version-routing rules:
 
@@ -135,12 +137,17 @@ Protocol_YAML_Template.md
 Embedded_C_Coding_Rules.md
 ```
 
-The filename identifies the document. The `Document Version` metadata identifies the content revision. Git history,
-tags, Releases, and release-package names preserve immutable snapshots.
+The canonical filename identifies the maintained repository document. The `Document Version` metadata identifies
+the content revision. Git history, tags, Releases, and release-package names preserve immutable snapshots.
 
-An AI shall not infer a document version from its filename and shall not create a second maintained copy merely to
-encode a new PATCH or MINOR version. Historical snapshots shall be resolved through Git history, tags, Releases, or
-controlled archives rather than parallel versioned Markdown filenames.
+An AI shall not infer the current authority version from a maintained filename and shall not create a second
+maintained copy merely to represent a PATCH or MINOR revision. Historical snapshots belong in Git history, tags,
+Releases, release packages, or controlled archives rather than parallel maintained Markdown filenames.
+
+For an immutable release artifact, audit package, external deliverable, or detached snapshot, an AI shall include the
+approved document version or controlled Baseline identifier in the distributed filename. It shall also preserve the
+canonical source filename and source Git commit, tag, or Release in artifact metadata. Such a detached artifact is an
+immutable distribution copy, not a second maintained authority.
 
 ## 0.4 Promotion Gate
 
@@ -1024,6 +1031,11 @@ subordinate to the owning authority and shall not be used to create a competing 
 36. Routing from this Draft is provisional and cannot override direct human instructions or approved topic authorities.
 37. Cross-implementation interoperability applies to every implementation; cross-language interoperability applies only to language pairs in scope.
 38. Repeated non-owning requirements are derived conformance summaries and do not override the authority source.
+39. Maintained repository documents use stable canonical filenames, while immutable detached release, audit, and external-delivery artifacts use versioned or Baseline-identified distributed filenames.
+40. Detached artifacts preserve canonical source identity and Git commit, tag, or Release traceability and do not become parallel maintained authorities.
+41. Template authoring-reference versions are not evidence of Product compatibility.
+42. AI shall not populate a Project minimum-compatible version without explicit compatibility evidence.
+43. Every completed analysis records the exact authority version used and its source Git identity.
 
 ---
 

@@ -4,7 +4,7 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.5  
+**Document Version:** v1.0.6  
 **Status:** Baseline  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
@@ -190,6 +190,25 @@ A maintained Markdown file shall not be copied beside itself under a new version
 MINOR revision. The stable path is the current authority path. Historical snapshots shall be preserved through Git
 history, tags, Releases, or controlled archives rather than parallel versioned Markdown filenames.
 
+This stable-path rule applies to files maintained inside a controlled Git repository. It does not prohibit a
+versioned filename for an immutable artifact distributed outside that repository context.
+
+Immutable release artifacts, audit packages, external deliverables, and detached snapshots shall include the
+approved document version or a controlled Baseline identifier in the distributed filename. Examples include:
+
+```text
+Smart_Battery_Framework_Application_Analysis_v1.2.0.md
+Smart_Battery_Framework_Application_Analysis_v1.2.0.pdf
+Smart_Battery_Engineering_Baseline_v1.2.0.zip
+```
+
+A detached artifact shall also identify its source repository, canonical maintained filename, `Document Version`,
+Status, and source Git commit, tag, or Release. A downstream SRS, SDD, Test Protocol, or audit record shall cite the
+approved document identity and version rather than relying only on a mutable canonical path.
+
+A versioned detached artifact is an immutable distribution copy. It shall not become a second maintained authority
+file beside the canonical repository document.
+
 Protocol, Generator, Firmware, Bootloader, Product, or Reference Implementation Code may use:
 
 ```text
@@ -229,6 +248,7 @@ Markdown filename.
 | v1.0.3 | 2026-07-18 | Updated the active related-document references to `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; synchronized current authority references and version examples without changing architecture, Protocol, safety, security, Runtime, or governance semantics. |
 | v1.0.4 | 2026-07-18 | Adopted stable canonical Markdown filenames without embedded versions; moved document identity to metadata, Version History, Git history, tags, and Releases; updated all active cross-document references and examples to stable paths; moved historical snapshot preservation to Git and controlled archives rather than parallel versioned Markdown filenames; and preserved all architecture, Protocol, safety, security, Runtime, and governance semantics except for the filename-governance rule itself. |
 | v1.0.5 | 2026-07-18 | Clarified that generated Dispatcher output is Protocol plumbing and shall not contain Product control, state ownership, or hardware access; operationalized the one-authority rule through derived conformance summaries; and generalized interoperability requirements from fixed language pairs to all implementations and language pairs actually in scope. |
+| v1.0.6 | 2026-07-18 | Refined filename governance into a two-layer policy: maintained Markdown authority paths remain stable inside controlled Git repositories, while immutable release artifacts, audit packages, external deliverables, and detached snapshots include an approved document version or Baseline identifier in the distributed filename; required detached artifacts to carry source commit, tag, or Release traceability; and preserved all architecture and Protocol semantics. |
 
 ## 0.6 Core Conclusions
 
@@ -2829,6 +2849,8 @@ This Baseline establishes the following decisions:
 51. Generated dispatch skeletons are Protocol plumbing and shall not contain Product control, State Machine ownership, or direct hardware access.
 52. Repeated non-owning rules are derived conformance summaries and remain subordinate to the owning authority.
 53. Cross-implementation interoperability applies to every implementation; cross-language interoperability applies to language pairs in scope.
+54. Maintained repository Markdown files use stable canonical paths, while immutable detached release, audit, and external-delivery artifacts include an approved version or Baseline identifier in the distributed filename.
+55. A detached artifact identifies its source canonical file and Git commit, tag, or Release and shall not become a parallel maintained authority.
 
 ## 12.6 Core Design Philosophy
 
