@@ -1,8 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`  
-**Document Version:** v1.0.1  
+**Document Version:** v1.0.2  
 **Status:** Draft for Review  
+**Supersedes Document Version:** v1.0.1  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
@@ -16,6 +17,7 @@
 |---|---|---|---|
 | v1.0.0 | 2026-07-18 | Draft for Review | Established automated and human repository checks for canonical paths, document manifests, version and status consistency, links, Markdown structure, evidence claims, role routing, Draft authority handling, and detached-package traceability. |
 | v1.0.1 | 2026-07-18 | Draft for Review | Completed repository-validation enforcement by requiring the GitHub Actions workflow, exact authority-manifest set equality, marker-aware fenced-Code parsing, inline/image/reference-link and Markdown-anchor validation, Version History table-scoped checks, explicit Python runtime requirements, and Authority Boundary coverage for Coordinator and C# rule documents. |
+| v1.0.2 | 2026-07-18 | Draft for Review | Updated GitHub Actions to checkout v7 and setup-python v6; added Python 3.10 and 3.12 CI matrix validation; required complete metadata for every non-README Markdown document under docs; added semantic-version, current-version, ordering, and declared Supersedes-chain checks; and added automated validator regression tests. |
 
 ---
 
@@ -43,12 +45,13 @@ A tool result shall not be relabeled as human approval or Product validation.
 
 ## 3.1 Runtime
 
-Local execution requires Python 3.10 or later. The repository CI workflow shall use Python 3.12.
+Local execution requires Python 3.10 or later. The repository CI workflow shall validate both Python 3.10 and Python 3.12.
 
 Run:
 
 ```bash
 python tools/validate_repository.py
+python -m unittest discover -s tests -v
 ```
 
 ## 3.2 Required Automated Checks
@@ -61,8 +64,10 @@ The automated validator shall check at least:
 - Existing Markdown heading anchors for local links that contain fragments.
 - Defined and non-duplicated reference-link identifiers.
 - Unique canonical filenames.
-- Complete document metadata for every versioned authority document.
+- Complete canonical filename, document version, and status metadata for every non-README Markdown document under `docs/`; omission of all metadata shall not bypass governance.
+- Document versions use `vMAJOR.MINOR.PATCH`, Version History versions are unique and monotonic, and the metadata version is the highest listed version.
 - Current version presence exactly once in the Version History or Change History table located under the corresponding heading.
+- When `Supersedes Document Version` is declared, it uses `vMAJOR.MINOR.PATCH`, exists in Version History, is lower than the current version, and identifies the immediate prior listed version.
 - Version History status and date consistency when those columns are present.
 - Exact set equality between versioned authority documents and the root Current Document Set.
 - Exact set equality between versioned authority documents and the AI Active Document Manifest.
@@ -70,7 +75,8 @@ The automated validator shall check at least:
 - Draft documents that claim normative authority use `Proposed` wording.
 - Required canonical authority paths exist.
 - Repository-validation workflow and script exist.
-- The GitHub Actions workflow uses Python 3.12 and invokes `python tools/validate_repository.py`.
+- The GitHub Actions workflow uses `actions/checkout@v7`, `actions/setup-python@v6`, validates Python 3.10 and 3.12, invokes `python tools/validate_repository.py`, and runs the validator regression tests.
+- Validator regression tests retain expected failures for metadata omission, invalid or stale versions, broken Supersedes chains, obsolete Action versions, and incomplete Python matrices.
 
 A passing automated result proves only the checks implemented by the validator. It does not prove semantic correctness, Product suitability, or human approval.
 

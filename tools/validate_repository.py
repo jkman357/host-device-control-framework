@@ -2,7 +2,7 @@
 """Deterministic structural validation for the documentation repository.
 
 Runtime requirement: Python 3.10 or later.
-CI validation runtime: Python 3.12.
+CI validation runtimes: Python 3.10 and Python 3.12.
 """
 from __future__ import annotations
 
@@ -13,7 +13,6 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 MIN_PYTHON = (3, 10)
-CI_PYTHON = "3.12"
 ROOT = Path(__file__).resolve().parents[1]
 ERRORS: list[str] = []
 
@@ -212,7 +211,23 @@ def normalize_cell(cell: str) -> str:
     return cell.replace("`", "").strip()
 
 
-def parse_version_history(path: Path, text: str, version: str, status: str) -> None:
+SEMVER_RE = re.compile(r"^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
+
+
+def parse_semver(value: str) -> tuple[int, int, int] | None:
+    match = SEMVER_RE.fullmatch(value)
+    if not match:
+        return None
+    return tuple(int(part) for part in match.groups())
+
+
+def parse_version_history(
+    path: Path,
+    text: str,
+    version: str,
+    status: str,
+    supersedes: str | None,
+) -> None:
     heading_re = re.compile(
         r"^(#{1,6})\s+.*(?:Version|Change)\s+History\s*$",
         re.IGNORECASE | re.MULTILINE,
@@ -254,25 +269,74 @@ def parse_version_history(path: Path, text: str, version: str, status: str) -> N
         error(f"{rel(path)}: Version History first column must be Version")
         return
 
+    current_semver = parse_semver(version)
+    if current_semver is None:
+        error(f"{rel(path)}: Document Version {version!r} must match vMAJOR.MINOR.PATCH")
+
+    history_values: list[str] = []
+    history_semvers: list[tuple[int, int, int]] = []
+    for row in rows:
+        if not row:
+            continue
+        row_version = row[0]
+        parsed = parse_semver(row_version)
+        if parsed is None:
+            error(f"{rel(path)}: Version History value {row_version!r} must match vMAJOR.MINOR.PATCH")
+            continue
+        history_values.append(row_version)
+        history_semvers.append(parsed)
+
+    if len(history_values) != len(set(history_values)):
+        error(f"{rel(path)}: Version History contains duplicate versions")
+
+    if len(history_semvers) > 1:
+        ascending = history_semvers == sorted(history_semvers)
+        descending = history_semvers == sorted(history_semvers, reverse=True)
+        if not (ascending or descending):
+            error(f"{rel(path)}: Version History versions must be monotonic")
+
     matching = [row for row in rows if row and row[0] == version]
     if len(matching) != 1:
         error(f"{rel(path)}: current version {version} must appear exactly once in Version History table")
-        return
+    elif current_semver is not None and history_semvers and current_semver != max(history_semvers):
+        highest = "v" + ".".join(str(part) for part in max(history_semvers))
+        error(f"{rel(path)}: current version {version} must be the highest Version History version ({highest})")
 
-    normalized_header = [item.casefold() for item in header]
-    if "status" in normalized_header:
-        status_index = normalized_header.index("status")
-        history_status = matching[0][status_index] if status_index < len(matching[0]) else ""
-        if history_status != status:
-            error(
-                f"{rel(path)}: Version History status for {version} is {history_status!r}; "
-                f"metadata status is {status!r}"
-            )
-    if "date" in normalized_header:
-        date_index = normalized_header.index("date")
-        history_date = matching[0][date_index] if date_index < len(matching[0]) else ""
-        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", history_date):
-            error(f"{rel(path)}: Version History date for {version} must use YYYY-MM-DD")
+    if matching:
+        normalized_header = [item.casefold() for item in header]
+        if "status" in normalized_header:
+            status_index = normalized_header.index("status")
+            history_status = matching[0][status_index] if status_index < len(matching[0]) else ""
+            if history_status != status:
+                error(
+                    f"{rel(path)}: Version History status for {version} is {history_status!r}; "
+                    f"metadata status is {status!r}"
+                )
+        if "date" in normalized_header:
+            date_index = normalized_header.index("date")
+            history_date = matching[0][date_index] if date_index < len(matching[0]) else ""
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", history_date):
+                error(f"{rel(path)}: Version History date for {version} must use YYYY-MM-DD")
+
+    if supersedes is not None:
+        supersedes_semver = parse_semver(supersedes)
+        if supersedes_semver is None:
+            error(f"{rel(path)}: Supersedes Document Version {supersedes!r} must match vMAJOR.MINOR.PATCH")
+            return
+        if supersedes not in history_values:
+            error(f"{rel(path)}: Supersedes Document Version {supersedes} is not present in Version History")
+        if current_semver is not None and supersedes_semver >= current_semver:
+            error(f"{rel(path)}: Supersedes Document Version {supersedes} must be lower than {version}")
+        if current_semver is not None:
+            prior_versions = [item for item in history_semvers if item < current_semver]
+            if prior_versions:
+                expected = max(prior_versions)
+                if supersedes_semver != expected:
+                    expected_text = "v" + ".".join(str(part) for part in expected)
+                    error(
+                        f"{rel(path)}: Supersedes Document Version {supersedes} must identify "
+                        f"the immediate prior listed version {expected_text}"
+                    )
 
 
 def check_workflow() -> None:
@@ -280,14 +344,18 @@ def check_workflow() -> None:
     if not workflow.exists():
         return
     text = read_text(workflow)
-    if "actions/checkout@v4" not in text:
-        error(f"{rel(workflow)}: actions/checkout@v4 is required")
-    if "actions/setup-python@v5" not in text:
-        error(f"{rel(workflow)}: actions/setup-python@v5 is required")
-    if not re.search(rf"python-version:\s*[\"']?{re.escape(CI_PYTHON)}[\"']?", text):
-        error(f"{rel(workflow)}: CI Python version must be {CI_PYTHON}")
+    if "actions/checkout@v7" not in text:
+        error(f"{rel(workflow)}: actions/checkout@v7 is required")
+    if "actions/setup-python@v6" not in text:
+        error(f"{rel(workflow)}: actions/setup-python@v6 is required")
+    if not re.search(r"python-version:\s*\[[^\]]*['\"]3\.10['\"][^\]]*['\"]3\.12['\"][^\]]*\]", text):
+        error(f"{rel(workflow)}: Python matrix must include 3.10 and 3.12")
+    if not re.search(r"python-version:\s*\$\{\{\s*matrix\.python-version\s*\}\}", text):
+        error(f"{rel(workflow)}: setup-python must use matrix.python-version")
     if "python tools/validate_repository.py" not in text:
         error(f"{rel(workflow)}: validator invocation is missing")
+    if "python -m unittest discover -s tests -v" not in text:
+        error(f"{rel(workflow)}: validator regression-test invocation is missing")
 
 
 md_files = sorted(ROOT.rglob("*.md"))
@@ -311,19 +379,30 @@ for path in md_files:
     name = metadata(text, "Canonical Filename") or metadata(text, "Document Name")
     version = metadata(text, "Document Version")
     status = metadata(text, "Status")
+    supersedes = metadata(text, "Supersedes Document Version")
     role = metadata(text, "Repository Role")
+    is_docs_authority = path.is_relative_to(ROOT / "docs") and path.name != "README.md"
+
+    if is_docs_authority and not (name and version and status):
+        error(
+            f"{rel(path)}: every non-README Markdown document under docs must declare "
+            "Canonical Filename or Document Name, Document Version, and Status"
+        )
+
     if name:
+        if name != path.name:
+            error(f"{rel(path)}: canonical filename {name!r} must match the actual filename")
         if name in canonical:
             error(f"duplicate canonical filename {name}: {rel(canonical[name])} and {rel(path)}")
         canonical[name] = path
-    if version or status:
-        if not (version and status and name):
-            error(f"{rel(path)}: incomplete document metadata")
-        else:
-            documents[name] = (path, version, status)
-            parse_version_history(path, text, version, status)
-            if status == "Draft for Review" and role and "normative" in role.lower() and "proposed" not in role.lower():
-                error(f"{rel(path)}: Draft normative role must say Proposed")
+
+    if name and version and status:
+        documents[name] = (path, version, status)
+        parse_version_history(path, text, version, status, supersedes)
+        if status == "Draft for Review" and role and "normative" in role.lower() and "proposed" not in role.lower():
+            error(f"{rel(path)}: Draft normative role must say Proposed")
+    elif version or status or name or supersedes:
+        error(f"{rel(path)}: incomplete document metadata")
 
 required = [
     "README.md",
@@ -340,6 +419,7 @@ required = [
     "docs/coding-rules/CSharp_Coding_Rules.md",
     "docs/validation/Repository_Validation_Checklist.md",
     "tools/validate_repository.py",
+    "tests/test_validate_repository.py",
     ".github/workflows/document-validation.yml",
 ]
 for required_path in required:

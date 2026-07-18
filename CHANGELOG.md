@@ -15,6 +15,7 @@ Individual authority documents retain their own internal Version History and app
 - Added `CSharp_Coding_Rules.md` v1.0.1.
 - Added `Repository_Validation_Checklist.md` v1.0.0.
 - Added `tools/validate_repository.py` and `.github/workflows/document-validation.yml`.
+- Added `tests/test_validate_repository.py` with end-to-end validator regression and mutation tests.
 
 ### Changed
 
@@ -40,6 +41,8 @@ Individual authority documents retain their own internal Version History and app
 - Updated `AI_Engineering_Usage_Guide.md` to v1.0.12.
 - Updated `Framework_Application_Analysis_Template.md` to v1.0.14.
 - Updated `Repository_Validation_Checklist.md` to v1.0.1.
+- Updated `AI_Engineering_Usage_Guide.md` to v1.0.13.
+- Updated `Repository_Validation_Checklist.md` to v1.0.2.
 - Updated Coordinator, Coding Rules, and Validation directory guidance.
 
 ### Fixed
@@ -68,3 +71,8 @@ Individual authority documents retain their own internal Version History and app
 - Scoped current-version validation to the Version History or Change History table.
 - Completed the Application Analysis Authority Boundary for Coordinator and C# rule documents.
 - Declared Python 3.10 or later for local validation and fixed CI validation to Python 3.12.
+- Updated GitHub Actions to `actions/checkout@v7` and `actions/setup-python@v6`.
+- Added Python 3.10 and 3.12 CI matrix coverage for both repository validation and regression tests.
+- Prevented non-README Markdown files under `docs/` from bypassing authority governance by omitting all metadata.
+- Added semantic-version format, Version History uniqueness and monotonic-order, highest-current-version, and declared Supersedes-chain checks.
+- Added persistent regression tests for metadata omission, invalid and stale versions, Supersedes-chain errors, obsolete Action versions, and incomplete Python matrices.
