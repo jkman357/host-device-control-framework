@@ -4,7 +4,7 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.4  
+**Document Version:** v1.0.5  
 **Status:** Baseline  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
@@ -228,6 +228,7 @@ Markdown filename.
 | v1.0.2 | 2026-07-18 | Converted the complete Framework to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned terminology and authority boundaries with `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; clarified Telemetry versus Stream semantics, Protocol/Transport boundaries, Application/Bootloader Session separation, Firmware Update transaction identity, runtime Transport Profiles, structural rewrite governance, and public GitHub publication requirements. |
 | v1.0.3 | 2026-07-18 | Updated the active related-document references to `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; synchronized current authority references and version examples without changing architecture, Protocol, safety, security, Runtime, or governance semantics. |
 | v1.0.4 | 2026-07-18 | Adopted stable canonical Markdown filenames without embedded versions; moved document identity to metadata, Version History, Git history, tags, and Releases; updated all active cross-document references and examples to stable paths; moved historical snapshot preservation to Git and controlled archives rather than parallel versioned Markdown filenames; and preserved all architecture, Protocol, safety, security, Runtime, and governance semantics except for the filename-governance rule itself. |
+| v1.0.5 | 2026-07-18 | Clarified that generated Dispatcher output is Protocol plumbing and shall not contain Product control, state ownership, or hardware access; operationalized the one-authority rule through derived conformance summaries; and generalized interoperability requirements from fixed language pairs to all implementations and language pairs actually in scope. |
 
 ## 0.6 Core Conclusions
 
@@ -1175,6 +1176,10 @@ The authoritative field-level rules are in `Protocol_YAML_Definition_Guide.md`.
 
 Generated artifacts may include C, C#, and Java types, constants, codecs, validation, dispatch skeletons,
 documentation, tests, and decoder metadata.
+
+A generated dispatch skeleton is Protocol plumbing only. It may decode, validate, correlate, and forward a typed
+request to a handwritten Application Adapter or Service boundary. It shall not own Product State Machines,
+perform physical control, call hardware Drivers directly, or become a second Command Dispatcher authority.
 
 Every generated file shall identify:
 
@@ -2397,6 +2402,10 @@ One normative rule shall have one authority location.
 
 Other documents shall reference that authority rather than copy an independently editable duplicate.
 
+When a non-owning document repeats a rule for usability, the repeated text shall be labeled a derived conformance
+summary, identify the owning authority, and remain subordinate to that source. A derived summary shall not add,
+weaken, or reinterpret the normative rule.
+
 Protocol field details belong in the Protocol Guide and Project Protocol YAML.
 
 Product requirements belong in the SRS, Application Profile, Hazard Analysis, or UI Specification.
@@ -2657,9 +2666,12 @@ Generated codecs
 Resource measurement
 ```
 
-## 11.5 Cross-Language Interoperability
+## 11.5 Cross-Implementation and Cross-Language Interoperability
 
-At minimum:
+Every implementation in scope shall encode and decode the same Golden Frames with identical wire bytes and
+semantic values.
+
+When C and C# are in scope:
 
 ```text
 C# encodes -> C decodes
@@ -2671,8 +2683,10 @@ When Java is in scope:
 ```text
 Java encodes -> C decodes
 C encodes -> Java decodes
-C# and Java decode the same Golden Frame
+C# and Java decode the same Golden Frame when both are in scope
 ```
+
+When multiple implementations use the same language, they shall still pass cross-implementation interoperability.
 
 ## 11.6 Reference Implementation Version
 
@@ -2812,6 +2826,9 @@ This Baseline establishes the following decisions:
 48. Project adoption begins with Application Analysis and a Project-specific Protocol YAML.
 49. Product-specific rules shall not pollute the reusable Framework unless they are proven reusable.
 50. Migration shall be incremental and evidence-based.
+51. Generated dispatch skeletons are Protocol plumbing and shall not contain Product control, State Machine ownership, or direct hardware access.
+52. Repeated non-owning rules are derived conformance summaries and remain subordinate to the owning authority.
+53. Cross-implementation interoperability applies to every implementation; cross-language interoperability applies to language pairs in scope.
 
 ## 12.6 Core Design Philosophy
 

@@ -4,7 +4,7 @@
 
 **Document Name:** `Protocol_YAML_Template.md`  
 **Document ID:** PYT  
-**Document Version:** v1.0.5  
+**Document Version:** v1.0.6  
 **Status:** Baseline  
 **Document Type:** Reusable Project Template  
 **Primary Narrative Language:** English  
@@ -74,6 +74,7 @@ Schema Validation / Semantic Lint / Code Generation / Test Vectors
 | v1.0.3 | 2026-07-18 | Defined the intentional redundancy and normative consistency rule for `SAMPLE_STREAM_RECORD.sample_count`; required the sender to encode and the decoder to verify `sample_count == channel_count × samples_per_channel` using widened, overflow-checked arithmetic before reading the sample array; corrected the Stream record minimum length from 18 to 19 bytes; and synchronized Schema Validation, Semantic Lint, Baseline Readiness, and Baseline Decision Summary. |
 | v1.0.4 | 2026-07-18 | Updated the active Framework, Definition Guide, and Application Analysis references to `Coordinator_Node_Control_Framework.md`, `Protocol_YAML_Definition_Guide.md`, and `Framework_Application_Analysis_Template.md`; updated the illustrative YAML minimum-version metadata and Appendix responsibility references; and preserved the YAML structure and all Protocol semantics without technical change. |
 | v1.0.5 | 2026-07-18 | Adopted the stable canonical filename `Protocol_YAML_Template.md`; updated all active Framework, Definition Guide, Application Analysis, and illustrative Project document references to canonical paths; aligned the illustrative minimum-version metadata with the current document set; and preserved the YAML structure and all Protocol semantics without technical change. |
+| v1.0.6 | 2026-07-18 | Corrected computed Message minimum lengths; made Stream, Firmware chunk, Capability, and Transport envelopes mutually consistent; added explicit per-Message security, direction/environment Key Context mappings, Application and Bootloader Handshake contracts, sender-local Heartbeat timestamp semantics, and a signed canonical Firmware Manifest transfer; separated Telemetry replacement semantics from queue discipline; updated interoperability wording; and expanded Schema, Semantic Lint, security, Firmware Update, and Baseline checks. |
 
 ---
 
@@ -105,8 +106,10 @@ When tailoring the template:
 6. Do not place UI control names, MCU registers, RTOS task names, Driver handles, socket handles, or COM port names in the Protocol Contract.
 7. Use `category: telemetry` only for complete summarized state snapshots whose older unsent values may be replaced.
 8. Use `category: stream` for continuous ordered records whose loss, duplication, reordering, or timing discontinuity matters.
-9. Complete Schema Validation, Semantic Lint, Compatibility Review, Test Vectors, and cross-language interoperability before Protocol Baseline approval.
-10. Record every intentional removal or structural change that affects a previously approved Protocol Baseline.
+9. Complete Schema Validation, Semantic Lint, Compatibility Review, Test Vectors, cross-implementation interoperability, and cross-language interoperability for every language pair in scope before Protocol Baseline approval.
+10. Define an explicit `security` block for every Message; omission shall not imply inheritance.
+11. Define Application and Bootloader Handshake Messages and profiles when Secure Sessions are required.
+12. Record every intentional removal or structural change that affects a previously approved Protocol Baseline.
 
 ## 1.3 Minimum and Conditional Top-Level Keys
 
@@ -342,11 +345,11 @@ document:
 
   related_framework:
     name: Coordinator_Node_Control_Framework
-    minimum_version: v1.0.4
+    minimum_version: v1.0.5
 
   related_definition_guide:
     name: Protocol_YAML_Definition_Guide
-    minimum_version: v1.0.5
+    minimum_version: v1.0.6
 
   related_application_analysis: EXAMPLE_Framework_Application_Analysis.md
   related_application_profile: EXAMPLE_Application_Profile.md
@@ -520,6 +523,67 @@ types:
     unit: us
     description: Monotonic microseconds since Device boot.
 
+  - name: PeerMonotonicTimestampUs
+    kind: alias
+    base_type: uint64
+    unit: us
+    description: Sender-local monotonic microseconds; the sender-specific epoch is defined by the Message policy.
+  - name: FirmwareManifestV1
+    kind: struct
+    description: Canonical signed Firmware Manifest fields encoded field by field without implicit padding.
+    fields:
+      - name: manifest_format_version
+        type: uint16
+        minimum: 1
+        maximum: 1
+        description: Canonical Manifest format version.
+      - name: target_device_model
+        type: uint16
+        description: Required Device model identifier.
+      - name: minimum_hardware_revision
+        type: uint16
+        description: Minimum compatible hardware revision.
+      - name: maximum_hardware_revision
+        type: uint16
+        description: Maximum compatible hardware revision.
+      - name: firmware_version
+        type: struct
+        struct: SoftwareVersion
+        description: Candidate Firmware version.
+      - name: image_type
+        type: uint8
+        description: Target image or partition type.
+      - name: image_size
+        type: uint32
+        description: Complete image size in bytes.
+      - name: security_version
+        type: uint32
+        description: Monotonic anti-rollback security version.
+      - name: minimum_bootloader_version
+        type: struct
+        struct: SoftwareVersion
+        description: Minimum Bootloader version allowed to install this image.
+      - name: required_protocol_version
+        type: struct
+        struct: ProtocolVersion
+        description: Required Protocol version after activation.
+      - name: build_identifier
+        type: uint8
+        description: Fixed-width build identifier.
+        array:
+          length: 16
+      - name: image_hash
+        type: uint8
+        description: SHA-256 hash of the complete Firmware image.
+        array:
+          length: 32
+      - name: signing_key_id
+        type: uint32
+        description: Identifier of the approved Firmware-signing trust anchor.
+      - name: signature_algorithm
+        type: enum
+        enum: FirmwareSignatureAlgorithm
+        description: Algorithm used to sign the canonical Manifest hash.
   - name: TransactionId
     kind: alias
     base_type: uint32
@@ -567,6 +631,12 @@ enums:
       - name: CAPABILITY_NOT_SUPPORTED
         value: 0x0009
 
+      - name: MANIFEST_INVALID
+        value: 0x000a
+      - name: SIGNATURE_INVALID
+        value: 0x000b
+      - name: ROLLBACK_PROHIBITED
+        value: 0x000c
   - name: DeviceOperationState
     base_type: uint8
     unknown_value_policy: preserve_raw
@@ -636,6 +706,15 @@ enums:
       - name: FAULT
         value: 4
 
+  - name: FirmwareSignatureAlgorithm
+    base_type: uint8
+    unknown_value_policy: reject
+    description: Approved Firmware Manifest signature algorithms.
+    values:
+      - name: ECDSA_P256_SHA256
+        value: 1
+      - name: ED25519
+        value: 2
 bitsets:
   - name: DeviceStatusFlags
     base_type: uint16
@@ -734,6 +813,18 @@ errors:
     severity: error
     description: Requested Capability is unavailable.
 
+  - name: ERROR_MANIFEST_INVALID
+    value: 0x000a
+    severity: error
+    description: Firmware Manifest content, encoding, hash, or target compatibility is invalid.
+  - name: ERROR_SIGNATURE_INVALID
+    value: 0x000b
+    severity: critical
+    description: Firmware Manifest signature validation failed.
+  - name: ERROR_ROLLBACK_PROHIBITED
+    value: 0x000c
+    severity: critical
+    description: Firmware security version violates the anti-rollback policy.
 capabilities:
   - name: CAP_DEVICE_INFORMATION
     id: 0x0001
@@ -769,15 +860,26 @@ capabilities:
       - name: maximum_channels
         type: uint8
         minimum: 1
-        maximum: 32
+        maximum: 16
 
+        scope: runtime_effective_profile
       - name: maximum_sample_rate_hz
         type: uint32
         unit: Hz
 
+        scope: runtime_effective_profile
       - name: maximum_samples_per_record
         type: uint16
 
+        minimum: 1
+        maximum: 240
+        scope: runtime_effective_profile
+      - name: maximum_record_size_bytes
+        type: uint16
+        unit: bytes
+        minimum: 19
+        maximum: 1024
+        scope: runtime_effective_profile
   - name: CAP_DIAGNOSTICS
     id: 0x0105
     since: V1.0.0
@@ -788,6 +890,19 @@ capabilities:
     since: V1.0.0
     description: Bootloader Firmware Update support.
 
+    parameters:
+      - name: maximum_chunk_length
+        type: uint16
+        unit: bytes
+        minimum: 1
+        maximum: 1014
+        scope: runtime_effective_profile
+      - name: maximum_update_record_size_bytes
+        type: uint16
+        unit: bytes
+        minimum: 222
+        maximum: 1024
+        scope: runtime_effective_profile
 sequence_policy:
   default_control:
     field: message_sequence
@@ -864,6 +979,46 @@ security_model:
   session_required_for_firmware_update: true
   application_and_bootloader_sessions_separate: true
 
+  message_security_policy:
+    mode: explicit_per_message
+    omitted_security_block_policy: reject
+    bidirectional_key_context_policy: explicit_direction_and_environment_mapping
+  handshake_profiles:
+    - name: APPLICATION_MUTUAL_AUTH_V1
+      profile_id: 0x0001
+      execution_environment: application
+      authentication: mutual
+      transcript_hash: sha256
+      key_agreement: project_defined_before_baseline
+      proof_format: project_defined_before_baseline
+      anti_replay_source: nonce_and_handshake_transcript
+      derived_key_contexts:
+        - application_control_h2d
+        - application_control_d2h
+        - application_data_h2d
+        - application_data_d2h
+    - name: BOOTLOADER_MUTUAL_AUTH_V1
+      profile_id: 0x0002
+      execution_environment: bootloader
+      authentication: mutual
+      transcript_hash: sha256
+      key_agreement: project_defined_before_baseline
+      proof_format: project_defined_before_baseline
+      anti_replay_source: nonce_and_handshake_transcript
+      derived_key_contexts:
+        - bootloader_update_h2d
+        - bootloader_response_d2h
+  firmware_update_manifest:
+    struct: FirmwareManifestV1
+    canonical_encoding: protocol_wire_format_field_by_field_without_padding
+    hash_algorithm: sha256
+    signature_input: domain_separator_then_manifest_hash
+    domain_separator: EXAMPLE_DEVICE_FW_MANIFEST_V1
+    minimum_signature_length: 64
+    maximum_signature_length: 96
+    accepted_signature_algorithms:
+      - ECDSA_P256_SHA256
+      - ED25519
   key_contexts:
     - application_control_h2d
     - application_control_d2h
@@ -942,7 +1097,7 @@ messages:
     description: Device identity and version information.
 
     length_policy: extensible
-    minimum_length: 30
+    minimum_length: 41
     unknown_trailing_policy: ignore
 
     security:
@@ -1061,6 +1216,13 @@ messages:
             length_from: capability_count
             maximum_length: 64
 
+    security:
+      authentication_required: false
+      confidentiality_required: false
+      integrity_required: false
+      anti_replay_required: false
+      allowed_before_session: true
+      privilege: public_read
   - name: GET_DEVICE_STATUS_REQUEST
     id: 0x0005
     namespace: framework
@@ -1085,6 +1247,16 @@ messages:
 
     payload:
       fields: []
+    security:
+      authentication_required: true
+      confidentiality_required: false
+      integrity_required: true
+      anti_replay_required: true
+      allowed_before_session: false
+      privilege: authenticated_read
+      key_context_by_environment:
+        application: application_control_h2d
+        bootloader: bootloader_update_h2d
 
   - name: GET_DEVICE_STATUS_RESPONSE
     id: 0x0006
@@ -1126,6 +1298,16 @@ messages:
           alias: DeviceTimestampUs
           description: Device timestamp at status capture.
 
+    security:
+      authentication_required: true
+      confidentiality_required: false
+      integrity_required: true
+      anti_replay_required: true
+      allowed_before_session: false
+      privilege: authenticated_read
+      key_context_by_environment:
+        application: application_control_d2h
+        bootloader: bootloader_response_d2h
   - name: HEARTBEAT
     id: 0x0007
     namespace: framework
@@ -1150,9 +1332,24 @@ messages:
 
         - name: timestamp_us
           type: alias
-          alias: DeviceTimestampUs
-          description: Sender monotonic timestamp when available.
+          alias: PeerMonotonicTimestampUs
+          description: Sender-local monotonic timestamp; the epoch is local to the sending peer.
 
+    maximum_record_size: 12
+    security:
+      authentication_required: true
+      confidentiality_required: false
+      integrity_required: true
+      anti_replay_required: true
+      allowed_before_session: false
+      privilege: session_liveness
+      key_context_by_direction_and_environment:
+        coordinator_to_node:
+          application: application_control_h2d
+          bootloader: bootloader_update_h2d
+        node_to_coordinator:
+          application: application_control_d2h
+          bootloader: bootloader_response_d2h
   - name: ERROR_RESPONSE
     id: 0x0008
     namespace: framework
@@ -1189,6 +1386,240 @@ messages:
 
   # Application Command / Response Messages: 0x0100-0x0FFF
 
+    security:
+      authentication_required: true
+      confidentiality_required: false
+      integrity_required: true
+      anti_replay_required: true
+      allowed_before_session: false
+      privilege: protocol_error_reporting
+      key_context_by_direction_and_environment:
+        coordinator_to_node:
+          application: application_control_h2d
+          bootloader: bootloader_update_h2d
+        node_to_coordinator:
+          application: application_control_d2h
+          bootloader: bootloader_response_d2h
+  - name: APPLICATION_HANDSHAKE_REQUEST
+    id: 0x0009
+    namespace: framework
+    service: SESSION_MANAGEMENT
+    category: handshake
+    direction: coordinator_to_node
+    execution_environment: application
+    description: Establish the Application Secure Session using the declared Handshake Profile.
+    length_policy: minimum
+    minimum_length: 8
+    unknown_trailing_policy: reject
+    maximum_record_size: 264
+    timeout_ms: 3000
+    retry_policy:
+      mode: bounded
+      maximum_attempts: 2
+      retry_on:
+        - timeout
+      backoff_ms: 250
+    idempotency: idempotent_with_operation_id
+    security:
+      authentication_required: true
+      authentication_source: handshake_profile
+      confidentiality_required: false
+      integrity_required: true
+      integrity_source: handshake_profile
+      anti_replay_required: true
+      anti_replay_source: nonce_and_handshake_transcript
+      allowed_before_session: true
+      privilege: session_establishment
+      handshake_profile: APPLICATION_MUTUAL_AUTH_V1
+    payload:
+      fields:
+        - name: handshake_id
+          type: alias
+          alias: TransactionId
+          description: Handshake transaction identifier.
+        - name: handshake_profile_id
+          type: uint16
+          description: Selected Handshake Profile identifier.
+        - name: handshake_payload_length
+          type: uint16
+          minimum: 1
+          maximum: 256
+          description: Length of profile-defined canonical handshake_payload.
+        - name: handshake_payload
+          type: uint8
+          description: Bounded profile-defined handshake data, including required nonce and proof material.
+          array:
+            length_from: handshake_payload_length
+            maximum_length: 256
+  - name: APPLICATION_HANDSHAKE_RESPONSE
+    id: 0x000a
+    namespace: framework
+    service: SESSION_MANAGEMENT
+    category: handshake
+    direction: node_to_coordinator
+    response_to: APPLICATION_HANDSHAKE_REQUEST
+    execution_environment: application
+    description: Establish the Application Secure Session using the declared Handshake Profile.
+    length_policy: minimum
+    minimum_length: 14
+    unknown_trailing_policy: reject
+    maximum_record_size: 270
+    timeout_ms: 3000
+    retry_policy:
+      mode: bounded
+      maximum_attempts: 2
+      retry_on:
+        - timeout
+      backoff_ms: 250
+    idempotency: idempotent_with_operation_id
+    security:
+      authentication_required: true
+      authentication_source: handshake_profile
+      confidentiality_required: false
+      integrity_required: true
+      integrity_source: handshake_profile
+      anti_replay_required: true
+      anti_replay_source: nonce_and_handshake_transcript
+      allowed_before_session: true
+      privilege: session_establishment
+      handshake_profile: APPLICATION_MUTUAL_AUTH_V1
+    payload:
+      fields:
+        - name: result
+          type: enum
+          enum: CommandResult
+          description: Handshake result.
+        - name: handshake_id
+          type: alias
+          alias: TransactionId
+          description: Handshake transaction identifier.
+        - name: handshake_profile_id
+          type: uint16
+          description: Accepted Handshake Profile identifier.
+        - name: session_id
+          type: uint32
+          description: Newly established Session identifier; zero when the Handshake failed.
+        - name: handshake_payload_length
+          type: uint16
+          minimum: 1
+          maximum: 256
+          description: Length of profile-defined canonical handshake_payload.
+        - name: handshake_payload
+          type: uint8
+          description: Bounded profile-defined response data, including required nonce and proof material.
+          array:
+            length_from: handshake_payload_length
+            maximum_length: 256
+  - name: BOOTLOADER_HANDSHAKE_REQUEST
+    id: 0x000b
+    namespace: framework
+    service: SESSION_MANAGEMENT
+    category: handshake
+    direction: coordinator_to_node
+    execution_environment: bootloader
+    description: Establish the Bootloader Secure Session using the declared Handshake Profile.
+    length_policy: minimum
+    minimum_length: 8
+    unknown_trailing_policy: reject
+    maximum_record_size: 264
+    timeout_ms: 3000
+    retry_policy:
+      mode: bounded
+      maximum_attempts: 2
+      retry_on:
+        - timeout
+      backoff_ms: 250
+    idempotency: idempotent_with_operation_id
+    security:
+      authentication_required: true
+      authentication_source: handshake_profile
+      confidentiality_required: false
+      integrity_required: true
+      integrity_source: handshake_profile
+      anti_replay_required: true
+      anti_replay_source: nonce_and_handshake_transcript
+      allowed_before_session: true
+      privilege: session_establishment
+      handshake_profile: BOOTLOADER_MUTUAL_AUTH_V1
+    payload:
+      fields:
+        - name: handshake_id
+          type: alias
+          alias: TransactionId
+          description: Handshake transaction identifier.
+        - name: handshake_profile_id
+          type: uint16
+          description: Selected Handshake Profile identifier.
+        - name: handshake_payload_length
+          type: uint16
+          minimum: 1
+          maximum: 256
+          description: Length of profile-defined canonical handshake_payload.
+        - name: handshake_payload
+          type: uint8
+          description: Bounded profile-defined handshake data, including required nonce and proof material.
+          array:
+            length_from: handshake_payload_length
+            maximum_length: 256
+  - name: BOOTLOADER_HANDSHAKE_RESPONSE
+    id: 0x000c
+    namespace: framework
+    service: SESSION_MANAGEMENT
+    category: handshake
+    direction: node_to_coordinator
+    response_to: BOOTLOADER_HANDSHAKE_REQUEST
+    execution_environment: bootloader
+    description: Establish the Bootloader Secure Session using the declared Handshake Profile.
+    length_policy: minimum
+    minimum_length: 14
+    unknown_trailing_policy: reject
+    maximum_record_size: 270
+    timeout_ms: 3000
+    retry_policy:
+      mode: bounded
+      maximum_attempts: 2
+      retry_on:
+        - timeout
+      backoff_ms: 250
+    idempotency: idempotent_with_operation_id
+    security:
+      authentication_required: true
+      authentication_source: handshake_profile
+      confidentiality_required: false
+      integrity_required: true
+      integrity_source: handshake_profile
+      anti_replay_required: true
+      anti_replay_source: nonce_and_handshake_transcript
+      allowed_before_session: true
+      privilege: session_establishment
+      handshake_profile: BOOTLOADER_MUTUAL_AUTH_V1
+    payload:
+      fields:
+        - name: result
+          type: enum
+          enum: CommandResult
+          description: Handshake result.
+        - name: handshake_id
+          type: alias
+          alias: TransactionId
+          description: Handshake transaction identifier.
+        - name: handshake_profile_id
+          type: uint16
+          description: Accepted Handshake Profile identifier.
+        - name: session_id
+          type: uint32
+          description: Newly established Session identifier; zero when the Handshake failed.
+        - name: handshake_payload_length
+          type: uint16
+          minimum: 1
+          maximum: 256
+          description: Length of profile-defined canonical handshake_payload.
+        - name: handshake_payload
+          type: uint8
+          description: Bounded profile-defined response data, including required nonce and proof material.
+          array:
+            length_from: handshake_payload_length
+            maximum_length: 256
   - name: GET_CONFIGURATION_REQUEST
     id: 0x0101
     namespace: application
@@ -1561,6 +1992,14 @@ messages:
           alias: DeviceTimestampUs
           description: State-transition timestamp.
 
+    security:
+      authentication_required: true
+      confidentiality_required: false
+      integrity_required: true
+      anti_replay_required: true
+      allowed_before_session: false
+      privilege: authenticated_read
+      key_context: application_control_d2h
   - name: DATA_QUALITY_ALARM
     id: 0x1101
     namespace: application
@@ -1594,6 +2033,14 @@ messages:
           alias: DeviceTimestampUs
           description: Alarm occurrence timestamp.
 
+    security:
+      authentication_required: true
+      confidentiality_required: false
+      integrity_required: true
+      anti_replay_required: true
+      allowed_before_session: false
+      privilege: authenticated_read
+      key_context: application_data_d2h
   - name: DEVICE_HARDWARE_FAULT
     id: 0x1201
     namespace: application
@@ -1609,7 +2056,7 @@ messages:
     reset_policy: explicit_command_after_condition_clear
 
     length_policy: extensible
-    minimum_length: 14
+    minimum_length: 16
     unknown_trailing_policy: ignore
 
     payload:
@@ -1640,6 +2087,14 @@ messages:
 
   # Telemetry / Streaming Messages: 0x2000-0x2FFF
 
+    security:
+      authentication_required: true
+      confidentiality_required: false
+      integrity_required: true
+      anti_replay_required: true
+      allowed_before_session: false
+      privilege: authenticated_read
+      key_context: application_control_d2h
   - name: DEVICE_STATUS_TELEMETRY
     id: 0x2001
     namespace: application
@@ -1708,6 +2163,7 @@ messages:
           alias: OperationId
           description: Current operation identifier; zero means no active operation.
 
+    delivery_queue_policy: single_pending
   - name: SAMPLE_STREAM_RECORD
     id: 0x2101
     namespace: application
@@ -1722,7 +2178,7 @@ messages:
     unknown_trailing_policy: reject
 
     priority: data
-    maximum_record_size: 512
+    maximum_record_size: 1024
     loss_policy: detectable_drop_allowed
 
     sequence_policy:
@@ -1769,19 +2225,19 @@ messages:
         - name: channel_count
           type: uint8
           minimum: 1
-          maximum: 32
+          maximum: 16
           description: Number of enabled channels represented by each sample group.
 
         - name: samples_per_channel
           type: uint8
           minimum: 1
-          maximum: 128
+          maximum: 15
           description: Number of samples for each channel in this record.
 
         - name: sample_count
           type: uint16
           minimum: 1
-          maximum: 4096
+          maximum: 240
           description: >
             Total number of encoded sample values. This value shall equal
             channel_count multiplied by samples_per_channel.
@@ -1801,7 +2257,7 @@ messages:
             Payload length and destination capacity.
           array:
             length_from: sample_count
-            maximum_length: 4096
+            maximum_length: 240
 
   # Firmware Update / Bootloader Messages: 0x5000-0x5FFF
 
@@ -1812,9 +2268,9 @@ messages:
     category: firmware_update
     direction: coordinator_to_node
     execution_environment: bootloader
-    description: Begin or resume a Firmware Update transaction.
+    description: Transfer the signed canonical Firmware Manifest and begin or resume an Update transaction.
 
-    length_policy: exact
+    length_policy: minimum
     unknown_trailing_policy: reject
     timeout_ms: 3000
 
@@ -1841,31 +2297,28 @@ messages:
           type: alias
           alias: TransactionId
           description: Update Transaction identifier.
-
-        - name: image_type
-          type: uint8
-          description: Target image or partition type.
-
-        - name: image_size
-          type: uint32
-          description: Complete image size in bytes.
-
-        - name: security_version
-          type: uint32
-          description: Monotonic anti-rollback security version.
-
+        - name: manifest
+          type: struct
+          struct: FirmwareManifestV1
+          description: Canonical Manifest fields used for target, version, hash, and anti-rollback validation.
         - name: manifest_hash
           type: uint8
-          description: SHA-256 hash of the canonical manifest.
+          description: SHA-256 hash recomputed over the canonical encoded manifest field.
           array:
             length: 32
-
-        - name: image_hash
+        - name: manifest_signature_length
+          type: uint16
+          minimum: 64
+          maximum: 96
+          description: Length of manifest_signature in bytes.
+        - name: manifest_signature
           type: uint8
-          description: SHA-256 hash of the complete image.
+          description: Signature over the domain separator followed by manifest_hash.
           array:
-            length: 32
-
+            length_from: manifest_signature_length
+            maximum_length: 96
+    minimum_length: 126
+    maximum_record_size: 222
   - name: BEGIN_UPDATE_RESPONSE
     id: 0x5002
     namespace: bootloader
@@ -1905,8 +2358,10 @@ messages:
 
         - name: maximum_chunk_length
           type: uint16
-          description: Maximum accepted chunk-data length.
+          description: Maximum accepted chunk-data length for the Runtime Effective Profile.
 
+          minimum: 1
+          maximum: 1014
   - name: WRITE_UPDATE_CHUNK_REQUEST
     id: 0x5003
     namespace: bootloader
@@ -1952,7 +2407,7 @@ messages:
         - name: chunk_length
           type: uint16
           minimum: 1
-          maximum: 1024
+          maximum: 1014
           description: Number of bytes in chunk_data.
 
         - name: chunk_data
@@ -1960,8 +2415,9 @@ messages:
           description: Firmware image bytes.
           array:
             length_from: chunk_length
-            maximum_length: 1024
+            maximum_length: 1014
 
+    maximum_record_size: 1024
   - name: WRITE_UPDATE_CHUNK_RESPONSE
     id: 0x5004
     namespace: bootloader
@@ -2287,12 +2743,18 @@ The reusable template file may contain documented placeholders. The Product Base
 - [ ] Streaming defines Sequence, Timestamp, Loss Policy, ordering behavior, and Maximum Record Size.
 - [ ] `SAMPLE_STREAM_RECORD.sample_count` equals `channel_count × samples_per_channel`.
 - [ ] The Stream decoder checks multiplication overflow, maximum bounds, equality, remaining Payload length, and destination capacity before reading `samples`.
-- [ ] Every maximum Telemetry or Stream record can be carried or fragmented by a declared Transport Profile.
+- [ ] Every declared `minimum_length` equals the computed required fixed prefix before optional or variable trailing data.
+- [ ] Every derived maximum encoded Message length is within its declared `maximum_record_size` when present.
+- [ ] Every maximum Telemetry, Stream, Handshake, and Firmware Update record can be carried or fragmented by a declared Transport Profile.
+- [ ] Capability parameters are bounded by the Runtime Effective Profile.
 - [ ] Every variable array and Fragmentation path has a bounded memory requirement.
 - [ ] No published or reserved Message ID is reused.
 - [ ] Capability discovery rather than model-name inference controls optional features.
-- [ ] Security-sensitive Messages define Authentication, Integrity, Anti-Replay, Privilege, and Key Context.
+- [ ] Every Message defines an explicit `security` block; public and pre-Session Messages state that policy explicitly.
+- [ ] Bidirectional or multi-environment secure Messages define deterministic direction/environment Key Context mappings.
+- [ ] Application and Bootloader Handshake Messages and profiles are complete and bounded.
 - [ ] Application and Bootloader Session and Key Context boundaries remain separate.
+- [ ] Signed Firmware Manifest transfer, canonical hashing, signing-key identity, signature algorithm, and signature bounds are defined.
 
 ---
 
@@ -2325,13 +2787,15 @@ The reusable template file may contain documented placeholders. The Product Base
 - [ ] Generated output is current and deterministic.
 - [ ] Generated files identify source and Generator versions and hashes.
 - [ ] Normal, boundary, invalid, and truncated Test Vectors pass.
-- [ ] Cross-language interoperability passes for all languages in scope.
+- [ ] Cross-implementation interoperability passes for all implementations in scope.
+- [ ] Cross-language interoperability passes for every language pair in scope.
 - [ ] Telemetry replacement behavior is tested.
 - [ ] Streaming loss, duplicate, ordering, wrap, and maximum-size tests pass.
 - [ ] Inconsistent `channel_count`, `samples_per_channel`, and `sample_count` vectors are rejected before sample-array access.
 - [ ] Stream minimum-length boundary vectors include the 19-byte fixed header and truncated variants.
+- [ ] Application and Bootloader Handshake, wrong-profile, transcript, proof, replay, and Key Context vectors pass when applicable.
 - [ ] Security golden vectors pass when applicable.
-- [ ] Firmware Update resume, duplicate-chunk, hash-failure, signature-failure, interruption, and rollback vectors pass when applicable.
+- [ ] Firmware Update Manifest-hash, wrong-key, signature-failure, anti-rollback, resume, duplicate-chunk, interruption, and rollback vectors pass when applicable.
 - [ ] No published or reserved identifier was reused.
 - [ ] No Product-specific placeholder remains.
 - [ ] Human-readable Protocol documentation is current.
@@ -2390,6 +2854,9 @@ Protocol_YAML_Template.md
 
 The Template shall not redefine a rule differently from the Guide.
 
+Architecture, security, Firmware Update, and implementation statements repeated here are derived conformance
+summaries. They shall cite and remain subordinate to the document that owns the topic.
+
 When the Guide changes:
 
 1. Review the Template for affected fields and examples.
@@ -2431,9 +2898,16 @@ This baseline establishes the following decisions:
 26. Firmware Update defines transaction identity, bounded chunks, resume state, complete-image verification, and controlled finalization.
 27. Generated Code shall not be edited manually.
 28. Code Generation is deterministic and validated by regeneration comparison.
-29. Formal Baseline approval requires Schema Validation, Semantic Lint, Compatibility Review, Test Vectors, and cross-language interoperability.
+29. Formal Baseline approval requires Schema Validation, Semantic Lint, Compatibility Review, Test Vectors, cross-implementation interoperability, and cross-language interoperability for every language pair in scope.
 30. Product-specific placeholders shall not remain in a derived Protocol Baseline.
 31. Structural rewrites preserve approved normative rules or explicitly record every intentional removal.
+32. Every declared `minimum_length` matches the computed required fixed prefix.
+33. Every derived maximum encoded Message length fits its declared record and Transport envelope.
+34. Every Message carries explicit security semantics; omission is rejected.
+35. Required Application and Bootloader Sessions have explicit bounded Handshake Messages and profiles.
+36. Firmware Update transfers a canonical Manifest hash, signing-key identity, signature algorithm, and bounded signature before image acceptance.
+37. Queue implementation is separate from Telemetry replacement semantics.
+38. Repeated non-owning rules are derived conformance summaries and do not override their authority document.
 
 ---
 

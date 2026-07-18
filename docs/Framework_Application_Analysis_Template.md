@@ -4,7 +4,7 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.5  
+**Document Version:** v1.0.6  
 **Status:** Baseline  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
@@ -83,6 +83,7 @@ Other Coordinator/Node applications
 | v1.0.3 | 2026-07-18 | Ray Yang | Converted the complete template to English; added repository identity, copyright, personal-project clarification, and third-party-material notice; aligned the analysis method with `Coordinator_Node_Control_Framework.md`, `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; removed the obsolete independent Protocol YAML skeleton; separated Telemetry and Stream analysis; added Transport Profile, timing, bandwidth, resource, safety, Application/Bootloader Session, Firmware Update transaction, Code Generation, validation-evidence, structural-rewrite, decision-register, and completion-gate requirements. |
 | v1.0.4 | 2026-07-18 | Ray Yang | Restored and modernized the reusable Command, Data Field, State, UI Page, Framework Gap, Review Question, and detailed completion-checklist appendices that were unintentionally omitted during the v1.0.3 structural rewrite; added the Bootloader/Update responsibility column; made signed Firmware image verification mandatory whenever Firmware Update is in scope; expanded placeholder guidance and source-input coverage; and synchronized the Baseline Decision Summary and structural validation. |
 | v1.0.5 | 2026-07-18 | Ray Yang | Adopted the stable canonical filename `Framework_Application_Analysis_Template.md`; updated all active authority and example-document references to canonical paths; aligned the default validated document versions with the current document set; and preserved the analysis method, templates, completion gates, and technical decisions without behavioral change. |
+| v1.0.6 | 2026-07-18 | Ray Yang | Corrected the completed-analysis stable filename rule; separated Telemetry replacement semantics from delivery queue policy; split Secure Session responsibility into peer-local Coordinator, Node, and Bootloader ownership; updated active Framework and Protocol versions; clarified cross-implementation and cross-language validation; and labeled repeated non-owning requirements as derived conformance summaries. |
 
 ## 0.3 Template Usage Convention
 
@@ -107,7 +108,7 @@ The following placeholders shall be replaced in a completed Application Analysis
 Save a completed analysis as:
 
 ```text
-<Application_Name>_Framework_Application_Analysis_vX.Y.Z.md
+<Application_Name>_Framework_Application_Analysis.md
 ```
 
 Examples:
@@ -130,11 +131,11 @@ Every completed Application Analysis shall record the Framework version it evalu
 
 | Item | Value |
 |---|---|
-| Minimum Framework Version | `v1.0.4` |
-| Validated Framework Version | `v1.0.4` |
+| Minimum Framework Version | `v1.0.5` |
+| Validated Framework Version | `v1.0.5` |
 | Embedded C Coding Rules Version | `v1.0.15` or `<N/A>` |
-| Protocol YAML Definition Guide Version | `v1.0.5` |
-| Protocol YAML Template Version | `v1.0.5` |
+| Protocol YAML Definition Guide Version | `v1.0.6` |
+| Protocol YAML Template Version | `v1.0.6` |
 | Last Compatibility Review | `<YYYY-MM-DD>` |
 | Revalidation Status | Valid / Review Required / Invalid |
 | Revalidation Owner | `<Owner>` |
@@ -147,7 +148,7 @@ Revalidation rules:
 | Framework MINOR | Reassess Reuse Classification, boundaries, Profile, optional capabilities, Gaps, and migration. |
 | Framework MAJOR | Repeat the complete Application Analysis and establish a new compatibility plan. |
 | Security model change | Revalidate Authentication, Authorization, Session, Key Context, Rekey, Anti-Replay, audit, Application/Bootloader separation, and credential lifecycle. |
-| Protocol compatibility change | Regenerate artifacts and rerun Schema Validation, Semantic Lint, compatibility, Golden Vectors, and cross-language interoperability. |
+| Protocol compatibility change | Regenerate artifacts and rerun Schema Validation, Semantic Lint, compatibility, Golden Vectors, cross-implementation interoperability, and cross-language interoperability for language pairs in scope. |
 | State or Fault model change | Revalidate ownership, transitions, recovery, safe state, stale state, UI behavior, and tests. |
 | Transport Profile change | Recalculate MTU, Fragmentation, throughput, control latency, Buffer, and Runtime Effective Profile behavior. |
 | Firmware Update change | Revalidate Manifest, transaction identity, Session boundary, resume, signature, anti-rollback, rollback, and recovery. |
@@ -182,6 +183,9 @@ This template records application-specific analysis and decisions. It shall not 
 | Test procedure and result | Test specifications and reports |
 
 One normative rule shall have one authority location.
+
+Architecture, Protocol, security, Firmware Update, and implementation statements repeated in this Template are
+derived conformance summaries. They guide analysis but do not override the document that owns the topic.
 
 ## 0.6 Analysis Completion Gate
 
@@ -594,14 +598,16 @@ Audit requirement
 
 Use Telemetry only for complete summarized state whose older unsent value may be replaced.
 
-| Name | Producer | Trigger or Nominal Rate | Maximum Rate | Replacement Policy | Timestamp | Priority | Loss Policy | Maximum Record Size |
-|---|---|---|---|---|---|---|---|---:|
-| `<TBD>` | Node | `<TBD>` | `<TBD>` | latest_value_only / queue_all / bounded_queue | `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` |
+| Name | Producer | Trigger or Nominal Rate | Maximum Rate | Replacement Policy | Delivery Queue Policy | Timestamp | Priority | Loss Policy | Maximum Record Size |
+|---|---|---|---|---|---|---|---|---|---:|
+| `<TBD>` | Node | `<TBD>` | `<TBD>` | latest_value_only / coalesce_by_key | single_pending / bounded_latest_per_key | `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` |
 
 Verify:
 
 - The Payload is independently usable.
 - A newer value may replace an older unsent value only when declared.
+- Replacement semantics are separate from queue capacity and overflow implementation.
+- `queue_all` is not used as a Telemetry replacement policy.
 - A partial delta is not mislabeled as latest-value-only Telemetry.
 - Freshness and stale-state behavior are defined.
 
@@ -740,7 +746,9 @@ Use `A` for accountable authority, `R` for execution responsibility, `C` for con
 |---|---:|---:|---:|---:|---:|---:|---:|
 | User interaction | A/R | C | I | I | I | I | I |
 | Link and reconnect coordination | I | A/R | R | R during update | C | I | I |
-| Secure Session | I | A/R | R | R for Bootloader Session | C | I | I |
+| Coordinator-side Secure Session state | I | A/R | C | C during update | I | I | I |
+| Node Application Session acceptance and local state | I | C | A/R | I | C | I | I |
+| Bootloader Session acceptance and local state | I | C | I | A/R | C | I | I |
 | Protocol encode/decode | I | A/R | R | R for update Protocol | C | I | I |
 | Command authorization | C | R | A/R for Application | A/R for update | I | I | I |
 | Real-time control | I | I | A/R | I | R | C | C |
@@ -1738,7 +1746,7 @@ An excluded item shall not invalidate the architecture assumption being tested.
 | 1 | Requirements and Analysis Baseline | Roles, boundaries, risks, and scope approved |
 | 2 | Application Profile | Product commands, data, states, and failure behavior reviewable |
 | 3 | Project Protocol YAML | Schema and Semantic Lint pass |
-| 4 | Generated contracts and Golden Vectors | Deterministic and cross-language reviewable |
+| 4 | Generated contracts and Golden Vectors | Deterministic and cross-implementation reviewable; cross-language reviewable for languages in scope |
 | 5 | Mock Node and Transport | Normal and failure scenarios reproducible |
 | 6 | Coordinator Core | Connection, commands, state reconciliation, Telemetry, and Stream operate |
 | 7 | Node Core | Event-Driven dispatch, validation, state ownership, and local protection operate |
@@ -2364,6 +2372,11 @@ This baseline establishes the following decisions:
 38. Final approval requires an explicit Go, Conditional Go, or No-Go decision.
 39. Reusable Command, Data Field, State, UI Page, and Framework Gap mini-templates remain part of the analysis method.
 40. Detailed Review Questions and completion checklists remain part of Baseline acceptance evidence.
+41. Maintained completed-analysis filenames are stable and do not contain document versions.
+42. Telemetry replacement semantics are separate from delivery queue policy.
+43. Each peer is accountable for its own local Secure Session state.
+44. Cross-implementation validation applies to every implementation; cross-language validation applies to language pairs in scope.
+45. Repeated non-owning requirements are derived conformance summaries and remain subordinate to their authority source.
 
 ---
 

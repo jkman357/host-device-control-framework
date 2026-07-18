@@ -30,11 +30,11 @@ Human reviews decisions and validates actual system behavior
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/AI_Engineering_Usage_Guide.md) | v1.0.3 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
-| [`Coordinator_Node_Control_Framework.md`](docs/Coordinator_Node_Control_Framework.md) | v1.0.4 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
-| [`Framework_Application_Analysis_Template.md`](docs/Framework_Application_Analysis_Template.md) | v1.0.5 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
-| [`Protocol_YAML_Definition_Guide.md`](docs/Protocol_YAML_Definition_Guide.md) | v1.0.5 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
-| [`Protocol_YAML_Template.md`](docs/Protocol_YAML_Template.md) | v1.0.5 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
+| [`AI_Engineering_Usage_Guide.md`](docs/AI_Engineering_Usage_Guide.md) | v1.0.4 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`Coordinator_Node_Control_Framework.md`](docs/Coordinator_Node_Control_Framework.md) | v1.0.5 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
+| [`Framework_Application_Analysis_Template.md`](docs/Framework_Application_Analysis_Template.md) | v1.0.6 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
+| [`Protocol_YAML_Definition_Guide.md`](docs/Protocol_YAML_Definition_Guide.md) | v1.0.6 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
+| [`Protocol_YAML_Template.md`](docs/Protocol_YAML_Template.md) | v1.0.6 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
 | [`Embedded_C_Coding_Rules.md`](docs/Embedded_C_Coding_Rules.md) | v1.0.15 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 
 ## AI Task Routing
@@ -62,6 +62,9 @@ Embedded C generation or review
     -> Embedded C Coding Rules
     -> Approved Project Protocol YAML and Node design
 ```
+
+While `AI_Engineering_Usage_Guide.md` remains `Draft for Review`, this routing is provisional. Direct human
+instructions and the approved topic authority documents take precedence.
 
 ## Stable Filename Policy
 
@@ -109,7 +112,8 @@ Source Code, builds, logs, measurements, and test reports
     Provide as-built evidence; they do not silently override approved authority.
 ```
 
-One normative rule should have one authority location.
+One normative rule should have one authority location. Repeated text in a non-owning document is a derived
+conformance summary and does not override the owning authority.
 
 ## Engineering Principles
 

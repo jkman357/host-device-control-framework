@@ -4,7 +4,7 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.0.5  
+**Document Version:** v1.0.6  
 **Status:** Baseline  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
@@ -202,6 +202,7 @@ The keywords in this document have the following meanings:
 | v1.0.3 | 2026-07-18 | Defined the normative decision boundary between `telemetry` and `stream`; added a complete `category: telemetry` YAML example; required telemetry cadence, replacement, priority, and maximum-record-size policies; clarified when sequence and timestamp fields are required; and synchronized Semantic Lint, Project Adoption Checklist, Quick Reference, and Baseline Decision Summary. |
 | v1.0.4 | 2026-07-18 | Updated the active Framework, Template, and Application Analysis references to `Coordinator_Node_Control_Framework.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; corrected the companion-artifact wording now that the Template exists; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
 | v1.0.5 | 2026-07-18 | Adopted the stable canonical filename `Protocol_YAML_Definition_Guide.md`; updated active Framework, Template, and Application Analysis references to canonical paths; retained version identity in document metadata and Git history; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
+| v1.0.6 | 2026-07-18 | Corrected the Telemetry replacement model by separating replacement semantics from queue discipline; required explicit per-Message security and deterministic direction/environment Key Context mapping; defined Application and Bootloader Handshake profiles and pre-Session protection; made signed canonical Firmware Manifest transfer mandatory when Firmware Update is in scope; added computed minimum/maximum length and Runtime Effective Profile Lint rules; and clarified cross-implementation versus cross-language interoperability. |
 
 ---
 
@@ -638,6 +639,9 @@ Messages with the appropriate category. It is not a separate top-level `firmware
 Bootloader is an Execution Environment and Namespace, not a top-level `bootloader` key.
 
 The formal top-level security key is `security_model`, not `security`.
+
+Handshake Profiles and the signed Firmware Manifest policy are nested under `security_model`; they are not
+independent top-level keys.
 
 ### 4.2 Document Metadata
 
@@ -1254,15 +1258,26 @@ Maximum record size
 Loss policy
 ```
 
-Recommended replacement policies include:
+Recommended Telemetry replacement policies include:
 
 ```text
 latest_value_only
-queue_all
-bounded_queue
+coalesce_by_key
 ```
 
-`latest_value_only` is recommended for replaceable status summaries.
+A replacement policy defines which unsent state may be superseded. It is separate from the Runtime queue
+implementation.
+
+Recommended delivery queue policies include:
+
+```text
+single_pending
+bounded_latest_per_key
+```
+
+`queue_all` is not a Telemetry replacement policy. When every historical record is required, use `stream`,
+`event`, `alarm`, `fault`, or another explicitly reliable Message design whose loss and ordering semantics match
+the Product requirement.
 
 When `latest_value_only` is used:
 
@@ -1271,6 +1286,7 @@ When `latest_value_only` is used:
 - A sequence field is optional unless the Product requires detection of skipped accepted records.
 - A timestamp should identify when the represented state was sampled or assembled.
 - A newer timestamp shall not silently represent an older state.
+- Queue capacity and overflow behavior remain explicit implementation or Runtime Profile properties.
 
 Example:
 
@@ -1292,6 +1308,7 @@ Example:
     numerator: 5
     denominator: 1
   replacement_policy: latest_value_only
+  delivery_queue_policy: single_pending
   loss_policy: latest_value_only
   priority: status
   maximum_record_size: 32
@@ -1324,8 +1341,8 @@ Example:
 ```
 
 A delta-only Payload that cannot be interpreted without every preceding record shall not use
-`replacement_policy: latest_value_only`. It shall use `stream`, `queue_all`, or another explicitly reliable
-message design.
+`replacement_policy: latest_value_only`. It shall use `stream`, `event`, `alarm`, `fault`, or another explicitly reliable
+Message design.
 
 ### 10.2 Streaming
 
@@ -1805,9 +1822,21 @@ explicitly justifies that dependency.
 
 ## 16. Security Attributes
 
-### 16.1 Per-Message Security
+### 16.1 Explicit Per-Message Security
 
-A security-sensitive Message shall define:
+Every Message shall define an explicit `security` block, including public Discovery, pre-Session Handshake,
+Heartbeat, Error, Event, Alarm, Fault, Telemetry, Stream, and Firmware Update Messages.
+
+Omission shall not imply inheritance.
+
+```yaml
+security_model:
+  message_security_policy:
+    mode: explicit_per_message
+    omitted_security_block_policy: reject
+```
+
+A Session-protected Message should define:
 
 ```yaml
 security:
@@ -1815,13 +1844,26 @@ security:
   confidentiality_required: false
   integrity_required: true
   anti_replay_required: true
+  allowed_before_session: false
   privilege: control
   key_context: application_control_h2d
 ```
 
+A public Message shall state that fact explicitly:
+
+```yaml
+security:
+  authentication_required: false
+  confidentiality_required: false
+  integrity_required: false
+  anti_replay_required: false
+  allowed_before_session: true
+  privilege: public_read
+```
+
 The Project shall not use one vague `secure: true` flag as a substitute for explicit attributes.
 
-### 16.2 Key Context Separation
+### 16.2 Key Context Separation and Mapping
 
 Application and Bootloader Messages shall not share an ambiguous Key Context.
 
@@ -1838,28 +1880,93 @@ bootloader_response_d2h
 
 A Bootloader Message shall not use an Application Key Context.
 
-### 16.3 Unauthenticated Messages
+A unidirectional single-environment Message may use:
 
-Only necessary Handshake or Discovery Messages may be allowed before authentication:
+```yaml
+key_context: application_control_h2d
+```
+
+A Message that is valid in multiple Execution Environments shall define:
+
+```yaml
+key_context_by_environment:
+  application: application_control_h2d
+  bootloader: bootloader_update_h2d
+```
+
+A bidirectional Message shall define a deterministic mapping:
+
+```yaml
+key_context_by_direction_and_environment:
+  coordinator_to_node:
+    application: application_control_h2d
+    bootloader: bootloader_update_h2d
+  node_to_coordinator:
+    application: application_control_d2h
+    bootloader: bootloader_response_d2h
+```
+
+`key_context`, `key_context_by_environment`, and `key_context_by_direction_and_environment` are mutually
+exclusive for one Message.
+
+### 16.3 Handshake Profiles
+
+When the Security Model requires a Secure Session, the Protocol shall define bounded `category: handshake`
+Messages for Application and Bootloader Session establishment or shall reference a separately versioned and
+deterministically merged Session Protocol.
+
+A Handshake Profile shall define:
+
+```text
+Profile ID
+Execution Environment
+Authentication mode
+Transcript hash
+Key-agreement method
+Proof format
+Nonce and Anti-Replay source
+Derived direction-specific Key Contexts
+Maximum Handshake payload
+Failure behavior
+```
+
+Handshake Messages are allowed before a Session exists, but they are not unauthenticated discovery traffic.
+Their authentication, integrity, and Anti-Replay properties are provided by the declared Handshake Profile and
+canonical transcript.
+
+Example:
 
 ```yaml
 security:
-  authentication_required: false
-  integrity_required: false
+  authentication_required: true
+  authentication_source: handshake_profile
+  integrity_required: true
+  integrity_source: handshake_profile
+  anti_replay_required: true
+  anti_replay_source: nonce_and_handshake_transcript
   allowed_before_session: true
+  privilege: session_establishment
+  handshake_profile: APPLICATION_MUTUAL_AUTH_V1
 ```
 
-The reason shall be documented.
+Application and Bootloader Handshake Profiles, Sessions, counters, and Key Contexts shall remain separate.
 
-Configuration, control, and Firmware Update Messages shall not be made unauthenticated for development
-convenience.
+### 16.4 Unauthenticated Discovery Messages
 
-### 16.4 Security Failures
+Only necessary identity or Capability Discovery Messages may be unauthenticated.
+
+The reason, information exposure, rate limit, and failure behavior shall be documented.
+
+Configuration, control, state-sensitive status, Event, Alarm, Fault, Telemetry, Stream, and Firmware Update
+Messages shall not be made unauthenticated for development convenience.
+
+### 16.5 Security Failures
 
 The Security Model shall define behavior for:
 
 ```text
 Authentication Failure
+Handshake proof failure
 Integrity Failure
 Replay Detected
 Wrong Session ID
@@ -1867,16 +1974,20 @@ Wrong Key Context
 Counter Gap
 Expired Session
 Execution Environment Mismatch
+Manifest hash failure
+Firmware signature failure
 ```
 
 The Project shall define whether each failure causes an error response, disconnect, diagnostic counter, rate
 limit, lockout, or another controlled action.
 
-### 16.5 Security Compatibility
+### 16.6 Security Compatibility
 
-A security-attribute change may alter Session compatibility even when the Payload layout is unchanged.
+A security-attribute, Handshake Profile, Key Context mapping, Manifest format, trust-anchor, or signature-policy
+change may alter Session or Firmware Update compatibility even when the ordinary Payload layout is unchanged.
 
-Compatibility Review shall include authentication, integrity, anti-replay, privilege, and Key Context changes.
+Compatibility Review shall include authentication, integrity, Anti-Replay, privilege, Key Context, Handshake,
+Manifest, trust-anchor, and signature changes.
 
 ---
 
@@ -1897,6 +2008,10 @@ capabilities:
 ```
 
 A Capability describes what the Node actually supports.
+
+A throughput-, record-, channel-, or chunk-related Capability parameter shall state whether it is a Device-absolute
+limit or a Runtime Effective Profile limit. The usable value is the most restrictive applicable Device,
+Transport Profile, negotiated Runtime, Buffer, and Product limit.
 
 The Coordinator shall not infer all features only from Device model or Protocol version.
 
@@ -1971,6 +2086,10 @@ Allowed channel and sample profile
 ```
 
 The Project shall demonstrate predictable behavior under the worst supported conditions.
+
+Semantic Lint shall derive every maximum encoded Message length from fixed fields, nested Types, and maximum
+variable-array bounds. The derived value shall not exceed the Message maximum, Transport Profile maximum record,
+or bounded reassembly Buffer.
 
 ### 18.3 Runtime Effective Profile
 
@@ -2069,26 +2188,48 @@ Integrity scope
 
 All sizes and offsets shall be bounded and range-checked.
 
-### 19.4 Manifest and Image Verification
+### 19.4 Signed Canonical Manifest and Image Verification
 
-A Firmware Manifest should include:
+When Firmware Update is in scope, a canonical signed Firmware Manifest shall be transferred before image
+acceptance.
+
+The Manifest shall include:
 
 ```text
+Manifest format version
 Device model
 Hardware revision range
 Firmware version
 Image type
 Image size
-Load address or partition
-Cryptographic hash
-Digital signature
+Load address or partition when applicable
+Complete-image cryptographic hash
+Signing-key identifier
+Signature algorithm
 Minimum Bootloader version
 Required Protocol version
 Build identifier
 Security version
 ```
 
-Transport integrity does not replace full-image hash and signature verification.
+The Protocol shall define:
+
+```text
+Canonical field order and encoding
+Manifest hash algorithm
+Signature input and domain separation
+Maximum signature length
+Accepted signature algorithms
+Trust-anchor or signing-key selection
+Manifest-to-Update-Transaction binding
+Failure and audit behavior
+```
+
+The Bootloader shall recompute the Manifest hash from the canonical fields, compare the transferred hash, verify
+the signature with the approved signing key, validate target compatibility and anti-rollback policy, and bind the
+accepted Manifest identity to the Update Transaction.
+
+Transport integrity does not replace complete-image hash and independent Manifest signature verification.
 
 A CRC may detect accidental transmission corruption but does not establish a trusted Firmware origin.
 
@@ -2341,12 +2482,17 @@ Every variable array has maximum_length
 Every length_from field exists and precedes the array
 Extensible Optional Fields appear only at the tail
 An exact Message does not ignore trailing data
+Every Message has an explicit security block
+A public or pre-Session Message states its policy explicitly
+Bidirectional and multi-environment secure Messages have deterministic Key Context mappings
+Required Application and Bootloader Sessions have explicit Handshake Messages or a controlled merged Session Protocol
 A safety-critical command is not unauthenticated
 A non-idempotent command is not retried without a controlled identity
 A deprecated symbol does not reuse an ID
 A Bootloader Message does not use an Application Key Context
-Maximum Payload length remains within its declared limit
-A Transport Profile can carry the maximum record or defines Fragmentation
+Every declared minimum_length equals the computed required fixed prefix before optional or variable trailing data
+Every derived maximum encoded Message length remains within its declared maximum_record_size when present
+A Transport Profile can carry or fragment the maximum record within its bounded reassembly Buffer
 Declared ranges fit the wire type
 Invalid values do not overlap normal ranges
 Unit and scale are complete when required
@@ -2355,6 +2501,7 @@ A `latest_value_only` Telemetry Payload is a complete independently usable snaps
 A Message categorized as Telemetry does not require every intermediate record for correct interpretation
 A Message categorized as Stream defines sequence continuity and loss or ordering behavior
 Streaming has sequence, timestamp, loss, and maximum-record-size policies
+Signed Firmware Update defines canonical Manifest hashing, signing-key identity, signature algorithm, bounded signature, and transaction binding
 Published and reserved identifiers are not reused
 ```
 
@@ -2429,19 +2576,23 @@ Endianness vector
 Round-trip Encode/Decode vector
 ```
 
-### 24.2 Cross-Language Interoperability
+### 24.2 Cross-Implementation and Cross-Language Interoperability
 
-The Project should verify:
+Every implementation in scope shall encode and decode the same Golden Vectors with identical wire bytes and
+semantic values.
+
+Examples include:
 
 ```text
 C Encode -> C Decode
-C Encode -> C# Decode
-C# Encode -> C Decode
-C# Encode -> C# Decode
+C Encode -> C# Decode when C# is in scope
+C# Encode -> C Decode when C# is in scope
 Java interoperability when Java is in scope
+Independent C implementation interoperability when more than one C implementation exists
 ```
 
-The same vector shall produce the same wire bytes and semantic values across implementations.
+Cross-implementation interoperability is always required when more than one implementation exists.
+Cross-language interoperability is required for every language pair in scope.
 
 ### 24.3 Streaming Tests
 
@@ -2776,7 +2927,8 @@ Hazard Analysis defines risk controls
 - [ ] Generated output is current and deterministic.
 - [ ] Generated files contain source and Generator identity.
 - [ ] Normal and boundary Test Vectors pass.
-- [ ] Cross-language interoperability passes.
+- [ ] Cross-implementation interoperability passes for all implementations in scope.
+- [ ] Cross-language interoperability passes for every language pair in scope.
 - [ ] Streaming loss and ordering tests pass.
 - [ ] Security golden vectors pass when applicable.
 - [ ] Firmware Update recovery vectors pass when applicable.
@@ -2932,9 +3084,17 @@ This baseline establishes the following decisions:
 30. Published Message IDs, Enum values, Error Codes, and reserved identifiers shall not be silently reused.
 31. Generated artifacts identify source and Generator versions and shall not be edited manually.
 32. Code Generation is deterministic and validated by regeneration comparison.
-33. Baseline approval requires Schema Validation, Semantic Lint, Compatibility Review, Test Vectors, and cross-language interoperability.
+33. Baseline approval requires Schema Validation, Semantic Lint, Compatibility Review, Test Vectors, cross-implementation interoperability, and cross-language interoperability for every language pair in scope.
 34. Structural rewrites preserve approved normative rules or explicitly record intentional removals.
 35. Product-specific commands and data remain in each Project's `<Application>_protocol.yaml`, not in one universal Product Protocol.
+36. Telemetry replacement semantics are independent of queue implementation; `queue_all` is not a Telemetry replacement policy.
+37. Every Message defines explicit security semantics; omission is rejected.
+38. Secure bidirectional and multi-environment Messages define deterministic Key Context mappings.
+39. Required Application and Bootloader Sessions define explicit Handshake contracts or a controlled merged Session Protocol.
+40. Every declared minimum and maximum Message length is derived and checked against the Runtime Effective Profile.
+41. Firmware Update transfers and verifies a canonical signed Manifest bound to the Update Transaction.
+42. Cross-implementation interoperability applies to all implementations; cross-language testing applies to language pairs in scope.
+43. Repeated rules outside their owning document are derived conformance summaries and shall not override the authority source.
 
 ---
 
