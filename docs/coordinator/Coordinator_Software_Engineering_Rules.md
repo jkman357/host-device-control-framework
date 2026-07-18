@@ -1,13 +1,13 @@
 # Coordinator Software Engineering Rules
 
 **Canonical Filename:** `Coordinator_Software_Engineering_Rules.md`  
-**Document Version:** V1.0.1  
+**Document Version:** v1.0.2  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, test engineers, code generators, and AI-assisted engineering systems  
-**Repository Role:** Normative engineering authority for Coordinator-owned software  
+**Repository Role:** Proposed normative engineering authority for Coordinator-owned software  
 
 ---
 
@@ -23,8 +23,9 @@ This document is independently authored. External standards and guidance are ref
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
-| V1.0.1 | 2026-07-18 | Draft for Review | Corrected architecture-flow representation, clarified source dependency direction, introduced bootstrap diagnostics during startup, linked the required Project profile to the Framework Application Analysis, and clarified document approval versus implementation conformance. |
-| V1.0.0 | 2026-07-18 | Draft for Review | Initial full baseline covering Coordinator software architecture, concurrency, state ownership, communication integration, diagnostics, configuration, security, testability, release governance, and AI-assisted implementation controls. |
+| v1.0.2 | 2026-07-18 | Draft for Review | Clarified that this Draft is proposed normative authority pending human approval and normalized document-version formatting without changing Coordinator engineering requirements. |
+| v1.0.1 | 2026-07-18 | Draft for Review | Corrected architecture-flow representation, clarified source dependency direction, introduced bootstrap diagnostics during startup, linked the required Project profile to the Framework Application Analysis, and clarified document approval versus implementation conformance. |
+| v1.0.0 | 2026-07-18 | Draft for Review | Initial full baseline covering Coordinator software architecture, concurrency, state ownership, communication integration, diagnostics, configuration, security, testability, release governance, and AI-assisted implementation controls. |
 
 ---
 

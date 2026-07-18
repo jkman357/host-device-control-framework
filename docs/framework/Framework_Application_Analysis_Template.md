@@ -4,7 +4,7 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.11  
+**Document Version:** v1.0.12  
 **Status:** Baseline  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
@@ -90,7 +90,8 @@ Other Coordinator/Node applications
 | v1.0.8 | 2026-07-18 | Ray Yang | Clarified that authority versions shown by the reusable Template are authoring references rather than automatic Product compatibility decisions; changed Project minimum-compatible and version-used fields to explicit completion-time inputs; required compatibility evidence before claiming an earlier minimum version; and corrected review-package traceability without changing the analysis architecture or dual filename policy. |
 | v1.0.9 | 2026-07-18 | Ray Yang | Added Product-analysis records for public Discovery privacy, rate limiting, transcript binding, and authenticated revalidation; concrete Handshake and downgrade policy; per-Key-Context Record Counter/Rekey lifecycle; exact Firmware signature encoding; fixed-prefix `minimum_length`; and distinct plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets. Updated authoring-reference versions without changing the Project-specific compatibility-evidence rule. |
 | v1.0.10 | 2026-07-18 | Ray Yang | Added Product-analysis records and acceptance questions for exact Fragment Header and reassembly behavior, concrete named Handshake wire structs, Profile allowlist/security-level/deprecation selection, Firmware Update resume authorization bound to transaction/Manifest/Device/Host, and positive minimum-MTU Fragment payload; synchronized authoring-reference versions. |
-| v1.0.11 | 2026-07-18 | Ray Yang | Integrated `Coordinator_Software_Engineering_Rules.md` V1.0.1 and `CSharp_Coding_Rules.md` V1.0.1 as conditional Product-analysis authorities; added authoring references, Existing Framework Baseline records, Draft-authority approval handling, detailed completion checks, and Baseline decisions so Coordinator and C# applicability, version, evidence, deviation, or `N/A` rationale cannot be omitted. |
+| v1.0.11 | 2026-07-18 | Ray Yang | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 as conditional Product-analysis authorities; added authoring references, Existing Framework Baseline records, Draft-authority approval handling, detailed completion checks, and Baseline decisions so Coordinator and C# applicability, version, evidence, deviation, or `N/A` rationale cannot be omitted. |
+| v1.0.12 | 2026-07-18 | Ray Yang | Updated the Framework authoring reference to v1.0.10 and the Coordinator and C# authoring references to v1.0.2 after Draft-authority, conditional-applicability, and document-version-format clarification; preserved the existing Product-specific compatibility-evidence and approval requirements. |
 
 ## 0.3 Template Usage Convention
 
@@ -152,12 +153,12 @@ authoring references, not automatic compatibility decisions for every Product:
 
 | Authority | Template Authoring Reference Version | Status at Authoring |
 |---|---:|---|
-| `Coordinator_Node_Control_Framework.md` | `v1.0.9` | Baseline |
+| `Coordinator_Node_Control_Framework.md` | `v1.0.10` | Baseline |
 | `Protocol_YAML_Definition_Guide.md` | `v1.0.8` | Baseline |
 | `Protocol_YAML_Template.md` | `v1.0.8` | Baseline |
-| `Coordinator_Software_Engineering_Rules.md` | `V1.0.1` | Draft for Review |
+| `Coordinator_Software_Engineering_Rules.md` | `v1.0.2` | Draft for Review |
 | `Embedded_C_Coding_Rules.md` | `v1.0.15` | Final Baseline |
-| `CSharp_Coding_Rules.md` | `V1.0.1` | Draft for Review |
+| `CSharp_Coding_Rules.md` | `v1.0.2` | Draft for Review |
 
 Every completed Application Analysis shall separately record:
 
@@ -334,12 +335,12 @@ State the criteria used to decide whether the application can proceed.
 
 | Item | Minimum Compatible Version | Version Used for This Analysis | Source Commit, Tag, or Release | Compatibility Evidence |
 |---|---:|---:|---|---|
-| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.9>` | `<TBD>` | `<Evidence>` |
+| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.10>` | `<TBD>` | `<Evidence>` |
 | `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
 | `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.8>` | `<TBD>` | `<Evidence>` |
-| `Coordinator_Software_Engineering_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: V1.0.1>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Coordinator_Software_Engineering_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.2>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
 | `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.15>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
-| `CSharp_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: V1.0.1>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `CSharp_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.2>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
 
 `Coordinator_Software_Engineering_Rules.md` is required when Coordinator-owned software is in scope.
 `CSharp_Coding_Rules.md` is required when Product-owned C# is in scope. If either authority remains `Draft for Review`,

@@ -11,8 +11,8 @@ Individual authority documents retain their own internal Version History and app
 - Added categorized documentation directories for Framework, Protocol, Coordinator, Coding Rules, and Validation.
 - Added directory-level `README.md` files to define each documentation domain and its authority boundary.
 - Added `CHANGELOG.md`, `LICENSE`, and `NOTICE.md` at the repository root.
-- Added `Coordinator_Software_Engineering_Rules.md` V1.0.1.
-- Added `CSharp_Coding_Rules.md` V1.0.1.
+- Added `Coordinator_Software_Engineering_Rules.md` v1.0.1.
+- Added `CSharp_Coding_Rules.md` v1.0.1.
 
 ### Changed
 
@@ -24,7 +24,12 @@ Individual authority documents retain their own internal Version History and app
 - Split the former repository-level `COPYRIGHT.md` responsibilities between `LICENSE` and `NOTICE.md`.
 - Updated `AI_Engineering_Usage_Guide.md` to v1.0.9.
 - Updated `Coordinator_Node_Control_Framework.md` to v1.0.9.
+- Updated `Coordinator_Node_Control_Framework.md` to v1.0.10.
 - Updated `Framework_Application_Analysis_Template.md` to v1.0.11.
+- Updated `AI_Engineering_Usage_Guide.md` to v1.0.10.
+- Updated `Framework_Application_Analysis_Template.md` to v1.0.12.
+- Updated `Coordinator_Software_Engineering_Rules.md` to v1.0.2.
+- Updated `CSharp_Coding_Rules.md` to v1.0.2.
 
 ### Fixed
 
@@ -33,3 +38,7 @@ Individual authority documents retain their own internal Version History and app
 - Added Coordinator and C# authority applicability, version, status, evidence, deviation, and `N/A` records to the Framework Application Analysis method.
 - Clarified that Coordinator implementations require both role-level and applicable language-level authorities.
 - Clarified that a `Draft for Review` authority is not silently promoted to an approved Product Baseline.
+- Clarified the two Draft engineering-rule documents as proposed normative authorities pending human approval.
+- Made Coordinator software engineering context conditional for non-Coordinator C# AI tasks.
+- Scoped the recommended C# `coordinator/` project structure to Coordinator-role implementations.
+- Normalized document-version formatting to lowercase `v` for the Coordinator and C# rule documents.

@@ -4,7 +4,7 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.9  
+**Document Version:** v1.0.10  
 **Status:** Baseline  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
@@ -263,7 +263,8 @@ Markdown filename.
 | v1.0.6 | 2026-07-18 | Refined filename governance into a two-layer policy: maintained Markdown authority paths remain stable inside controlled Git repositories, while immutable release artifacts, audit packages, external deliverables, and detached snapshots include an approved document version or Baseline identifier in the distributed filename; required detached artifacts to carry source commit, tag, or Release traceability; and preserved all architecture and Protocol semantics. |
 | v1.0.7 | 2026-07-18 | Closed the remaining machine-verifiable security and Transport-envelope gaps: required minimal ephemeral public Discovery and authenticated revalidation; bound Handshake Profile selection and complete canonical transcripts against downgrade and profile confusion; required per-Key-Context Record Counter/Rekey profiles; defined exact canonical Firmware signature encodings; clarified fixed-prefix `minimum_length`; and separated plaintext Message, security overhead, secured Record, reassembly, and Fragment size domains. |
 | v1.0.8 | 2026-07-18 | Closed the remaining machine-verifiable Protocol-contract gaps by requiring an exact Fragment Header and bounded reassembly policies, concrete named Handshake request/response payloads, explicit Profile allowlists and security-level/deprecation metadata instead of numeric ID ordering, cryptographically authorized Firmware Update resume across Session changes, and a positive data-bearing Fragment payload at every supported minimum MTU. |
-| v1.0.9 | 2026-07-18 | Integrated `Coordinator_Software_Engineering_Rules.md` V1.0.1 and `CSharp_Coding_Rules.md` V1.0.1 into Related Documents, the authority boundary, stable document identity, Baseline decisions, and the Authority Matrix; clarified that reusable Coordinator engineering rules and language-specific implementation rules remain subordinate to this Framework, approved Product requirements, and Project-specific design. |
+| v1.0.9 | 2026-07-18 | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 into Related Documents, the authority boundary, stable document identity, Baseline decisions, and the Authority Matrix; clarified that reusable Coordinator engineering rules and language-specific implementation rules remain subordinate to this Framework, approved Product requirements, and Project-specific design. |
+| v1.0.10 | 2026-07-18 | Normalized document-version notation for the Coordinator and C# rule references and aligned the active Draft engineering-rule set with v1.0.2; no reusable architecture, Protocol, safety, security, Runtime, or governance semantics changed. |
 
 ## 0.6 Core Conclusions
 

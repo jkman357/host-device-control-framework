@@ -38,14 +38,14 @@ Human reviews decisions and validates actual system behavior
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.9 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
-| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.0.9 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
-| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.0.11 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
+| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.10 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.0.10 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
+| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.0.12 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
 | [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.0.8 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
 | [`Protocol_YAML_Template.md`](docs/protocol/Protocol_YAML_Template.md) | v1.0.8 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
-| [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | V1.0.1 | Draft for Review | Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
+| [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | v1.0.2 | Draft for Review | Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
 | [`Embedded_C_Coding_Rules.md`](docs/coding-rules/Embedded_C_Coding_Rules.md) | v1.0.15 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
-| [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | V1.0.1 | Draft for Review | Product-owned C# language and .NET implementation rules |
+| [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.2 | Draft for Review | Product-owned C# language and .NET implementation rules |
 
 ## AI Task Routing
 

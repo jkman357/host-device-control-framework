@@ -1,13 +1,13 @@
 # C# Coding Rules
 
 **Canonical Filename:** `CSharp_Coding_Rules.md`  
-**Document Version:** V1.0.1  
+**Document Version:** v1.0.2  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
 **Intended Audience:** Human engineers, reviewers, test engineers, code generators, and AI-assisted engineering systems  
-**Repository Role:** Normative language and implementation authority for Product-owned C# code  
+**Repository Role:** Proposed normative language and implementation authority for Product-owned C# code  
 
 ---
 
@@ -23,8 +23,9 @@ This document is independently authored. Microsoft and other external guidance i
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
-| V1.0.1 | 2026-07-18 | Draft for Review | Clarified conditional architecture authority, refined formatting and field rules, established the default .NET Framework 4.7.2 / C# 7.3 profile, corrected cancellation and background-worker examples, and separated document review from project implementation validation. |
-| V1.0.0 | 2026-07-18 | Draft for Review | Initial full baseline covering C# source organization, naming, type use, null handling, asynchronous programming, concurrency, errors, resources, UI integration, serialization, security, analyzers, testing, generated code, and a .NET Framework 4.7.2 compatibility profile. |
+| v1.0.2 | 2026-07-18 | Draft for Review | Made Coordinator software engineering authority conditional in the AI required-context rules, scoped the recommended Coordinator project structure to Coordinator-role implementations, clarified the document as proposed normative authority while still under review, and normalized document-version formatting. |
+| v1.0.1 | 2026-07-18 | Draft for Review | Clarified conditional architecture authority, refined formatting and field rules, established the default .NET Framework 4.7.2 / C# 7.3 profile, corrected cancellation and background-worker examples, and separated document review from project implementation validation. |
+| v1.0.0 | 2026-07-18 | Draft for Review | Initial full baseline covering C# source organization, naming, type use, null handling, asynchronous programming, concurrency, errors, resources, UI integration, serialization, security, analyzers, testing, generated code, and a .NET Framework 4.7.2 compatibility profile. |
 
 ---
 
@@ -1986,7 +1987,8 @@ Interfaces around platform and framework boundaries should permit future migrati
 Before AI generates or modifies C# code, it shall be given or directed to:
 
 - This document.
-- `Coordinator_Software_Engineering_Rules.md`.
+- `Coordinator_Software_Engineering_Rules.md` when the C# code implements or directly supports a Coordinator role.
+- Otherwise, the applicable Project-approved architecture and software engineering authority.
 - The approved architecture.
 - The target framework.
 - C# language version.
@@ -2127,6 +2129,9 @@ C# code conforms only when:
 
 # Appendix A — Recommended C# Project Structure
 
+The following structure applies when the C# implementation performs or directly supports a Coordinator role.
+A non-Coordinator C# project shall use its Project-approved architecture and responsibility structure instead.
+
 ```text
 coordinator/
 ├── Product.Application/
@@ -2145,7 +2150,7 @@ coordinator/
 └── Product.Tests.Integration/
 ```
 
-The exact structure may differ. Responsibility boundaries are governed by `Coordinator_Software_Engineering_Rules.md`.
+For a Coordinator implementation, the exact structure may differ and responsibility boundaries are governed by `Coordinator_Software_Engineering_Rules.md`. For non-Coordinator C# code, responsibility boundaries are governed by the applicable Project-approved architecture and software engineering authority.
 
 # Appendix B — Example Thin UI Handler
 
