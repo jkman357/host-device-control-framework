@@ -1,17 +1,17 @@
 # Protocol YAML Template
 
-## Coordinator/Node Application Protocol Project Template
 
 **Document Name:** `Protocol_YAML_Template.md`  
 **Document ID:** PYT  
-**Document Version:** v1.0.9  
+**Document Version:** v1.0.10  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.8  
+**Supersedes Document Version:** v1.0.9  
 **Document Type:** Reusable Project Template  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
+**Repository Role:** Normative reusable Protocol YAML template authority  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Protocol_YAML_Definition_Guide.md`
@@ -28,6 +28,8 @@ All third-party standards, publications, trademarks, source code, licenses, and 
 the property of their respective owners. References to third-party materials do not imply ownership,
 endorsement, affiliation, or authorization.
 
+
+## Coordinator/Node Application Protocol Project Template
 ---
 
 # 0. Document Purpose
@@ -66,18 +68,19 @@ Schema Validation / Semantic Lint / Code Generation / Test Vectors
 
 ## 0.1 Version History
 
-| Version | Date | Description |
-|---|---|---|
-| v1.0.0 | 2026-07-15 | Established the initial reusable Protocol YAML Project template. |
-| v1.0.1 | 2026-07-15 | Corrected the Message ID allocation example; aligned the required and conditional top-level keys with the Definition Guide; separated Registry scopes; and strengthened validation, compatibility, and Baseline checklists. |
-| v1.0.2 | 2026-07-18 | Converted the complete template to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned the template with `Protocol_YAML_Definition_Guide_v1.0.3`; replaced native-layout-oriented Wire Format settings with field-by-field encoding and prohibited implicit padding; added distinct Telemetry and Stream examples and policies; and normalized checklists, appendices, and Baseline decisions for public GitHub publication. |
-| v1.0.3 | 2026-07-18 | Defined the intentional redundancy and normative consistency rule for `SAMPLE_STREAM_RECORD.sample_count`; required the sender to encode and the decoder to verify `sample_count == channel_count × samples_per_channel` using widened, overflow-checked arithmetic before reading the sample array; corrected the Stream record minimum length from 18 to 19 bytes; and synchronized Schema Validation, Semantic Lint, Baseline Readiness, and Baseline Decision Summary. |
-| v1.0.4 | 2026-07-18 | Updated the active Framework, Definition Guide, and Application Analysis references to `Coordinator_Node_Control_Framework.md`, `Protocol_YAML_Definition_Guide.md`, and `Framework_Application_Analysis_Template.md`; updated the illustrative YAML minimum-version metadata and Appendix responsibility references; and preserved the YAML structure and all Protocol semantics without technical change. |
-| v1.0.5 | 2026-07-18 | Adopted the stable canonical filename `Protocol_YAML_Template.md`; updated all active Framework, Definition Guide, Application Analysis, and illustrative Project document references to canonical paths; aligned the illustrative minimum-version metadata with the current document set; and preserved the YAML structure and all Protocol semantics without technical change. |
-| v1.0.6 | 2026-07-18 | Corrected computed Message minimum lengths; made Stream, Firmware chunk, Capability, and Transport envelopes mutually consistent; added explicit per-Message security, direction/environment Key Context mappings, Application and Bootloader Handshake contracts, sender-local Heartbeat timestamp semantics, and a signed canonical Firmware Manifest transfer; separated Telemetry replacement semantics from queue discipline; updated interoperability wording; and expanded Schema, Semantic Lint, security, Firmware Update, and Baseline checks. |
-| v1.0.7 | 2026-07-18 | Closed the remaining security-contract and size-model gaps: strengthened unresolved-placeholder Lint; replaced public permanent identity and Capability disclosure with bounded ephemeral Discovery plus authenticated revalidation; added machine-verifiable Record Counter, Rekey, failure, and atomic-cutover policies; bound Handshake Profile selection and canonical transcript fields to reject downgrade and profile confusion; defined exact canonical Firmware signature encodings; fixed `minimum_length` to mean the fixed decoding prefix only; and separated plaintext Message size, security overhead, secured Record size, Transport reassembly size, and Fragment payload limits. |
-| v1.0.8 | 2026-07-18 | Defined a concrete 16-byte Fragment Header and complete reassembly policies; replaced opaque Handshake payloads with four named fixed-capacity wire structs and explicit transcript assembly; replaced numeric Profile-strength comparison with allowlists, preference order, security level, and deprecation state; added Device-issued Firmware Update resume authorization bound to transaction, Manifest, Device, Host, and security version; corrected CAN FD minimum data-bearing MTU; and synchronized all machine-verifiable checks. |
-| v1.0.9 | 2026-07-19 | Added explicit Supersedes metadata required by repository governance; no normative Protocol YAML template semantics changed. |
+| Version | Date | Status | Description |
+| --- | --- | --- | --- |
+| v1.0.0 | 2026-07-15 | Not recorded | Established the initial reusable Protocol YAML Project template. |
+| v1.0.1 | 2026-07-15 | Not recorded | Corrected the Message ID allocation example; aligned the required and conditional top-level keys with the Definition Guide; separated Registry scopes; and strengthened validation, compatibility, and Baseline checklists. |
+| v1.0.2 | 2026-07-18 | Not recorded | Converted the complete template to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned the template with `Protocol_YAML_Definition_Guide_v1.0.3`; replaced native-layout-oriented Wire Format settings with field-by-field encoding and prohibited implicit padding; added distinct Telemetry and Stream examples and policies; and normalized checklists, appendices, and Baseline decisions for public GitHub publication. |
+| v1.0.3 | 2026-07-18 | Not recorded | Defined the intentional redundancy and normative consistency rule for `SAMPLE_STREAM_RECORD.sample_count`; required the sender to encode and the decoder to verify `sample_count == channel_count × samples_per_channel` using widened, overflow-checked arithmetic before reading the sample array; corrected the Stream record minimum length from 18 to 19 bytes; and synchronized Schema Validation, Semantic Lint, Baseline Readiness, and Baseline Decision Summary. |
+| v1.0.4 | 2026-07-18 | Not recorded | Updated the active Framework, Definition Guide, and Application Analysis references to `Coordinator_Node_Control_Framework.md`, `Protocol_YAML_Definition_Guide.md`, and `Framework_Application_Analysis_Template.md`; updated the illustrative YAML minimum-version metadata and Appendix responsibility references; and preserved the YAML structure and all Protocol semantics without technical change. |
+| v1.0.5 | 2026-07-18 | Not recorded | Adopted the stable canonical filename `Protocol_YAML_Template.md`; updated all active Framework, Definition Guide, Application Analysis, and illustrative Project document references to canonical paths; aligned the illustrative minimum-version metadata with the current document set; and preserved the YAML structure and all Protocol semantics without technical change. |
+| v1.0.6 | 2026-07-18 | Not recorded | Corrected computed Message minimum lengths; made Stream, Firmware chunk, Capability, and Transport envelopes mutually consistent; added explicit per-Message security, direction/environment Key Context mappings, Application and Bootloader Handshake contracts, sender-local Heartbeat timestamp semantics, and a signed canonical Firmware Manifest transfer; separated Telemetry replacement semantics from queue discipline; updated interoperability wording; and expanded Schema, Semantic Lint, security, Firmware Update, and Baseline checks. |
+| v1.0.7 | 2026-07-18 | Not recorded | Closed the remaining security-contract and size-model gaps: strengthened unresolved-placeholder Lint; replaced public permanent identity and Capability disclosure with bounded ephemeral Discovery plus authenticated revalidation; added machine-verifiable Record Counter, Rekey, failure, and atomic-cutover policies; bound Handshake Profile selection and canonical transcript fields to reject downgrade and profile confusion; defined exact canonical Firmware signature encodings; fixed `minimum_length` to mean the fixed decoding prefix only; and separated plaintext Message size, security overhead, secured Record size, Transport reassembly size, and Fragment payload limits. |
+| v1.0.8 | 2026-07-18 | Not recorded | Defined a concrete 16-byte Fragment Header and complete reassembly policies; replaced opaque Handshake payloads with four named fixed-capacity wire structs and explicit transcript assembly; replaced numeric Profile-strength comparison with allowlists, preference order, security level, and deprecation state; added Device-issued Firmware Update resume authorization bound to transaction, Manifest, Device, Host, and security version; corrected CAN FD minimum data-bearing MTU; and synchronized all machine-verifiable checks. |
+| v1.0.9 | 2026-07-19 | Not recorded | Added explicit Supersedes metadata required by repository governance; no normative Protocol YAML template semantics changed. |
+| v1.0.10 | 2026-07-19 | Baseline | Added explicit Repository Role metadata and migrated Version History to the governed Date/Status schema; no Protocol YAML template semantics changed. |
 
 ---
 

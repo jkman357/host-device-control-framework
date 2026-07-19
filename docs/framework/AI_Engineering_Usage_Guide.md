@@ -1,17 +1,17 @@
 # AI Engineering Usage Guide
 
-## Operating Rules for AI-Assisted Design, Generation, Review, and Validation
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`  
 **Document ID:** AIEUG  
-**Document Version:** v1.0.14  
+**Document Version:** v1.0.15  
 **Status:** Draft for Review  
 **Document Type:** AI Usage and Authority Routing Guide  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
-**Supersedes Document Version:** v1.0.13  
+**Repository Role:** Proposed normative AI task-routing and repository-governance authority  
+**Supersedes Document Version:** v1.0.14  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -33,6 +33,8 @@ All third-party standards, publications, trademarks, source code, licenses, and 
 the property of their respective owners. References to third-party materials do not imply ownership,
 endorsement, affiliation, or authorization.
 
+
+## Operating Rules for AI-Assisted Design, Generation, Review, and Validation
 ---
 
 # 0. Purpose
@@ -91,23 +93,24 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 ## 0.1 Version History
 
-| Version | Date | Description |
-|---|---|---|
-| v1.0.0 | 2026-07-18 | Established the AI-consumable repository positioning, authority priority, task routing, required AI inputs and outputs, prohibited behaviors, review severity, evidence requirements, prompt pattern, standard workflows, human approval boundary, completion checklist, and Baseline decisions. |
-| v1.0.1 | 2026-07-18 | Corrected the authority model so the Application Analysis Template governs the analysis method rather than Product decisions; separated normative design authority from as-built evidence; added an active baseline manifest, full-context and version-integrity rules, source-trust and prompt-injection boundaries, controlled deviation handling, validation-evidence states, artifact-status approval rules, Coordinator/non-C implementation and engineering-tooling task routes, and explicit prohibition of fabricated test results or self-approved Baselines. Changed the document status to Draft for Review pending human approval and cross-document reference reconciliation. |
-| v1.0.2 | 2026-07-18 | Adopted stable canonical Markdown filenames and the rule that document versions belong in metadata, Version History, Git history, tags, and Releases rather than maintained filenames; updated the Active Baseline Manifest and all task-routing examples to canonical paths; and retained Draft for Review status pending human approval. |
-| v1.0.3 | 2026-07-18 | Renamed the current-version table from Active Baseline Manifest to Active Document Manifest so it may accurately include Draft for Review material; clarified that only Baseline and Final Baseline artifacts have completed human approval; synchronized README and copyright approval wording; and retained Draft for Review status pending human approval. |
-| v1.0.4 | 2026-07-18 | Updated the Active Document Manifest for the corrected Framework, Application Analysis, Protocol Guide, and Protocol Template versions; made the Guide's routing effect explicitly provisional while its status remains Draft for Review; added derived-conformance-summary handling; and replaced generic cross-language wording with cross-implementation validation plus language-pair testing when applicable. |
-| v1.0.5 | 2026-07-18 | Updated active Framework and Application Analysis versions; refined stable filename routing to distinguish maintained repository authority paths from immutable versioned release, audit, external-delivery, and detached-snapshot filenames; required source commit/tag/Release traceability for detached artifacts; and preserved Draft for Review status. |
-| v1.0.6 | 2026-07-18 | Updated the Active Document Manifest for Application Analysis Template v1.0.8; clarified that Template authoring-reference versions do not prove Project compatibility; required AI to leave minimum-compatible versions unresolved until supported by comparison evidence; and retained Draft for Review status. |
-| v1.0.7 | 2026-07-18 | Updated routing for Framework v1.0.7, Application Analysis v1.0.9, Protocol Guide v1.0.7, and Protocol Template v1.0.7; required AI to reject unresolved security sentinels, public permanent identity disclosure, incomplete Counter/Rekey lifecycle, Handshake Profile confusion or downgrade, ambiguous signature encoding, conflicting `minimum_length`, and conflated plaintext/secured/Transport size domains; retained Draft for Review status. |
-| v1.0.8 | 2026-07-18 | Updated routing for Framework v1.0.8, Application Analysis v1.0.10, Protocol Guide v1.0.8, and Protocol Template v1.0.8; required AI to reject incomplete Fragment wire contracts, opaque security-critical Handshake payloads, numeric Profile-ID strength ordering, unauthorised Update resume across Session changes, and zero-byte minimum-MTU Fragment payloads; retained Draft for Review status. |
-| v1.0.9 | 2026-07-18 | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 into Related Documents, the Active Document Manifest, canonical repository paths, topic authority routing, Coordinator and C# implementation workflows, engineering-tooling routing, completion checks, and Draft decisions; retained Draft for Review status pending human approval. |
-| v1.0.10 | 2026-07-18 | Updated active Framework routing to v1.0.10, Application Analysis routing to v1.0.12, and Coordinator and C# authority versions to v1.0.2 after clarifying proposed Draft authority, conditional Coordinator applicability for C# AI tasks, the recommended Coordinator project-structure scope, and lowercase document-version notation; retained Draft for Review status pending human approval. |
-| v1.0.11 | 2026-07-18 | Made implementation routing role-first and language-second; removed the Embedded C equals Node and non-C equals Coordinator assumptions; clarified topic ownership before precedence; made Draft Coordinator and C# authorities conditional on explicit Project adoption; integrated repository validation tooling and checklist routing; added detached-package manifest and hash requirements; and retained Draft for Review status pending human approval. |
-| v1.0.12 | 2026-07-18 | Updated active routing for Framework Application Analysis Template v1.0.14 and Repository Validation Checklist v1.0.1 after completing Authority Boundary coverage and repository-validation enforcement; retained Draft for Review status pending human approval. |
-| v1.0.13 | 2026-07-18 | Updated active routing for Repository Validation Checklist v1.0.2 after hardening metadata governance, semantic-version and declared Supersedes-chain checks, Python 3.10 and 3.12 CI coverage, current GitHub Action versions, and validator regression tests; retained Draft for Review status pending human approval. |
-| v1.0.14 | 2026-07-19 | Updated the active authority manifest after adding mandatory Supersedes metadata across governed documents and strengthening fenced-content, metadata-region, Workflow YAML, Markdown-link, directory-index, extension, and validator-regression controls; retained Draft for Review status pending human approval. |
+| Version | Date | Status | Description |
+| --- | --- | --- | --- |
+| v1.0.0 | 2026-07-18 | Not recorded | Established the AI-consumable repository positioning, authority priority, task routing, required AI inputs and outputs, prohibited behaviors, review severity, evidence requirements, prompt pattern, standard workflows, human approval boundary, completion checklist, and Baseline decisions. |
+| v1.0.1 | 2026-07-18 | Not recorded | Corrected the authority model so the Application Analysis Template governs the analysis method rather than Product decisions; separated normative design authority from as-built evidence; added an active baseline manifest, full-context and version-integrity rules, source-trust and prompt-injection boundaries, controlled deviation handling, validation-evidence states, artifact-status approval rules, Coordinator/non-C implementation and engineering-tooling task routes, and explicit prohibition of fabricated test results or self-approved Baselines. Changed the document status to Draft for Review pending human approval and cross-document reference reconciliation. |
+| v1.0.2 | 2026-07-18 | Not recorded | Adopted stable canonical Markdown filenames and the rule that document versions belong in metadata, Version History, Git history, tags, and Releases rather than maintained filenames; updated the Active Baseline Manifest and all task-routing examples to canonical paths; and retained Draft for Review status pending human approval. |
+| v1.0.3 | 2026-07-18 | Not recorded | Renamed the current-version table from Active Baseline Manifest to Active Document Manifest so it may accurately include Draft for Review material; clarified that only Baseline and Final Baseline artifacts have completed human approval; synchronized README and copyright approval wording; and retained Draft for Review status pending human approval. |
+| v1.0.4 | 2026-07-18 | Not recorded | Updated the Active Document Manifest for the corrected Framework, Application Analysis, Protocol Guide, and Protocol Template versions; made the Guide's routing effect explicitly provisional while its status remains Draft for Review; added derived-conformance-summary handling; and replaced generic cross-language wording with cross-implementation validation plus language-pair testing when applicable. |
+| v1.0.5 | 2026-07-18 | Not recorded | Updated active Framework and Application Analysis versions; refined stable filename routing to distinguish maintained repository authority paths from immutable versioned release, audit, external-delivery, and detached-snapshot filenames; required source commit/tag/Release traceability for detached artifacts; and preserved Draft for Review status. |
+| v1.0.6 | 2026-07-18 | Not recorded | Updated the Active Document Manifest for Application Analysis Template v1.0.8; clarified that Template authoring-reference versions do not prove Project compatibility; required AI to leave minimum-compatible versions unresolved until supported by comparison evidence; and retained Draft for Review status. |
+| v1.0.7 | 2026-07-18 | Not recorded | Updated routing for Framework v1.0.7, Application Analysis v1.0.9, Protocol Guide v1.0.7, and Protocol Template v1.0.7; required AI to reject unresolved security sentinels, public permanent identity disclosure, incomplete Counter/Rekey lifecycle, Handshake Profile confusion or downgrade, ambiguous signature encoding, conflicting `minimum_length`, and conflated plaintext/secured/Transport size domains; retained Draft for Review status. |
+| v1.0.8 | 2026-07-18 | Not recorded | Updated routing for Framework v1.0.8, Application Analysis v1.0.10, Protocol Guide v1.0.8, and Protocol Template v1.0.8; required AI to reject incomplete Fragment wire contracts, opaque security-critical Handshake payloads, numeric Profile-ID strength ordering, unauthorised Update resume across Session changes, and zero-byte minimum-MTU Fragment payloads; retained Draft for Review status. |
+| v1.0.9 | 2026-07-18 | Not recorded | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 into Related Documents, the Active Document Manifest, canonical repository paths, topic authority routing, Coordinator and C# implementation workflows, engineering-tooling routing, completion checks, and Draft decisions; retained Draft for Review status pending human approval. |
+| v1.0.10 | 2026-07-18 | Not recorded | Updated active Framework routing to v1.0.10, Application Analysis routing to v1.0.12, and Coordinator and C# authority versions to v1.0.2 after clarifying proposed Draft authority, conditional Coordinator applicability for C# AI tasks, the recommended Coordinator project-structure scope, and lowercase document-version notation; retained Draft for Review status pending human approval. |
+| v1.0.11 | 2026-07-18 | Not recorded | Made implementation routing role-first and language-second; removed the Embedded C equals Node and non-C equals Coordinator assumptions; clarified topic ownership before precedence; made Draft Coordinator and C# authorities conditional on explicit Project adoption; integrated repository validation tooling and checklist routing; added detached-package manifest and hash requirements; and retained Draft for Review status pending human approval. |
+| v1.0.12 | 2026-07-18 | Not recorded | Updated active routing for Framework Application Analysis Template v1.0.14 and Repository Validation Checklist v1.0.1 after completing Authority Boundary coverage and repository-validation enforcement; retained Draft for Review status pending human approval. |
+| v1.0.13 | 2026-07-18 | Not recorded | Updated active routing for Repository Validation Checklist v1.0.2 after hardening metadata governance, semantic-version and declared Supersedes-chain checks, Python 3.10 and 3.12 CI coverage, current GitHub Action versions, and validator regression tests; retained Draft for Review status pending human approval. |
+| v1.0.14 | 2026-07-19 | Not recorded | Updated the active authority manifest after adding mandatory Supersedes metadata across governed documents and strengthening fenced-content, metadata-region, Workflow YAML, Markdown-link, directory-index, extension, and validator-regression controls; retained Draft for Review status pending human approval. |
+| v1.0.15 | 2026-07-19 | Draft for Review | Added the machine-readable authority registry and synchronized identity, role, applicability, topic, prerequisite, manifest, workflow, history-schema, dependency-hash, and parser-governance controls; retained Draft for Review status pending human approval. |
 
 ## 0.2 Active Document Manifest
 
@@ -115,17 +118,19 @@ This Draft is the proposed version-routing entry point for AI use of this reposi
 Baseline, its routing is provisional and shall not override direct human instructions or the approved topic authority
 of the documents listed below.
 
+The machine-readable `authority-registry.yaml` is the identity and routing-metadata source for this manifest. The human-readable table shall not redefine or silently diverge from the registry.
+
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.14` | Draft for Review | AI authority routing and operating controls |
-| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.0.12` | Baseline | Reusable architecture and governance |
-| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.0.15` | Baseline | Application-analysis method and required records |
-| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.0.9` | Baseline | Protocol YAML semantics and validation rules |
-| Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.0.9` | Baseline | Reusable Project Protocol starting structure |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.15` | Draft for Review | AI authority routing and operating controls |
+| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.0.13` | Baseline | Reusable architecture and governance |
+| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.0.16` | Baseline | Application-analysis method and required records |
+| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.0.10` | Baseline | Protocol YAML semantics and validation rules |
+| Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.0.10` | Baseline | Reusable Project Protocol starting structure |
 | Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.0.4` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
-| Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.16` | Final Baseline | Product-owned Embedded C implementation rules |
+| Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.17` | Final Baseline | Product-owned Embedded C implementation rules |
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.3` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.4` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
 
 Version-routing rules:
 

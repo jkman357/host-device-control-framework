@@ -1,17 +1,17 @@
 # Coordinator/Node Cross-Platform Embedded Control Framework
 
-## Architecture, Communication, Security, Real-Time Behavior, Firmware Update, and Engineering Governance Baseline
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.12  
+**Document Version:** v1.0.13  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.11  
+**Supersedes Document Version:** v1.0.12  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
+**Repository Role:** Normative architecture and framework-governance authority  
 **Related Documents:**
 - `Coordinator_Software_Engineering_Rules.md`
 - `Embedded_C_Coding_Rules.md`
@@ -32,6 +32,8 @@ All third-party standards, publications, trademarks, source code, licenses, and 
 the property of their respective owners. References to third-party materials do not imply ownership,
 endorsement, affiliation, or authorization.
 
+
+## Architecture, Communication, Security, Real-Time Behavior, Firmware Update, and Engineering Governance Baseline
 ---
 
 # 0. Document Control
@@ -254,21 +256,22 @@ Markdown filename.
 
 ## 0.5 Version History
 
-| Version | Date | Description |
-|---|---|---|
-| v1.0.0 | 2026-07-15 | Integrated the Embedded Device Control Framework v1.4.2 and Coordinator/Node Architecture v1.2.1 into one Master Baseline. |
-| v1.0.1 | 2026-07-15 | Removed duplicate Protocol/Transport text, corrected Part XI numbering, removed obsolete normative references, removed the duplicate Baseline conclusion, and completed structural and Markdown validation without changing design semantics. |
-| v1.0.2 | 2026-07-18 | Converted the complete Framework to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned terminology and authority boundaries with `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; clarified Telemetry versus Stream semantics, Protocol/Transport boundaries, Application/Bootloader Session separation, Firmware Update transaction identity, runtime Transport Profiles, structural rewrite governance, and public GitHub publication requirements. |
-| v1.0.3 | 2026-07-18 | Updated the active related-document references to `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; synchronized current authority references and version examples without changing architecture, Protocol, safety, security, Runtime, or governance semantics. |
-| v1.0.4 | 2026-07-18 | Adopted stable canonical Markdown filenames without embedded versions; moved document identity to metadata, Version History, Git history, tags, and Releases; updated all active cross-document references and examples to stable paths; moved historical snapshot preservation to Git and controlled archives rather than parallel versioned Markdown filenames; and preserved all architecture, Protocol, safety, security, Runtime, and governance semantics except for the filename-governance rule itself. |
-| v1.0.5 | 2026-07-18 | Clarified that generated Dispatcher output is Protocol plumbing and shall not contain Product control, state ownership, or hardware access; operationalized the one-authority rule through derived conformance summaries; and generalized interoperability requirements from fixed language pairs to all implementations and language pairs actually in scope. |
-| v1.0.6 | 2026-07-18 | Refined filename governance into a two-layer policy: maintained Markdown authority paths remain stable inside controlled Git repositories, while immutable release artifacts, audit packages, external deliverables, and detached snapshots include an approved document version or Baseline identifier in the distributed filename; required detached artifacts to carry source commit, tag, or Release traceability; and preserved all architecture and Protocol semantics. |
-| v1.0.7 | 2026-07-18 | Closed the remaining machine-verifiable security and Transport-envelope gaps: required minimal ephemeral public Discovery and authenticated revalidation; bound Handshake Profile selection and complete canonical transcripts against downgrade and profile confusion; required per-Key-Context Record Counter/Rekey profiles; defined exact canonical Firmware signature encodings; clarified fixed-prefix `minimum_length`; and separated plaintext Message, security overhead, secured Record, reassembly, and Fragment size domains. |
-| v1.0.8 | 2026-07-18 | Closed the remaining machine-verifiable Protocol-contract gaps by requiring an exact Fragment Header and bounded reassembly policies, concrete named Handshake request/response payloads, explicit Profile allowlists and security-level/deprecation metadata instead of numeric ID ordering, cryptographically authorized Firmware Update resume across Session changes, and a positive data-bearing Fragment payload at every supported minimum MTU. |
-| v1.0.9 | 2026-07-18 | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 into Related Documents, the authority boundary, stable document identity, Baseline decisions, and the Authority Matrix; clarified that reusable Coordinator engineering rules and language-specific implementation rules remain subordinate to this Framework, approved Product requirements, and Project-specific design. |
-| v1.0.10 | 2026-07-18 | Normalized document-version notation for the Coordinator and C# rule references and aligned the active Draft engineering-rule set with v1.0.2; no reusable architecture, Protocol, safety, security, Runtime, or governance semantics changed. |
-| v1.0.11 | 2026-07-18 | Clarified that programming languages do not determine Coordinator, Node, Tool, or Service roles; made the Draft Coordinator and C# rules applicable only after explicit Project adoption or approval; marked their Authority Matrix entries as proposed while Draft; and added repository validation and detached-package traceability expectations without changing Protocol wire semantics. |
-| v1.0.12 | 2026-07-19 | Added explicit Supersedes metadata required by repository governance; no normative Framework architecture requirements changed. |
+| Version | Date | Status | Description |
+| --- | --- | --- | --- |
+| v1.0.0 | 2026-07-15 | Not recorded | Integrated the Embedded Device Control Framework v1.4.2 and Coordinator/Node Architecture v1.2.1 into one Master Baseline. |
+| v1.0.1 | 2026-07-15 | Not recorded | Removed duplicate Protocol/Transport text, corrected Part XI numbering, removed obsolete normative references, removed the duplicate Baseline conclusion, and completed structural and Markdown validation without changing design semantics. |
+| v1.0.2 | 2026-07-18 | Not recorded | Converted the complete Framework to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned terminology and authority boundaries with `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; clarified Telemetry versus Stream semantics, Protocol/Transport boundaries, Application/Bootloader Session separation, Firmware Update transaction identity, runtime Transport Profiles, structural rewrite governance, and public GitHub publication requirements. |
+| v1.0.3 | 2026-07-18 | Not recorded | Updated the active related-document references to `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; synchronized current authority references and version examples without changing architecture, Protocol, safety, security, Runtime, or governance semantics. |
+| v1.0.4 | 2026-07-18 | Not recorded | Adopted stable canonical Markdown filenames without embedded versions; moved document identity to metadata, Version History, Git history, tags, and Releases; updated all active cross-document references and examples to stable paths; moved historical snapshot preservation to Git and controlled archives rather than parallel versioned Markdown filenames; and preserved all architecture, Protocol, safety, security, Runtime, and governance semantics except for the filename-governance rule itself. |
+| v1.0.5 | 2026-07-18 | Not recorded | Clarified that generated Dispatcher output is Protocol plumbing and shall not contain Product control, state ownership, or hardware access; operationalized the one-authority rule through derived conformance summaries; and generalized interoperability requirements from fixed language pairs to all implementations and language pairs actually in scope. |
+| v1.0.6 | 2026-07-18 | Not recorded | Refined filename governance into a two-layer policy: maintained Markdown authority paths remain stable inside controlled Git repositories, while immutable release artifacts, audit packages, external deliverables, and detached snapshots include an approved document version or Baseline identifier in the distributed filename; required detached artifacts to carry source commit, tag, or Release traceability; and preserved all architecture and Protocol semantics. |
+| v1.0.7 | 2026-07-18 | Not recorded | Closed the remaining machine-verifiable security and Transport-envelope gaps: required minimal ephemeral public Discovery and authenticated revalidation; bound Handshake Profile selection and complete canonical transcripts against downgrade and profile confusion; required per-Key-Context Record Counter/Rekey profiles; defined exact canonical Firmware signature encodings; clarified fixed-prefix `minimum_length`; and separated plaintext Message, security overhead, secured Record, reassembly, and Fragment size domains. |
+| v1.0.8 | 2026-07-18 | Not recorded | Closed the remaining machine-verifiable Protocol-contract gaps by requiring an exact Fragment Header and bounded reassembly policies, concrete named Handshake request/response payloads, explicit Profile allowlists and security-level/deprecation metadata instead of numeric ID ordering, cryptographically authorized Firmware Update resume across Session changes, and a positive data-bearing Fragment payload at every supported minimum MTU. |
+| v1.0.9 | 2026-07-18 | Not recorded | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 into Related Documents, the authority boundary, stable document identity, Baseline decisions, and the Authority Matrix; clarified that reusable Coordinator engineering rules and language-specific implementation rules remain subordinate to this Framework, approved Product requirements, and Project-specific design. |
+| v1.0.10 | 2026-07-18 | Not recorded | Normalized document-version notation for the Coordinator and C# rule references and aligned the active Draft engineering-rule set with v1.0.2; no reusable architecture, Protocol, safety, security, Runtime, or governance semantics changed. |
+| v1.0.11 | 2026-07-18 | Not recorded | Clarified that programming languages do not determine Coordinator, Node, Tool, or Service roles; made the Draft Coordinator and C# rules applicable only after explicit Project adoption or approval; marked their Authority Matrix entries as proposed while Draft; and added repository validation and detached-package traceability expectations without changing Protocol wire semantics. |
+| v1.0.12 | 2026-07-19 | Not recorded | Added explicit Supersedes metadata required by repository governance; no normative Framework architecture requirements changed. |
+| v1.0.13 | 2026-07-19 | Baseline | Added explicit Repository Role metadata and migrated Version History to the governed Date/Status schema; no normative Framework architecture requirements changed. |
 
 ## 0.6 Core Conclusions
 

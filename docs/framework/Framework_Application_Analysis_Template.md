@@ -1,17 +1,17 @@
 # Framework Application Analysis Template
 
-## Reusable Method for Applying the Coordinator/Node Framework to a New Application
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.15  
+**Document Version:** v1.0.16  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.14  
+**Supersedes Document Version:** v1.0.15  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
+**Repository Role:** Normative framework-application analysis method  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Coordinator_Software_Engineering_Rules.md`
@@ -32,6 +32,8 @@ All third-party standards, publications, trademarks, source code, licenses, and 
 the property of their respective owners. References to third-party materials do not imply ownership,
 endorsement, affiliation, or authorization.
 
+
+## Reusable Method for Applying the Coordinator/Node Framework to a New Application
 ---
 
 # 0. Document Control
@@ -78,24 +80,25 @@ Other Coordinator/Node applications
 
 ## 0.2 Version History
 
-| Version | Date | Author | Description |
-|---|---|---|---|
-| v1.0.0 | 2026-07-15 | Ray Yang | Established the initial reusable Application Analysis template. |
-| v1.0.1 | 2026-07-15 | Ray Yang | Added Security and Access Control analysis, Framework compatibility revalidation, and Gap owner/status tracking. |
-| v1.0.2 | 2026-07-15 | Ray Yang | Corrected Section 20 Final Output Format numbering. |
-| v1.0.3 | 2026-07-18 | Ray Yang | Converted the complete template to English; added repository identity, copyright, personal-project clarification, and third-party-material notice; aligned the analysis method with `Coordinator_Node_Control_Framework.md`, `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; removed the obsolete independent Protocol YAML skeleton; separated Telemetry and Stream analysis; added Transport Profile, timing, bandwidth, resource, safety, Application/Bootloader Session, Firmware Update transaction, Code Generation, validation-evidence, structural-rewrite, decision-register, and completion-gate requirements. |
-| v1.0.4 | 2026-07-18 | Ray Yang | Restored and modernized the reusable Command, Data Field, State, UI Page, Framework Gap, Review Question, and detailed completion-checklist appendices that were unintentionally omitted during the v1.0.3 structural rewrite; added the Bootloader/Update responsibility column; made signed Firmware image verification mandatory whenever Firmware Update is in scope; expanded placeholder guidance and source-input coverage; and synchronized the Baseline Decision Summary and structural validation. |
-| v1.0.5 | 2026-07-18 | Ray Yang | Adopted the stable canonical filename `Framework_Application_Analysis_Template.md`; updated all active authority and example-document references to canonical paths; aligned the default validated document versions with the current document set; and preserved the analysis method, templates, completion gates, and technical decisions without behavioral change. |
-| v1.0.6 | 2026-07-18 | Ray Yang | Corrected the completed-analysis stable filename rule; separated Telemetry replacement semantics from delivery queue policy; split Secure Session responsibility into peer-local Coordinator, Node, and Bootloader ownership; updated active Framework and Protocol versions; clarified cross-implementation and cross-language validation; and labeled repeated non-owning requirements as derived conformance summaries. |
-| v1.0.7 | 2026-07-18 | Ray Yang | Distinguished minimum-compatible authority versions from the actual authority versions used for an analysis; separated the stable repository working filename from immutable release, audit, external-delivery, and detached-snapshot filenames; added source commit/tag/Release traceability fields; synchronized the default current Framework Baseline to v1.0.6; and clarified downstream citation requirements without changing the analysis method. |
-| v1.0.8 | 2026-07-18 | Ray Yang | Clarified that authority versions shown by the reusable Template are authoring references rather than automatic Product compatibility decisions; changed Project minimum-compatible and version-used fields to explicit completion-time inputs; required compatibility evidence before claiming an earlier minimum version; and corrected review-package traceability without changing the analysis architecture or dual filename policy. |
-| v1.0.9 | 2026-07-18 | Ray Yang | Added Product-analysis records for public Discovery privacy, rate limiting, transcript binding, and authenticated revalidation; concrete Handshake and downgrade policy; per-Key-Context Record Counter/Rekey lifecycle; exact Firmware signature encoding; fixed-prefix `minimum_length`; and distinct plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets. Updated authoring-reference versions without changing the Project-specific compatibility-evidence rule. |
-| v1.0.10 | 2026-07-18 | Ray Yang | Added Product-analysis records and acceptance questions for exact Fragment Header and reassembly behavior, concrete named Handshake wire structs, Profile allowlist/security-level/deprecation selection, Firmware Update resume authorization bound to transaction/Manifest/Device/Host, and positive minimum-MTU Fragment payload; synchronized authoring-reference versions. |
-| v1.0.11 | 2026-07-18 | Ray Yang | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 as conditional Product-analysis authorities; added authoring references, Existing Framework Baseline records, Draft-authority approval handling, detailed completion checks, and Baseline decisions so Coordinator and C# applicability, version, evidence, deviation, or `N/A` rationale cannot be omitted. |
-| v1.0.12 | 2026-07-18 | Ray Yang | Updated the Framework authoring reference to v1.0.10 and the Coordinator and C# authoring references to v1.0.2 after Draft-authority, conditional-applicability, and document-version-format clarification; preserved the existing Product-specific compatibility-evidence and approval requirements. |
-| v1.0.13 | 2026-07-18 | Ray Yang | Updated authoring references for Framework v1.0.11 and Draft Coordinator/C# rules v1.0.3; required role classification before language selection; prohibited using implementation language as a role proxy; added repository validation and package-traceability evidence to completion checks; and preserved all Product-specific decisions as unresolved until completed by a Project. |
-| v1.0.14 | 2026-07-18 | Ray Yang | Completed the Authority Boundary table by adding conditional authority ownership for cross-language Coordinator software engineering and Product-owned C# implementation; clarified that Draft authorities require explicit Project adoption or approved deviation; and preserved all existing application-analysis decisions and completion requirements. |
-| v1.0.15 | 2026-07-19 | Ray Yang | Updated authoring-reference versions after repository-wide Supersedes metadata completion; no Product-specific analysis conclusion was added. |
+| Version | Date | Status | Author | Description |
+| --- | --- | --- | --- | --- |
+| v1.0.0 | 2026-07-15 | Not recorded | Ray Yang | Established the initial reusable Application Analysis template. |
+| v1.0.1 | 2026-07-15 | Not recorded | Ray Yang | Added Security and Access Control analysis, Framework compatibility revalidation, and Gap owner/status tracking. |
+| v1.0.2 | 2026-07-15 | Not recorded | Ray Yang | Corrected Section 20 Final Output Format numbering. |
+| v1.0.3 | 2026-07-18 | Not recorded | Ray Yang | Converted the complete template to English; added repository identity, copyright, personal-project clarification, and third-party-material notice; aligned the analysis method with `Coordinator_Node_Control_Framework.md`, `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; removed the obsolete independent Protocol YAML skeleton; separated Telemetry and Stream analysis; added Transport Profile, timing, bandwidth, resource, safety, Application/Bootloader Session, Firmware Update transaction, Code Generation, validation-evidence, structural-rewrite, decision-register, and completion-gate requirements. |
+| v1.0.4 | 2026-07-18 | Not recorded | Ray Yang | Restored and modernized the reusable Command, Data Field, State, UI Page, Framework Gap, Review Question, and detailed completion-checklist appendices that were unintentionally omitted during the v1.0.3 structural rewrite; added the Bootloader/Update responsibility column; made signed Firmware image verification mandatory whenever Firmware Update is in scope; expanded placeholder guidance and source-input coverage; and synchronized the Baseline Decision Summary and structural validation. |
+| v1.0.5 | 2026-07-18 | Not recorded | Ray Yang | Adopted the stable canonical filename `Framework_Application_Analysis_Template.md`; updated all active authority and example-document references to canonical paths; aligned the default validated document versions with the current document set; and preserved the analysis method, templates, completion gates, and technical decisions without behavioral change. |
+| v1.0.6 | 2026-07-18 | Not recorded | Ray Yang | Corrected the completed-analysis stable filename rule; separated Telemetry replacement semantics from delivery queue policy; split Secure Session responsibility into peer-local Coordinator, Node, and Bootloader ownership; updated active Framework and Protocol versions; clarified cross-implementation and cross-language validation; and labeled repeated non-owning requirements as derived conformance summaries. |
+| v1.0.7 | 2026-07-18 | Not recorded | Ray Yang | Distinguished minimum-compatible authority versions from the actual authority versions used for an analysis; separated the stable repository working filename from immutable release, audit, external-delivery, and detached-snapshot filenames; added source commit/tag/Release traceability fields; synchronized the default current Framework Baseline to v1.0.6; and clarified downstream citation requirements without changing the analysis method. |
+| v1.0.8 | 2026-07-18 | Not recorded | Ray Yang | Clarified that authority versions shown by the reusable Template are authoring references rather than automatic Product compatibility decisions; changed Project minimum-compatible and version-used fields to explicit completion-time inputs; required compatibility evidence before claiming an earlier minimum version; and corrected review-package traceability without changing the analysis architecture or dual filename policy. |
+| v1.0.9 | 2026-07-18 | Not recorded | Ray Yang | Added Product-analysis records for public Discovery privacy, rate limiting, transcript binding, and authenticated revalidation; concrete Handshake and downgrade policy; per-Key-Context Record Counter/Rekey lifecycle; exact Firmware signature encoding; fixed-prefix `minimum_length`; and distinct plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets. Updated authoring-reference versions without changing the Project-specific compatibility-evidence rule. |
+| v1.0.10 | 2026-07-18 | Not recorded | Ray Yang | Added Product-analysis records and acceptance questions for exact Fragment Header and reassembly behavior, concrete named Handshake wire structs, Profile allowlist/security-level/deprecation selection, Firmware Update resume authorization bound to transaction/Manifest/Device/Host, and positive minimum-MTU Fragment payload; synchronized authoring-reference versions. |
+| v1.0.11 | 2026-07-18 | Not recorded | Ray Yang | Integrated `Coordinator_Software_Engineering_Rules.md` v1.0.1 and `CSharp_Coding_Rules.md` v1.0.1 as conditional Product-analysis authorities; added authoring references, Existing Framework Baseline records, Draft-authority approval handling, detailed completion checks, and Baseline decisions so Coordinator and C# applicability, version, evidence, deviation, or `N/A` rationale cannot be omitted. |
+| v1.0.12 | 2026-07-18 | Not recorded | Ray Yang | Updated the Framework authoring reference to v1.0.10 and the Coordinator and C# authoring references to v1.0.2 after Draft-authority, conditional-applicability, and document-version-format clarification; preserved the existing Product-specific compatibility-evidence and approval requirements. |
+| v1.0.13 | 2026-07-18 | Not recorded | Ray Yang | Updated authoring references for Framework v1.0.11 and Draft Coordinator/C# rules v1.0.3; required role classification before language selection; prohibited using implementation language as a role proxy; added repository validation and package-traceability evidence to completion checks; and preserved all Product-specific decisions as unresolved until completed by a Project. |
+| v1.0.14 | 2026-07-18 | Not recorded | Ray Yang | Completed the Authority Boundary table by adding conditional authority ownership for cross-language Coordinator software engineering and Product-owned C# implementation; clarified that Draft authorities require explicit Project adoption or approved deviation; and preserved all existing application-analysis decisions and completion requirements. |
+| v1.0.15 | 2026-07-19 | Not recorded | Ray Yang | Updated authoring-reference versions after repository-wide Supersedes metadata completion; no Product-specific analysis conclusion was added. |
+| v1.0.16 | 2026-07-19 | Baseline | Ray Yang | Added explicit Repository Role metadata and migrated Version History to the governed Date/Status schema; no Product-analysis method or required evidence record changed. |
 
 ## 0.3 Template Usage Convention
 

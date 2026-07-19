@@ -8,6 +8,8 @@ Individual authority documents retain their own internal Version History and app
 
 ### Added
 
+- Added `authority-registry.yaml` as the machine-readable source for authority identity, role, applicability, topics, prerequisites, README purpose, and AI routing-role metadata.
+- Added SHA-256 hashes for the PyYAML source distribution and the Python 3.10/3.12 Linux x86-64 CI wheels.
 - Added categorized documentation directories for Framework, Protocol, Coordinator, Coding Rules, and Validation.
 - Added directory-level `README.md` files to define each documentation domain and its authority boundary.
 - Added `CHANGELOG.md`, `LICENSE`, and `NOTICE.md` at the repository root.
@@ -21,6 +23,12 @@ Individual authority documents retain their own internal Version History and app
 
 ### Changed
 
+- Hardened governed-document metadata with Status enums, mandatory Repository Role, compatible Status/Role combinations, and placement before the first level-2 heading.
+- Excluded fenced and HTML `pre`/`code`/`script`/`style` examples from metadata, manifest, Version History, link, and anchor parsing.
+- Required exact, separate, unconditional Workflow steps and hash-verified dependency installation.
+- Required unique Current Document Set and Active Document Manifest headings and validated their descriptive fields against the authority registry.
+- Migrated governed Version History tables to Date/Status schemas, retained `Not recorded` for unavailable legacy facts, and added complete row, real-date, status, and ordering checks.
+- Updated AI Engineering Usage Guide to v1.0.15, Coordinator/Node Control Framework to v1.0.13, Framework Application Analysis Template to v1.0.16, Protocol YAML Definition Guide and Template to v1.0.10, Embedded C Coding Rules to v1.0.17, and Repository Validation Checklist to v1.0.4.
 - Reorganized Framework and application-analysis documents under `docs/framework/`.
 - Reorganized Protocol documents under `docs/protocol/`.
 - Reorganized Coordinator software engineering rules under `docs/coordinator/`.

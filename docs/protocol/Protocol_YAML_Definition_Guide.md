@@ -1,12 +1,11 @@
 # Protocol YAML Definition Guide
 
-## Coordinator/Node Protocol Schema Authoring, Validation, Code Generation, and Governance Baseline
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.0.9  
+**Document Version:** v1.0.10  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.8  
+**Supersedes Document Version:** v1.0.9  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
@@ -15,6 +14,7 @@
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
+**Repository Role:** Normative Protocol YAML definition and governance authority  
 **First Issued:** 2026-07-15  
 **Last Revised:** 2026-07-19  
 Copyright © 2026 Ray Yang. All rights reserved.
@@ -26,6 +26,8 @@ All third-party standards, publications, trademarks, source code, licenses, and 
 the property of their respective owners. References to third-party materials do not imply ownership,
 endorsement, affiliation, or authorization.
 
+
+## Coordinator/Node Protocol Schema Authoring, Validation, Code Generation, and Governance Baseline
 ---
 
 ## 0. Document Control
@@ -194,18 +196,19 @@ The keywords in this document have the following meanings:
 
 ### 0.6 Version History
 
-| Version | Date | Description |
-|---|---|---|
-| v1.0.0 | 2026-07-15 | Established the general Protocol YAML Definition Guide, including data models, Messages, versioning, security, Transport, Code Generation, Lint, Test Vectors, and governance rules. |
-| v1.0.1 | 2026-07-15 | Corrected the inconsistency between a Framework Message ID example and the recommended allocation range; explicitly separated the Message, Capability, Service, Namespace, Error, Enum, and Bitset registries and their uniqueness scopes; and strengthened Semantic Lint, quick-reference, and Baseline decisions. |
-| v1.0.2 | 2026-07-18 | Converted the complete guide to English; established Ray Yang as Author and Maintainer; added repository identity, copyright, personal-project clarification, and third-party-material notice; normalized terminology, punctuation, headings, examples, and checklists; and preserved the v1.0.1 technical baseline decisions. |
-| v1.0.3 | 2026-07-18 | Defined the normative decision boundary between `telemetry` and `stream`; added a complete `category: telemetry` YAML example; required telemetry cadence, replacement, priority, and maximum-plaintext-message-size policies; clarified when sequence and timestamp fields are required; and synchronized Semantic Lint, Project Adoption Checklist, Quick Reference, and Baseline Decision Summary. |
-| v1.0.4 | 2026-07-18 | Updated the active Framework, Template, and Application Analysis references to `Coordinator_Node_Control_Framework.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; corrected the companion-artifact wording now that the Template exists; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
-| v1.0.5 | 2026-07-18 | Adopted the stable canonical filename `Protocol_YAML_Definition_Guide.md`; updated active Framework, Template, and Application Analysis references to canonical paths; retained version identity in document metadata and Git history; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
-| v1.0.6 | 2026-07-18 | Corrected the Telemetry replacement model by separating replacement semantics from queue discipline; required explicit per-Message security and deterministic direction/environment Key Context mapping; defined Application and Bootloader Handshake profiles and pre-Session protection; made signed canonical Firmware Manifest transfer mandatory when Firmware Update is in scope; added computed minimum/maximum length and Runtime Effective Profile Lint rules; and clarified cross-implementation versus cross-language interoperability. |
-| v1.0.7 | 2026-07-18 | Closed the remaining security and sizing ambiguities: required unresolved-security sentinel rejection; defined privacy-preserving bounded public Discovery and authenticated revalidation; made Record Counter and Rekey lifecycle machine-verifiable per Key Context; bound Handshake Profile selection and canonical transcript fields to prevent profile confusion and downgrade; required exact canonical Firmware signature encodings; fixed `minimum_length` to the fixed decoding prefix; and separated plaintext Message, secured Record, Transport reassembly, and Fragment payload limits. |
-| v1.0.8 | 2026-07-18 | Required an exact machine-verifiable Fragment Header and complete reassembly behavior; prohibited opaque security-critical Handshake payloads and required named canonical request/response structs; replaced numeric Profile-ID downgrade ordering with explicit allowlists, preference, security level, and deprecation state; defined Device-issued Firmware Update resume authorization bound to transaction, Manifest, Device, Host, and security version; and required a positive data-bearing payload at the minimum MTU. |
-| v1.0.9 | 2026-07-19 | Added explicit Supersedes metadata required by repository governance; no normative Protocol YAML definition rules changed. |
+| Version | Date | Status | Description |
+| --- | --- | --- | --- |
+| v1.0.0 | 2026-07-15 | Not recorded | Established the general Protocol YAML Definition Guide, including data models, Messages, versioning, security, Transport, Code Generation, Lint, Test Vectors, and governance rules. |
+| v1.0.1 | 2026-07-15 | Not recorded | Corrected the inconsistency between a Framework Message ID example and the recommended allocation range; explicitly separated the Message, Capability, Service, Namespace, Error, Enum, and Bitset registries and their uniqueness scopes; and strengthened Semantic Lint, quick-reference, and Baseline decisions. |
+| v1.0.2 | 2026-07-18 | Not recorded | Converted the complete guide to English; established Ray Yang as Author and Maintainer; added repository identity, copyright, personal-project clarification, and third-party-material notice; normalized terminology, punctuation, headings, examples, and checklists; and preserved the v1.0.1 technical baseline decisions. |
+| v1.0.3 | 2026-07-18 | Not recorded | Defined the normative decision boundary between `telemetry` and `stream`; added a complete `category: telemetry` YAML example; required telemetry cadence, replacement, priority, and maximum-plaintext-message-size policies; clarified when sequence and timestamp fields are required; and synchronized Semantic Lint, Project Adoption Checklist, Quick Reference, and Baseline Decision Summary. |
+| v1.0.4 | 2026-07-18 | Not recorded | Updated the active Framework, Template, and Application Analysis references to `Coordinator_Node_Control_Framework.md`, `Protocol_YAML_Template.md`, and `Framework_Application_Analysis_Template.md`; corrected the companion-artifact wording now that the Template exists; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
+| v1.0.5 | 2026-07-18 | Not recorded | Adopted the stable canonical filename `Protocol_YAML_Definition_Guide.md`; updated active Framework, Template, and Application Analysis references to canonical paths; retained version identity in document metadata and Git history; and preserved all Protocol YAML syntax, semantics, validation, compatibility, and governance rules without technical change. |
+| v1.0.6 | 2026-07-18 | Not recorded | Corrected the Telemetry replacement model by separating replacement semantics from queue discipline; required explicit per-Message security and deterministic direction/environment Key Context mapping; defined Application and Bootloader Handshake profiles and pre-Session protection; made signed canonical Firmware Manifest transfer mandatory when Firmware Update is in scope; added computed minimum/maximum length and Runtime Effective Profile Lint rules; and clarified cross-implementation versus cross-language interoperability. |
+| v1.0.7 | 2026-07-18 | Not recorded | Closed the remaining security and sizing ambiguities: required unresolved-security sentinel rejection; defined privacy-preserving bounded public Discovery and authenticated revalidation; made Record Counter and Rekey lifecycle machine-verifiable per Key Context; bound Handshake Profile selection and canonical transcript fields to prevent profile confusion and downgrade; required exact canonical Firmware signature encodings; fixed `minimum_length` to the fixed decoding prefix; and separated plaintext Message, secured Record, Transport reassembly, and Fragment payload limits. |
+| v1.0.8 | 2026-07-18 | Not recorded | Required an exact machine-verifiable Fragment Header and complete reassembly behavior; prohibited opaque security-critical Handshake payloads and required named canonical request/response structs; replaced numeric Profile-ID downgrade ordering with explicit allowlists, preference, security level, and deprecation state; defined Device-issued Firmware Update resume authorization bound to transaction, Manifest, Device, Host, and security version; and required a positive data-bearing payload at the minimum MTU. |
+| v1.0.9 | 2026-07-19 | Not recorded | Added explicit Supersedes metadata required by repository governance; no normative Protocol YAML definition rules changed. |
+| v1.0.10 | 2026-07-19 | Baseline | Added explicit Repository Role metadata and migrated Version History to the governed Date/Status schema; no normative Protocol YAML semantics changed. |
 
 ---
 
