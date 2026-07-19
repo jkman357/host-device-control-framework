@@ -37,6 +37,12 @@ Individual authority documents retain their own internal Version History and app
 
 ### Changed
 
+- Activated Draft 2020-12 Protocol schema validation before semantic linting and rejected duplicate YAML keys fail-closed.
+- Replaced workflow substring checks with structural validation of the required unconditional validation steps and commands.
+- Hardened governed-document metadata, Markdown fence, link, heading, filename-extension, Registry duplicate-key, and current `Unreleased` CHANGELOG validation.
+- Added regression coverage for the confirmed schema, workflow, metadata, Registry, filename, Markdown parsing, and CHANGELOG bypasses.
+- Added hash-pinned `jsonschema` and transitive validation dependencies for the supported Python validation environments.
+
 - Expanded the Framework, Application Analysis, Protocol YAML, compatibility, Registry, security, Coordinator, Node, and validation authorities into a complete Multi-Node baseline for independent point-to-point links, shared multidrop buses, and routed gateways.
 - Added the conditional `node_model` contract while preserving omission as the legacy Single-Node interpretation and avoiding a mandatory on-wire Node ID for connection-bound point-to-point links.
 - Defined stable Node identity, runtime address, route, connection generation, Protocol Session, Secure Session, correlation, lifecycle, broadcast, multi-target, resource-containment, and Firmware Update targeting semantics.
