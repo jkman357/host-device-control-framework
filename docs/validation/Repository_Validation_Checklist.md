@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`  
-**Document Version:** v1.0.4  
+**Document Version:** v1.0.5  
 **Status:** Draft for Review  
-**Supersedes Document Version:** v1.0.3  
+**Supersedes Document Version:** v1.0.4  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
@@ -20,6 +20,7 @@
 | v1.0.2 | 2026-07-18 | Draft for Review | Updated GitHub Actions to checkout v7 and setup-python v6; added Python 3.10 and 3.12 CI matrix validation; required complete metadata for every non-README Markdown document under docs; added semantic-version, current-version, ordering, and declared Supersedes-chain checks; and added automated validator regression tests. |
 | v1.0.3 | 2026-07-19 | Draft for Review | Closed validator parsing and governance bypasses by excluding fenced examples from metadata, Version History, and manifest parsing; requiring unique opening-region metadata and mandatory Supersedes chains; parsing Workflow YAML structurally; pinning Actions by immutable SHA; governing directory indexes and Markdown extensions; validating HTML and balanced-parenthesis links plus Setext anchors; and expanding persistent regression tests. |
 | v1.0.4 | 2026-07-19 | Draft for Review | Hardened Status and Repository Role governance, opening metadata placement, HTML code-example exclusion, exact Workflow step execution, critical-heading uniqueness, machine-readable authority-registry consistency, complete Version History row/date/status validation, true HTML-anchor parsing, dependency hash pinning, and persistent regression coverage. |
+| v1.0.5 | 2026-07-19 | Draft for Review | Required the exact authority-registry root schema and controlled GitHub-main source identity, rejected prerequisite dependency cycles, fixed the CI runner to ubuntu-24.04, and added persistent regression tests for all three controls. |
 
 ---
 
@@ -81,14 +82,16 @@ The automated validator shall check at least:
 - Exact set equality between versioned authority documents and the root Current Document Set.
 - Exact set equality between versioned authority documents and the AI Active Document Manifest.
 - `authority-registry.yaml` exactly covers governed documents and matches their path, version, Status, and Repository Role metadata.
+- Registry root fields are exactly `registry_version`, `repository`, `source_of_truth`, `policy`, and `documents`; `source_of_truth` is exactly `GitHub main`.
 - Registry applicability, authority-topic, prerequisite, README-purpose, and AI-routing-role fields are non-empty and internally valid.
+- Registry prerequisite relationships reference known documents and form an acyclic directed graph.
 - Manifest path, version, status, Purpose, display-name, and Routing Role consistency with the authority registry.
 - Draft documents use `Proposed` Repository Role wording; Baseline and Final Baseline documents use non-proposed normative wording.
 - Required canonical authority paths exist.
 - Repository-validation workflow and script exist.
-- The GitHub Actions workflow is valid YAML; enables `push` and `pull_request`; uses read-only contents permission; pins `actions/checkout` v7.0.0 and `actions/setup-python` v6.3.0 by full immutable commit SHA; validates Python 3.10 and 3.12; and executes dependency installation, repository validation, and regression tests as exact, separate, unconditional steps in one ordered job.
+- The GitHub Actions workflow is valid YAML; enables `push` and `pull_request`; uses read-only contents permission; runs on the fixed `ubuntu-24.04` image; pins `actions/checkout` v7.0.0 and `actions/setup-python` v6.3.0 by full immutable commit SHA; validates Python 3.10 and 3.12; and executes dependency installation, repository validation, and regression tests as exact, separate, unconditional steps in one ordered job.
 - Validation dependencies are installed with `--require-hashes`, and `requirements-validation.txt` contains the approved PyYAML version and SHA-256 hashes used by supported CI resolution.
-- Validator regression tests retain expected pass/fail behavior for fenced metadata and history examples, missing or duplicate metadata, missing Supersedes declarations, invalid Workflow YAML or structure, unapproved directory indexes, non-lowercase Markdown extensions, balanced-parenthesis and HTML links, Setext anchors, version-chain failures, and incomplete Python matrices.
+- Validator regression tests retain expected pass/fail behavior for fenced metadata and history examples, missing or duplicate metadata, missing Supersedes declarations, invalid Workflow YAML or structure, unapproved directory indexes, non-lowercase Markdown extensions, balanced-parenthesis and HTML links, Setext anchors, version-chain failures, exact Registry root fields, controlled source identity, prerequisite cycles, fixed CI runner, and incomplete Python matrices.
 
 A passing automated result proves only the checks implemented by the validator. It does not prove semantic correctness, Product suitability, or human approval.
 

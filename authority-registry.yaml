@@ -9,7 +9,7 @@ policy:
 documents:
   - display_name: AI Engineering Usage Guide
     path: docs/framework/AI_Engineering_Usage_Guide.md
-    version: v1.0.15
+    version: v1.0.16
     status: Draft for Review
     repository_role: Proposed normative AI task-routing and repository-governance authority
     readme_purpose: AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary
@@ -142,7 +142,7 @@ documents:
 
   - display_name: Repository Validation Checklist
     path: docs/validation/Repository_Validation_Checklist.md
-    version: v1.0.4
+    version: v1.0.5
     status: Draft for Review
     repository_role: Proposed operational validation method; not a Product or architecture authority
     readme_purpose: Repository structural, manifest, canonical-reference, evidence-state, and detached-package checks

@@ -23,6 +23,9 @@ Individual authority documents retain their own internal Version History and app
 
 ### Changed
 
+- Required the exact `authority-registry.yaml` root schema and controlled `GitHub main` source identity.
+- Fixed document-validation CI to the `ubuntu-24.04` runner image.
+- Updated AI Engineering Usage Guide to v1.0.16 and Repository Validation Checklist to v1.0.5.
 - Hardened governed-document metadata with Status enums, mandatory Repository Role, compatible Status/Role combinations, and placement before the first level-2 heading.
 - Excluded fenced and HTML `pre`/`code`/`script`/`style` examples from metadata, manifest, Version History, link, and anchor parsing.
 - Required exact, separate, unconditional Workflow steps and hash-verified dependency installation.
@@ -68,6 +71,9 @@ Individual authority documents retain their own internal Version History and app
 
 ### Fixed
 
+- Rejected missing or unexpected authority-registry root fields and uncontrolled `source_of_truth` values.
+- Added directed-graph cycle detection for authority prerequisite relationships.
+- Added regression coverage for Registry root schema, source identity, prerequisite cycles, and CI runner pinning.
 - Integrated Coordinator Software Engineering Rules and C# Coding Rules into the AI Active Document Manifest and canonical repository path list.
 - Added explicit topic authority and task routing for Coordinator and C# implementation work.
 - Added Coordinator and C# authority applicability, version, status, evidence, deviation, and `N/A` records to the Framework Application Analysis method.

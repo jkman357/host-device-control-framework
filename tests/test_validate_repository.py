@@ -126,8 +126,8 @@ class RepositoryValidatorRegressionTests(unittest.TestCase):
     def test_duplicate_metadata_is_rejected(self) -> None:
         target = self.backup_path(CHECKLIST_RELATIVE_PATH)
         text = target.read_text(encoding="utf-8").replace(
-            "**Document Version:** v1.0.4",
-            "**Document Version:** v1.0.4\n**Document Version:** v1.0.4",
+            "**Document Version:** v1.0.5",
+            "**Document Version:** v1.0.5\n**Document Version:** v1.0.5",
             1,
         )
         target.write_text(text, encoding="utf-8")
@@ -203,8 +203,8 @@ class RepositoryValidatorRegressionTests(unittest.TestCase):
     def test_history_row_cell_count_is_rejected(self) -> None:
         target = self.backup_path(CHECKLIST_RELATIVE_PATH)
         text = target.read_text(encoding="utf-8").replace(
-            "| v1.0.4 | 2026-07-19 | Draft for Review | Hardened",
-            "| v1.0.4 | 2026-07-19 | Hardened",
+            "| v1.0.5 | 2026-07-19 | Draft for Review | Required",
+            "| v1.0.5 | 2026-07-19 | Required",
             1,
         )
         target.write_text(text, encoding="utf-8")
@@ -212,14 +212,14 @@ class RepositoryValidatorRegressionTests(unittest.TestCase):
 
     def test_invalid_calendar_date_is_rejected(self) -> None:
         target = self.backup_path(CHECKLIST_RELATIVE_PATH)
-        text = target.read_text(encoding="utf-8").replace("| v1.0.4 | 2026-07-19 |", "| v1.0.4 | 2026-99-99 |", 1)
+        text = target.read_text(encoding="utf-8").replace("| v1.0.5 | 2026-07-19 |", "| v1.0.5 | 2026-99-99 |", 1)
         target.write_text(text, encoding="utf-8")
-        self.assert_validator_fails("current Version History date must be a real ISO")
+        self.assert_validator_fails("must be a real ISO YYYY-MM-DD date")
 
     def test_empty_history_summary_is_rejected(self) -> None:
         target = self.backup_path(CHECKLIST_RELATIVE_PATH)
         text = re.sub(
-            r"(\| v1\.0\.4 \| 2026-07-19 \| Draft for Review \|)[^|]+(\|)",
+            r"(\| v1\.0\.5 \| 2026-07-19 \| Draft for Review \|)[^|]+(\|)",
             r"\1 \2",
             target.read_text(encoding="utf-8"),
             count=1,
@@ -236,12 +236,12 @@ class RepositoryValidatorRegressionTests(unittest.TestCase):
     def test_non_immediate_supersedes_is_rejected(self) -> None:
         target = self.backup_path(GUIDE_RELATIVE_PATH)
         text = target.read_text(encoding="utf-8").replace(
-            "**Supersedes Document Version:** v1.0.14",
+            "**Supersedes Document Version:** v1.0.15",
             "**Supersedes Document Version:** v1.0.12",
             1,
         )
         target.write_text(text, encoding="utf-8")
-        self.assert_validator_fails("immediate prior listed version v1.0.14")
+        self.assert_validator_fails("immediate prior listed version v1.0.15")
 
     def test_duplicate_current_document_set_heading_is_rejected(self) -> None:
         target = self.backup_path("README.md")
@@ -264,9 +264,35 @@ class RepositoryValidatorRegressionTests(unittest.TestCase):
         target.write_text(text, encoding="utf-8")
         self.assert_validator_fails("must appear exactly once; found 0")
 
+    def test_registry_missing_source_of_truth_is_rejected(self) -> None:
+        target = self.backup_path(REGISTRY_RELATIVE_PATH)
+        text = target.read_text(encoding="utf-8").replace("source_of_truth: GitHub main\n", "", 1)
+        target.write_text(text, encoding="utf-8")
+        self.assert_validator_fails("registry root fields invalid")
+
+    def test_registry_unexpected_root_field_is_rejected(self) -> None:
+        target = self.backup_path(REGISTRY_RELATIVE_PATH)
+        text = target.read_text(encoding="utf-8").replace(
+            "source_of_truth: GitHub main\n",
+            "source_of_truth: GitHub main\nuncontrolled_field: true\n",
+            1,
+        )
+        target.write_text(text, encoding="utf-8")
+        self.assert_validator_fails("registry root fields invalid")
+
+    def test_registry_source_of_truth_value_is_controlled(self) -> None:
+        target = self.backup_path(REGISTRY_RELATIVE_PATH)
+        text = target.read_text(encoding="utf-8").replace(
+            "source_of_truth: GitHub main",
+            "source_of_truth: detached package",
+            1,
+        )
+        target.write_text(text, encoding="utf-8")
+        self.assert_validator_fails("source_of_truth must be exactly 'GitHub main'")
+
     def test_registry_version_mismatch_is_rejected(self) -> None:
         target = self.backup_path(REGISTRY_RELATIVE_PATH)
-        text = target.read_text(encoding="utf-8").replace("version: v1.0.15", "version: v9.9.9", 1)
+        text = target.read_text(encoding="utf-8").replace("version: v1.0.16", "version: v9.9.9", 1)
         target.write_text(text, encoding="utf-8")
         self.assert_validator_fails("authority-registry.yaml version mismatch")
 
@@ -289,6 +315,16 @@ class RepositoryValidatorRegressionTests(unittest.TestCase):
         )
         target.write_text(text, encoding="utf-8")
         self.assert_validator_fails("has unknown prerequisites")
+
+    def test_registry_prerequisite_cycle_is_rejected(self) -> None:
+        target = self.backup_path(REGISTRY_RELATIVE_PATH)
+        text = target.read_text(encoding="utf-8").replace(
+            "    prerequisite_documents: []",
+            "    prerequisite_documents:\n      - docs/framework/Coordinator_Node_Control_Framework.md",
+            1,
+        )
+        target.write_text(text, encoding="utf-8")
+        self.assert_validator_fails("prerequisite cycle detected")
 
     def test_registry_empty_topics_is_rejected(self) -> None:
         target = self.backup_path(REGISTRY_RELATIVE_PATH)
@@ -355,6 +391,16 @@ class RepositoryValidatorRegressionTests(unittest.TestCase):
         )
         target.write_text(text, encoding="utf-8")
         self.assert_validator_fails("exact, separate, unconditional")
+
+    def test_workflow_runner_must_be_pinned(self) -> None:
+        target = self.backup_path(WORKFLOW_RELATIVE_PATH)
+        text = target.read_text(encoding="utf-8").replace(
+            "runs-on: ubuntu-24.04",
+            "runs-on: ubuntu-latest",
+            1,
+        )
+        target.write_text(text, encoding="utf-8")
+        self.assert_validator_fails("one ubuntu-24.04 job")
 
     def test_hashless_workflow_install_is_rejected(self) -> None:
         target = self.backup_path(WORKFLOW_RELATIVE_PATH)

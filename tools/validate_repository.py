@@ -37,6 +37,7 @@ INSTALL_COMMAND = (
 )
 VALIDATOR_COMMAND = "python tools/validate_repository.py"
 TEST_COMMAND = "python -m unittest discover -s tests -v"
+CI_RUNNER = "ubuntu-24.04"
 EXPECTED_REQUIREMENTS = """PyYAML==6.0.3 \\
     --hash=sha256:d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f \\
     --hash=sha256:9c7708761fccb9397fe64bbc0395abcae8c4bf7b0eac081e12b809bf47700d0b \\
@@ -680,7 +681,7 @@ def check_workflow() -> None:
         versions = matrix.get("python-version") if isinstance(matrix, dict) else None
         if not isinstance(versions, list) or set(versions) != {"3.10", "3.12"}:
             continue
-        if job.get("runs-on") != "ubuntu-latest":
+        if job.get("runs-on") != CI_RUNNER:
             continue
         steps = job.get("steps")
         if not isinstance(steps, list):
@@ -721,7 +722,7 @@ def check_workflow() -> None:
 
     if not valid_job_found:
         error(
-            f"{rel(workflow)}: one ubuntu-latest job must contain exact, separate, unconditional "
+            f"{rel(workflow)}: one {CI_RUNNER} job must contain exact, separate, unconditional "
             "SHA-pinned checkout/setup with non-persisted credentials, Python 3.10/3.12 matrix, hash-verified dependency install, "
             "validator, and regression-test steps in execution order"
         )
@@ -759,10 +760,28 @@ def load_authority_registry() -> list[dict[str, object]]:
     if not isinstance(data, dict):
         error(f"{rel(path)}: registry root must be a YAML mapping")
         return []
+    required_root_fields = {
+        "registry_version",
+        "repository",
+        "source_of_truth",
+        "policy",
+        "documents",
+    }
+    if set(data) != required_root_fields:
+        missing = required_root_fields - set(data)
+        extra = set(data) - required_root_fields
+        detail: list[str] = []
+        if missing:
+            detail.append(f"missing {sorted(missing)}")
+        if extra:
+            detail.append(f"unexpected {sorted(extra)}")
+        error(f"{rel(path)}: registry root fields invalid: {'; '.join(detail)}")
     if data.get("registry_version") != 1:
         error(f"{rel(path)}: registry_version must be integer 1")
     if data.get("repository") != "host-device-control-framework":
         error(f"{rel(path)}: repository identity mismatch")
+    if data.get("source_of_truth") != "GitHub main":
+        error(f"{rel(path)}: source_of_truth must be exactly 'GitHub main'")
     policy = data.get("policy")
     expected_policy = {
         "routing_order": "role-first-language-second",
@@ -829,6 +848,7 @@ def load_authority_registry() -> list[dict[str, object]]:
         valid_entries.append(entry)
 
     registry_paths = {entry["path"] for entry in valid_entries}
+    graph: dict[str, list[str]] = {}
     for entry in valid_entries:
         path_value = entry["path"]
         prerequisites = entry["prerequisite_documents"]
@@ -837,6 +857,39 @@ def load_authority_registry() -> list[dict[str, object]]:
         unknown = set(prerequisites) - registry_paths
         if unknown:
             error(f"{rel(path)}: {path_value} has unknown prerequisites: {', '.join(sorted(unknown))}")
+        graph[path_value] = [item for item in prerequisites if item in registry_paths and item != path_value]
+
+    state: dict[str, int] = {node: 0 for node in graph}
+    stack: list[str] = []
+    reported_cycles: set[tuple[str, ...]] = set()
+
+    def canonical_cycle(nodes: list[str]) -> tuple[str, ...]:
+        cycle = nodes[:-1]
+        rotations = [tuple(cycle[index:] + cycle[:index]) for index in range(len(cycle))]
+        return min(rotations)
+
+    def visit(node: str) -> None:
+        state[node] = 1
+        stack.append(node)
+        for prerequisite in graph[node]:
+            if state[prerequisite] == 0:
+                visit(prerequisite)
+            elif state[prerequisite] == 1:
+                start = stack.index(prerequisite)
+                cycle_nodes = stack[start:] + [prerequisite]
+                key = canonical_cycle(cycle_nodes)
+                if key not in reported_cycles:
+                    reported_cycles.add(key)
+                    error(
+                        f"{rel(path)}: prerequisite cycle detected: "
+                        + " -> ".join(cycle_nodes)
+                    )
+        stack.pop()
+        state[node] = 2
+
+    for node in sorted(graph):
+        if state[node] == 0:
+            visit(node)
     return valid_entries
 
 
