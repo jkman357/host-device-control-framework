@@ -3,7 +3,7 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`  
 **Document ID:** AIEUG  
-**Document Version:** v1.0.16  
+**Document Version:** v1.0.17  
 **Status:** Draft for Review  
 **Document Type:** AI Usage and Authority Routing Guide  
 **Primary Narrative Language:** English  
@@ -11,13 +11,18 @@
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
 **Repository Role:** Proposed normative AI task-routing and repository-governance authority  
-**Supersedes Document Version:** v1.0.15  
+**Supersedes Document Version:** v1.0.16  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
 - `Protocol_YAML_Definition_Guide.md`
 - `Protocol_YAML_Template.md`
 - `Coordinator_Software_Engineering_Rules.md`
+- `Coordinator_Architecture_Patterns.md`
+- `Coordinator_Concurrency_Guide.md`
+- `Coordinator_Logging_Guide.md`
+- `Coordinator_Testing_Guide.md`
+- `Coordinator_UI_Engineering_Guide.md`
 - `Embedded_C_Coding_Rules.md`
 - `CSharp_Coding_Rules.md`
 - `Repository_Validation_Checklist.md`
@@ -112,6 +117,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 | v1.0.14 | 2026-07-19 | Not recorded | Updated the active authority manifest after adding mandatory Supersedes metadata across governed documents and strengthening fenced-content, metadata-region, Workflow YAML, Markdown-link, directory-index, extension, and validator-regression controls; retained Draft for Review status pending human approval. |
 | v1.0.15 | 2026-07-19 | Draft for Review | Added the machine-readable authority registry and synchronized identity, role, applicability, topic, prerequisite, manifest, workflow, history-schema, dependency-hash, and parser-governance controls; retained Draft for Review status pending human approval. |
 | v1.0.16 | 2026-07-19 | Draft for Review | Synchronized validation routing for exact Registry root fields, controlled GitHub-main source identity, acyclic prerequisite relationships, and the fixed ubuntu-24.04 CI runner; retained Draft for Review status pending human approval. |
+| v1.0.17 | 2026-07-19 | Draft for Review | Integrated five topic-specific Coordinator Guides into the Active Document Manifest, stable canonical paths, authority routing, and Coordinator implementation selection; updated Coordinator Software Engineering Rules routing to v1.0.5; retained all new Guides as proposed Draft authorities pending explicit Project adoption. |
 
 ## 0.2 Active Document Manifest
 
@@ -123,12 +129,17 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.16` | Draft for Review | AI authority routing and operating controls |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.17` | Draft for Review | AI authority routing and operating controls |
 | Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.0.13` | Baseline | Reusable architecture and governance |
 | Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.0.16` | Baseline | Application-analysis method and required records |
 | Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.0.10` | Baseline | Protocol YAML semantics and validation rules |
 | Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.0.10` | Baseline | Reusable Project Protocol starting structure |
-| Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.0.4` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
+| Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.0.5` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
+| Coordinator Architecture Patterns | `docs/coordinator/Coordinator_Architecture_Patterns.md` | `v1.0.0` | Draft for Review | Detailed Coordinator architecture-pattern and structural-realization rules |
+| Coordinator Concurrency Guide | `docs/coordinator/Coordinator_Concurrency_Guide.md` | `v1.0.0` | Draft for Review | Detailed Coordinator concurrency, cancellation, backpressure, and shutdown rules |
+| Coordinator Logging Guide | `docs/coordinator/Coordinator_Logging_Guide.md` | `v1.0.0` | Draft for Review | Detailed Coordinator logging, redaction, delivery, retention, and export rules |
+| Coordinator Testing Guide | `docs/coordinator/Coordinator_Testing_Guide.md` | `v1.0.0` | Draft for Review | Detailed Coordinator engineering-test strategy and evidence-classification rules |
+| Coordinator UI Engineering Guide | `docs/coordinator/Coordinator_UI_Engineering_Guide.md` | `v1.0.0` | Draft for Review | Detailed Coordinator UI implementation and presentation-state realization rules |
 | Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.17` | Final Baseline | Product-owned Embedded C implementation rules |
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
 | Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.5` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
@@ -156,6 +167,11 @@ docs/framework/Framework_Application_Analysis_Template.md
 docs/protocol/Protocol_YAML_Definition_Guide.md
 docs/protocol/Protocol_YAML_Template.md
 docs/coordinator/Coordinator_Software_Engineering_Rules.md
+docs/coordinator/Coordinator_Architecture_Patterns.md
+docs/coordinator/Coordinator_Concurrency_Guide.md
+docs/coordinator/Coordinator_Logging_Guide.md
+docs/coordinator/Coordinator_Testing_Guide.md
+docs/coordinator/Coordinator_UI_Engineering_Guide.md
 docs/coding-rules/Embedded_C_Coding_Rules.md
 docs/coding-rules/CSharp_Coding_Rules.md
 docs/validation/Repository_Validation_Checklist.md
@@ -226,7 +242,12 @@ Authority is assigned by topic rather than by document length, recency alone, or
 | Protocol YAML syntax, field semantics, Message categories, security attributes, compatibility, validation, and Protocol governance | `Protocol_YAML_Definition_Guide.md` |
 | Reusable starting structure for a Project Protocol YAML | `Protocol_YAML_Template.md` |
 | Actual Project wire contract | Approved `<Application>_protocol.yaml` |
-| Cross-language Coordinator architecture, lifecycle, state ownership, concurrency, communication integration, diagnostics, configuration, security, testing, and release behavior | `Coordinator_Software_Engineering_Rules.md` |
+| Cross-language Coordinator minimum rules, lifecycle, state ownership, communication integration, security, deviation, and release governance | `Coordinator_Software_Engineering_Rules.md` |
+| Detailed Coordinator architecture patterns, module boundaries, command/receive pipelines, and multi-Node isolation | `Coordinator_Architecture_Patterns.md` when explicitly adopted for Project use |
+| Detailed Coordinator concurrency, cancellation, timeout, backpressure, and shutdown realization | `Coordinator_Concurrency_Guide.md` when explicitly adopted for Project use |
+| Detailed Coordinator diagnostic logging, redaction, retention, export, and logger-failure behavior | `Coordinator_Logging_Guide.md` when explicitly adopted for Project use |
+| Detailed Coordinator engineering-test strategy, deterministic race testing, simulators, fuzzing, and evidence integrity | `Coordinator_Testing_Guide.md` when explicitly adopted for Project use |
+| Detailed Coordinator UI implementation, presentation state, responsiveness, visualization, and engineering controls | `Coordinator_UI_Engineering_Guide.md` when explicitly adopted for Project use |
 | Product-owned Embedded C implementation, naming, static memory, arithmetic, ISR, callback, `main()`, RTOS, and review rules | `Embedded_C_Coding_Rules.md` |
 | Product-owned C# language and .NET implementation rules | `CSharp_Coding_Rules.md` |
 | Project-specific Coordinator design, decomposition, selected platform, and approved deviations | Approved Coordinator SDD and applicable Project standards |

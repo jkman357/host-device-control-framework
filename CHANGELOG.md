@@ -8,6 +8,7 @@ Individual authority documents retain their own internal Version History and app
 
 ### Added
 
+- Added five proposed topic-specific Coordinator authorities: architecture patterns, concurrency, logging, testing, and UI engineering Guides.
 - Added `authority-registry.yaml` as the machine-readable source for authority identity, role, applicability, topics, prerequisites, README purpose, and AI routing-role metadata.
 - Added SHA-256 hashes for the PyYAML source distribution and the Python 3.10/3.12 Linux x86-64 CI wheels.
 - Added categorized documentation directories for Framework, Protocol, Coordinator, Coding Rules, and Validation.
@@ -23,6 +24,8 @@ Individual authority documents retain their own internal Version History and app
 
 ### Changed
 
+- Updated AI Engineering Usage Guide to v1.0.17 and Coordinator Software Engineering Rules to v1.0.5 for topic-specific Coordinator Guide routing.
+- Synchronized the authority registry, root Current Document Set, AI Active Document Manifest, Coordinator directory index, authority boundaries, and repository structure for the five new Guides.
 - Required the exact `authority-registry.yaml` root schema and controlled `GitHub main` source identity.
 - Fixed document-validation CI to the `ubuntu-24.04` runner image.
 - Updated AI Engineering Usage Guide to v1.0.16 and Repository Validation Checklist to v1.0.5.

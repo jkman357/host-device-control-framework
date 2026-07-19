@@ -30,7 +30,7 @@ Human reviews decisions and validates actual system behavior
 |---|---|
 | [`docs/framework/`](docs/framework/) | Cross-platform architecture, AI usage, and framework application analysis |
 | [`docs/protocol/`](docs/protocol/) | Protocol YAML definition, template, compatibility, and governance |
-| [`docs/coordinator/`](docs/coordinator/) | Cross-language Coordinator software engineering rules |
+| [`docs/coordinator/`](docs/coordinator/) | Cross-language Coordinator software engineering rules and topic-specific implementation guides |
 | [`docs/coding-rules/`](docs/coding-rules/) | Programming-language implementation and coding rules |
 | [`docs/validation/`](docs/validation/) | Validation methods, evidence guidance, conformance checklists, and reports |
 
@@ -38,12 +38,17 @@ Human reviews decisions and validates actual system behavior
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.16 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.17 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
 | [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.0.13 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
 | [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.0.16 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
 | [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.0.10 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
 | [`Protocol_YAML_Template.md`](docs/protocol/Protocol_YAML_Template.md) | v1.0.10 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
-| [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | v1.0.4 | Draft for Review | Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
+| [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | v1.0.5 | Draft for Review | Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
+| [`Coordinator_Architecture_Patterns.md`](docs/coordinator/Coordinator_Architecture_Patterns.md) | v1.0.0 | Draft for Review | Coordinator layering, dependency direction, state ownership, command and receive pipelines, lifecycle, multi-Node isolation, and architecture review patterns |
+| [`Coordinator_Concurrency_Guide.md`](docs/coordinator/Coordinator_Concurrency_Guide.md) | v1.0.0 | Draft for Review | Coordinator execution-context ownership, asynchronous I/O, cancellation, timeout, backpressure, connection generations, overload, and bounded shutdown |
+| [`Coordinator_Logging_Guide.md`](docs/coordinator/Coordinator_Logging_Guide.md) | v1.0.0 | Draft for Review | Structured diagnostic events, correlation, redaction, injection resistance, bounded delivery, retention, export, and logging-failure behavior |
+| [`Coordinator_Testing_Guide.md`](docs/coordinator/Coordinator_Testing_Guide.md) | v1.0.0 | Draft for Review | Coordinator test layers, Protocol and Transport coverage, deterministic race testing, fault injection, fuzzing, simulator governance, and evidence integrity |
+| [`Coordinator_UI_Engineering_Guide.md`](docs/coordinator/Coordinator_UI_Engineering_Guide.md) | v1.0.0 | Draft for Review | Coordinator presentation state, command feedback, stale data, multi-Node binding, responsiveness, visualization, input safety, and engineering controls |
 | [`Embedded_C_Coding_Rules.md`](docs/coding-rules/Embedded_C_Coding_Rules.md) | v1.0.17 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 | [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.4 | Draft for Review | Product-owned C# language and .NET implementation rules |
 | [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.5 | Draft for Review | Repository structural, manifest, canonical-reference, evidence-state, and detached-package checks |

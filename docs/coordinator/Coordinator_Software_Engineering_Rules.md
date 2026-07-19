@@ -1,14 +1,22 @@
 # Coordinator Software Engineering Rules
 
 **Canonical Filename:** `Coordinator_Software_Engineering_Rules.md`  
-**Document Version:** v1.0.4  
+**Document Version:** v1.0.5  
 **Status:** Draft for Review  
-**Supersedes Document Version:** v1.0.3  
+**Supersedes Document Version:** v1.0.4  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, test engineers, code generators, and AI-assisted engineering systems  
 **Repository Role:** Proposed normative engineering authority for Coordinator-owned software  
+**Related Documents:**
+- `../framework/Coordinator_Node_Control_Framework.md`
+- `Coordinator_Architecture_Patterns.md`
+- `Coordinator_Concurrency_Guide.md`
+- `Coordinator_Logging_Guide.md`
+- `Coordinator_Testing_Guide.md`
+- `Coordinator_UI_Engineering_Guide.md`
+
 
 ---
 
@@ -24,6 +32,7 @@ This document is independently authored. External standards and guidance are ref
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.5 | 2026-07-19 | Draft for Review | Added explicit routing and authority boundaries for the five topic-specific Coordinator Guides; clarified that this document owns cross-topic minimum constraints while an explicitly adopted Guide owns detailed realization within its topic; retained Draft for Review status pending human approval. |
 | v1.0.4 | 2026-07-19 | Draft for Review | Added explicit Supersedes metadata required by repository governance; no normative Coordinator engineering requirements changed. |
 | v1.0.3 | 2026-07-18 | Draft for Review | Resolved authority ownership by topic before precedence, clarified that Framework and Protocol restatements are derived conformance summaries while Coordinator-specific realization remains owned here, and reinforced role-first implementation routing without changing Project approval status. |
 | v1.0.2 | 2026-07-18 | Draft for Review | Clarified that this Draft is proposed normative authority pending human approval and normalized document-version formatting without changing Coordinator engineering requirements. |
@@ -117,10 +126,11 @@ The following precedence shall then apply when requirements conflict within the 
 2. Approved system and software requirements.
 3. `Coordinator_Node_Control_Framework.md`.
 4. The approved Project Protocol YAML and its definition guide.
-5. This document.
-6. Language-specific coding rules.
-7. Project-local conventions.
-8. Tool defaults and personal preference.
+5. This document for cross-topic Coordinator minimum rules and governance.
+6. An explicitly adopted topic-specific Coordinator Guide within the topic it owns.
+7. Language-specific coding rules.
+8. Project-local conventions.
+9. Tool defaults and personal preference.
 
 A lower-authority document shall not weaken or reinterpret a higher-authority requirement.
 
@@ -160,6 +170,20 @@ Document versions shall be represented through:
 - Git tags.
 - Releases.
 - Controlled archive package names.
+
+## 6.1 Topic-Specific Coordinator Guide Routing
+
+This document owns cross-topic Coordinator minimum constraints, lifecycle and state-ownership governance, communication-integration boundaries, security expectations, deviation handling, and release evidence. The topic-specific Guides below may own more detailed realization rules only after explicit Project adoption.
+
+| Topic | Detailed Authority After Explicit Adoption |
+|---|---|
+| Coordinator architecture patterns, module boundaries, state-store realization, command and receive pipelines, and multi-Node isolation | `Coordinator_Architecture_Patterns.md` |
+| Execution-context ownership, asynchronous I/O, cancellation, timeout, backpressure, connection generations, and bounded shutdown | `Coordinator_Concurrency_Guide.md` |
+| Diagnostic event models, correlation, redaction, injection resistance, bounded logging, retention, and support export | `Coordinator_Logging_Guide.md` |
+| Coordinator test layering, deterministic race testing, fault injection, fuzzing, simulator governance, and evidence integrity | `Coordinator_Testing_Guide.md` |
+| Presentation-state realization, UI responsiveness, high-rate visualization, multi-Node UI binding, input safety, and engineering controls | `Coordinator_UI_Engineering_Guide.md` |
+
+A Guide shall not apply merely because it exists in the repository. Its `Draft for Review` requirements remain proposed until the Project explicitly adopts or approves it. When a Guide is adopted, repeated rules in this document remain cross-topic minimum constraints or derived summaries; the Guide owns the detailed realization within its declared topic and shall not weaken this document or a higher topic authority.
 
 ---
 
