@@ -6,7 +6,7 @@ This directory contains cross-language software engineering authority for compon
 
 ## Documents
 
-- [`Node_Software_Engineering_Rules.md`](Node_Software_Engineering_Rules.md) — **Draft for Review / proposed normative authority** for Node-specific architecture realization, execution contexts, state ownership, command execution, local safety, bounded resources, diagnostics, Bootloader handoff, and target evidence.
+- [`Node_Software_Engineering_Rules.md`](Node_Software_Engineering_Rules.md) — **Draft for Review / proposed normative authority** for Node identity, address handling, target validation, broadcast response, Session isolation, lifecycle, command execution, local safety, bounded resources, diagnostics, Bootloader handoff, and target evidence.
 
 ## Recommended Reading Order
 

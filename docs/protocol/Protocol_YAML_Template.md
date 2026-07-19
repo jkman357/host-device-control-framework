@@ -3,9 +3,9 @@
 
 **Document Name:** `Protocol_YAML_Template.md`  
 **Document ID:** PYT  
-**Document Version:** v1.0.10  
+**Document Version:** v1.1.0  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.9  
+**Supersedes Document Version:** v1.0.10  
 **Document Type:** Reusable Project Template  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -70,6 +70,7 @@ Schema Validation / Semantic Lint / Code Generation / Test Vectors
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.0 | 2026-07-19 | Baseline | Added a backward-compatible conditional `node_model`, complete Single-Node and Multi-Node profile examples, identity/address/scope/resource/update fields, and schema, semantic-lint, compatibility, and readiness checks for independent links, shared buses, and routed gateways. |
 | v1.0.0 | 2026-07-15 | Not recorded | Established the initial reusable Protocol YAML Project template. |
 | v1.0.1 | 2026-07-15 | Not recorded | Corrected the Message ID allocation example; aligned the required and conditional top-level keys with the Definition Guide; separated Registry scopes; and strengthened validation, compatibility, and Baseline checklists. |
 | v1.0.2 | 2026-07-18 | Not recorded | Converted the complete template to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned the template with `Protocol_YAML_Definition_Guide_v1.0.3`; replaced native-layout-oriented Wire Format settings with field-by-field encoding and prohibited implicit padding; added distinct Telemetry and Stream examples and policies; and normalized checklists, appendices, and Baseline decisions for public GitHub publication. |
@@ -120,6 +121,11 @@ When tailoring the template:
 14. Define Record Counter, Rekey, Hard Limit, persistence, atomic cutover, and failure behavior for every Key Context.
 15. Define exact Firmware signature encoding and length for every accepted algorithm.
 16. Record every intentional removal or structural change that affects a previously approved Protocol Baseline.
+17. Complete `node_model` when more than one logical Node, shared addressing, routing, broadcast, or multi-target behavior is in scope.
+18. Preserve the omission default as the legacy Single-Node, connection-bound profile; do not force a Node address into every point-to-point Record.
+19. Keep Node identity, runtime address, route, connection generation, Protocol Session, Secure Session, and operation correlation distinct.
+20. Define explicit response-collision prevention before enabling Protocol broadcast.
+21. Define per-Node partial-result semantics before enabling Coordinator-expanded multi-target operations.
 
 ## 1.3 Minimum and Conditional Top-Level Keys
 
@@ -146,6 +152,7 @@ Complete the following keys when required by the Project:
 types
 bitsets
 capabilities
+node_model
 transport_profiles
 sequence_policy
 timestamp_policy
@@ -386,6 +393,40 @@ protocol:
   version: V1.0.0RC01
   minimum_compatible_version: V1.0.0RC01
   default_execution_environment: application
+
+node_model:
+  topology: single_node
+  maximum_nodes: 1
+  maximum_online_nodes: 1
+  identity:
+    node_id_required: true
+    uniqueness_scope: protocol_instance
+    persistence: stable
+  addressing:
+    method: connection_bound
+    address_assignment: not_applicable
+    target_required_on_wire: false
+    broadcast:
+      supported: false
+      response_policy: not_applicable
+  multi_target:
+    supported: false
+    partial_failure_policy: not_applicable
+  scope:
+    protocol_session: per_node
+    secure_session: per_node
+    sequence: per_node_session
+    correlation: per_node_session
+  lifecycle:
+    identity_conflict_policy: reject_and_quarantine
+    address_reuse_requires_new_connection_generation: true
+    address_reuse_requires_new_secure_session: true
+  resources:
+    maximum_pending_requests_per_node: 1
+    maximum_total_pending_requests: 1
+  firmware_update:
+    target_scope: single_node
+    concurrency: one_at_a_time
 
 wire_format:
   byte_order: little_endian
@@ -3431,10 +3472,180 @@ The reusable template file may contain documented placeholders. The Product Base
 
 ---
 
-# 8. Schema Validation Checklist
+# 8. Multi-Node Profile Examples
+
+These fragments replace the illustrative `node_model` in Section 4. They do not independently define Product
+values.
+
+## 8.1 Legacy Single-Node or One Independent Link
+
+```yaml
+node_model:
+  topology: single_node
+  maximum_nodes: 1
+  maximum_online_nodes: 1
+  identity:
+    node_id_required: true
+    uniqueness_scope: protocol_instance
+    persistence: stable
+  addressing:
+    method: connection_bound
+    address_assignment: not_applicable
+    target_required_on_wire: false
+    broadcast: {supported: false, response_policy: not_applicable}
+  multi_target: {supported: false, partial_failure_policy: not_applicable}
+  scope:
+    protocol_session: per_node
+    secure_session: per_node
+    sequence: per_node_session
+    correlation: per_node_session
+  lifecycle:
+    identity_conflict_policy: reject_and_quarantine
+    address_reuse_requires_new_connection_generation: true
+    address_reuse_requires_new_secure_session: true
+  resources:
+    maximum_pending_requests_per_node: 1
+    maximum_total_pending_requests: 1
+  firmware_update: {target_scope: single_node, concurrency: one_at_a_time}
+```
+
+A Project YAML that predates `node_model` may omit it and receives the same legacy interpretation.
+
+## 8.2 Multiple Independent Point-to-Point Connections
+
+```yaml
+node_model:
+  topology: independent_links
+  maximum_nodes: 8
+  maximum_online_nodes: 4
+  identity:
+    node_id_required: true
+    uniqueness_scope: coordinator_domain
+    persistence: stable
+  addressing:
+    method: connection_bound
+    address_assignment: not_applicable
+    target_required_on_wire: false
+    broadcast: {supported: false, response_policy: not_applicable}
+  multi_target:
+    supported: true
+    partial_failure_policy: per_target_result
+  scope:
+    protocol_session: per_node
+    secure_session: per_node
+    sequence: per_node_session
+    correlation: per_node_session
+  lifecycle:
+    identity_conflict_policy: reject_and_quarantine
+    address_reuse_requires_new_connection_generation: true
+    address_reuse_requires_new_secure_session: true
+  resources:
+    maximum_pending_requests_per_node: 4
+    maximum_total_pending_requests: 16
+  firmware_update: {target_scope: single_node, concurrency: one_at_a_time}
+```
+
+## 8.3 Shared Multidrop Bus
+
+```yaml
+node_model:
+  topology: shared_multidrop_bus
+  maximum_nodes: 32
+  maximum_online_nodes: 32
+  identity:
+    node_id_required: true
+    uniqueness_scope: coordinator_domain
+    persistence: stable
+  addressing:
+    method: frame_address
+    address_assignment: assigned
+    target_required_on_wire: true
+    broadcast:
+      supported: true
+      response_policy: polled
+  multi_target:
+    supported: false
+    partial_failure_policy: not_applicable
+  scope:
+    protocol_session: per_node
+    secure_session: per_node
+    sequence: per_node_session
+    correlation: per_node_session
+  lifecycle:
+    identity_conflict_policy: reject_and_quarantine
+    address_reuse_requires_new_connection_generation: true
+    address_reuse_requires_new_secure_session: true
+  resources:
+    maximum_pending_requests_per_node: 2
+    maximum_total_pending_requests: 16
+  firmware_update: {target_scope: single_node, concurrency: one_at_a_time}
+```
+
+The Message or protected Transport mapping shall define the exact target field. Broadcast-enabled Messages and
+response scheduling shall be enumerated by the Project Protocol; the example does not authorize all Messages.
+
+## 8.4 Routed Gateway
+
+```yaml
+node_model:
+  topology: routed_gateway
+  maximum_nodes: 64
+  maximum_online_nodes: 16
+  identity:
+    node_id_required: true
+    uniqueness_scope: coordinator_domain
+    persistence: stable
+  addressing:
+    method: route_bound
+    address_assignment: discovered
+    target_required_on_wire: true
+    broadcast: {supported: false, response_policy: not_applicable}
+  multi_target:
+    supported: true
+    partial_failure_policy: per_target_result
+  scope:
+    protocol_session: per_node
+    secure_session: per_node
+    sequence: per_node_session
+    correlation: globally_unique
+  lifecycle:
+    identity_conflict_policy: reject_and_quarantine
+    address_reuse_requires_new_connection_generation: true
+    address_reuse_requires_new_secure_session: true
+  resources:
+    maximum_pending_requests_per_node: 4
+    maximum_total_pending_requests: 32
+  firmware_update:
+    target_scope: multi_target
+    concurrency: bounded_parallel
+    maximum_concurrent_updates: 2
+```
+
+The gateway route does not establish downstream trust. The Security Profile shall bind each downstream stable Node
+identity or explicitly approve another trust model.
+
+## 8.5 Illegal Combinations
+
+The following shall fail Semantic Lint:
+
+```text
+maximum_nodes = 0
+maximum_online_nodes > maximum_nodes
+shared_multidrop_bus with connection_bound addressing
+shared_multidrop_bus with target_required_on_wire = false
+broadcast supported with response_policy = not_applicable
+broadcast disabled with an active response policy
+multi_target supported with partial_failure_policy = not_applicable
+group Secure Session without an approved group-security profile
+address reuse that preserves the previous Secure Session
+bounded_parallel Firmware Update without a positive maximum_concurrent_updates
+```
+
+# 9. Schema Validation Checklist
 
 - [ ] `schema_version` exists and is supported by the Generator.
 - [ ] All required top-level keys exist.
+- [ ] `node_model`, when present, follows the controlled topology, identity, addressing, scope, lifecycle, resource, and Firmware Update structure.
 - [ ] No duplicate YAML key exists.
 - [ ] Hex and integer representations are valid.
 - [ ] Every Enum, Bitset, Type, Alias, and Struct reference exists.
@@ -3454,8 +3665,11 @@ The reusable template file may contain documented placeholders. The Product Base
 
 ---
 
-# 9. Semantic Lint Checklist
+# 10. Semantic Lint Checklist
 
+- [ ] Omitted `node_model` resolves only to the legacy Single-Node profile.
+- [ ] `maximum_nodes >= 1` and `1 <= maximum_online_nodes <= maximum_nodes`.
+- [ ] Multi-Node topology, addressing, target binding, broadcast response, scope, address-reuse, multi-target partial failure, and Firmware Update concurrency combinations are coherent.
 - [ ] `messages[].id` values are globally unique.
 - [ ] `capabilities[].id` values are unique within the Capability Registry.
 - [ ] `services[].id` values are unique within their Namespace.
@@ -3498,8 +3712,9 @@ The reusable template file may contain documented placeholders. The Product Base
 
 ---
 
-# 10. Compatibility Review Checklist
+# 11. Compatibility Review Checklist
 
+- [ ] Adding an optional `node_model` without changing existing wire behavior is reviewed as an additive declaration; introducing required on-wire targeting or changing target/session scope is classified separately.
 - [ ] Existing Message IDs are unchanged.
 - [ ] Existing field offsets are unchanged.
 - [ ] Existing field types, widths, signedness, and endianness are unchanged.
@@ -3518,9 +3733,10 @@ The reusable template file may contain documented placeholders. The Product Base
 
 ---
 
-# 11. Baseline Readiness Checklist
+# 12. Baseline Readiness Checklist
 
-- [ ] Schema Validation passes.
+- [ ] Schema Validation passes, including `node_model` when present.
+- [ ] Valid Single-Node and applicable Multi-Node fixtures pass; invalid topology and scope fixtures fail for the expected rule.
 - [ ] Semantic Lint passes.
 - [ ] Naming and placeholder scans pass.
 - [ ] Compatibility Review is complete.

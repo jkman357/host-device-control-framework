@@ -1,0 +1,24 @@
+# Expected: PASS. node_model omission uses the legacy Single-Node interpretation.
+schema_version: '1.0'
+document:
+  name: fixture_protocol
+  version: v1.0.0
+  status: test
+protocol:
+  name: fixture
+  family: coordinator_node
+  version: V1.0.0
+wire_format:
+  byte_order: little_endian
+  implicit_padding: prohibited
+id_allocation:
+  message_id_width_bits: 16
+namespaces: []
+services: []
+enums: []
+errors: []
+messages: []
+compatibility:
+  minimum_compatible_version: V1.0.0
+code_generation:
+  enabled: false

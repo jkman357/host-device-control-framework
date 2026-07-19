@@ -37,29 +37,29 @@ AI may accelerate engineering work, but it cannot own Product authority, fabrica
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.20 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
-| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.0.14 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
-| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.0.17 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
-| [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.0.11 | Baseline | Protocol YAML syntax, semantics, machine-verifiable governance representation, Schema Validation, Semantic Lint, and Code Generation |
-| [`Protocol_YAML_Template.md`](docs/protocol/Protocol_YAML_Template.md) | v1.0.10 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
-| [`Protocol_Compatibility_Rules.md`](docs/protocol/Protocol_Compatibility_Rules.md) | v1.0.0 | Draft for Review | Protocol semantic-version consequences, compatibility dimensions, change classification, mixed-version operation, negotiation, deprecation, removal, and evidence |
-| [`Protocol_Registry_Governance.md`](docs/protocol/Protocol_Registry_Governance.md) | v1.0.0 | Draft for Review | Message and Capability identifier namespaces, allocation, uniqueness, lifecycle, retirement, non-reuse, merge control, generated artifacts, and evidence |
-| [`Protocol_Security_Profile.md`](docs/protocol/Protocol_Security_Profile.md) | v1.0.0 | Draft for Review | Security applicability, authenticated Session lifecycle, authorization, record protection, replay, Counter, Rekey, reconnect, credentials, environment separation, Firmware Update relationship, and evidence |
-| [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | v1.0.5 | Draft for Review | Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
-| [`Coordinator_Architecture_Patterns.md`](docs/coordinator/Coordinator_Architecture_Patterns.md) | v1.0.0 | Draft for Review | Coordinator layering, dependency direction, state ownership, command and receive pipelines, lifecycle, multi-Node isolation, and architecture review patterns |
-| [`Coordinator_Concurrency_Guide.md`](docs/coordinator/Coordinator_Concurrency_Guide.md) | v1.0.0 | Draft for Review | Coordinator execution-context ownership, asynchronous I/O, cancellation, timeout, backpressure, connection generations, overload, and bounded shutdown |
-| [`Coordinator_Logging_Guide.md`](docs/coordinator/Coordinator_Logging_Guide.md) | v1.0.1 | Draft for Review | Structured diagnostic events, correlation, redaction, injection resistance, bounded delivery, retention, export, and logging-failure behavior |
-| [`Coordinator_Testing_Guide.md`](docs/coordinator/Coordinator_Testing_Guide.md) | v1.0.1 | Draft for Review | Coordinator test layers, Protocol and Transport coverage, deterministic race testing, fault injection, fuzzing, simulator governance, and evidence integrity |
-| [`Coordinator_UI_Engineering_Guide.md`](docs/coordinator/Coordinator_UI_Engineering_Guide.md) | v1.0.1 | Draft for Review | Coordinator presentation state, command feedback, stale data, multi-Node binding, responsiveness, visualization, input safety, and engineering controls |
-| [`Node_Software_Engineering_Rules.md`](docs/node/Node_Software_Engineering_Rules.md) | v1.0.0 | Draft for Review | Node layering, execution contexts, local state and command ownership, safety, lifecycle, resources, telemetry, persistence, diagnostics, Bootloader handoff, target tests, and AI controls |
+| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.21 | Draft for Review | AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.1.0 | Baseline | Reusable Single-Node and Multi-Node architecture, role and target boundaries, timing, safety, security, Firmware Update, Runtime, validation, and governance |
+| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.1.0 | Baseline | Method for applying the Framework to a Product, including topology, identity, resource, Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
+| [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.1.0 | Baseline | Protocol YAML syntax, Multi-Node node_model semantics, machine-verifiable governance representation, Schema Validation, Semantic Lint, and Code Generation |
+| [`Protocol_YAML_Template.md`](docs/protocol/Protocol_YAML_Template.md) | v1.1.0 | Baseline | Reusable Single-Node and Multi-Node Project Protocol YAML starting structure, examples, and review checklists |
+| [`Protocol_Compatibility_Rules.md`](docs/protocol/Protocol_Compatibility_Rules.md) | v1.1.0 | Draft for Review | Protocol change classification, Single-Node and Multi-Node compatibility, mixed-version operation, migration, deprecation, removal, and evidence |
+| [`Protocol_Registry_Governance.md`](docs/protocol/Protocol_Registry_Governance.md) | v1.1.0 | Draft for Review | Protocol identifiers plus distinct Node identity, runtime address, route, allocation, lifecycle, retirement, non-reuse, merge control, and evidence |
+| [`Protocol_Security_Profile.md`](docs/protocol/Protocol_Security_Profile.md) | v1.1.0 | Draft for Review | Security applicability, per-Node identity and Session binding, authorization, replay, Counter, Rekey, reconnect, credentials, Firmware Update, and evidence |
+| [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | v1.1.0 | Draft for Review | Cross-language Coordinator architecture, per-Node ownership and isolation, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
+| [`Coordinator_Architecture_Patterns.md`](docs/coordinator/Coordinator_Architecture_Patterns.md) | v1.1.0 | Draft for Review | Coordinator layering, Node Registry and Context, immutable target binding, per-Node state and resources, shared-bus scheduling, aggregate state, and multi-target patterns |
+| [`Coordinator_Concurrency_Guide.md`](docs/coordinator/Coordinator_Concurrency_Guide.md) | v1.1.0 | Draft for Review | Per-Node and aggregate execution ownership, asynchronous I/O, cancellation, queues, fairness, backpressure, connection generations, overload, and bounded shutdown |
+| [`Coordinator_Logging_Guide.md`](docs/coordinator/Coordinator_Logging_Guide.md) | v1.1.0 | Draft for Review | Structured per-Node diagnostics, identity, route, Session and correlation context, redaction, bounded delivery, retention, export, and logger-failure behavior |
+| [`Coordinator_Testing_Guide.md`](docs/coordinator/Coordinator_Testing_Guide.md) | v1.1.0 | Draft for Review | Coordinator test layers plus Multi-Node isolation, targeting, race, conflict, shared-resource, broadcast, update, simulator, fuzz, and evidence coverage |
+| [`Coordinator_UI_Engineering_Guide.md`](docs/coordinator/Coordinator_UI_Engineering_Guide.md) | v1.1.0 | Draft for Review | Node selection and immutable operation binding, aggregate and per-Node views, partial results, stale state, responsiveness, visualization, and input safety |
+| [`Node_Software_Engineering_Rules.md`](docs/node/Node_Software_Engineering_Rules.md) | v1.1.0 | Draft for Review | Node identity, addressing, target validation, broadcast response, Session isolation, lifecycle, resources, safety, telemetry, diagnostics, Bootloader handoff, and target tests |
 | [`Embedded_C_Coding_Rules.md`](docs/coding-rules/Embedded_C_Coding_Rules.md) | v1.0.17 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 | [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.4 | Draft for Review | Product-owned C# language and .NET implementation rules |
-| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.6 | Draft for Review | Repository structural, manifest, canonical-reference, evidence-state, and detached-package checks |
-| [`Validation_Evidence_Guide.md`](docs/validation/Validation_Evidence_Guide.md) | v1.0.0 | Draft for Review | Evidence types, identity, traceability, reproducibility, ownership, environment, tools, result, anomaly, retention, integrity, and AI limitations |
-| [`Protocol_Validation_Checklist.md`](docs/validation/Protocol_Validation_Checklist.md) | v1.0.0 | Draft for Review | Traceable review and evidence-capture view for Protocol YAML, semantics, Registry, compatibility, security, robustness, vectors, and interoperability |
-| [`Framework_Conformance_Checklist.md`](docs/validation/Framework_Conformance_Checklist.md) | v1.0.0 | Draft for Review | Traceable Framework role, authority, layering, lifecycle, reconnect, safety, security, Bootloader, configuration, generation, deviation, and evidence view |
+| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.7 | Draft for Review | Repository structural, registry, manifest, canonical-reference, executable Protocol schema/fixture, evidence-state, and detached-package checks |
+| [`Validation_Evidence_Guide.md`](docs/validation/Validation_Evidence_Guide.md) | v1.1.0 | Draft for Review | Evidence identity, traceability, reproducibility, execution state, Multi-Node topology and isolation records, ownership, anomaly, retention, integrity, and AI limitations |
+| [`Protocol_Validation_Checklist.md`](docs/validation/Protocol_Validation_Checklist.md) | v1.1.0 | Draft for Review | Traceable Protocol YAML, node_model, topology, identity, addressing, targeting, scope, security, compatibility, fixture, and interoperability evidence view |
+| [`Framework_Conformance_Checklist.md`](docs/validation/Framework_Conformance_Checklist.md) | v1.1.0 | Draft for Review | Traceable Framework role, authority, Multi-Node topology and isolation, immutable targeting, lifecycle, resources, safety, security, update, deviation, and evidence view |
 | [`Coding_Rules_Review_Checklist.md`](docs/validation/Coding_Rules_Review_Checklist.md) | v1.0.0 | Draft for Review | Common review entry point for applicable language Coding Rules, types, arithmetic, resources, errors, concurrency, APIs, state machines, generated code, analysis, tests, and deviations |
-| [`AI_Generated_Artifact_Validation_Guide.md`](docs/validation/AI_Generated_Artifact_Validation_Guide.md) | v1.0.0 | Draft for Review | Authority and prompt control, hallucination and stale-source detection, code/document/test boundaries, execution evidence, target verification, security, licensing, approval, and records |
+| [`AI_Generated_Artifact_Validation_Guide.md`](docs/validation/AI_Generated_Artifact_Validation_Guide.md) | v1.1.0 | Draft for Review | Authority, prompt, stale-source, invented-topology, identity/address confusion, code/document/test, execution evidence, target verification, security, approval, and records |
 
 The machine-readable [`authority-registry.yaml`](authority-registry.yaml) is the controlled source for document identity, version, status, Repository Role, applicability, authority topics, prerequisites, README purpose, and AI manifest routing-role fields. The validator requires the registry, this table, directory indexes, and the AI Active Document Manifest to agree.
 
@@ -167,6 +167,8 @@ host-device-control-framework/
 ├── NOTICE.md
 ├── authority-registry.yaml
 ├── requirements-validation.txt
+├── schema/
+│   └── protocol.schema.yaml
 ├── .github/
 │   └── workflows/
 │       └── document-validation.yml
@@ -207,9 +209,15 @@ host-device-control-framework/
 │       ├── Coding_Rules_Review_Checklist.md
 │       └── AI_Generated_Artifact_Validation_Guide.md
 ├── tools/
-│   └── validate_repository.py
+│   ├── validate_repository.py
+│   └── validate_protocol.py
 └── tests/
-    └── test_validate_repository.py
+    ├── fixtures/
+    │   └── protocol/
+    │       ├── valid_*.yaml
+    │       └── invalid_*.yaml
+    ├── test_validate_repository.py
+    └── test_validate_protocol.py
 ```
 
 Directory `README.md` files are non-normative indexes. All other maintained Markdown under `docs/` is governed through `authority-registry.yaml`.
@@ -221,18 +229,19 @@ Run locally:
 ```bash
 python -m pip install --disable-pip-version-check --require-hashes -r requirements-validation.txt
 python tools/validate_repository.py
+python tools/validate_protocol.py tests/fixtures/protocol/valid_*.yaml
 python -m unittest discover -s tests -v
 ```
 
-The validator checks repository structure, registry equality, metadata/version/status, directory indexes, AI manifest, stable filenames, links, headings, fences, tables, NOTICE sections, routing, workflow controls, and regression-protected governance failures.
+The repository validator checks structure, registry equality, metadata/version/status, directory indexes, the AI manifest, stable filenames, links, headings, fences, tables, NOTICE sections, routing, workflow controls, the Protocol schema, valid/invalid semantic fixtures, and regression-protected governance failures. `validate_protocol.py` may also be run directly against Project Protocol YAML files.
 
 A passing result does not prove semantic correctness, Product suitability, safety, security adequacy, regulatory compliance, physical behavior, or human approval.
 
 ## Current Status
 
-The repository now contains the intended core authority layers for Framework, Protocol governance, Coordinator, Node, language implementation, validation evidence, and AI-assisted artifact control. New Protocol, Node, and validation documents remain **Draft for Review** until explicitly adopted.
+The repository now contains a machine-verifiable Single-Node and Multi-Node architecture baseline across Framework, Protocol governance, Coordinator, Node, and validation layers. The conditional `node_model`, semantic validator, schema, fixtures, and regression tests cover independent links, shared multidrop buses, and routed gateways while retaining legacy Single-Node YAML compatibility. Draft authorities remain **Draft for Review** until explicitly adopted.
 
-The next engineering phase is executable validation and reference implementation rather than uncontrolled document expansion.
+The next engineering phase is reference implementation, transport-specific Project adoption, interoperability testing, and target evidence rather than overlapping core-document expansion.
 
 ## Authorship and AI Assistance
 

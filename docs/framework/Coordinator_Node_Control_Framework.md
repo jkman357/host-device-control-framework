@@ -3,9 +3,9 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.14  
+**Document Version:** v1.1.0  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.13  
+**Supersedes Document Version:** v1.0.14  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -265,6 +265,7 @@ Markdown filename.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.0 | 2026-07-19 | Baseline | Established the complete Multi-Node architecture baseline for independent links, shared multidrop buses, and routed gateways; distinguished stable identity, runtime address, route, connection generation, Protocol and Secure Sessions; and defined per-Node isolation, lifecycle, targeting, shared-resource, broadcast, multi-target, Firmware Update, and fault-containment requirements while preserving Single-Node compatibility. |
 | v1.0.0 | 2026-07-15 | Not recorded | Integrated the Embedded Device Control Framework v1.4.2 and Coordinator/Node Architecture v1.2.1 into one Master Baseline. |
 | v1.0.1 | 2026-07-15 | Not recorded | Removed duplicate Protocol/Transport text, corrected Part XI numbering, removed obsolete normative references, removed the duplicate Baseline conclusion, and completed structural and Markdown validation without changing design semantics. |
 | v1.0.2 | 2026-07-18 | Not recorded | Converted the complete Framework to English; added Ray Yang authorship, repository identity, copyright, personal-project clarification, and third-party-material notice; aligned terminology and authority boundaries with `Embedded_C_Coding_Rules.md`, `Protocol_YAML_Definition_Guide.md`, and `Protocol_YAML_Template.md`; clarified Telemetry versus Stream semantics, Protocol/Transport boundaries, Application/Bootloader Session separation, Firmware Update transaction identity, runtime Transport Profiles, structural rewrite governance, and public GitHub publication requirements. |
@@ -932,28 +933,162 @@ docs/
 
 `protocol/docs/` stores Protocol-specific documentation. Root `docs/` stores system-level documentation.
 
-## 2.11 Single-Node to Multi-Node Evolution
+## 2.11 Single-Node and Multi-Node Architecture Baseline
 
-The first implementation may use:
-
-```text
-One active Node
-Fixed or simplified address
-One outstanding Request
-```
-
-Interfaces and data structures should still preserve:
+The Framework supports the following topology classes:
 
 ```text
-Node ID
-Node Address
-Service Domain
-Capability
-Routing Context
+Single Node on one connection
+Multiple Nodes on independent point-to-point connections
+Multiple Nodes on a shared multidrop bus
+Nodes reached through one or more routed gateways
 ```
 
-Do not implement unnecessary routing complexity in the first release, but do not hard-code the architecture so
-that multiple Nodes can never be introduced.
+A Project shall select and record its topology in the Framework Application Analysis and Project Protocol. The
+Framework does not require every Transport to encode a Node address in every Record. A connection-bound
+point-to-point profile may identify the target by an immutable connection-to-Node binding. A shared bus or route
+that cannot identify one target by connection context shall carry or derive an unambiguous target identity under
+the approved Transport Profile and Protocol.
+
+### 2.11.1 Identity, Address, Route, and Session Separation
+
+The design shall distinguish:
+
+```text
+Stable Node identity
+Runtime Node address
+Transport endpoint identity
+Logical route
+Physical connection
+Connection generation
+Protocol Session
+Secure Session
+Operation correlation identity
+```
+
+A bus address, socket, USB port, CAN identifier, Session ID, or route shall not be treated as a permanent Node
+identity unless the approved Project authority explicitly defines that equivalence. Address reassignment or
+connection replacement shall not silently transfer the previous Node's Session, authorization, pending Requests,
+or observed state.
+
+### 2.11.2 Per-Node Context and Isolation
+
+Each registered Node shall have a distinct context, or an equivalent design with the same isolation properties,
+covering at least:
+
+```text
+Identity and current address or route
+Transport connection and connection generation
+Protocol Session and Secure Session
+Capability and negotiated-version state
+Sequence and replay context
+Request/Response correlation and pending operations
+Observed actual state and freshness
+Immutable command-target binding
+Lifecycle state
+Resource quota and diagnostic context
+Firmware Update transaction state
+```
+
+A mutable global `current_device` or UI selection shall not be the authoritative target of an operation after that
+operation has been created. One Node's reconnect, malformed traffic, stream flood, timeout, cancellation, reset,
+or update shall not clear, rebind, starve, or corrupt another Node's state or operations.
+
+### 2.11.3 Node Registry and Lifecycle
+
+The Coordinator shall maintain a bounded Node Registry. The Project shall define an equivalent lifecycle covering:
+
+```text
+Unknown
+Discovered
+Registering
+Online
+Degraded
+Reconnecting
+Offline
+Removed
+Replaced
+Quarantined
+```
+
+Lifecycle transitions shall define identity verification, address assignment, capability discovery, Session
+establishment, reconciliation, stale-generation rejection, removal, and replacement. The same stable identity on
+multiple active paths, multiple identities claiming one address, an address reused by another Node, and an
+unauthorized or excess Node shall not be resolved by silent last-writer-wins replacement.
+
+### 2.11.4 Targeting and Operation Classes
+
+The architecture shall distinguish:
+
+```text
+Single-target operation
+Protocol broadcast
+Coordinator-expanded multi-target operation
+Aggregate query or aggregate presentation
+Coordinator-wide local operation
+```
+
+Selecting several Nodes in a UI does not by itself create a Protocol broadcast. A multi-target operation shall
+snapshot its target set and maintain an operation-level identity plus per-Node sub-operation state, progress,
+timeout, retry, cancellation, and final result. Partial success and partial failure shall be explicit. Rollback shall
+not be implied when the Product authority has not defined a safe rollback.
+
+Safety-significant control, configuration, reset, Rekey, credential, and Firmware Update operations shall default
+to single-target behavior unless the Project authority explicitly permits and validates multi-target or broadcast
+use.
+
+### 2.11.5 Broadcast and Shared-Bus Behavior
+
+When broadcast is supported, the Project Protocol shall define:
+
+- authorized Message categories and prohibited categories;
+- whether Nodes execute without a response or use polling, slots, a bounded response window, or another
+  collision-controlled response policy;
+- duplicate, late, unauthorized, and wrong-target behavior;
+- observability of partial execution and failure;
+- interaction with security, replay protection, and Firmware Update.
+
+A broadcast design shall not permit uncontrolled simultaneous responses or ambiguous per-Node completion.
+
+### 2.11.6 Shared Resources and Bounded Capacity
+
+A Multi-Node Coordinator shall define both per-Node and aggregate limits for registered and online Nodes, pending
+Requests, receive queues, stream and telemetry bandwidth, logging, reconnect attempts, discovery candidates,
+concurrent operations, and Firmware Updates. Shared schedulers shall define priority, fairness, starvation
+prevention, overload behavior, and observability.
+
+One Node shall not exhaust resources required for other Nodes through traffic rate, malformed input, reconnect
+storms, logging amplification, or repeated failures.
+
+### 2.11.7 Security and Trust Isolation
+
+Unless an approved security authority defines another model, authentication, authorization, Session keys, Record
+Counters, Replay windows, Rekey state, and Firmware Update authorization shall be bound to the authenticated
+stable Node identity and current connection generation. Address reuse shall require fresh identity verification and
+Session establishment. A routed gateway shall not silently extend trust to downstream Nodes.
+
+Group keys or shared Secure Sessions are not implied by Multi-Node support. They require an explicit security
+profile, authorization model, compromise analysis, rotation and revocation policy, and validation evidence.
+
+### 2.11.8 Firmware Update Coordination
+
+The Project shall define whether Firmware Updates are single-target only, serialized across Nodes, or bounded in
+parallel. Target identity, image compatibility, transaction state, signed Manifest, resume authorization, progress,
+activation, reconnect, and post-activation verification shall remain attributable to one Node. One failed update
+shall not corrupt another Node's update state.
+
+### 2.11.9 Aggregate State
+
+Coordinator aggregate status, alarms, progress, health, and availability shall be derived from identifiable per-Node
+state. Aggregate presentation shall preserve Node attribution and shall not hide partial failure, stale state, or an
+unknown target. Aggregate state is not a substitute for the Node's authoritative actual state.
+
+### 2.11.10 Backward-Compatible Single-Node Use
+
+A first implementation may use one active Node, one connection-bound target, and one outstanding Request.
+Omission of a conditional Multi-Node declaration may retain the legacy Single-Node interpretation defined by the
+Protocol YAML authority. This compatibility does not permit implementation code to discard stable identity,
+connection generation, Session ownership, correlation, or bounded resource concepts needed for safe evolution.
 
 ## 2.12 Build Targets and Physical Directories
 

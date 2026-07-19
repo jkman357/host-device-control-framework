@@ -8,6 +8,11 @@ Individual authority documents retain their own internal Version History and app
 
 ### Added
 
+- Added `schema/protocol.schema.yaml` as the controlled structural schema for the backward-compatible conditional `node_model`.
+- Added `tools/validate_protocol.py` with actionable rule, YAML path, expected value, actual value, and correction diagnostics for Multi-Node semantic validation.
+- Added valid Single-Node, independent-link, shared-bus, and routed-gateway fixtures plus invalid conflict, addressing, broadcast, scope, lifecycle, resource, and Firmware Update fixtures.
+- Added Protocol semantic-validator regression tests and integrated the fixture matrix into repository validation.
+
 - Added `docs/protocol/Protocol_Compatibility_Rules.md` for Protocol version consequences, change classification, mixed-version operation, deprecation, removal, and compatibility evidence.
 - Added `docs/protocol/Protocol_Registry_Governance.md` for Message and Capability ID allocation, namespaces, lifecycle, retirement, non-reuse, merge control, and generated Registry artifacts.
 - Added `docs/protocol/Protocol_Security_Profile.md` for secure-session applicability, authentication, authorization, record protection, replay, Counter, Rekey, reconnect, credential, Bootloader, and Firmware Update security governance.
@@ -31,6 +36,11 @@ Individual authority documents retain their own internal Version History and app
 - Added `requirements-validation.txt` with the pinned PyYAML validation dependency.
 
 ### Changed
+
+- Expanded the Framework, Application Analysis, Protocol YAML, compatibility, Registry, security, Coordinator, Node, and validation authorities into a complete Multi-Node baseline for independent point-to-point links, shared multidrop buses, and routed gateways.
+- Added the conditional `node_model` contract while preserving omission as the legacy Single-Node interpretation and avoiding a mandatory on-wire Node ID for connection-bound point-to-point links.
+- Defined stable Node identity, runtime address, route, connection generation, Protocol Session, Secure Session, correlation, lifecycle, broadcast, multi-target, resource-containment, and Firmware Update targeting semantics.
+- Synchronized `authority-registry.yaml`, the root document set, AI Active Document Manifest, directory indexes, repository structure, and validation guidance for the Multi-Node authority changes.
 
 - Updated AI Engineering Usage Guide to v1.0.20, Coordinator/Node Control Framework to v1.0.14, Framework Application Analysis Template to v1.0.17, Protocol YAML Definition Guide to v1.0.11, and Repository Validation Checklist to v1.0.6.
 - Split Protocol topic ownership so dedicated compatibility, Registry, and security documents own governance decisions while the Protocol YAML Definition Guide retains machine-verifiable representation, Semantic Lint, validation, and Code Generation ownership.

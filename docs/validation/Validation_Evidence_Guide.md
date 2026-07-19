@@ -1,7 +1,8 @@
 # Validation Evidence Guide
 
 **Canonical Filename:** `Validation_Evidence_Guide.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -30,6 +31,7 @@ This document defines an evidence method. It does not itself establish Product a
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added minimum Multi-Node evidence identity and result records for topology fixtures, conflicts, cross-Node isolation, resource containment, broadcast, UI binding, mixed versions, and Firmware Update targeting. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining evidence types, identity, traceability, reproducibility, ownership, environment and tool identification, pass/fail criteria, anomalies, retention, invalid evidence, and AI-generated evidence limitations. |
 
 ---
@@ -341,7 +343,33 @@ AI shall not claim that:
 - a hash proves authenticity without an independent trust anchor;
 - generated code is safe merely because it follows a template.
 
-## 28. Minimum Evidence Record
+## 28. Multi-Node Evidence Record
+
+A Multi-Node claim shall identify the tested topology, number of simulated and physical Nodes, stable identities,
+runtime addresses/routes, Protocol and security profiles, software versions, resource limits, and applicable
+transport conditions. Evidence shall retain per-Node and aggregate results.
+
+The evidence set shall include applicable results for:
+
+```text
+Schema and Semantic Lint
+Legacy Single-Node regression
+Valid independent-link, shared-bus, and routed fixtures
+Invalid topology and scope fixtures
+Duplicate identity and address conflict
+Cross-Node correlation, sequence, Replay, Protocol Session, and Secure Session isolation
+Disconnect/reconnect and stale connection generation
+Per-Node and aggregate resource exhaustion
+Broadcast response-collision prevention
+Multi-target partial result and UI target binding
+Firmware Update target and concurrency
+Mixed Protocol and Capability versions
+```
+
+A tool result supports only the topology, fixtures, rules, implementation, versions, and environment actually
+executed. Simulated evidence shall not be represented as physical multi-device evidence.
+
+## 29. Minimum Evidence Record
 
 A practical minimum record is:
 

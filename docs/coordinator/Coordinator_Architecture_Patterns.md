@@ -3,7 +3,8 @@
 > Reusable Structural Patterns for Coordinator-Side Applications
 
 **Canonical Filename:** `Coordinator_Architecture_Patterns.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -38,6 +39,7 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Expanded the Multi-Node isolation pattern into Node Registry, Node Context, immutable target/route binding, per-Node request/state/resource, shared-bus scheduling, aggregate-state, replacement, and multi-target operation patterns. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining Coordinator layers, dependency direction, state ownership, command and receive pipelines, lifecycle handling, multi-Node isolation, security-session ownership, extension boundaries, configuration, error propagation, pattern selection, anti-patterns, and review criteria. |
 
 ---
@@ -280,18 +282,68 @@ After initial connect, reconnect, reset, or suspected desynchronization, the Coo
 
 ## 4.6 Multi-Node Isolation Pattern
 
-When one Coordinator communicates with more than one Node, each Node relationship shall have independently identifiable:
+### 4.6.1 Node Registry Pattern
 
-- Transport instance or routed link identity;
-- connection generation;
+A bounded Node Registry maps authenticated stable identity to the current Node Context. Discovery candidates,
+partially registered Nodes, online Nodes, replaced Nodes, and quarantined conflicts shall not share one ambiguous
+entry. Duplicate identity or address conflict shall be surfaced rather than resolved by last-writer-wins.
+
+### 4.6.2 Node Context Pattern
+
+Each Node Context shall own its own:
+
+- stable identity and current address or route;
+- Transport connection and connection generation;
 - Protocol and Secure Session state;
-- capability and compatibility result;
-- pending-request table or a table keyed by target identity;
-- observed-state store;
-- queue and resource quotas;
-- recording, logging, and diagnostic correlation context.
+- Capability and negotiated-version state;
+- sequence, Replay, and correlation context;
+- pending Request table and command lifecycle;
+- observed-state store and freshness;
+- queue and resource quota;
+- logging and audit context;
+- lifecycle and Firmware Update transaction state.
 
-A disconnect, reset, capability change, or overload affecting one Node shall not invalidate unrelated Node relationships unless an approved shared-resource policy requires it. A pending command shall never be rerouted merely because the active UI selection changes. Reconnect to a different physical Node shall invalidate prior observed state, capability data, authorization state, and pending work before commands are enabled.
+### 4.6.3 Connection-to-Node and Route-to-Node Binding
+
+A point-to-point connection may bind one Node without an on-wire address. A shared bus or routed topology shall
+provide an unambiguous protected target. The mapping shall be generation-aware. A prior connection, address, or
+route shall not deliver state or Responses into a replacement Node Context.
+
+### 4.6.4 Immutable Command Target Binding
+
+An operation shall contain an immutable target snapshot comprising stable Node identity plus the required
+Session/connection-generation context. A mutable global `current_device`, current list selection, or active tab is
+not a valid operation target. UI selection changes shall affect only subsequently created operations.
+
+### 4.6.5 Per-Node Request and State Patterns
+
+Pending Requests and observed state shall be partitioned by Node context or use globally collision-free identities
+that retain Node attribution. A Node reconnect shall cancel or reconcile only that Node's affected work and shall
+not reset unrelated Nodes.
+
+### 4.6.6 Shared-Bus Scheduler and Resource Quota Patterns
+
+A shared scheduler shall apply priority, fairness, starvation prevention, and bounded per-Node plus aggregate
+queues. A noisy or failed Node shall be rate-limited, rejected, degraded, or quarantined without consuming all
+Coordinator resources.
+
+### 4.6.7 Aggregate State Pattern
+
+Aggregate health, Alarm, progress, and availability are projections over per-Node state. The projection shall retain
+source identity, freshness, unknown/offline state, and partial failure. Aggregate state shall not overwrite or become
+the source of truth for a Node's actual state.
+
+### 4.6.8 Node Removal and Replacement Pattern
+
+Removal invalidates address/route binding, connection generation, Sessions, pending Requests, and stale observed
+state under an explicit policy. Replacement at the same address creates a new identity binding and shall not inherit
+authorization or operation state.
+
+### 4.6.9 Multi-Target Operation Pattern
+
+A multi-target operation snapshots a target set, creates per-Node sub-operations, and exposes per-Node progress,
+timeout, retry, cancellation, and result plus a deterministic aggregate result. It is not a Protocol broadcast and
+does not imply rollback.
 
 # 5. Command Pipeline Pattern
 

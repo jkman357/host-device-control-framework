@@ -1,0 +1,90 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://example.invalid/host-device-control-framework/protocol.schema.yaml
+title: Host-Device Protocol YAML Schema
+type: object
+required:
+  - schema_version
+  - document
+  - protocol
+  - wire_format
+  - id_allocation
+  - namespaces
+  - services
+  - enums
+  - errors
+  - messages
+  - compatibility
+  - code_generation
+properties:
+  schema_version:
+    type: string
+  document:
+    type: object
+  protocol:
+    type: object
+  wire_format:
+    type: object
+  id_allocation:
+    type: object
+  namespaces:
+    type: array
+  services:
+    type: array
+  enums:
+    type: array
+  errors:
+    type: array
+  messages:
+    type: array
+  compatibility:
+    type: object
+  code_generation:
+    type: object
+  node_model:
+    type: object
+    required:
+      - topology
+      - maximum_nodes
+      - maximum_online_nodes
+      - identity
+      - addressing
+      - multi_target
+      - scope
+      - lifecycle
+      - resources
+      - firmware_update
+    properties:
+      topology:
+        type: string
+        enum: [single_node, independent_links, shared_multidrop_bus, routed_gateway]
+      maximum_nodes:
+        type: integer
+        minimum: 1
+      maximum_online_nodes:
+        type: integer
+        minimum: 1
+      identity:
+        type: object
+        required: [node_id_required, uniqueness_scope, persistence]
+      addressing:
+        type: object
+        required: [method, address_assignment, target_required_on_wire, broadcast]
+      multi_target:
+        type: object
+        required: [supported, partial_failure_policy]
+      scope:
+        type: object
+        required: [protocol_session, secure_session, sequence, correlation]
+      lifecycle:
+        type: object
+        required:
+          - identity_conflict_policy
+          - address_reuse_requires_new_connection_generation
+          - address_reuse_requires_new_secure_session
+      resources:
+        type: object
+        required: [maximum_pending_requests_per_node, maximum_total_pending_requests]
+      firmware_update:
+        type: object
+        required: [target_scope, concurrency]
+additionalProperties: true

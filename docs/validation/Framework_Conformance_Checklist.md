@@ -1,7 +1,8 @@
 # Framework Conformance Checklist
 
 **Canonical Filename:** `Framework_Conformance_Checklist.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -29,6 +30,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Expanded Multi-Node conformance checks for topology, Node Registry and Context, immutable targeting, identity/address/lifecycle separation, fault and resource containment, shared-bus fairness, aggregate state, broadcast, multi-target operations, security, and updates. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft providing a traceable Framework role, authority, layering, lifecycle, reconnect, safety, Bootloader, configuration, generated-code, deviation, and evidence conformance view. |
 
 ---
@@ -80,11 +82,19 @@ For each item record the governing section, applicability, method, evidence, res
 
 # 7. Reconnect and Multi-Node Behavior
 
-- [ ] F-050 Reconnect creates or validates a new connection generation and rejects stale callbacks/results.
-- [ ] F-051 Version, capability, security, state, configuration, subscription, and transaction assumptions are reconciled after reconnect.
-- [ ] F-052 Multi-Node Sessions, state, commands, logs, security contexts, and UI binding are isolated.
-- [ ] F-053 One slow or faulty Node cannot create unbounded impact on unrelated Nodes.
-- [ ] F-054 Device replacement and identity change are distinguishable from reconnect to the same authenticated Node.
+- [ ] F-050 Connection lifecycle includes connect, negotiate, operate, disconnect, reconnect, cancellation, and shutdown.
+- [ ] F-051 Reconnect invalidates stale transport, Protocol, Session, Request, and cached-state assumptions.
+- [ ] F-052 Supported topology is explicitly selected as Single-Node, independent links, shared multidrop bus, or routed gateway.
+- [ ] F-053 Stable identity, runtime address, endpoint, route, connection generation, Protocol Session, Secure Session, and correlation are distinct.
+- [ ] F-054 A bounded Node Registry and per-Node Context isolate identity, state, pending requests, resources, Sessions, updates, and logs.
+- [ ] F-055 Commands use an immutable target snapshot; no mutable global current Node or UI selection can rebind active work.
+- [ ] F-056 Duplicate identity, address conflict, address reuse, replacement, maximum count, and quarantine behavior are explicit.
+- [ ] F-057 One Node reconnect, failure, malformed traffic, flood, or update does not reset, starve, authorize, or corrupt unrelated Nodes.
+- [ ] F-058 Shared-resource scheduling defines per-Node and aggregate limits, priority, fairness, starvation prevention, and overload behavior.
+- [ ] F-059 Aggregate state preserves per-Node attribution, freshness, unknown/offline state, and partial failure.
+- [ ] F-05A Broadcast and multi-target operations are distinct and have approved targeting, response, partial-result, and cancellation semantics.
+- [ ] F-05B Protocol and Secure Sessions, sequence, Replay, and correlation cannot collide or migrate across Nodes or generations.
+- [ ] F-05C Firmware Update target, transaction, concurrency, and post-activation result remain attributable to one Node.
 
 # 8. Timing, Concurrency, and Resources
 

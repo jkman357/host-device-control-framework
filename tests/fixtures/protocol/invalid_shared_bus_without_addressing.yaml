@@ -1,0 +1,57 @@
+# Expected: FAIL PY-MN-016/PY-MN-017.
+schema_version: '1.0'
+document:
+  name: fixture_protocol
+  version: v1.0.0
+  status: test
+protocol:
+  name: fixture
+  family: coordinator_node
+  version: V1.0.0
+wire_format:
+  byte_order: little_endian
+  implicit_padding: prohibited
+id_allocation:
+  message_id_width_bits: 16
+namespaces: []
+services: []
+enums: []
+errors: []
+messages: []
+compatibility:
+  minimum_compatible_version: V1.0.0
+code_generation:
+  enabled: false
+node_model:
+  topology: shared_multidrop_bus
+  maximum_nodes: 4
+  maximum_online_nodes: 4
+  identity:
+    node_id_required: true
+    uniqueness_scope: protocol_instance
+    persistence: stable
+  addressing:
+    method: connection_bound
+    address_assignment: assigned
+    target_required_on_wire: false
+    broadcast:
+      supported: false
+      response_policy: not_applicable
+  multi_target:
+    supported: false
+    partial_failure_policy: not_applicable
+  scope:
+    protocol_session: per_node
+    secure_session: per_node
+    sequence: per_node_session
+    correlation: per_node_session
+  lifecycle:
+    identity_conflict_policy: reject_and_quarantine
+    address_reuse_requires_new_connection_generation: true
+    address_reuse_requires_new_secure_session: true
+  resources:
+    maximum_pending_requests_per_node: 1
+    maximum_total_pending_requests: 4
+  firmware_update:
+    target_scope: single_node
+    concurrency: one_at_a_time

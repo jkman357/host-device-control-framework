@@ -1,9 +1,9 @@
 # Coordinator Software Engineering Rules
 
 **Canonical Filename:** `Coordinator_Software_Engineering_Rules.md`  
-**Document Version:** v1.0.5  
+**Document Version:** v1.1.0  
 **Status:** Draft for Review  
-**Supersedes Document Version:** v1.0.4  
+**Supersedes Document Version:** v1.0.5  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
@@ -32,6 +32,7 @@ This document is independently authored. External standards and guidance are ref
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added Coordinator-wide Multi-Node targeting, context isolation, registry/lifecycle, shared-resource, broadcast, multi-target, aggregate-state, Session, and Firmware Update realization requirements while preserving Single-Node implementations. |
 | v1.0.5 | 2026-07-19 | Draft for Review | Added explicit routing and authority boundaries for the five topic-specific Coordinator Guides; clarified that this document owns cross-topic minimum constraints while an explicitly adopted Guide owns detailed realization within its topic; retained Draft for Review status pending human approval. |
 | v1.0.4 | 2026-07-19 | Draft for Review | Added explicit Supersedes metadata required by repository governance; no normative Coordinator engineering requirements changed. |
 | v1.0.3 | 2026-07-18 | Draft for Review | Resolved authority ownership by topic before precedence, clarified that Framework and Protocol restatements are derived conformance summaries while Coordinator-specific realization remains owned here, and reinforced role-first implementation routing without changing Project approval status. |
@@ -785,6 +786,25 @@ Request/response behavior shall define:
 - Session-loss behavior.
 
 A response shall not be matched only by message type when multiple concurrent requests of the same type are possible.
+
+## 36.1 Multi-Node Coordinator Boundary
+
+When more than one logical Node is supported, the Coordinator shall maintain a bounded Node Registry and a
+distinct Node context, or an equivalent representation, for identity, current address/route, connection generation,
+Protocol and Secure Sessions, Capability/version state, sequence/Replay context, pending Requests, observed state,
+operation target, lifecycle, resource quota, diagnostics, and Firmware Update state.
+
+A Request or operation shall snapshot its target identity and connection generation at creation. UI selection,
+re-discovery, address reuse, or another Node reconnect shall not rebind it. Response correlation shall include enough
+Node/Session/generation context to reject a Response from another Node or a previous connection.
+
+Shared buses and global services shall define bounded scheduling, priority, fairness, starvation prevention, and
+per-Node plus aggregate limits. One Node's traffic, failures, logs, or reconnect storm shall not exhaust other Nodes'
+required capacity.
+
+Coordinator-expanded multi-target operations shall create per-Node sub-operations and explicit partial results;
+they shall not be represented as successful because any one Node succeeded. Protocol broadcast is a separate wire
+behavior and shall be used only where the Project Protocol authorizes the Message and response policy.
 
 ## 37. Command Execution
 

@@ -1,7 +1,8 @@
 # Protocol Registry Governance
 
 **Canonical Filename:** `Protocol_Registry_Governance.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -32,6 +33,7 @@ This document is independently authored for a personal engineering project. Thir
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Distinguished stable Node identity, runtime address, transport endpoint, route, Session, and operation identities; defined address-space reserved values, reuse, replacement, conflict, and broadcast/group governance without changing Message or Capability Registry scope. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining Protocol namespaces, identifier allocation, uniqueness, lifecycle, retirement, merge control, generated artifacts, validation, and evidence. |
 
 ---
@@ -237,9 +239,48 @@ A new semantic concept requires a new identity even when the old implementation 
 
 Historical Registry entries shall not be deleted merely to simplify the current view. Corrections shall preserve an auditable history, including the previous erroneous value or allocation record where needed to understand released artifacts.
 
+## 17. Node Identity, Runtime Address, and Route Governance
+
+The following identities occupy different scopes and shall not be silently aliased:
+
+| Identity | Primary Meaning | Typical Governance |
+|---|---|---|
+| Protocol family/profile ID | Protocol contract | Protocol Registry |
+| Message ID | Message meaning | Message Registry |
+| Capability ID | Optional behavior | Capability Registry |
+| Namespace or Service ID | Protocol organization | Protocol Registry |
+| Stable Node ID | Logical Node identity | Project identity authority |
+| Runtime Node address | Current delivery address | Project Protocol/Transport Profile |
+| Transport endpoint | Socket, port, bus endpoint, or link handle | Runtime Transport |
+| Logical route | Gateway/path selector | Project routing authority |
+| Protocol or Secure Session ID | Current Session context | Session authority |
+| Operation correlation ID | Request or operation matching | Protocol/application authority |
+
+Message IDs and Capability IDs remain Protocol-family allocations and shall not acquire different meanings per
+Node. A Node ID does not create a private Message Registry. A runtime address shall not be used as permanent
+identity unless approved as such by the Project identity authority.
+
+When a Protocol allocates runtime or group addresses, it shall govern:
+
+- width and encoding;
+- uniqueness scope and assignment authority;
+- invalid, unassigned, Coordinator, broadcast, group, reserved, and experimental values;
+- fixed, discovered, and assigned lifecycles;
+- duplicate identity and address-conflict behavior;
+- address release, reuse, replacement, and quarantine;
+- mapping to stable identity and connection generation;
+- evidence that stale Sessions and Responses cannot migrate to a new Node at a reused address.
+
+Published address meanings and reserved values shall not be silently reallocated. Runtime address reuse may be
+permitted only when a new connection generation and fresh identity/Session validation prevent stale-message,
+authorization, Replay, and state inheritance.
+
+Broadcast and group addresses do not authorize Messages by themselves. Message eligibility, response policy,
+security, and Product behavior remain under their owning authorities.
+
 # Part V — Generated Artifacts and Validation
 
-## 17. Generated Registry Artifacts
+## 18. Generated Registry Artifacts
 
 Generated outputs may include:
 
@@ -254,7 +295,7 @@ Generated outputs may include:
 
 Each generated artifact shall identify its Registry source identity or reproducible input hash. Manual edits to generated identity values are prohibited unless the Project explicitly owns a controlled override process.
 
-## 18. Validation Requirements
+## 19. Validation Requirements
 
 Automated validation shall check, as applicable:
 
@@ -273,7 +314,7 @@ Automated validation shall check, as applicable:
 
 Validation shall fail rather than silently select one of two colliding entries.
 
-## 19. Review Evidence
+## 20. Review Evidence
 
 An allocation or lifecycle change shall retain:
 
@@ -289,13 +330,13 @@ An allocation or lifecycle change shall retain:
 
 A generated file without traceable Registry input is not sufficient evidence of approved allocation.
 
-## 20. Release Control
+## 21. Release Control
 
 A release shall identify the exact Registry source used by the Protocol and generated implementations. If Registry source and generated output do not match, the release shall fail or remain explicitly unapproved.
 
 Detached packages should include a manifest or immutable source reference sufficient to recover the Registry identity.
 
-## 21. AI-Assisted Work
+## 22. AI-Assisted Work
 
 AI may suggest names, detect collisions, prepare allocation requests, regenerate artifacts, and compare Registries. AI shall not:
 

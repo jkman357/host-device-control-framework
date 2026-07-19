@@ -1,7 +1,8 @@
 # Protocol Security Profile
 
 **Canonical Filename:** `Protocol_Security_Profile.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -32,6 +33,7 @@ This document is independently authored for a personal engineering project. It i
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added per-Node identity, connection-generation, Session, key, Replay, Rekey, broadcast, group-security, routed-gateway, compromised-Node containment, replacement, and Firmware Update target-binding requirements. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining security-profile applicability, secure-session lifecycle, authentication, authorization, confidentiality, integrity, replay protection, counters, rekey, reconnect, credentials, downgrade prevention, Bootloader separation, Firmware Update relationship, and evidence. |
 
 ---
@@ -325,9 +327,46 @@ The Profile shall define behavior for:
 
 Repeated failures shall not cause unbounded log, retry, allocation, or response amplification.
 
+## 24. Multi-Node Security Isolation
+
+The default Multi-Node security model is per-Node. Authentication, authorization, Protocol Session, Secure Session,
+Key Context, Record Counter, Replay state, Rekey state, credential decision, and Firmware Update authorization shall
+bind the authenticated stable Node identity and current connection generation.
+
+A runtime address, route, socket, USB port, CAN identifier, or discovery result shall not substitute for
+authenticated stable identity. Address reassignment, route change, Node replacement, or a different Node appearing
+at a prior endpoint shall require identity verification and a fresh Secure Session. Previous pending operations,
+keys, Replay windows, authorization, and update-resume state shall not transfer.
+
+A compromised, malformed, flooding, or repeatedly reconnecting Node shall not expose another Node's secrets,
+Session material, authorization, counters, logs, update state, or service availability. Per-Node and aggregate
+security-resource limits shall be bounded.
+
+Protocol broadcast shall define authentication, authorization, Replay, target scope, and response behavior. A
+shared group key or group Secure Session is not implied. It may be used only when an approved profile defines:
+
+```text
+Membership and identity binding
+Provisioning and trust anchors
+Compromise impact
+Join, leave, rotation, Rekey, and revocation
+Replay and sender attribution
+Authorization by Message category
+Response-collision policy
+Audit and incident evidence
+```
+
+Safety-significant control, credential, Rekey, reset, and Firmware Update broadcasts shall be prohibited unless the
+Product authority explicitly approves and validates them.
+
+A routed gateway shall declare whether it is a transparent router, authenticated intermediary, or security
+termination point. Trust shall not automatically extend from the gateway to downstream Nodes. Firmware Update
+Manifest, transaction, resume authorization, image compatibility, activation, and post-update confirmation shall
+remain bound to the intended Node.
+
 # Part VII — Validation and AI Controls
 
-## 24. Required Evidence
+## 25. Required Evidence
 
 Security evidence shall identify the exact implementation, Protocol, Profile, environment, credentials class, tools, configuration, and test boundary.
 
@@ -351,7 +390,7 @@ Evidence should include, as applicable:
 
 A simulator or mock shall not prove secure-storage behavior, hardware identity, physical attack resistance, or target timing.
 
-## 25. Prohibited Repository Content
+## 26. Prohibited Repository Content
 
 This Repository shall not contain:
 
@@ -364,7 +403,7 @@ This Repository shall not contain:
 
 Examples shall use unmistakably non-production placeholders and shall be rejected by Product-baseline lint when unresolved.
 
-## 26. AI-Assisted Security Work
+## 27. AI-Assisted Security Work
 
 AI may assist with threat enumeration, traceability, test design, diff review, and consistency checks. AI shall not:
 

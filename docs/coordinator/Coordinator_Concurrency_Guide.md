@@ -3,7 +3,8 @@
 > Threading, Asynchrony, Cancellation, and Bounded Work for Coordinator Software
 
 **Canonical Filename:** `Coordinator_Concurrency_Guide.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -38,6 +39,7 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added per-Node queue, cancellation, generation-aware correlation, shared-bus fairness, bounded multi-target concurrency, Node-removal races, and overload isolation requirements and tests. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining concurrency models, ownership, UI-thread rules, asynchronous I/O, bounded channels, cancellation, timeout, synchronization, attempt generations, priority isolation, shutdown, overload handling, testing, and anti-patterns. |
 
 ---
@@ -332,6 +334,21 @@ On disconnect:
 
 ---
 
+
+## 11.1 Multi-Node Correlation and Generation Isolation
+
+Correlation keys shall include the Node/Session scope required by the Protocol. A Response received on the wrong
+Node context, Secure Session, logical route, or connection generation shall be rejected as stale or misrouted and
+shall not complete another Node's operation.
+
+Per-Node cancellation sources, queues, timers, and reconnect transitions shall not be shared in a way that cancels
+or drains unrelated Nodes. Node removal during active work shall atomically prevent new work, cancel or reconcile
+owned work, reject late completions, and preserve evidence of the final state.
+
+A shared-bus scheduler shall define bounded work classes, priority, fairness, and starvation prevention. Multi-target
+operations shall use bounded parallelism and shall preserve per-Node timeout and cancellation outcomes. One Node's
+flood, reconnect storm, or slow consumer shall trigger local or bounded aggregate backpressure rather than an
+unbounded global queue.
 
 # 12. Priority and Work-Class Isolation
 

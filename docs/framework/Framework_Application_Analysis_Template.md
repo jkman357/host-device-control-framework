@@ -3,9 +3,9 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.17  
+**Document Version:** v1.1.0  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.16  
+**Supersedes Document Version:** v1.0.17  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -91,6 +91,7 @@ Other Coordinator/Node applications
 
 | Version | Date | Status | Author | Description |
 | --- | --- | --- | --- | --- |
+| v1.1.0 | 2026-07-19 | Baseline | Ray Yang | Added mandatory Multi-Node topology, identity, addressing, lifecycle, operation, security, shared-resource, Firmware Update, validation, and acceptance analysis records for independent links, shared buses, and routed gateways while retaining the existing Single-Node application path. |
 | v1.0.0 | 2026-07-15 | Not recorded | Ray Yang | Established the initial reusable Application Analysis template. |
 | v1.0.1 | 2026-07-15 | Not recorded | Ray Yang | Added Security and Access Control analysis, Framework compatibility revalidation, and Gap owner/status tracking. |
 | v1.0.2 | 2026-07-15 | Not recorded | Ray Yang | Corrected Section 20 Final Output Format numbering. |
@@ -1125,6 +1126,138 @@ conditions cannot support the requested Stream.
 | CPU worst case | `<TBD>` | `<TBD>` | `<TBD>` | `<TBD>` | `<Evidence>` |
 
 ---
+
+## 9.8 Multi-Node Topology, Identity, and Resource Analysis
+
+Complete this section for every Project. A Single-Node Project may select `single_node`, but it shall still record
+its target-binding and future-evolution assumptions.
+
+### 9.8.1 Topology Decision
+
+| Decision | Project Entry | Authority / Evidence |
+|---|---|---|
+| Topology | `single_node`, `independent_links`, `shared_multidrop_bus`, or `routed_gateway` | `<Project authority>` |
+| Maximum registered Nodes | `<bounded value>` | `<resource analysis>` |
+| Maximum simultaneously online Nodes | `<bounded value>` | `<resource analysis>` |
+| Physical links and logical routes | `<description>` | `<architecture>` |
+| Connection-bound targeting allowed | `<yes/no and conditions>` | `<Protocol/Transport Profile>` |
+| On-wire target identity required | `<yes/no and conditions>` | `<Protocol/Transport Profile>` |
+| Gateway trust boundary | `<not applicable or definition>` | `<security architecture>` |
+
+### 9.8.2 Identity and Addressing
+
+Record separately:
+
+| Item | Project Decision |
+|---|---|
+| Stable Node identity source and persistence | `<decision>` |
+| Identity uniqueness scope | `<decision>` |
+| Runtime address form | `<decision>` |
+| Address assignment | `fixed`, `discovered`, `assigned`, or `not_applicable` |
+| Transport endpoint identity | `<decision>` |
+| Logical route identity | `<decision>` |
+| Discovery and registration flow | `<decision>` |
+| Duplicate identity policy | `<reject/quarantine/operator resolution>` |
+| Address conflict policy | `<decision>` |
+| Address reuse and connection-generation policy | `<decision>` |
+| Node replacement policy | `<decision>` |
+| Maximum-Node-count behavior | `<reject/quarantine/operator resolution>` |
+
+Do not equate Node ID, bus address, Session ID, route, socket, USB port, or CAN identifier without an approved
+Project decision and evidence.
+
+### 9.8.3 Scope and Isolation Decisions
+
+| Context | Scope | Required Evidence |
+|---|---|---|
+| Protocol Session | `<per Node / approved shared scope>` | `<analysis/test>` |
+| Secure Session | `<per Node / approved group profile>` | `<security review>` |
+| Sequence and Replay state | `<scope>` | `<semantic lint/test>` |
+| Request/Response correlation | `<scope>` | `<semantic lint/test>` |
+| Timeout and retry | `<per operation/per Node>` | `<test>` |
+| Pending Request table | `<per Node plus aggregate limit>` | `<resource test>` |
+| Observed-state store | `<per Node>` | `<architecture test>` |
+| Command target | `<immutable operation snapshot>` | `<UI/concurrency test>` |
+| Cancellation | `<single target/subset/all>` | `<test>` |
+| Logging and audit context | `<Node-attributable fields>` | `<log review>` |
+
+### 9.8.4 Unicast, Broadcast, Multi-Target, and Aggregate Operations
+
+For each operation category, record whether it is allowed and why:
+
+| Operation Class | Allowed | Target/Response Policy | Partial-Failure Policy |
+|---|---:|---|---|
+| Single-target | `<yes/no>` | `<binding>` | `<not applicable or policy>` |
+| Broadcast | `<yes/no>` | `<no response/polled/slotted/bounded window>` | `<observability>` |
+| Coordinator-expanded multi-target | `<yes/no>` | `<per-Node sub-operations>` | `<per-target/fail-fast/best-effort>` |
+| Aggregate query or view | `<yes/no>` | `<per-Node source and freshness>` | `<unknown/stale/partial>` |
+| Coordinator-wide local operation | `<yes/no>` | `<local scope>` | `<policy>` |
+
+Explicitly decide whether safety-significant control, configuration, reset, Rekey, credential, and Firmware Update
+operations may use broadcast or multi-target behavior. An unresolved decision shall use the Project's controlled
+unresolved-decision sentinel and shall block Product Baseline approval.
+
+### 9.8.5 Shared Resource and Scheduling Budget
+
+| Resource | Per-Node Limit | Aggregate Limit | Overload / Backpressure | Evidence |
+|---|---:|---:|---|---|
+| Pending Requests | `<value>` | `<value>` | `<policy>` | `<test>` |
+| Receive queue | `<value>` | `<value>` | `<policy>` | `<test>` |
+| Telemetry bandwidth | `<value>` | `<value>` | `<policy>` | `<measurement>` |
+| Stream bandwidth | `<value>` | `<value>` | `<policy>` | `<measurement>` |
+| Log rate/storage | `<value>` | `<value>` | `<policy>` | `<test>` |
+| Reconnect attempts | `<value>` | `<value>` | `<policy>` | `<test>` |
+| Discovery candidates | `<value>` | `<value>` | `<policy>` | `<test>` |
+| Concurrent operations | `<value>` | `<value>` | `<policy>` | `<test>` |
+| Concurrent Firmware Updates | `<value>` | `<value>` | `<policy>` | `<test>` |
+| CPU, RAM, file, and handle use | `<value>` | `<value>` | `<policy>` | `<measurement>` |
+
+Define bus scheduling, priority, fairness, starvation prevention, and the behavior of one noisy, malformed,
+reconnecting, degraded, or offline Node.
+
+### 9.8.6 Lifecycle and Recovery Matrix
+
+Analyze at least:
+
+```text
+Same identity on two active connections
+Two identities claiming one address
+Node reboot with the same identity
+Different Node appearing at a reused address
+Disconnect during a pending Request
+Stale response from a previous connection generation
+Coordinator restart and Node re-registration
+Partially registered or disappearing Node
+Unauthorized or unknown Node
+Node removal and replacement
+Mixed Protocol and Capability versions
+One Node fault, flood, or update failure while others remain active
+```
+
+For every case, identify state transition, affected contexts, stale-data handling, user/service visibility, recovery,
+and evidence. Silent last-writer-wins replacement is not an acceptable conflict policy.
+
+### 9.8.7 Firmware Update Coordination
+
+Record target binding, maximum concurrent updates, serialization or bounded-parallel policy, shared-bandwidth
+allocation, per-Node Manifest and transaction state, interruption behavior, post-activation verification, and the
+required behavior of unaffected Nodes.
+
+### 9.8.8 Validation Configuration and Acceptance Criteria
+
+Define the minimum simulator and physical setup, including:
+
+- minimum simultaneous simulated Nodes;
+- minimum simultaneous physical Nodes or a justified substitute;
+- independent-link, shared-bus, and routed profiles applicable to the Product;
+- duplicate identity, address conflict, stale generation, cross-Node correlation, sequence, Session, Secure Session,
+  resource exhaustion, reconnect isolation, broadcast collision, Firmware Update targeting, UI target binding, and
+  mixed-version tests;
+- per-Node and aggregate logging/evidence requirements.
+
+Multi-Node acceptance shall require evidence that one Node cannot rebind, starve, corrupt, authorize, cancel, or
+misrepresent another Node's operation or state. Project-specific values shall not be invented by the Framework or
+an AI system.
 
 # 10. State Machines
 

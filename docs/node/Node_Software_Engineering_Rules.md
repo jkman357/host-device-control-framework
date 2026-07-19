@@ -1,7 +1,8 @@
 # Node Software Engineering Rules
 
 **Canonical Filename:** `Node_Software_Engineering_Rules.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -34,6 +35,7 @@ This document is independently authored. External standards and guidance are ref
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added Node identity/address lifecycle, discovery and registration, target validation, wrong-target and broadcast behavior, Session binding, duplicate/conflict handling, replacement, resource isolation, and Firmware Update target requirements for Multi-Node deployments. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining Node-specific layering, execution context, state and command ownership, local safety, startup, communication loss, bounded resources, telemetry, persistence, diagnostics, Bootloader handoff, target testing, and AI implementation controls. |
 
 ---
@@ -219,6 +221,32 @@ Exclusive operations shall reject, queue, or explicitly arbitrate conflicts. Bli
 The Node shall validate capability and current state even when the Coordinator has already done so. Capability may depend on hardware variant, configuration, security role, execution environment, fault state, or runtime availability.
 
 Unsupported or temporarily unavailable behavior shall return a defined result without partial uncontrolled execution.
+
+## 18.1 Multi-Node Identity and Target Validation
+
+A Node shall acquire, store, expose, and validate its stable identity according to the Project authority. Runtime
+address, discovery identity, Transport endpoint, Protocol Session, and Secure Session shall remain distinct.
+
+A Node shall not execute a targeted command unless the command is unambiguously addressed and authorized for that
+Node. The Project Protocol shall select exactly one behavior for a well-formed command targeting another Node:
+
+```text
+Silently ignore
+Reject with a defined bounded Response
+Treat as a Protocol violation
+```
+
+The implementation shall not choose among these behaviors locally. Malformed or unauthorized routing metadata
+shall be rejected before Product state changes.
+
+When broadcast is supported, the Node shall enforce the approved Message allowlist, authorization, Replay, and
+response policy. It shall not transmit an immediate response when the Protocol requires no response, polling,
+slots, or another collision-control mechanism. Safety-significant control, configuration, reset, Rekey, credential,
+and Firmware Update broadcast shall be rejected unless explicitly authorized by the Product authority.
+
+Registration and re-registration shall handle fixed, discovered, or assigned addresses, duplicate identity, address
+conflict, Coordinator restart, Node reset, stale Coordinator Session, replacement, quarantine, and maximum-Node
+rejection. Address reassignment shall not retain an old Secure Session or authorization.
 
 # Part V — Safety, Faults, and Lifecycle
 
@@ -426,6 +454,13 @@ A Coordinator success display shall not substitute for Node verification.
 Power loss, reset, disconnect, Rekey, duplicate chunk, wrong offset, storage failure, invalid Manifest, and failed activation shall have defined recovery behavior.
 
 The design shall prevent booting an unverified image and shall preserve an approved recovery path.
+
+## 40.1 Multi-Node Firmware Update Targeting
+
+Before erase, program, commit, or activation, the Node shall verify that the authenticated update Session, signed
+Manifest, transaction identity, hardware/Product compatibility, and target identity refer to this Node. A broadcast
+or group address alone shall not authorize Firmware Update. Resume state shall remain bound to the approved Node and
+host identity according to the Security Profile.
 
 # Part IX — Verification and Release
 

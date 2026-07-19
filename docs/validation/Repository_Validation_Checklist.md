@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`  
-**Document Version:** v1.0.6  
+**Document Version:** v1.0.7  
 **Status:** Draft for Review  
-**Supersedes Document Version:** v1.0.5  
+**Supersedes Document Version:** v1.0.6  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.7 | 2026-07-19 | Draft for Review | Added controlled Protocol schema, semantic-lint tool, Multi-Node fixtures, regression-test, workflow, and detached-package evidence checks. |
 | v1.0.6 | 2026-07-19 | Draft for Review | Added the common checklist non-authority principle and coverage for Protocol, Node, validation, NOTICE, folder-index, routing, synchronization, and governance-regression checks. |
 | v1.0.5 | 2026-07-19 | Draft for Review | Required the exact authority-registry root schema and controlled GitHub-main source identity, rejected prerequisite dependency cycles, fixed the CI runner to ubuntu-24.04, and added persistent regression tests for all three controls. |
 | v1.0.4 | 2026-07-19 | Draft for Review | Hardened Status and Repository Role governance, opening metadata placement, HTML code-example exclusion, exact Workflow step execution, critical-heading uniqueness, machine-readable authority-registry consistency, complete Version History row/date/status validation, true HTML-anchor parsing, dependency hash pinning, and persistent regression coverage. |
@@ -58,6 +59,7 @@ Run:
 ```bash
 python -m pip install --disable-pip-version-check --require-hashes -r requirements-validation.txt
 python tools/validate_repository.py
+python tools/validate_protocol.py tests/fixtures/protocol/valid_single_node.yaml
 python -m unittest discover -s tests -v
 ```
 

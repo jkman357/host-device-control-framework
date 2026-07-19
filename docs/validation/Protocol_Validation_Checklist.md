@@ -1,7 +1,8 @@
 # Protocol Validation Checklist
 
 **Canonical Filename:** `Protocol_Validation_Checklist.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -30,6 +31,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added traceable Multi-Node YAML, identity/address, targeting, broadcast, multi-target, scope, lifecycle, resource, transport, security, Firmware Update, compatibility, and fixture evidence checks. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft providing a traceable Protocol definition, compatibility, Registry, security, robustness, interoperability, and evidence review view. |
 
 ---
@@ -81,7 +83,25 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-028 State and capability preconditions trace to Product authority.
 - [ ] P-029 Semantic lint reports no unresolved or conflicting contract.
 
-# 5. Registry and Identifier Governance
+# 5. Multi-Node Protocol Contract
+
+- [ ] P-MN-001 Omitted `node_model` has the defined legacy Single-Node interpretation and the existing Single-Node fixture still passes.
+- [ ] P-MN-002 `maximum_nodes` and `maximum_online_nodes` are valid and bounded.
+- [ ] P-MN-003 Multi-Node topology defines stable identity, uniqueness, persistence, addressing, and target binding.
+- [ ] P-MN-004 Node ID, runtime address, endpoint, route, connection generation, Session IDs, and operation correlation are not conflated.
+- [ ] P-MN-005 Independent links may use immutable connection-bound targeting without an unnecessary on-wire Node address.
+- [ ] P-MN-006 Shared multidrop transport defines frame/hybrid addressing, target protection, assignment, conflict, and address-reuse behavior.
+- [ ] P-MN-007 Routed topology defines route mapping and gateway trust boundary.
+- [ ] P-MN-008 Broadcast support has an approved Message allowlist, authorization, wrong-target behavior, and collision-controlled response policy.
+- [ ] P-MN-009 Multi-target operations define snapshotted targets, per-Node correlation/progress, cancellation, timeout, retry, and partial failure.
+- [ ] P-MN-010 Protocol Session, Secure Session, sequence, Replay, and correlation scopes are unambiguous per Node or explicitly approved otherwise.
+- [ ] P-MN-011 Duplicate identity, address conflict, replacement, quarantine, and stale-generation behavior are defined.
+- [ ] P-MN-012 Per-Node and aggregate resource limits and overload behavior are defined by the applicable authorities.
+- [ ] P-MN-013 Firmware Update target scope, concurrency, transaction isolation, and post-activation attribution are explicit.
+- [ ] P-MN-014 Valid Single-Node and applicable Multi-Node fixtures pass; invalid combinations fail for the expected YAML path and rule.
+- [ ] P-MN-015 A change that introduces required on-wire targeting or changes identity/Session scope has the correct compatibility classification and migration evidence.
+
+# 6. Registry and Identifier Governance
 
 - [ ] P-030 Message IDs are unique within scope and inside approved ranges.
 - [ ] P-031 Capability IDs and other governed identities are unique within scope.
@@ -92,7 +112,7 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-036 Coordinator and Node generated registries derive from the same controlled source.
 - [ ] P-037 Registry collision and branch-merge checks passed on the merged source.
 
-# 6. Compatibility
+# 7. Compatibility
 
 - [ ] P-040 Every change has a compatibility decision record.
 - [ ] P-041 MAJOR/MINOR/PATCH classification matches wire and behavioral impact.
@@ -104,7 +124,7 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-047 Reconnect revalidates version, capability, state, Session, and transaction assumptions.
 - [ ] P-048 Application compatibility is not used as proof of Bootloader compatibility.
 
-# 7. Security
+# 8. Security
 
 - [ ] P-050 Security applicability is explicitly approved for each environment and operation class.
 - [ ] P-051 Peer roles, identities, credentials, trust anchors, Profile, Session, and Key Contexts are defined without committing secrets.
@@ -118,7 +138,7 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-059 Application and Bootloader Sessions and security contexts are separated.
 - [ ] P-060 Firmware Update binds authenticated peer, target, signed Manifest, image, version, hash, transaction, resume, and commit.
 
-# 8. Robustness and Negative Behavior
+# 9. Robustness and Negative Behavior
 
 - [ ] P-070 Malformed, truncated, oversized, undersized, and partially received records are rejected safely.
 - [ ] P-071 Unknown message, field, enum, bit, capability, and environment behavior is tested.
@@ -129,7 +149,7 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-076 Fuzz and resource-exhaustion testing covers parser, decoder, Handshake, and pre-Session boundaries as applicable.
 - [ ] P-077 Diagnostics are bounded and do not disclose secrets.
 
-# 9. Telemetry and Streaming
+# 10. Telemetry and Streaming
 
 - [ ] P-080 Telemetry snapshot consistency and invalid/stale representation are tested.
 - [ ] P-081 Streaming sample rate, publication rate, batching, sequence, timestamp, queue bound, and loss indication are verified.
@@ -137,7 +157,7 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-083 Reconnect, resubscribe, Session change, and sequence reset behavior is tested.
 - [ ] P-084 Raw recording and display-rate reduction remain distinguishable where applicable.
 
-# 10. Code Generation and Golden Test Vectors
+# 11. Code Generation and Golden Test Vectors
 
 - [ ] P-090 Generation is deterministic for identical inputs and tool versions.
 - [ ] P-091 Generated Coordinator and Node types, constants, codecs, and registries compile under supported toolchains.
@@ -147,7 +167,7 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-095 Negative vectors cover invalid length, range, enum, identifier, security, sequence, and environment cases.
 - [ ] P-096 Vector source Protocol, generator version, expected bytes, and interpretation are immutable and traceable.
 
-# 11. Coordinator/Node Interoperability
+# 12. Coordinator/Node Interoperability
 
 - [ ] P-100 Coordinator encoder to Node decoder passed for claimed versions and environments.
 - [ ] P-101 Node encoder to Coordinator decoder passed for claimed versions and environments.
@@ -156,7 +176,7 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-104 Mixed-version and unsupported-version behavior passed for each claimed direction.
 - [ ] P-105 Target or representative-system evidence exists for timing, hardware, and physical behavior that mocks cannot prove.
 
-# 12. Evidence and Approval
+# 13. Evidence and Approval
 
 - [ ] P-110 Evidence identifies Protocol source, implementations, builds, hardware, configuration, tools, environment, and execution state.
 - [ ] P-111 Failures, warnings, anomalies, excluded scope, and deviations are visible.

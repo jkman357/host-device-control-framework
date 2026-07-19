@@ -3,14 +3,14 @@
 > UI Architecture, State Presentation, Responsiveness, and Control Feedback
 
 **Canonical Filename:** `Coordinator_UI_Engineering_Guide.md`  
-**Document Version:** v1.0.1  
+**Document Version:** v1.1.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, UI engineers, reviewers, test engineers, code generators, and AI-assisted engineering systems  
 **Repository Role:** Proposed topic-specific normative engineering authority for Coordinator UI implementation, subordinate to Coordinator Software Engineering Rules  
-**Supersedes Document Version:** v1.0.0
+**Supersedes Document Version:** v1.0.1
 
 ---
 
@@ -39,6 +39,7 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Expanded Multi-Node UI rules for selected versus operation-bound Nodes, aggregate and per-Node views, identity conflict, offline/reconnecting state, multi-target confirmation, per-Node progress, partial results, and alarm attribution. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining UI architecture, state ownership, command feedback, connection and stale state, multi-Node binding, data visualization, responsiveness, alarms and events, validation, errors, units, accessibility, localization, persistence, engineering controls, testing, and anti-patterns. |
 | v1.0.1 | 2026-07-19 | Draft for Review | Hardened archive and package import against symbolic links, hard links, Windows reparse points, special filesystem entries, destination-link traversal, canonical-path escape, unintended overwrite, and time-of-check/time-of-use replacement. |
 
@@ -173,14 +174,29 @@ Rules:
 
 ## 4.1 Multi-Node Selection and Operation Binding
 
-When the UI can display or control more than one Node:
+In a Multi-Node UI, selection is presentation state. An operation shall bind to a stable Node identity and connection
+or Session generation when the operation is created.
 
-1. The selected view target, the operation target, and the connected-session identity shall be distinguishable.
-2. A command shall capture its target Node identity and connection generation before leaving the Presentation layer.
-3. Changing the visible selection shall not retarget, cancel, or visually attribute an in-flight operation unless the defined workflow explicitly performs that action.
-4. Pending and completed results shall be presented against the Node that actually received the operation.
-5. Reconnect to a different Node shall clear or mark stale the prior Node state before controls are enabled.
-6. Shared controls shall not appear to operate on all Nodes unless the workflow explicitly defines a reviewed multi-target command with per-Node results.
+Changing the selected Node while an operation is pending shall not redirect that operation or its completion. A
+completion for one Node shall not update another Node's panel merely because the user changed selection.
+
+The UI shall distinguish:
+
+```text
+Currently selected Node
+Operation-bound Node or snapshotted target set
+Aggregate view
+Single-Node view
+Offline, reconnecting, degraded, replaced, and quarantined Nodes
+```
+
+Duplicate identity and address conflict shall be visible as conflicts, not merged into one row. Aggregate alarms,
+health, progress, and availability shall preserve per-Node attribution, freshness, unknown state, and partial failure.
+
+Before a multi-target operation, the UI shall present the snapshotted target set and the operation's safety-relevant
+scope. Progress and completion shall expose per-Node outcomes plus the aggregate result. A partial success shall not
+be labelled as complete success. Selecting multiple Nodes shall not silently convert the action to Protocol
+broadcast.
 
 # 5. Stale, Unknown, and Invalid Data
 

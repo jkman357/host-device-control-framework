@@ -3,14 +3,14 @@
 > Structured, Bounded, and Reviewable Logging for Coordinator Software
 
 **Canonical Filename:** `Coordinator_Logging_Guide.md`  
-**Document Version:** v1.0.1  
+**Document Version:** v1.1.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, test engineers, support-tool developers, code generators, and AI-assisted engineering systems  
 **Repository Role:** Proposed topic-specific normative engineering authority for Coordinator logging implementation, subordinate to Coordinator Software Engineering Rules  
-**Supersedes Document Version:** v1.0.0
+**Supersedes Document Version:** v1.0.1
 
 ---
 
@@ -39,6 +39,7 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added Node-attributable identity, address/route, transport, connection generation, Protocol/Secure Session, target, sequence, lifecycle, multi-target, address-conflict, and aggregate-event logging requirements and tests. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining log purpose, event structure, levels, identifiers, correlation, Protocol logging, sensitive-data handling, injection resistance, asynchronous and bounded delivery, retention, export, integrity, time, startup context, fault evidence, testing, and anti-patterns. |
 | v1.0.1 | 2026-07-19 | Draft for Review | Distinguished accidental-corruption detection from adversarial tamper detection and authenticity; required independently anchored signing, authentication, trusted timestamp, or controlled append-only evidence when the threat model requires stronger assurance than a hash manifest. |
 
@@ -196,6 +197,31 @@ Correlation values shall not be confused with security secrets or authentication
 A timeout, late response, duplicate response, and state-reconciliation result should be linkable to the original command where practical.
 
 ---
+
+## 6.1 Multi-Node Correlation Context
+
+A log event that involves a Node shall include the applicable non-secret subset of:
+
+```text
+stable Node ID
+runtime address or logical route
+Transport identity
+connection generation
+Protocol Session identifier
+non-secret Secure Session correlation identifier
+command target snapshot
+operation and per-Node sub-operation correlation identifiers
+Request sequence
+direction
+Node lifecycle state
+```
+
+Address, route, Session, or connection identifiers shall not replace stable Node identity in audit-relevant records.
+Duplicate identity, address conflict, replacement, quarantine, stale-generation rejection, wrong-target rejection,
+and cross-Node correlation failure shall have stable event identifiers.
+
+A multi-target or aggregate event shall retain the parent operation plus per-Node outcomes. Logging shall not expose
+keys, plaintext credentials, sensitive payloads, or security material merely to distinguish Nodes.
 
 # 7. Connection and Lifecycle Logging
 

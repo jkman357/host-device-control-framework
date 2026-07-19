@@ -3,9 +3,9 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.0.11  
+**Document Version:** v1.1.0  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.10  
+**Supersedes Document Version:** v1.0.11  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
@@ -202,6 +202,7 @@ The keywords in this document have the following meanings:
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.0 | 2026-07-19 | Baseline | Added the conditional `node_model` contract and semantic-lint rules for Single-Node compatibility, independent links, shared multidrop buses, routed gateways, identity/address separation, target binding, broadcast and multi-target behavior, per-Node scope, lifecycle, resources, and Firmware Update coordination. |
 | v1.0.0 | 2026-07-15 | Not recorded | Established the general Protocol YAML Definition Guide, including data models, Messages, versioning, security, Transport, Code Generation, Lint, Test Vectors, and governance rules. |
 | v1.0.1 | 2026-07-15 | Not recorded | Corrected the inconsistency between a Framework Message ID example and the recommended allocation range; explicitly separated the Message, Capability, Service, Namespace, Error, Enum, and Bitset registries and their uniqueness scopes; and strengthened Semantic Lint, quick-reference, and Baseline decisions. |
 | v1.0.2 | 2026-07-18 | Not recorded | Converted the complete guide to English; established Ray Yang as Author and Maintainer; added repository identity, copyright, personal-project clarification, and third-party-material notice; normalized terminology, punctuation, headings, examples, and checklists; and preserved the v1.0.1 technical baseline decisions. |
@@ -600,6 +601,7 @@ bitsets
 errors
 capabilities
 messages
+node_model
 transport_profiles
 sequence_policy
 timestamp_policy
@@ -633,6 +635,7 @@ The following are CONDITIONAL:
 types
 bitsets
 capabilities
+node_model
 transport_profiles
 sequence_policy
 timestamp_policy
@@ -681,7 +684,141 @@ protocol:
   default_execution_environment: application
 ```
 
-### 4.4 Wire Format
+### 4.4 Node Model and Multi-Node Targeting
+
+`node_model` is CONDITIONAL. It shall be present when a Project supports more than one logical Node, a shared
+address space, a routed target, Protocol broadcast, or Coordinator-expanded multi-target operations. For backward
+compatibility, omission means the legacy Single-Node profile:
+
+```yaml
+node_model:
+  topology: single_node
+  maximum_nodes: 1
+  maximum_online_nodes: 1
+  identity:
+    node_id_required: true
+    uniqueness_scope: protocol_instance
+    persistence: stable
+  addressing:
+    method: connection_bound
+    address_assignment: not_applicable
+    target_required_on_wire: false
+    broadcast:
+      supported: false
+      response_policy: not_applicable
+  multi_target:
+    supported: false
+    partial_failure_policy: not_applicable
+  scope:
+    protocol_session: per_node
+    secure_session: per_node
+    sequence: per_node_session
+    correlation: per_node_session
+  lifecycle:
+    identity_conflict_policy: reject_and_quarantine
+    address_reuse_requires_new_connection_generation: true
+    address_reuse_requires_new_secure_session: true
+  resources:
+    maximum_pending_requests_per_node: 1
+    maximum_total_pending_requests: 1
+  firmware_update:
+    target_scope: single_node
+    concurrency: one_at_a_time
+```
+
+The omission default is a compatibility interpretation, not permission for implementation code to discard stable
+identity, connection generation, Session ownership, or bounded resources.
+
+Allowed `topology` values are:
+
+```text
+single_node
+independent_links
+shared_multidrop_bus
+routed_gateway
+```
+
+The Project may define a controlled extension only when its semantics, compatibility consequence, validation, and
+Code Generation behavior are approved.
+
+#### 4.4.1 Identity and Addressing
+
+`identity` describes the logical Node identity. `addressing` describes how a current target is reached. The
+following concepts shall remain distinct:
+
+```text
+Node ID
+Runtime address
+Transport endpoint
+Logical route
+Connection generation
+Protocol Session ID
+Secure Session ID
+Operation correlation ID
+```
+
+For `independent_links`, `method: connection_bound` may set `target_required_on_wire: false` when the immutable
+connection binding uniquely identifies the Node. For `shared_multidrop_bus`, the method shall be `frame_address`
+or `hybrid`, and the target shall be present or deterministically derived in the protected Protocol/Transport
+contract. For `routed_gateway`, the method shall be `route_bound` or `hybrid`, and the route plus authenticated
+logical identity shall identify the target without ambiguity.
+
+#### 4.4.2 Broadcast
+
+When `addressing.broadcast.supported` is `true`, `response_policy` shall be one of:
+
+```text
+no_response
+polled
+slotted
+bounded_window
+```
+
+The Project Protocol shall identify which Messages may be broadcast, authorization requirements, duplicate and
+wrong-target behavior, response-collision prevention, and how partial execution is observed. `not_applicable` is
+legal only when broadcast is disabled. Safety-significant control, configuration, reset, Rekey, credential, and
+Firmware Update Messages shall not be broadcast unless an approved Product authority explicitly permits them.
+
+#### 4.4.3 Multi-Target Operations
+
+`multi_target` represents a Coordinator-expanded operation over a snapshotted target set; it is not synonymous
+with Protocol broadcast. When supported, `partial_failure_policy` shall be one of:
+
+```text
+per_target_result
+fail_fast
+best_effort
+```
+
+The application contract shall define an operation-level correlation identity and per-Node sub-operation state,
+progress, timeout, retry, cancellation, and final result. Rollback shall be explicit when supported and shall not be
+inferred from `fail_fast`.
+
+#### 4.4.4 Scope
+
+The selected scope shall make cross-Node collision impossible or detectable. A per-Node Protocol or Secure Session
+shall bind the authenticated Node identity and connection generation. Sequence, Replay, and correlation state shall
+not be shared ambiguously across Nodes. A group Secure Session is outside the default baseline and requires an
+explicit approved Security Profile; `secure_session: group` without that profile shall fail Semantic Lint.
+
+#### 4.4.5 Lifecycle and Address Reuse
+
+The Protocol shall define duplicate identity, address conflict, registration, reconnect, removal, replacement, and
+quarantine behavior. Address reuse shall create a new connection generation and shall not inherit a previous
+Node's Secure Session, Replay window, pending Requests, authorization, or observed state.
+
+#### 4.4.6 Resources and Firmware Update
+
+`resources` shall define bounded per-Node and aggregate Request capacity when concurrent Requests are possible.
+Project authorities shall additionally bound Nodes, queues, bandwidth, logs, reconnects, discovery candidates,
+operations, and updates in the Application Analysis and implementation profile.
+
+`firmware_update.target_scope` shall be `single_node` or `multi_target`. `concurrency` shall be `one_at_a_time` or
+`bounded_parallel`; bounded parallel use requires an approved positive limit and per-Node transaction isolation.
+Firmware Update remains represented by the Bootloader Namespace, Service, Messages, and Security Model rather than
+a new top-level key.
+
+### 4.5 Wire Format
 
 The wire-format section shall define all representation assumptions required for deterministic encoding:
 
@@ -2454,6 +2591,22 @@ A Message categorized as Stream defines sequence continuity and loss or ordering
 Streaming has sequence, timestamp, loss, and maximum-plaintext-message-size policies
 Signed Firmware Update defines canonical Manifest hashing, signing-key identity, signature algorithm, bounded signature, and transaction binding
 Published and reserved identifiers are not reused
+Node-model omission resolves only to the legacy Single-Node profile
+`maximum_nodes` is at least 1 and `maximum_online_nodes` is between 1 and `maximum_nodes`
+A Multi-Node topology defines stable identity and a uniqueness scope
+A shared multidrop bus uses frame or hybrid addressing and requires an unambiguous on-wire or protected derived target
+A routed gateway defines route-bound or hybrid addressing and an authenticated target binding
+Connection-bound targeting is used only when one immutable connection identifies one Node
+Broadcast support defines authorized Messages and a collision-controlled response policy
+Broadcast disabled uses `response_policy: not_applicable`
+Per-Node Protocol and Secure Sessions bind the authenticated Node identity and connection generation
+Sequence, Replay, and correlation scopes cannot collide across Nodes
+Group Secure Sessions have an explicitly approved Security Profile and compromise model
+Multi-target support defines partial-failure semantics and per-Node sub-operation correlation
+Address reuse requires a new connection generation and Secure Session
+Firmware Update target scope and concurrency are explicit
+Bounded-parallel Firmware Update defines a positive concurrency limit
+Transport addressing is compatible with the selected topology
 ```
 
 ### 22.3 Naming Lint

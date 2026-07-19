@@ -1,7 +1,8 @@
 # AI-Generated Artifact Validation Guide
 
 **Canonical Filename:** `AI_Generated_Artifact_Validation_Guide.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -30,6 +31,7 @@ This Guide validates AI-assisted artifacts against their governing authorities. 
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added Multi-Node AI review controls for invented topology, identity/address conflation, duplicated authority, unsupported broadcast/group security, missing isolation and negative tests, fabricated execution claims, and happy-path-only evidence. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining authority identification, prompt and input control, hallucination and stale-source detection, code/document/test boundaries, execution evidence, security and licensing review, approval, prohibited self-approval, and required records. |
 
 ---
@@ -149,6 +151,23 @@ A plausible-looking call is not evidence that an API exists or is safe.
 Review the complete artifact set for consistent names, versions, paths, identifiers, units, ranges, state names, message definitions, authority boundaries, and cross-references.
 
 Generated documents shall not claim synchronization with files that were not actually updated and checked.
+
+## 10.1 Multi-Node AI Review
+
+For a Multi-Node artifact, the reviewer shall verify that AI did not:
+
+- invent a Product topology, maximum Node count, address range, broadcast permission, group key, or Firmware Update concurrency decision;
+- treat Node ID, bus address, endpoint, route, connection generation, Session ID, or correlation ID as interchangeable;
+- duplicate one normative Multi-Node rule across several authority documents instead of routing it to the owner;
+- add a Node ID to every Record without evaluating connection-bound point-to-point compatibility;
+- use a mutable UI selection or global current Node as an operation target;
+- omit Node-side wrong-target, conflict, broadcast, Session, or resource behavior;
+- present happy-path examples as evidence of duplicate identity, stale generation, cross-Node isolation, resource exhaustion, or collision handling;
+- claim schema, semantic lint, test, simulator, hardware, or interoperability execution that was not actually run;
+- silently expand gateway trust or permit shared/group security without an approved Security Profile.
+
+Human review shall trace topology, identity, addressing, compatibility, security, and acceptance decisions to their
+owning authorities and shall retain actual fixture and command results.
 
 ## 11. Scope Preservation
 

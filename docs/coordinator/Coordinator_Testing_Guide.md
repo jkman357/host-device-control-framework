@@ -3,14 +3,14 @@
 > Verification Strategy for Coordinator Applications, Protocol Integration, and UI Behavior
 
 **Canonical Filename:** `Coordinator_Testing_Guide.md`  
-**Document Version:** v1.0.1  
+**Document Version:** v1.1.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, verification engineers, test-tool developers, code generators, and AI-assisted engineering systems  
 **Repository Role:** Proposed topic-specific normative engineering authority for Coordinator engineering tests, subordinate to Coordinator Software Engineering Rules  
-**Supersedes Document Version:** v1.0.0
+**Supersedes Document Version:** v1.0.1
 
 ---
 
@@ -39,6 +39,7 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added a complete Multi-Node verification matrix covering isolation, conflicts, stale generations, shared-bus fairness, cross-Node correlation and Session boundaries, broadcast, multi-target partial results, UI binding, mixed versions, and Firmware Update targeting. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining test layers, traceability, deterministic dependencies, Protocol and Transport coverage, concurrency and reconnect testing, fuzzing, UI testing, performance, fault injection, simulators, CI, flakiness control, evidence integrity, and release review. |
 | v1.0.1 | 2026-07-19 | Draft for Review | Clarified that artifact hashes and immutable identities detect change only when their provenance is trusted, and required independently anchored signing, authentication, trusted timestamp, or append-only evidence where authenticity or adversarial tamper resistance is required. |
 
@@ -310,6 +311,37 @@ Test the lifecycle from every relevant state, including:
 The test should verify both internal state and user-visible state.
 
 ---
+
+## 8.1 Multi-Node Verification Matrix
+
+Applicable Projects shall test at least:
+
+```text
+Multiple Nodes operating concurrently
+One Node disconnecting, reconnecting, resetting, or disappearing while others continue
+Stale Response from a prior connection generation
+Duplicate stable identity on two connections
+Two identities claiming one runtime address
+Address reuse by a replacement Node
+Discovery collision and maximum-Node-count behavior
+Node removal during a pending Request
+One Node flooding valid, malformed, or repeated traffic
+Per-Node and aggregate queue/resource exhaustion
+Shared-bus contention, priority, fairness, and starvation prevention
+Cross-Node Request/Response correlation
+Per-Node sequence and Replay isolation
+Protocol Session and Secure Session isolation
+UI selection change during an active operation
+Coordinator-expanded multi-target partial success, failure, timeout, and cancellation
+Protocol broadcast eligibility and response-collision prevention
+Single-target and concurrent Firmware Update policy
+Mixed Protocol and Capability versions
+Aggregate Alarm/health/progress consistency and Node attribution
+```
+
+Tests shall assert that one Node cannot complete, cancel, authorize, rebind, starve, overwrite, or misrepresent
+another Node's operation or state. Every expected rejection shall identify the violated rule and Node/generation
+context without disclosing secrets.
 
 # 9. Concurrency and Race Testing
 

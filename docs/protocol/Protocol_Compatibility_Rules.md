@@ -1,7 +1,8 @@
 # Protocol Compatibility Rules
 
 **Canonical Filename:** `Protocol_Compatibility_Rules.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.0.0  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -32,6 +33,7 @@ This document is independently authored for a personal engineering project. Thir
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-19 | Draft for Review | Added Multi-Node compatibility classification for optional topology declarations, required on-wire targeting, identity and address scope, mixed-version Nodes, broadcast, multi-target operations, Session scope, routed gateways, and migration evidence. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining Protocol versioning, compatibility dimensions, change classification, mixed-version operation, capability negotiation, deprecation, removal, Bootloader boundaries, and compatibility evidence. |
 
 ---
@@ -275,9 +277,48 @@ Compatibility analysis shall separately address:
 
 An Application compatibility claim shall not imply Bootloader compatibility.
 
+## 19. Multi-Node Compatibility and Migration
+
+Adding an optional machine-verifiable `node_model` while preserving the legacy Single-Node omission semantics and
+unchanged wire behavior may be a MINOR declaration change. The following changes require independent compatibility
+classification and are normally breaking unless an approved negotiation or parallel profile proves coexistence:
+
+- adding a required target or source field to an existing exact Record;
+- changing connection-bound targeting to frame or route addressing without compatible negotiation;
+- changing stable Node identity, address width, reserved address values, or address-assignment semantics;
+- changing Protocol Session, Secure Session, sequence, Replay, or correlation scope across Nodes;
+- enabling broadcast for an existing Message or changing its response behavior;
+- changing a single-target operation into broadcast or implicit multi-target execution;
+- changing partial-success, cancellation, retry, idempotency, or rollback semantics;
+- permitting a routed gateway to terminate or extend trust differently;
+- changing Firmware Update target or concurrency semantics.
+
+Mixed-version operation shall be evaluated per Node and per negotiated profile. One newer Node shall not force an
+older compatible Node into unsupported topology, security, broadcast, or multi-target behavior. A Coordinator
+shall preserve the selected version, Capability, topology, addressing, and security context in each Node context.
+
+Migration evidence shall include, as applicable:
+
+```text
+Legacy YAML with omitted node_model
+New Single-Node YAML
+Old Coordinator with new Node
+New Coordinator with old Node
+Multiple Nodes at different compatible MINOR versions
+Address reuse and replacement
+Required on-wire target introduction
+Broadcast and response scheduling
+Per-Node Session, sequence, Replay, and correlation isolation
+Routed gateway trust-boundary behavior
+Firmware Update targeting and concurrency
+```
+
+A document-version increase alone does not require a Protocol MAJOR change. The actual Project Protocol version
+consequence depends on wire and behavioral compatibility.
+
 # Part V — Evidence and Control
 
-## 19. Compatibility Evidence
+## 20. Compatibility Evidence
 
 Minimum evidence for a compatibility claim shall include:
 
@@ -296,7 +337,7 @@ Minimum evidence for a compatibility claim shall include:
 
 Mock-only evidence shall be labelled as such and shall not prove physical behavior.
 
-## 20. Compatibility Matrix
+## 21. Compatibility Matrix
 
 A maintained Project should record compatibility in a matrix such as:
 
@@ -306,13 +347,13 @@ A maintained Project should record compatibility in a matrix such as:
 
 A blank cell shall not be interpreted as compatible.
 
-## 21. Exceptions and Deviations
+## 22. Exceptions and Deviations
 
 A deviation shall identify the violated rule, scope, rationale, risk, compensating control, evidence, owner, approver, and expiration or removal plan.
 
 A compatibility waiver shall not authorize identifier reuse, silent security downgrade, fabricated evidence, or an unbounded mixed-version claim.
 
-## 22. AI-Assisted Work
+## 23. AI-Assisted Work
 
 AI may assist with diff generation, candidate classification, matrix generation, and test design. AI shall not:
 

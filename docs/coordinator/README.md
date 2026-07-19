@@ -7,11 +7,11 @@ This directory contains approved and proposed cross-language software engineerin
 ## Documents
 
 - [`Coordinator_Software_Engineering_Rules.md`](Coordinator_Software_Engineering_Rules.md) — Draft for Review / proposed cross-topic normative authority for Coordinator minimum engineering rules, lifecycle, state ownership, communication integration, security, deviation, and release governance.
-- [`Coordinator_Architecture_Patterns.md`](Coordinator_Architecture_Patterns.md) — Draft for Review / Coordinator layering, dependency direction, state ownership, command and receive pipelines, lifecycle, multi-Node isolation, and architecture review patterns.
-- [`Coordinator_Concurrency_Guide.md`](Coordinator_Concurrency_Guide.md) — Draft for Review / Coordinator execution-context ownership, asynchronous I/O, cancellation, timeout, backpressure, connection generations, overload, and bounded shutdown.
-- [`Coordinator_Logging_Guide.md`](Coordinator_Logging_Guide.md) — Draft for Review / Structured diagnostic events, correlation, redaction, injection resistance, bounded delivery, retention, export, and logging-failure behavior.
-- [`Coordinator_Testing_Guide.md`](Coordinator_Testing_Guide.md) — Draft for Review / Coordinator test layers, Protocol and Transport coverage, deterministic race testing, fault injection, fuzzing, simulator governance, and evidence integrity.
-- [`Coordinator_UI_Engineering_Guide.md`](Coordinator_UI_Engineering_Guide.md) — Draft for Review / Coordinator presentation state, command feedback, stale data, multi-Node binding, responsiveness, visualization, input safety, and engineering controls.
+- [`Coordinator_Architecture_Patterns.md`](Coordinator_Architecture_Patterns.md) — Draft for Review / Coordinator Node Registry and Context patterns, immutable target binding, per-Node state/resources, shared-bus scheduling, aggregate state, multi-target operations, and architecture review.
+- [`Coordinator_Concurrency_Guide.md`](Coordinator_Concurrency_Guide.md) — Draft for Review / Per-Node and aggregate execution-context ownership, cancellation, timeout, queue fairness, backpressure, connection generations, overload isolation, and bounded shutdown.
+- [`Coordinator_Logging_Guide.md`](Coordinator_Logging_Guide.md) — Draft for Review / Structured per-Node diagnostic identity, route, Session and correlation context, redaction, bounded delivery, retention, export, and logging-failure behavior.
+- [`Coordinator_Testing_Guide.md`](Coordinator_Testing_Guide.md) — Draft for Review / Coordinator test layers plus Multi-Node identity conflict, isolation, targeting, resource, shared-bus, broadcast, update, race, fuzz, simulator, and evidence coverage.
+- [`Coordinator_UI_Engineering_Guide.md`](Coordinator_UI_Engineering_Guide.md) — Draft for Review / Node selection, immutable operation binding, aggregate/per-Node views, partial results, stale data, responsiveness, visualization, input safety, and engineering controls.
 
 ## Authority Boundary
 

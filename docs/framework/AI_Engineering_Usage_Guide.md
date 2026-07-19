@@ -3,7 +3,7 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`  
 **Document ID:** AIEUG  
-**Document Version:** v1.0.20  
+**Document Version:** v1.0.21  
 **Status:** Draft for Review  
 **Document Type:** AI Usage and Authority Routing Guide  
 **Primary Narrative Language:** English  
@@ -11,7 +11,7 @@
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
 **Repository Role:** Proposed normative AI task-routing and repository-governance authority  
-**Supersedes Document Version:** v1.0.19  
+**Supersedes Document Version:** v1.0.20  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -100,6 +100,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.0.21 | 2026-07-19 | Draft for Review | Synchronized the active authority manifest and routed Multi-Node architecture, Protocol representation, Coordinator/Node realization, security, compatibility, and validation tasks to their governing documents and executable checks. |
 | v1.0.0 | 2026-07-18 | Not recorded | Established the AI-consumable repository positioning, authority priority, task routing, required AI inputs and outputs, prohibited behaviors, review severity, evidence requirements, prompt pattern, standard workflows, human approval boundary, completion checklist, and Baseline decisions. |
 | v1.0.1 | 2026-07-18 | Not recorded | Corrected the authority model so the Application Analysis Template governs the analysis method rather than Product decisions; separated normative design authority from as-built evidence; added an active baseline manifest, full-context and version-integrity rules, source-trust and prompt-injection boundaries, controlled deviation handling, validation-evidence states, artifact-status approval rules, Coordinator/non-C implementation and engineering-tooling task routes, and explicit prohibition of fabricated test results or self-approved Baselines. Changed the document status to Draft for Review pending human approval and cross-document reference reconciliation. |
 | v1.0.2 | 2026-07-18 | Not recorded | Adopted stable canonical Markdown filenames and the rule that document versions belong in metadata, Version History, Git history, tags, and Releases rather than maintained filenames; updated the Active Baseline Manifest and all task-routing examples to canonical paths; and retained Draft for Review status pending human approval. |
@@ -132,29 +133,29 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.20` | Draft for Review | AI authority routing and operating controls |
-| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.0.14` | Baseline | Reusable architecture and governance |
-| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.0.17` | Baseline | Application-analysis method and required records |
-| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.0.11` | Baseline | Protocol YAML representation, semantic validation, and Code Generation rules |
-| Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.0.10` | Baseline | Reusable Project Protocol starting structure |
-| Protocol Compatibility Rules | `docs/protocol/Protocol_Compatibility_Rules.md` | `v1.0.0` | Draft for Review | Protocol compatibility, evolution, and mixed-version rules |
-| Protocol Registry Governance | `docs/protocol/Protocol_Registry_Governance.md` | `v1.0.0` | Draft for Review | Protocol identifier Registry and allocation lifecycle rules |
-| Protocol Security Profile | `docs/protocol/Protocol_Security_Profile.md` | `v1.0.0` | Draft for Review | Protocol security-profile and secure-session lifecycle rules |
-| Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.0.5` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
-| Coordinator Architecture Patterns | `docs/coordinator/Coordinator_Architecture_Patterns.md` | `v1.0.0` | Draft for Review | Detailed Coordinator architecture-pattern and structural-realization rules |
-| Coordinator Concurrency Guide | `docs/coordinator/Coordinator_Concurrency_Guide.md` | `v1.0.0` | Draft for Review | Detailed Coordinator concurrency, cancellation, backpressure, and shutdown rules |
-| Coordinator Logging Guide | `docs/coordinator/Coordinator_Logging_Guide.md` | `v1.0.1` | Draft for Review | Detailed Coordinator logging, redaction, delivery, retention, and export rules |
-| Coordinator Testing Guide | `docs/coordinator/Coordinator_Testing_Guide.md` | `v1.0.1` | Draft for Review | Detailed Coordinator engineering-test strategy and evidence-classification rules |
-| Coordinator UI Engineering Guide | `docs/coordinator/Coordinator_UI_Engineering_Guide.md` | `v1.0.1` | Draft for Review | Detailed Coordinator UI implementation and presentation-state realization rules |
-| Node Software Engineering Rules | `docs/node/Node_Software_Engineering_Rules.md` | `v1.0.0` | Draft for Review | Cross-language Node architecture and engineering rules |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.21` | Draft for Review | AI authority routing and operating controls |
+| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.0` | Baseline | Reusable Single-Node and Multi-Node architecture and governance |
+| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.1.0` | Baseline | Application, topology, resource, and acceptance analysis method |
+| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.1.0` | Baseline | Protocol YAML representation and Multi-Node semantic-validation rules |
+| Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.1.0` | Baseline | Reusable Single-Node and Multi-Node Protocol starting structure |
+| Protocol Compatibility Rules | `docs/protocol/Protocol_Compatibility_Rules.md` | `v1.1.0` | Draft for Review | Protocol compatibility, Multi-Node migration, and mixed-version rules |
+| Protocol Registry Governance | `docs/protocol/Protocol_Registry_Governance.md` | `v1.1.0` | Draft for Review | Protocol identifiers and Node identity/address/route governance |
+| Protocol Security Profile | `docs/protocol/Protocol_Security_Profile.md` | `v1.1.0` | Draft for Review | Protocol security-profile and per-Node Session-isolation rules |
+| Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.1.0` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
+| Coordinator Architecture Patterns | `docs/coordinator/Coordinator_Architecture_Patterns.md` | `v1.1.0` | Draft for Review | Detailed Coordinator Multi-Node architecture and structural-realization rules |
+| Coordinator Concurrency Guide | `docs/coordinator/Coordinator_Concurrency_Guide.md` | `v1.1.0` | Draft for Review | Detailed per-Node concurrency, fairness, backpressure, and shutdown rules |
+| Coordinator Logging Guide | `docs/coordinator/Coordinator_Logging_Guide.md` | `v1.1.0` | Draft for Review | Detailed per-Node logging, redaction, delivery, retention, and export rules |
+| Coordinator Testing Guide | `docs/coordinator/Coordinator_Testing_Guide.md` | `v1.1.0` | Draft for Review | Detailed Coordinator Multi-Node engineering-test and evidence rules |
+| Coordinator UI Engineering Guide | `docs/coordinator/Coordinator_UI_Engineering_Guide.md` | `v1.1.0` | Draft for Review | Detailed Multi-Node Coordinator UI and operation-binding rules |
+| Node Software Engineering Rules | `docs/node/Node_Software_Engineering_Rules.md` | `v1.1.0` | Draft for Review | Cross-language Node identity, targeting, lifecycle, and engineering rules |
 | Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.17` | Final Baseline | Product-owned Embedded C implementation rules |
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.6` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
-| Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.0.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
-| Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.0.0` | Draft for Review | Protocol validation and evidence-capture checklist |
-| Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.0.0` | Draft for Review | Framework conformance and evidence-capture checklist |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.7` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
+| Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.1.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
+| Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.1.0` | Draft for Review | Protocol and Multi-Node validation evidence-capture checklist |
+| Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.1.0` | Draft for Review | Framework and Multi-Node conformance evidence-capture checklist |
 | Coding Rules Review Checklist | `docs/validation/Coding_Rules_Review_Checklist.md` | `v1.0.0` | Draft for Review | Language Coding Rules review and evidence-capture checklist |
-| AI-Generated Artifact Validation Guide | `docs/validation/AI_Generated_Artifact_Validation_Guide.md` | `v1.0.0` | Draft for Review | AI-generated artifact validation and human-approval controls |
+| AI-Generated Artifact Validation Guide | `docs/validation/AI_Generated_Artifact_Validation_Guide.md` | `v1.1.0` | Draft for Review | AI-generated artifact validation and human-approval controls |
 
 Version-routing rules:
 
