@@ -3,13 +3,14 @@
 > Verification Strategy for Coordinator Applications, Protocol Integration, and UI Behavior
 
 **Canonical Filename:** `Coordinator_Testing_Guide.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.0.1  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, verification engineers, test-tool developers, code generators, and AI-assisted engineering systems  
-**Repository Role:** Proposed topic-specific normative engineering authority for Coordinator engineering tests, subordinate to Coordinator Software Engineering Rules
+**Repository Role:** Proposed topic-specific normative engineering authority for Coordinator engineering tests, subordinate to Coordinator Software Engineering Rules  
+**Supersedes Document Version:** v1.0.0
 
 ---
 
@@ -39,6 +40,7 @@ This document is maintained as part of a personal engineering project. It is not
 | Version | Date | Status | Summary |
 |---|---|---|---|
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining test layers, traceability, deterministic dependencies, Protocol and Transport coverage, concurrency and reconnect testing, fuzzing, UI testing, performance, fault injection, simulators, CI, flakiness control, evidence integrity, and release review. |
+| v1.0.1 | 2026-07-19 | Draft for Review | Clarified that artifact hashes and immutable identities detect change only when their provenance is trusted, and required independently anchored signing, authentication, trusted timestamp, or append-only evidence where authenticity or adversarial tamper resistance is required. |
 
 ---
 
@@ -577,9 +579,12 @@ An executed test record should identify:
 - result;
 - deviations;
 - retained logs, captures, screenshots, recordings, and measurements;
-- hashes or immutable artifact identities when evidence integrity matters;
+- hashes or immutable artifact identities for accidental-change detection when their provenance is independently trusted;
+- a digitally signed or approved authenticated manifest, trusted timestamp, controlled append-only record, or other independently anchored evidence when authenticity or adversarial tamper resistance is required;
 - test tool, simulator, dependency, and fixture version or package identity;
 - reviewer or approval state when applicable.
+
+A hash or immutable identifier alone shall not be represented as proof of authorship, authenticity, trusted creation time, or adversarial tamper resistance. If an actor can replace both the artifact and its hash record, the hash can be recomputed; stronger claims therefore require an independently protected trust anchor.
 
 The report shall distinguish:
 
@@ -610,8 +615,9 @@ Reject or explicitly justify:
 12. Using screenshots alone to prove timing or dynamic behavior.
 13. A test name without traceability, acceptance criteria, or environment identity.
 14. Using production secrets, credentials, private keys, or uncontrolled personal data in test fixtures.
-15. Retaining evidence without hashes or immutable identity when integrity is required.
-16. Treating an unpinned simulator, dependency, test tool, or generated artifact as reproducible evidence.
+15. Retaining evidence without hashes or immutable identity when accidental-change detection is required.
+16. Treating an unsigned hash or mutable identifier as proof of authorship, authenticity, trusted time, or adversarial tamper resistance.
+17. Treating an unpinned simulator, dependency, test tool, or generated artifact as reproducible evidence.
 
 ---
 
@@ -635,5 +641,5 @@ Reject or explicitly justify:
 - [ ] Simulators document supported and simplified behavior.
 - [ ] CI reports skipped and incomplete coverage honestly.
 - [ ] Flaky tests are controlled and visible.
-- [ ] Test evidence identifies exact software, Protocol, configuration, environment, result, artifact hashes when required, and test-tool or simulator identity.
+- [ ] Test evidence identifies exact software, Protocol, configuration, environment, result, artifact hashes when required, independently anchored authenticity controls when required, and test-tool or simulator identity.
 - [ ] Test fixtures exclude production secrets and uncontrolled personal or patient data.

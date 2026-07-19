@@ -38,7 +38,7 @@ Human reviews decisions and validates actual system behavior
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.17 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.18 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
 | [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.0.13 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
 | [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.0.16 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
 | [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.0.10 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
@@ -46,9 +46,9 @@ Human reviews decisions and validates actual system behavior
 | [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | v1.0.5 | Draft for Review | Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
 | [`Coordinator_Architecture_Patterns.md`](docs/coordinator/Coordinator_Architecture_Patterns.md) | v1.0.0 | Draft for Review | Coordinator layering, dependency direction, state ownership, command and receive pipelines, lifecycle, multi-Node isolation, and architecture review patterns |
 | [`Coordinator_Concurrency_Guide.md`](docs/coordinator/Coordinator_Concurrency_Guide.md) | v1.0.0 | Draft for Review | Coordinator execution-context ownership, asynchronous I/O, cancellation, timeout, backpressure, connection generations, overload, and bounded shutdown |
-| [`Coordinator_Logging_Guide.md`](docs/coordinator/Coordinator_Logging_Guide.md) | v1.0.0 | Draft for Review | Structured diagnostic events, correlation, redaction, injection resistance, bounded delivery, retention, export, and logging-failure behavior |
-| [`Coordinator_Testing_Guide.md`](docs/coordinator/Coordinator_Testing_Guide.md) | v1.0.0 | Draft for Review | Coordinator test layers, Protocol and Transport coverage, deterministic race testing, fault injection, fuzzing, simulator governance, and evidence integrity |
-| [`Coordinator_UI_Engineering_Guide.md`](docs/coordinator/Coordinator_UI_Engineering_Guide.md) | v1.0.0 | Draft for Review | Coordinator presentation state, command feedback, stale data, multi-Node binding, responsiveness, visualization, input safety, and engineering controls |
+| [`Coordinator_Logging_Guide.md`](docs/coordinator/Coordinator_Logging_Guide.md) | v1.0.1 | Draft for Review | Structured diagnostic events, correlation, redaction, injection resistance, bounded delivery, retention, export, and logging-failure behavior |
+| [`Coordinator_Testing_Guide.md`](docs/coordinator/Coordinator_Testing_Guide.md) | v1.0.1 | Draft for Review | Coordinator test layers, Protocol and Transport coverage, deterministic race testing, fault injection, fuzzing, simulator governance, and evidence integrity |
+| [`Coordinator_UI_Engineering_Guide.md`](docs/coordinator/Coordinator_UI_Engineering_Guide.md) | v1.0.1 | Draft for Review | Coordinator presentation state, command feedback, stale data, multi-Node binding, responsiveness, visualization, input safety, and engineering controls |
 | [`Embedded_C_Coding_Rules.md`](docs/coding-rules/Embedded_C_Coding_Rules.md) | v1.0.17 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 | [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.4 | Draft for Review | Product-owned C# language and .NET implementation rules |
 | [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.5 | Draft for Review | Repository structural, manifest, canonical-reference, evidence-state, and detached-package checks |
@@ -144,7 +144,22 @@ Protocol YAML Template
     Defines the approved Project-specific machine-verifiable wire contract.
 
 Coordinator Software Engineering Rules
-    Defines cross-language Coordinator software architecture and engineering requirements.
+    Defines cross-language Coordinator software architecture and minimum engineering requirements.
+
+Coordinator Architecture Patterns
+    Owns detailed Coordinator layering, dependency direction, state ownership, command and receive pipelines, lifecycle realization, multi-Node isolation, and architecture-review patterns.
+
+Coordinator Concurrency Guide
+    Owns detailed execution-context ownership, asynchronous I/O, cancellation, timeout, bounded queues, backpressure, connection generations, overload, and shutdown behavior.
+
+Coordinator Logging Guide
+    Owns detailed structured diagnostic events, correlation, redaction, injection resistance, bounded delivery, retention, export, and logging-failure behavior.
+
+Coordinator Testing Guide
+    Owns detailed Coordinator engineering-test strategy, deterministic race and fault testing, fuzzing, simulator governance, and evidence classification.
+
+Coordinator UI Engineering Guide
+    Owns detailed Coordinator presentation-state realization, command feedback, stale-data behavior, responsiveness, visualization, untrusted-content handling, and engineering controls.
 
 Embedded C Coding Rules
     Defines Product-owned Embedded C implementation requirements.
@@ -234,7 +249,12 @@ host-device-control-framework/
 │   │   └── Protocol_YAML_Template.md
 │   ├── coordinator/
 │   │   ├── README.md
-│   │   └── Coordinator_Software_Engineering_Rules.md
+│   │   ├── Coordinator_Software_Engineering_Rules.md
+│   │   ├── Coordinator_Architecture_Patterns.md
+│   │   ├── Coordinator_Concurrency_Guide.md
+│   │   ├── Coordinator_Logging_Guide.md
+│   │   ├── Coordinator_Testing_Guide.md
+│   │   └── Coordinator_UI_Engineering_Guide.md
 │   ├── coding-rules/
 │   │   ├── README.md
 │   │   ├── Embedded_C_Coding_Rules.md

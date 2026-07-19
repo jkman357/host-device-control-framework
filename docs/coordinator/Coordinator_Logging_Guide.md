@@ -3,13 +3,14 @@
 > Structured, Bounded, and Reviewable Logging for Coordinator Software
 
 **Canonical Filename:** `Coordinator_Logging_Guide.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.0.1  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, test engineers, support-tool developers, code generators, and AI-assisted engineering systems  
-**Repository Role:** Proposed topic-specific normative engineering authority for Coordinator logging implementation, subordinate to Coordinator Software Engineering Rules
+**Repository Role:** Proposed topic-specific normative engineering authority for Coordinator logging implementation, subordinate to Coordinator Software Engineering Rules  
+**Supersedes Document Version:** v1.0.0
 
 ---
 
@@ -39,6 +40,7 @@ This document is maintained as part of a personal engineering project. It is not
 | Version | Date | Status | Summary |
 |---|---|---|---|
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining log purpose, event structure, levels, identifiers, correlation, Protocol logging, sensitive-data handling, injection resistance, asynchronous and bounded delivery, retention, export, integrity, time, startup context, fault evidence, testing, and anti-patterns. |
+| v1.0.1 | 2026-07-19 | Draft for Review | Distinguished accidental-corruption detection from adversarial tamper detection and authenticity; required independently anchored signing, authentication, trusted timestamp, or controlled append-only evidence when the threat model requires stronger assurance than a hash manifest. |
 
 ---
 
@@ -433,9 +435,12 @@ A log export or support bundle shall define:
 - redaction before packaging;
 - bounded size and failure behavior;
 - package identity and software context;
-- integrity protection such as a SHA-256 manifest when evidence integrity matters;
+- accidental-corruption detection such as a SHA-256 manifest when file-integrity checking is required;
+- independently anchored authenticity or adversarial-tamper protection, such as a digitally signed manifest, an approved MAC under controlled keys, a trusted timestamp, or a controlled append-only evidence store, when the threat model requires it;
 - secure destination and transfer expectations;
 - retention and deletion behavior for temporary and exported copies.
+
+A cryptographic hash manifest detects changed bytes only when the manifest and its provenance remain independently trusted. A hash manifest alone shall not be represented as proof of authorship, authenticity, trusted creation time, or adversarial tamper resistance because an attacker able to replace both an artifact and its manifest can recompute the hashes.
 
 Export shall not broaden access to data merely because the same data already exists in a local log. Temporary export artifacts shall be removed through a defined bounded cleanup path.
 
@@ -458,7 +463,7 @@ Tests should verify:
 - payload length caps for malformed input;
 - CR/LF, terminal-control, delimiter, and markup injection handling;
 - safe filename generation and path-traversal rejection;
-- export authorization, redaction, integrity manifest, temporary-file cleanup, and disposal;
+- export authorization, redaction, accidental-corruption manifest, independently anchored authenticity controls when required, temporary-file cleanup, and disposal;
 - absence of secret material in representative logs.
 
 Tests shall not depend primarily on free-form message text when stable fields are available.
@@ -484,6 +489,7 @@ Reject or explicitly justify:
 13. Allowing untrusted text to define message templates, event identifiers, directory names, or filenames.
 14. Assuming a hashed or tokenized identifier is automatically anonymous.
 15. Exporting logs or support bundles without authorization, redaction, integrity, size, retention, and disposal controls.
+16. Treating an unsigned hash manifest as proof of authorship, authenticity, trusted time, or adversarial tamper resistance.
 
 ---
 

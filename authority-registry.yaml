@@ -5,153 +5,229 @@ policy:
   routing_order: role-first-language-second
   conflict_resolution: topic-ownership-before-precedence
   draft_effect: proposed-until-explicitly-adopted
-
 documents:
-  - display_name: AI Engineering Usage Guide
-    path: docs/framework/AI_Engineering_Usage_Guide.md
-    version: v1.0.16
-    status: Draft for Review
-    repository_role: Proposed normative AI task-routing and repository-governance authority
-    readme_purpose: AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary
-    routing_role: AI authority routing and operating controls
-    applies_when: Any AI-assisted engineering task uses this repository or a detached authority-set package.
-    authority_topics:
-      - AI task routing
-      - evidence-state reporting
-      - prohibited AI behavior
-      - human approval boundary
-    prerequisite_documents: []
-
-  - display_name: Coordinator/Node Control Framework
-    path: docs/framework/Coordinator_Node_Control_Framework.md
-    version: v1.0.13
-    status: Baseline
-    repository_role: Normative architecture and framework-governance authority
-    readme_purpose: Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance
-    routing_role: Reusable architecture and governance
-    applies_when: A task defines or reviews Coordinator/Node roles, boundaries, architecture, Protocol layering, Runtime, safety placement, security, or Firmware Update behavior.
-    authority_topics:
-      - Coordinator and Node roles
-      - reusable architecture
-      - timing and concurrency boundaries
-      - safety and security placement
-      - Firmware Update architecture
-    prerequisite_documents:
-      - docs/framework/AI_Engineering_Usage_Guide.md
-
-  - display_name: Framework Application Analysis Template
-    path: docs/framework/Framework_Application_Analysis_Template.md
-    version: v1.0.16
-    status: Baseline
-    repository_role: Normative framework-application analysis method
-    readme_purpose: Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence
-    routing_role: Application-analysis method and required records
-    applies_when: The Framework is applied to a new Product, application, platform, or Product revision.
-    authority_topics:
-      - framework applicability analysis
-      - reuse classification
-      - Project gaps and risks
-      - MVP and acceptance evidence
-    prerequisite_documents:
-      - docs/framework/AI_Engineering_Usage_Guide.md
-      - docs/framework/Coordinator_Node_Control_Framework.md
-
-  - display_name: Protocol YAML Definition Guide
-    path: docs/protocol/Protocol_YAML_Definition_Guide.md
-    version: v1.0.10
-    status: Baseline
-    repository_role: Normative Protocol YAML definition and governance authority
-    readme_purpose: Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance
-    routing_role: Protocol YAML semantics and validation rules
-    applies_when: A Project Protocol YAML is designed, reviewed, linted, versioned, or used for Code Generation.
-    authority_topics:
-      - Protocol YAML syntax and semantics
-      - identifiers and Registry rules
-      - compatibility and security declarations
-      - semantic validation and Code Generation
-    prerequisite_documents:
-      - docs/framework/AI_Engineering_Usage_Guide.md
-      - docs/framework/Coordinator_Node_Control_Framework.md
-      - docs/framework/Framework_Application_Analysis_Template.md
-
-  - display_name: Protocol YAML Template
-    path: docs/protocol/Protocol_YAML_Template.md
-    version: v1.0.10
-    status: Baseline
-    repository_role: Normative reusable Protocol YAML template authority
-    readme_purpose: Reusable Project Protocol YAML starting structure and review checklists
-    routing_role: Reusable Project Protocol starting structure
-    applies_when: A new Project Protocol YAML is initialized or checked for structural preservation.
-    authority_topics:
-      - Protocol YAML starting structure
-      - required top-level sections
-      - Protocol review checklists
-    prerequisite_documents:
-      - docs/framework/AI_Engineering_Usage_Guide.md
-      - docs/protocol/Protocol_YAML_Definition_Guide.md
-
-  - display_name: Coordinator Software Engineering Rules
-    path: docs/coordinator/Coordinator_Software_Engineering_Rules.md
-    version: v1.0.4
-    status: Draft for Review
-    repository_role: Proposed normative engineering authority for Coordinator-owned software
-    readme_purpose: Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules
-    routing_role: Cross-language Coordinator architecture and engineering rules
-    applies_when: Software performs or directly supports a Coordinator role and the Draft is explicitly adopted or approved for Project use.
-    authority_topics:
-      - Coordinator software architecture
-      - lifecycle and concurrency
-      - diagnostics and configuration
-      - Coordinator testing and release evidence
-    prerequisite_documents:
-      - docs/framework/AI_Engineering_Usage_Guide.md
-      - docs/framework/Coordinator_Node_Control_Framework.md
-
-  - display_name: Embedded C Coding Rules
-    path: docs/coding-rules/Embedded_C_Coding_Rules.md
-    version: v1.0.17
-    status: Final Baseline
-    repository_role: Normative language and implementation authority for Product-owned Embedded C code
-    readme_purpose: Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules
-    routing_role: Product-owned Embedded C implementation rules
-    applies_when: Product-owned Embedded C code is generated, modified, reviewed, or validated.
-    authority_topics:
-      - Embedded C language rules
-      - static memory and arithmetic safety
-      - State Machine, ISR, callback, and RTOS implementation
-      - Embedded C review evidence
-    prerequisite_documents:
-      - docs/framework/AI_Engineering_Usage_Guide.md
-      - docs/framework/Coordinator_Node_Control_Framework.md
-
-  - display_name: C# Coding Rules
-    path: docs/coding-rules/CSharp_Coding_Rules.md
-    version: v1.0.4
-    status: Draft for Review
-    repository_role: Proposed normative language and implementation authority for Product-owned C# code
-    readme_purpose: Product-owned C# language and .NET implementation rules
-    routing_role: Product-owned C# language and .NET implementation rules
-    applies_when: Product-owned C# code is generated, modified, reviewed, or validated and the Draft is explicitly adopted or approved for Project use.
-    authority_topics:
-      - C# language rules
-      - .NET resource and concurrency behavior
-      - untrusted input and deserialization safety
-      - C# review evidence
-    prerequisite_documents:
-      - docs/framework/AI_Engineering_Usage_Guide.md
-
-  - display_name: Repository Validation Checklist
-    path: docs/validation/Repository_Validation_Checklist.md
-    version: v1.0.5
-    status: Draft for Review
-    repository_role: Proposed operational validation method; not a Product or architecture authority
-    readme_purpose: Repository structural, manifest, canonical-reference, evidence-state, and detached-package checks
-    routing_role: Repository structural, manifest, reference, and evidence checks
-    applies_when: Repository content, authority manifests, detached packages, or validation tooling are changed or reviewed.
-    authority_topics:
-      - repository structural validation
-      - manifest and registry consistency
-      - detached-package traceability
-      - validation evidence boundaries
-    prerequisite_documents:
-      - docs/framework/AI_Engineering_Usage_Guide.md
+- display_name: AI Engineering Usage Guide
+  path: docs/framework/AI_Engineering_Usage_Guide.md
+  version: v1.0.18
+  status: Draft for Review
+  repository_role: Proposed normative AI task-routing and repository-governance authority
+  readme_purpose: AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary
+  routing_role: AI authority routing and operating controls
+  applies_when: Any AI-assisted engineering task uses this repository or a detached authority-set package.
+  authority_topics:
+  - AI task routing
+  - evidence-state reporting
+  - prohibited AI behavior
+  - human approval boundary
+  prerequisite_documents: []
+- display_name: Coordinator/Node Control Framework
+  path: docs/framework/Coordinator_Node_Control_Framework.md
+  version: v1.0.13
+  status: Baseline
+  repository_role: Normative architecture and framework-governance authority
+  readme_purpose: Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance
+  routing_role: Reusable architecture and governance
+  applies_when: A task defines or reviews Coordinator/Node roles, boundaries, architecture, Protocol layering, Runtime, safety placement, security, or Firmware Update behavior.
+  authority_topics:
+  - Coordinator and Node roles
+  - reusable architecture
+  - timing and concurrency boundaries
+  - safety and security placement
+  - Firmware Update architecture
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+- display_name: Framework Application Analysis Template
+  path: docs/framework/Framework_Application_Analysis_Template.md
+  version: v1.0.16
+  status: Baseline
+  repository_role: Normative framework-application analysis method
+  readme_purpose: Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence
+  routing_role: Application-analysis method and required records
+  applies_when: The Framework is applied to a new Product, application, platform, or Product revision.
+  authority_topics:
+  - framework applicability analysis
+  - reuse classification
+  - Project gaps and risks
+  - MVP and acceptance evidence
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/framework/Coordinator_Node_Control_Framework.md
+- display_name: Protocol YAML Definition Guide
+  path: docs/protocol/Protocol_YAML_Definition_Guide.md
+  version: v1.0.10
+  status: Baseline
+  repository_role: Normative Protocol YAML definition and governance authority
+  readme_purpose: Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance
+  routing_role: Protocol YAML semantics and validation rules
+  applies_when: A Project Protocol YAML is designed, reviewed, linted, versioned, or used for Code Generation.
+  authority_topics:
+  - Protocol YAML syntax and semantics
+  - identifiers and Registry rules
+  - compatibility and security declarations
+  - semantic validation and Code Generation
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/framework/Coordinator_Node_Control_Framework.md
+  - docs/framework/Framework_Application_Analysis_Template.md
+- display_name: Protocol YAML Template
+  path: docs/protocol/Protocol_YAML_Template.md
+  version: v1.0.10
+  status: Baseline
+  repository_role: Normative reusable Protocol YAML template authority
+  readme_purpose: Reusable Project Protocol YAML starting structure and review checklists
+  routing_role: Reusable Project Protocol starting structure
+  applies_when: A new Project Protocol YAML is initialized or checked for structural preservation.
+  authority_topics:
+  - Protocol YAML starting structure
+  - required top-level sections
+  - Protocol review checklists
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/protocol/Protocol_YAML_Definition_Guide.md
+- display_name: Coordinator Software Engineering Rules
+  path: docs/coordinator/Coordinator_Software_Engineering_Rules.md
+  version: v1.0.5
+  status: Draft for Review
+  repository_role: Proposed normative engineering authority for Coordinator-owned software
+  readme_purpose: Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules
+  routing_role: Cross-language Coordinator architecture and engineering rules
+  applies_when: Software performs or directly supports a Coordinator role and the Draft is explicitly adopted or approved for Project use.
+  authority_topics:
+  - Coordinator software architecture
+  - lifecycle and concurrency
+  - diagnostics and configuration
+  - Coordinator testing and release evidence
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/framework/Coordinator_Node_Control_Framework.md
+- display_name: Coordinator Architecture Patterns
+  path: docs/coordinator/Coordinator_Architecture_Patterns.md
+  version: v1.0.0
+  status: Draft for Review
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator architecture patterns, subordinate to Coordinator Software Engineering Rules
+  readme_purpose: Coordinator layering, dependency direction, state ownership, command and receive pipelines, lifecycle, multi-Node isolation, and architecture review patterns
+  routing_role: Detailed Coordinator architecture-pattern and structural-realization rules
+  applies_when: Coordinator structure, layering, dependency direction, state ownership, command or receive pipelines, lifecycle realization, or multi-Node isolation is designed or reviewed and this Draft is explicitly adopted or approved for Project use.
+  authority_topics:
+  - Coordinator layering and dependency direction
+  - Coordinator state ownership
+  - Coordinator command and receive pipelines
+  - Coordinator lifecycle and multi-Node isolation
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/framework/Coordinator_Node_Control_Framework.md
+  - docs/coordinator/Coordinator_Software_Engineering_Rules.md
+- display_name: Coordinator Concurrency Guide
+  path: docs/coordinator/Coordinator_Concurrency_Guide.md
+  version: v1.0.0
+  status: Draft for Review
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator concurrency, subordinate to Coordinator Software Engineering Rules
+  readme_purpose: Coordinator execution-context ownership, asynchronous I/O, cancellation, timeout, backpressure, connection generations, overload, and bounded shutdown
+  routing_role: Detailed Coordinator concurrency, cancellation, backpressure, and shutdown rules
+  applies_when: Coordinator execution contexts, asynchronous I/O, cancellation, timeout, queueing, backpressure, reconnect generation, overload, or shutdown behavior is designed or reviewed and this Draft is explicitly adopted or approved for Project use.
+  authority_topics:
+  - Coordinator execution-context ownership
+  - Coordinator asynchronous I/O and cancellation
+  - Coordinator backpressure and overload
+  - Coordinator reconnect generation and shutdown
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/framework/Coordinator_Node_Control_Framework.md
+  - docs/coordinator/Coordinator_Software_Engineering_Rules.md
+- display_name: Coordinator Logging Guide
+  path: docs/coordinator/Coordinator_Logging_Guide.md
+  version: v1.0.1
+  status: Draft for Review
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator logging implementation, subordinate to Coordinator Software Engineering Rules
+  readme_purpose: Structured diagnostic events, correlation, redaction, injection resistance, bounded delivery, retention, export, and logging-failure behavior
+  routing_role: Detailed Coordinator logging, redaction, delivery, retention, and export rules
+  applies_when: Coordinator diagnostic logging, correlation, redaction, bounded delivery, retention, export, evidence-integrity, or logger-failure behavior is designed or reviewed and this Draft is explicitly adopted or approved for Project use.
+  authority_topics:
+  - Coordinator diagnostic event structure
+  - Coordinator logging correlation and redaction
+  - Coordinator bounded logging delivery and retention
+  - Coordinator log export and evidence-integrity controls
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/framework/Coordinator_Node_Control_Framework.md
+  - docs/coordinator/Coordinator_Software_Engineering_Rules.md
+- display_name: Coordinator Testing Guide
+  path: docs/coordinator/Coordinator_Testing_Guide.md
+  version: v1.0.1
+  status: Draft for Review
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator engineering tests, subordinate to Coordinator Software Engineering Rules
+  readme_purpose: Coordinator test layers, Protocol and Transport coverage, deterministic race testing, fault injection, fuzzing, simulator governance, and evidence integrity
+  routing_role: Detailed Coordinator engineering-test strategy and evidence-classification rules
+  applies_when: Coordinator unit, component, integration, system, concurrency, fault, fuzz, simulator, CI, or evidence testing is planned, implemented, reviewed, or reported and this Draft is explicitly adopted or approved for Project use.
+  authority_topics:
+  - Coordinator test strategy and layers
+  - Coordinator deterministic race and fault testing
+  - Coordinator fuzzing and simulator governance
+  - Coordinator test evidence classification
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/framework/Coordinator_Node_Control_Framework.md
+  - docs/coordinator/Coordinator_Software_Engineering_Rules.md
+- display_name: Coordinator UI Engineering Guide
+  path: docs/coordinator/Coordinator_UI_Engineering_Guide.md
+  version: v1.0.1
+  status: Draft for Review
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator UI implementation, subordinate to Coordinator Software Engineering Rules
+  readme_purpose: Coordinator presentation state, command feedback, stale data, multi-Node binding, responsiveness, visualization, input safety, and engineering controls
+  routing_role: Detailed Coordinator UI implementation and presentation-state realization rules
+  applies_when: A Coordinator UI presents Node state, issues commands, handles external content, visualizes data, or implements operational, service, production, or laboratory workflows and this Draft is explicitly adopted or approved for Project use.
+  authority_topics:
+  - Coordinator presentation-state realization
+  - Coordinator command feedback and stale-data display
+  - Coordinator high-rate visualization and responsiveness
+  - Coordinator UI input and external-content safety
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/framework/Coordinator_Node_Control_Framework.md
+  - docs/coordinator/Coordinator_Software_Engineering_Rules.md
+- display_name: Embedded C Coding Rules
+  path: docs/coding-rules/Embedded_C_Coding_Rules.md
+  version: v1.0.17
+  status: Final Baseline
+  repository_role: Normative language and implementation authority for Product-owned Embedded C code
+  readme_purpose: Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules
+  routing_role: Product-owned Embedded C implementation rules
+  applies_when: Product-owned Embedded C code is generated, modified, reviewed, or validated.
+  authority_topics:
+  - Embedded C language rules
+  - static memory and arithmetic safety
+  - State Machine, ISR, callback, and RTOS implementation
+  - Embedded C review evidence
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+  - docs/framework/Coordinator_Node_Control_Framework.md
+- display_name: C# Coding Rules
+  path: docs/coding-rules/CSharp_Coding_Rules.md
+  version: v1.0.4
+  status: Draft for Review
+  repository_role: Proposed normative language and implementation authority for Product-owned C# code
+  readme_purpose: Product-owned C# language and .NET implementation rules
+  routing_role: Product-owned C# language and .NET implementation rules
+  applies_when: Product-owned C# code is generated, modified, reviewed, or validated and the Draft is explicitly adopted or approved for Project use.
+  authority_topics:
+  - C# language rules
+  - .NET resource and concurrency behavior
+  - untrusted input and deserialization safety
+  - C# review evidence
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md
+- display_name: Repository Validation Checklist
+  path: docs/validation/Repository_Validation_Checklist.md
+  version: v1.0.5
+  status: Draft for Review
+  repository_role: Proposed operational validation method; not a Product or architecture authority
+  readme_purpose: Repository structural, manifest, canonical-reference, evidence-state, and detached-package checks
+  routing_role: Repository structural, manifest, reference, and evidence checks
+  applies_when: Repository content, authority manifests, detached packages, or validation tooling are changed or reviewed.
+  authority_topics:
+  - repository structural validation
+  - manifest and registry consistency
+  - detached-package traceability
+  - validation evidence boundaries
+  prerequisite_documents:
+  - docs/framework/AI_Engineering_Usage_Guide.md

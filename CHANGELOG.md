@@ -24,8 +24,12 @@ Individual authority documents retain their own internal Version History and app
 
 ### Changed
 
-- Updated AI Engineering Usage Guide to v1.0.17 and Coordinator Software Engineering Rules to v1.0.5 for topic-specific Coordinator Guide routing.
-- Synchronized the authority registry, root Current Document Set, AI Active Document Manifest, Coordinator directory index, authority boundaries, and repository structure for the five new Guides.
+- Updated AI Engineering Usage Guide to v1.0.18; retained Coordinator Software Engineering Rules v1.0.5; and updated Coordinator Logging, Testing, and UI Engineering Guides to v1.0.1.
+- Synchronized `authority-registry.yaml`, the root Current Document Set, the AI Active Document Manifest, the Coordinator directory index, the root Authority Boundary, and the root Repository Structure for all five Coordinator Guides.
+- Hardened archive and package import against links, special filesystem entries, canonical-path escape, destination-link traversal, and time-of-check/time-of-use replacement.
+- Distinguished hash-based accidental-corruption detection from independently anchored authenticity and adversarial-tamper evidence in logging and testing guidance.
+- Replaced the registry-version mismatch regression mutation with a version-independent targeted edit.
+- Corrected validator YAML alias diagnostics to emit the controlled `aliases` wording used by regression tests.
 - Required the exact `authority-registry.yaml` root schema and controlled `GitHub main` source identity.
 - Fixed document-validation CI to the `ubuntu-24.04` runner image.
 - Updated AI Engineering Usage Guide to v1.0.16 and Repository Validation Checklist to v1.0.5.

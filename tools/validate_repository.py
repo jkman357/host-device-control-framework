@@ -8,1094 +8,554 @@ CI validation runtimes: Python 3.10 and Python 3.12.
 from __future__ import annotations
 
 import datetime as dt
+import html.parser
+import os
 import re
 import sys
 import unicodedata
-from html.parser import HTMLParser
+from collections import Counter
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-try:
-    import yaml
-except ImportError:
-    print(
-        "Repository validation: FAIL\n"
-        "- PyYAML 6.0.3 is required; run "
-        "'python -m pip install --require-hashes -r requirements-validation.txt'"
-    )
-    sys.exit(2)
+import yaml
 
-MIN_PYTHON = (3, 10)
 ROOT = Path(__file__).resolve().parents[1]
-ERRORS: list[str] = []
+REGISTRY = ROOT / "authority-registry.yaml"
+ROOT_README = ROOT / "README.md"
+AI_GUIDE = ROOT / "docs/framework/AI_Engineering_Usage_Guide.md"
+WORKFLOW = ROOT / ".github/workflows/document-validation.yml"
+REQUIREMENTS = ROOT / "requirements-validation.txt"
 
-CHECKOUT_ACTION = "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0"
-SETUP_PYTHON_ACTION = "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1"
-INSTALL_COMMAND = (
-    "python -m pip install --disable-pip-version-check --require-hashes "
-    "-r requirements-validation.txt"
-)
-VALIDATOR_COMMAND = "python tools/validate_repository.py"
-TEST_COMMAND = "python -m unittest discover -s tests -v"
-CI_RUNNER = "ubuntu-24.04"
+DIRECTORY_INDEX_ALLOWLIST = {
+    Path("docs/framework/README.md"),
+    Path("docs/protocol/README.md"),
+    Path("docs/coordinator/README.md"),
+    Path("docs/coding-rules/README.md"),
+    Path("docs/validation/README.md"),
+}
+ROOT_MARKDOWN_ALLOWLIST = {Path("README.md"), Path("CHANGELOG.md"), Path("NOTICE.md")}
+ALLOWED_STATUSES = {"Draft for Review", "Baseline", "Final Baseline", "Deprecated", "Retired"}
+REQUIRED_METADATA = ("Document Version", "Status", "Repository Role")
+IDENTITY_KEYS = ("Canonical Filename", "Document Name")
+SEMVER_RE = re.compile(r"^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
+ROOT_REGISTRY_KEYS = {"registry_version", "repository", "source_of_truth", "policy", "documents"}
+POLICY_KEYS = {"routing_order", "conflict_resolution", "draft_effect"}
+ENTRY_KEYS = {
+    "display_name", "path", "version", "status", "repository_role", "readme_purpose",
+    "routing_role", "applies_when", "authority_topics", "prerequisite_documents",
+}
 EXPECTED_REQUIREMENTS = """PyYAML==6.0.3 \\
     --hash=sha256:d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f \\
     --hash=sha256:9c7708761fccb9397fe64bbc0395abcae8c4bf7b0eac081e12b809bf47700d0b \\
     --hash=sha256:ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc
 """
-DIRECTORY_INDEX_ALLOWLIST = {
-    "docs/framework/README.md",
-    "docs/protocol/README.md",
-    "docs/coordinator/README.md",
-    "docs/coding-rules/README.md",
-    "docs/validation/README.md",
-}
-DIRECTORY_INDEX_ROLE = "Non-normative directory index"
-METADATA_KEYS = (
-    "Canonical Filename",
-    "Document Name",
-    "Document Version",
-    "Status",
-    "Supersedes Document Version",
-    "Repository Role",
-)
-ALLOWED_STATUSES = {
-    "Draft for Review",
-    "Baseline",
-    "Final Baseline",
-    "Deprecated",
-    "Retired",
-}
-SEMVER_RE = re.compile(r"^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
-HTML_CODE_TAGS = ("pre", "code", "script", "style")
+ERRORS: list[str] = []
 
-if sys.version_info < MIN_PYTHON:
-    required = ".".join(str(part) for part in MIN_PYTHON)
-    actual = f"{sys.version_info.major}.{sys.version_info.minor}"
-    print(f"Repository validation: FAIL\n- Python {required} or later is required; found {actual}")
-    sys.exit(2)
+
+def rel(path: Path) -> str:
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return str(path)
 
 
 def error(message: str) -> None:
     ERRORS.append(message)
 
 
-def rel(path: Path) -> str:
-    return path.relative_to(ROOT).as_posix()
-
-
 def read_text(path: Path) -> str:
     try:
-        data = path.read_bytes()
-        text = data.decode("utf-8")
-    except Exception as exc:
-        error(f"{rel(path)}: UTF-8 read failed: {exc}")
+        raw = path.read_bytes()
+    except OSError as exc:
+        error(f"{rel(path)}: cannot read file: {exc}")
+        return ""
+    if raw.startswith(b"\xef\xbb\xbf"):
+        error(f"{rel(path)}: UTF-8 BOM is not allowed")
+    if b"\x00" in raw:
+        error(f"{rel(path)}: NUL byte is not allowed")
+    if b"\r" in raw:
+        error(f"{rel(path)}: CR or CRLF line endings are not allowed")
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        error(f"{rel(path)}: invalid UTF-8: {exc}")
         return ""
     if text and not text.endswith("\n"):
-        error(f"{rel(path)}: missing final newline")
+        error(f"{rel(path)}: text file must end with a newline")
     return text
 
 
-def blank_preserving_newlines(value: str) -> str:
-    return "".join("\n" if char == "\n" else " " for char in value)
+class UniqueKeyLoader(yaml.SafeLoader):
+    pass
 
 
-def fence_free_text(path: Path, text: str) -> str:
-    """Validate fenced blocks and return text with fenced content blanked."""
-    output: list[str] = []
-    opening: tuple[str, int, int] | None = None
-    fence_re = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
-
-    for line_no, line in enumerate(text.splitlines(), start=1):
-        match = fence_re.match(line)
-        if opening is None:
-            if match:
-                marker = match.group(1)
-                opening = (marker[0], len(marker), line_no)
-                output.append("")
-            else:
-                output.append(line)
-            continue
-
-        marker_char, marker_length, _ = opening
-        if match:
-            marker = match.group(1)
-            trailing = match.group(2)
-            if marker[0] == marker_char and len(marker) >= marker_length and not trailing.strip():
-                opening = None
-        output.append("")
-
-    if opening is not None:
-        marker_char, marker_length, opening_line = opening
-        error(
-            f"{rel(path)}:{opening_line}: unclosed fenced Code block "
-            f"opened with {marker_char * marker_length}"
-        )
-    return "\n".join(output) + ("\n" if text.endswith("\n") else "")
-
-
-def html_code_free_text(path: Path, text: str) -> str:
-    """Blank HTML code/example blocks while preserving line positions."""
-    result = text
-    complete_re = re.compile(
-        r"<(?P<tag>pre|code|script|style)\b[^>]*>.*?</(?P=tag)\s*>",
-        re.IGNORECASE | re.DOTALL,
-    )
-    while True:
-        result, count = complete_re.subn(lambda match: blank_preserving_newlines(match.group(0)), result)
-        if count == 0:
-            break
-
-    opening_re = re.compile(r"<(pre|code|script|style)\b[^>]*>", re.IGNORECASE)
-    opening = opening_re.search(result)
-    if opening:
-        line_no = result.count("\n", 0, opening.start()) + 1
-        error(f"{rel(path)}:{line_no}: unclosed HTML code/example block <{opening.group(1).lower()}>")
-        result = result[: opening.start()] + blank_preserving_newlines(result[opening.start() :])
-    return result
-
-
-def governed_searchable_text(path: Path, text: str) -> str:
-    return html_code_free_text(path, fence_free_text(path, text))
-
-
-def remove_inline_code(text: str) -> str:
-    return re.sub(r"(`+)(.+?)\1", lambda match: " " * len(match.group(0)), text)
-
-
-def parse_metadata(path: Path, searchable: str) -> dict[str, str]:
-    """Parse unique metadata from before the first level-2 heading and line 80."""
-    lines = searchable.splitlines()
-    first_h2 = next(
-        (index for index, line in enumerate(lines) if re.match(r"^ {0,3}##\s+", line)),
-        len(lines),
-    )
-    opening_limit = min(first_h2, 80)
-    patterns = {
-        key: re.compile(rf"^\*\*{re.escape(key)}:\*\*\s*`?([^`\n]+?)`?\s*$", re.MULTILINE)
-        for key in METADATA_KEYS
-    }
-    values: dict[str, str] = {}
-    for key, pattern in patterns.items():
-        matches = list(pattern.finditer(searchable))
-        if len(matches) > 1:
-            error(f"{rel(path)}: metadata key {key!r} must appear exactly once")
-            continue
-        if not matches:
-            continue
-        match = matches[0]
-        line_index = searchable.count("\n", 0, match.start())
-        if line_index >= opening_limit:
-            error(
-                f"{rel(path)}:{line_index + 1}: metadata key {key!r} must appear "
-                "before the first level-2 heading and line 80"
+def _construct_mapping(loader: UniqueKeyLoader, node: yaml.nodes.MappingNode, deep: bool = False):
+    mapping = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        if key in mapping:
+            raise yaml.constructor.ConstructorError(
+                "while constructing a mapping", node.start_mark,
+                f"found duplicate key {key!r}", key_node.start_mark,
             )
-            continue
-        values[key] = match.group(1).strip()
-    return values
+        mapping[key] = loader.construct_object(value_node, deep=deep)
+    return mapping
 
 
-def validate_status_role(path: Path, status: str, role: str) -> None:
-    if status not in ALLOWED_STATUSES:
-        error(f"{rel(path)}: Status {status!r} is not in the controlled enum")
-        return
-    role_cf = role.casefold()
-    if status == "Draft for Review":
-        if not role_cf.startswith("proposed "):
-            error(f"{rel(path)}: Draft for Review Repository Role must begin with 'Proposed '")
-    elif status in {"Baseline", "Final Baseline"}:
-        if "normative" not in role_cf or "proposed" in role_cf:
-            error(
-                f"{rel(path)}: {status} Repository Role must be non-proposed normative wording"
-            )
-    elif status == "Deprecated":
-        if not any(token in role_cf for token in ("deprecated", "historical")):
-            error(f"{rel(path)}: Deprecated Repository Role must identify deprecated or historical use")
-    elif status == "Retired":
-        if not any(token in role_cf for token in ("retired", "historical")):
-            error(f"{rel(path)}: Retired Repository Role must identify retired or historical use")
+UniqueKeyLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _construct_mapping)
 
 
-def github_slug(raw_heading: str) -> str:
-    text = re.sub(r"<[^>]+>", "", raw_heading)
-    text = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", text)
-    text = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", text)
-    text = re.sub(r"[`*_~]", "", text)
-    text = unicodedata.normalize("NFKC", text).strip().lower()
-    chars: list[str] = []
-    for char in text:
-        category = unicodedata.category(char)
-        if char in ("-", "_", " ") or category[0] in ("L", "N"):
-            chars.append(char)
-    return "".join(chars).replace(" ", "-")
-
-
-def heading_anchors(text: str) -> set[str]:
-    headings: list[tuple[int, str]] = []
-    lines = text.splitlines()
-    for index, line in enumerate(lines):
-        atx = re.match(r"^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$", line)
-        if atx:
-            headings.append((index, atx.group(2)))
-        if index + 1 < len(lines) and line.strip():
-            setext = re.match(r"^ {0,3}(=+|-+)\s*$", lines[index + 1])
-            if setext and "|" not in line:
-                headings.append((index, line.strip()))
-
-    anchors: set[str] = set()
-    duplicates: dict[str, int] = {}
-    for _, raw in sorted(headings):
-        base = github_slug(raw)
-        if not base:
-            continue
-        count = duplicates.get(base, 0)
-        anchor = base if count == 0 else f"{base}-{count}"
-        duplicates[base] = count + 1
-        anchors.add(anchor)
-    return anchors
-
-
-class DocumentHTMLParser(HTMLParser):
-    def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.targets: list[str] = []
-        self.anchors: set[str] = set()
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        tag_cf = tag.casefold()
-        for key, value in attrs:
-            key_cf = key.casefold()
-            if value and key_cf in {"id", "name"}:
-                self.anchors.add(value)
-            if value and ((tag_cf == "a" and key_cf == "href") or (tag_cf == "img" and key_cf == "src")):
-                self.targets.append(value)
-
-
-def parse_html(path: Path, text: str) -> DocumentHTMLParser:
-    parser = DocumentHTMLParser()
-    try:
-        parser.feed(text)
-    except Exception as exc:
-        error(f"{rel(path)}: HTML parsing failed: {exc}")
-    return parser
-
-
-def split_link_target(raw_target: str) -> str:
-    raw_target = raw_target.strip()
-    if raw_target.startswith("<") and ">" in raw_target:
-        return raw_target[1 : raw_target.index(">")]
-    return raw_target.split(maxsplit=1)[0]
-
-
-def validate_target(source: Path, raw_target: str, anchors_by_path: dict[Path, set[str]]) -> None:
-    target = split_link_target(raw_target)
-    if not target:
-        return
-    parsed = urlsplit(target)
-    if parsed.scheme or target.startswith("//"):
-        return
-
-    path_part = unquote(parsed.path)
-    fragment = unquote(parsed.fragment)
-    resolved = source if not path_part else (source.parent / path_part).resolve()
-    try:
-        resolved.relative_to(ROOT.resolve())
-    except ValueError:
-        error(f"{rel(source)}: link escapes repository: {target}")
-        return
-
-    if not resolved.exists():
-        error(f"{rel(source)}: missing link or image target: {path_part or target}")
-        return
-
-    if fragment and resolved.is_file() and resolved.suffix == ".md":
-        available = anchors_by_path.get(resolved, set())
-        if fragment not in available:
-            error(f"{rel(source)}: missing heading anchor in {rel(resolved)}: #{fragment}")
-
-
-def inline_link_targets(text: str) -> list[str]:
-    targets: list[str] = []
-    index = 0
-    while True:
-        marker = text.find("](", index)
-        if marker < 0:
-            break
-        cursor = marker + 2
-        if cursor < len(text) and text[cursor] == "<":
-            end = cursor + 1
-            escaped = False
-            while end < len(text):
-                char = text[end]
-                if char == ">" and not escaped:
-                    targets.append(text[cursor : end + 1])
-                    cursor = end + 1
-                    break
-                escaped = char == "\\" and not escaped
-                if char != "\\":
-                    escaped = False
-                end += 1
-            index = max(cursor, marker + 2)
-            continue
-
-        depth = 1
-        end = cursor
-        escaped = False
-        while end < len(text):
-            char = text[end]
-            if escaped:
-                escaped = False
-            elif char == "\\":
-                escaped = True
-            elif char == "(":
-                depth += 1
-            elif char == ")":
-                depth -= 1
-                if depth == 0:
-                    targets.append(text[cursor:end])
-                    end += 1
-                    break
-            end += 1
-        index = max(end, marker + 2)
-    return targets
-
-
-def check_links(
-    path: Path,
-    text: str,
-    html_parser: DocumentHTMLParser,
-    anchors_by_path: dict[Path, set[str]],
-) -> None:
-    searchable = remove_inline_code(text)
-    definitions: dict[str, str] = {}
-    for match in re.finditer(
-        r"^ {0,3}\[([^\]]+)\]:\s*(?:<([^>]+)>|(\S+))",
-        searchable,
-        re.MULTILINE,
-    ):
-        label = re.sub(r"\s+", " ", match.group(1).strip()).casefold()
-        target = match.group(2) or match.group(3) or ""
-        if label in definitions:
-            error(f"{rel(path)}: duplicate reference-link definition: [{match.group(1)}]")
-        definitions[label] = target
-        validate_target(path, target, anchors_by_path)
-
-    for target in inline_link_targets(searchable):
-        validate_target(path, target, anchors_by_path)
-
-    for match in re.finditer(r"!?\[([^\]]+)\]\[([^\]]*)\]", searchable):
-        label = match.group(2).strip() or match.group(1).strip()
-        normalized = re.sub(r"\s+", " ", label).casefold()
-        if normalized not in definitions:
-            error(f"{rel(path)}: undefined reference-style link: [{label}]")
-
-    for target in html_parser.targets:
-        validate_target(path, target, anchors_by_path)
-
-
-def split_markdown_row(line: str) -> list[str]:
-    stripped = line.strip()
-    if stripped.startswith("|"):
-        stripped = stripped[1:]
-    if stripped.endswith("|"):
-        stripped = stripped[:-1]
-    cells: list[str] = []
-    current: list[str] = []
-    escaped = False
-    in_code = False
-    tick_length = 0
-    index = 0
-    while index < len(stripped):
-        char = stripped[index]
-        if escaped:
-            current.append(char)
-            escaped = False
-            index += 1
-            continue
-        if char == "\\":
-            current.append(char)
-            escaped = True
-            index += 1
-            continue
-        if char == "`":
-            end = index
-            while end < len(stripped) and stripped[end] == "`":
-                end += 1
-            run = end - index
-            current.extend(stripped[index:end])
-            if not in_code:
-                in_code = True
-                tick_length = run
-            elif run == tick_length:
-                in_code = False
-                tick_length = 0
-            index = end
-            continue
-        if char == "|" and not in_code:
-            cells.append("".join(current).strip())
-            current = []
-        else:
-            current.append(char)
-        index += 1
-    cells.append("".join(current).strip())
-    return cells
-
-
-def normalize_cell(cell: str) -> str:
-    cell = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", cell)
-    return cell.replace("`", "").strip()
-
-
-def parse_table_from_section(path: Path, section: str, table_name: str) -> tuple[list[str], list[list[str]]]:
-    lines = section.splitlines()
-    for index, line in enumerate(lines):
-        if not line.lstrip().startswith("|"):
-            continue
-        if index + 1 >= len(lines) or not lines[index + 1].lstrip().startswith("|"):
-            continue
-        header = [normalize_cell(cell) for cell in split_markdown_row(line)]
-        separator = [cell.strip() for cell in split_markdown_row(lines[index + 1])]
-        if not separator or not all(re.fullmatch(r":?-{3,}:?", cell) for cell in separator):
-            continue
-        if len(separator) != len(header):
-            error(f"{rel(path)}: {table_name} separator cell count must match header")
-        rows: list[list[str]] = []
-        for row_line in lines[index + 2 :]:
-            if not row_line.lstrip().startswith("|"):
-                break
-            row = [normalize_cell(cell) for cell in split_markdown_row(row_line)]
-            if len(row) != len(header):
-                error(
-                    f"{rel(path)}: {table_name} row has {len(row)} cells; expected {len(header)}"
-                )
-            rows.append(row)
-        return header, rows
-    error(f"{rel(path)}: {table_name} table not found")
-    return [], []
-
-
-def parse_unique_markdown_table(path: Path, text: str, heading: str) -> tuple[list[str], list[list[str]]]:
-    matches = list(re.finditer(rf"^{re.escape(heading)}\s*$", text, re.MULTILINE))
-    if len(matches) != 1:
-        error(f"{rel(path)}: heading {heading!r} must appear exactly once; found {len(matches)}")
-        return [], []
-    section = text[matches[0].end() :]
-    next_heading = re.search(r"^#{1,6}\s+", section, re.MULTILINE)
-    if next_heading:
-        section = section[: next_heading.start()]
-    return parse_table_from_section(path, section, heading)
-
-
-def parse_semver(value: str) -> tuple[int, int, int] | None:
-    match = SEMVER_RE.fullmatch(value)
-    if not match:
-        return None
-    return tuple(int(part) for part in match.groups())
-
-
-def parse_iso_date(value: str) -> dt.date | None:
-    try:
-        return dt.date.fromisoformat(value)
-    except ValueError:
-        return None
-
-
-def parse_version_history(
-    path: Path,
-    text: str,
-    version: str,
-    status: str,
-    supersedes: str | None,
-) -> None:
-    heading_re = re.compile(
-        r"^(#{1,6})\s+.*(?:Version|Change)\s+History\s*$",
-        re.IGNORECASE | re.MULTILINE,
-    )
-    headings = list(heading_re.finditer(text))
-    if len(headings) != 1:
-        error(
-            f"{rel(path)}: exactly one Version History or Change History heading is required; "
-            f"found {len(headings)}"
-        )
-        return
-    heading = headings[0]
-    level = len(heading.group(1))
-    section = text[heading.end() :]
-    next_heading = re.search(rf"^#{{1,{level}}}\s+", section, re.MULTILINE)
-    if next_heading:
-        section = section[: next_heading.start()]
-    header, rows = parse_table_from_section(path, section, "Version History")
-    if not header or not rows:
-        return
-
-    header_cf = [item.casefold() for item in header]
-    required = {"version", "date", "status"}
-    missing = required - set(header_cf)
-    if missing:
-        error(f"{rel(path)}: Version History missing required columns: {', '.join(sorted(missing))}")
-        return
-    summary_column = "summary" if "summary" in header_cf else "description" if "description" in header_cf else None
-    if summary_column is None:
-        error(f"{rel(path)}: Version History requires Summary or Description column")
-        return
-
-    version_index = header_cf.index("version")
-    date_index = header_cf.index("date")
-    status_index = header_cf.index("status")
-    summary_index = header_cf.index(summary_column)
-
-    current_semver = parse_semver(version)
-    if current_semver is None:
-        error(f"{rel(path)}: Document Version {version!r} must match vMAJOR.MINOR.PATCH")
-
-    values: list[str] = []
-    semvers: list[tuple[int, int, int]] = []
-    dates_in_row_order: list[dt.date] = []
-    for row in rows:
-        if len(row) != len(header):
-            continue
-        row_version = row[version_index]
-        parsed = parse_semver(row_version)
-        if parsed is None:
-            error(f"{rel(path)}: Version History value {row_version!r} must match vMAJOR.MINOR.PATCH")
-            continue
-        values.append(row_version)
-        semvers.append(parsed)
-
-        row_date = row[date_index]
-        parsed_date = parse_iso_date(row_date)
-        if row_version == version:
-            if parsed_date is None:
-                error(f"{rel(path)}: current Version History date must be a real ISO YYYY-MM-DD date")
-        elif row_date != "Not recorded" and parsed_date is None:
-            error(f"{rel(path)}: Version History date {row_date!r} must be a real ISO date or 'Not recorded'")
-        if parsed_date is not None:
-            dates_in_row_order.append(parsed_date)
-
-        row_status = row[status_index]
-        if row_version == version:
-            if row_status != status:
-                error(
-                    f"{rel(path)}: Version History status for {version} is {row_status!r}; "
-                    f"metadata status is {status!r}"
-                )
-        elif row_status != "Not recorded" and row_status not in ALLOWED_STATUSES:
-            error(
-                f"{rel(path)}: historical Version History status {row_status!r} "
-                "must use the controlled enum or 'Not recorded'"
-            )
-
-        if not row[summary_index].strip():
-            error(f"{rel(path)}: Version History summary/description must not be empty")
-
-    if len(values) != len(set(values)):
-        error(f"{rel(path)}: Version History contains duplicate versions")
-
-    ascending = semvers == sorted(semvers)
-    descending = semvers == sorted(semvers, reverse=True)
-    if len(semvers) > 1 and not (ascending or descending):
-        error(f"{rel(path)}: Version History versions must be monotonic")
-    if len(dates_in_row_order) > 1:
-        if ascending and dates_in_row_order != sorted(dates_in_row_order):
-            error(f"{rel(path)}: recorded Version History dates must follow ascending version order")
-        if descending and dates_in_row_order != sorted(dates_in_row_order, reverse=True):
-            error(f"{rel(path)}: recorded Version History dates must follow descending version order")
-
-    matching = [row for row in rows if len(row) == len(header) and row[version_index] == version]
-    if len(matching) != 1:
-        error(f"{rel(path)}: current version {version} must appear exactly once in Version History table")
-    elif current_semver is not None and semvers and current_semver != max(semvers):
-        highest = "v" + ".".join(str(part) for part in max(semvers))
-        error(f"{rel(path)}: current version {version} must be the highest Version History version ({highest})")
-
-    if len(values) <= 1:
-        if supersedes is not None:
-            error(f"{rel(path)}: Supersedes Document Version must be absent for an initial version")
-        return
-    if supersedes is None:
-        error(f"{rel(path)}: Supersedes Document Version is required when Version History has multiple entries")
-        return
-
-    supersedes_semver = parse_semver(supersedes)
-    if supersedes_semver is None:
-        error(f"{rel(path)}: Supersedes Document Version {supersedes!r} must match vMAJOR.MINOR.PATCH")
-        return
-    if supersedes not in values:
-        error(f"{rel(path)}: Supersedes Document Version {supersedes} is not present in Version History")
-    if current_semver is not None and supersedes_semver >= current_semver:
-        error(f"{rel(path)}: Supersedes Document Version {supersedes} must be lower than {version}")
-    if current_semver is not None:
-        prior_versions = [item for item in semvers if item < current_semver]
-        if prior_versions:
-            expected = max(prior_versions)
-            if supersedes_semver != expected:
-                expected_text = "v" + ".".join(str(part) for part in expected)
-                error(
-                    f"{rel(path)}: Supersedes Document Version {supersedes} must identify "
-                    f"the immediate prior listed version {expected_text}"
-                )
-
-
-def load_yaml(path: Path, base_loader: bool = False) -> object | None:
+def load_yaml_strict(path: Path) -> object | None:
     text = read_text(path)
+    # Registry/workflow files intentionally forbid YAML indirection and custom tags.
+    for token_type, plural_label in ((yaml.tokens.AnchorToken, "anchors"), (yaml.tokens.AliasToken, "aliases"), (yaml.tokens.TagToken, "tags")):
+        try:
+            if any(isinstance(token, token_type) for token in yaml.scan(text)):
+                error(f"{rel(path)}: YAML {plural_label} are not allowed")
+        except yaml.YAMLError as exc:
+            error(f"{rel(path)}: YAML tokenization failed: {exc}")
+            return None
+    if re.search(r"(?m)^\s*<<\s*:", text):
+        error(f"{rel(path)}: YAML merge keys are not allowed")
     try:
-        loader = yaml.BaseLoader if base_loader else yaml.SafeLoader
-        return yaml.load(text, Loader=loader)
+        return yaml.load(text, Loader=UniqueKeyLoader)
     except yaml.YAMLError as exc:
         error(f"{rel(path)}: invalid YAML: {exc}")
         return None
 
 
-def step_is_unconditional(step: dict[str, object]) -> bool:
-    return "if" not in step and step.get("continue-on-error") not in {"true", True}
+def blank_preserving_newlines(value: str) -> str:
+    return "".join("\n" if c == "\n" else " " for c in value)
 
 
-def check_workflow() -> None:
-    workflow = ROOT / ".github/workflows/document-validation.yml"
-    if not workflow.exists():
-        return
-    data = load_yaml(workflow, base_loader=True)
-    if not isinstance(data, dict):
-        error(f"{rel(workflow)}: workflow root must be a YAML mapping")
-        return
+def fence_free_text(path: Path, text: str) -> str:
+    out: list[str] = []
+    opening: tuple[str, int, int] | None = None
+    fence_re = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
+    for line_no, line in enumerate(text.splitlines(), 1):
+        match = fence_re.match(line)
+        if opening is None:
+            if match:
+                marker = match.group(1)
+                opening = (marker[0], len(marker), line_no)
+                out.append("")
+            else:
+                out.append(line)
+            continue
+        marker_char, marker_len, _ = opening
+        if match:
+            marker = match.group(1)
+            if marker[0] == marker_char and len(marker) >= marker_len and not match.group(2).strip():
+                opening = None
+        out.append("")
+    if opening is not None:
+        c, n, line_no = opening
+        error(f"{rel(path)}:{line_no}: unclosed fenced Code block opened with {c*n}")
+    return "\n".join(out) + ("\n" if text.endswith("\n") else "")
 
-    triggers = data.get("on")
-    if not isinstance(triggers, dict) or not {"push", "pull_request"}.issubset(triggers):
-        error(f"{rel(workflow)}: on must enable both push and pull_request")
-    permissions = data.get("permissions")
-    if permissions != {"contents": "read"}:
-        error(f"{rel(workflow)}: permissions must be exactly contents: read")
-    jobs = data.get("jobs")
-    if not isinstance(jobs, dict):
-        error(f"{rel(workflow)}: jobs mapping is required")
-        return
 
-    valid_job_found = False
-    for job in jobs.values():
-        if not isinstance(job, dict) or "if" in job or job.get("continue-on-error") in {"true", True}:
-            continue
-        if any(key in job for key in ("container", "services", "defaults", "env")):
-            continue
-        strategy = job.get("strategy")
-        matrix = strategy.get("matrix") if isinstance(strategy, dict) else None
-        versions = matrix.get("python-version") if isinstance(matrix, dict) else None
-        if not isinstance(versions, list) or set(versions) != {"3.10", "3.12"}:
-            continue
-        if job.get("runs-on") != CI_RUNNER:
-            continue
-        steps = job.get("steps")
-        if not isinstance(steps, list):
-            continue
-
-        indices: list[int] = []
-        matchers = [
-            lambda step: step.get("uses") == CHECKOUT_ACTION
-            and set(step).issubset({"name", "uses", "with"})
-            and step.get("with") == {"persist-credentials": "false"},
-            lambda step: step.get("uses") == SETUP_PYTHON_ACTION
-            and set(step).issubset({"name", "uses", "with"})
-            and step.get("with") == {"python-version": "${{ matrix.python-version }}"},
-            lambda step: isinstance(step.get("run"), str)
-            and set(step).issubset({"name", "run"})
-            and step["run"].strip() == INSTALL_COMMAND,
-            lambda step: isinstance(step.get("run"), str)
-            and set(step).issubset({"name", "run"})
-            and step["run"].strip() == VALIDATOR_COMMAND,
-            lambda step: isinstance(step.get("run"), str)
-            and set(step).issubset({"name", "run"})
-            and step["run"].strip() == TEST_COMMAND,
-        ]
-        valid = True
-        for matcher in matchers:
-            matched = [
-                index
-                for index, step in enumerate(steps)
-                if isinstance(step, dict) and matcher(step) and step_is_unconditional(step)
-            ]
-            if len(matched) != 1:
-                valid = False
-                break
-            indices.append(matched[0])
-        if valid and len(set(indices)) == len(indices) and indices == sorted(indices):
-            valid_job_found = True
+def html_code_free_text(path: Path, text: str) -> str:
+    result = re.sub(r"<!--.*?-->", lambda m: blank_preserving_newlines(m.group(0)), text, flags=re.S)
+    complete = re.compile(r"<(?P<tag>pre|code|script|style)\b[^>]*>.*?</(?P=tag)\s*>", re.I | re.S)
+    while True:
+        result, count = complete.subn(lambda m: blank_preserving_newlines(m.group(0)), result)
+        if not count:
             break
+    opening = re.search(r"<(pre|code|script|style)\b[^>]*>", result, re.I)
+    if opening:
+        line_no = result.count("\n", 0, opening.start()) + 1
+        error(f"{rel(path)}:{line_no}: unclosed HTML code/example block <{opening.group(1).lower()}>")
+        result = result[:opening.start()] + blank_preserving_newlines(result[opening.start():])
+    return result
 
-    if not valid_job_found:
-        error(
-            f"{rel(workflow)}: one {CI_RUNNER} job must contain exact, separate, unconditional "
-            "SHA-pinned checkout/setup with non-persisted credentials, Python 3.10/3.12 matrix, hash-verified dependency install, "
-            "validator, and regression-test steps in execution order"
-        )
+
+def searchable(path: Path, text: str) -> str:
+    return html_code_free_text(path, fence_free_text(path, text))
 
 
-def validate_markdown_extensions() -> None:
-    docs = ROOT / "docs"
-    if not docs.exists():
+def strip_markup(value: str) -> str:
+    value = value.strip()
+    if value.startswith("`") and value.endswith("`") and len(value) >= 2:
+        value = value[1:-1]
+    return value.strip()
+
+
+def parse_metadata(path: Path, text: str) -> dict[str, str]:
+    lines = text.splitlines()
+    first_h2 = next((i for i, line in enumerate(lines) if re.match(r"^ {0,3}##\s+", line)), len(lines))
+    region = "\n".join(lines[:min(first_h2, 80)])
+    metadata: dict[str, str] = {}
+    for key in (*IDENTITY_KEYS, *REQUIRED_METADATA, "Supersedes Document Version"):
+        matches = re.findall(rf"(?m)^\*\*{re.escape(key)}:\*\*\s*(.*?)\s*$", region)
+        if len(matches) > 1:
+            error(f"{rel(path)}: metadata {key!r} must appear at most once in the opening metadata region")
+        if matches:
+            metadata[key] = strip_markup(matches[0])
+    identities = [key for key in IDENTITY_KEYS if key in metadata]
+    if len(identities) != 1:
+        error(f"{rel(path)}: exactly one of Canonical Filename or Document Name is required")
+    else:
+        if metadata[identities[0]] != path.name:
+            error(f"{rel(path)}: declared filename {metadata[identities[0]]!r} does not match {path.name!r}")
+    for key in REQUIRED_METADATA:
+        if key not in metadata:
+            error(f"{rel(path)}: missing required metadata: {key}")
+    version = metadata.get("Document Version", "")
+    if version and not SEMVER_RE.fullmatch(version):
+        error(f"{rel(path)}: Document Version {version!r} must match vMAJOR.MINOR.PATCH")
+    status = metadata.get("Status", "")
+    if status and status not in ALLOWED_STATUSES:
+        error(f"{rel(path)}: Status {status!r} is not controlled")
+    role = metadata.get("Repository Role", "")
+    if status == "Draft for Review" and role and not role.startswith("Proposed "):
+        error(f"{rel(path)}: Draft for Review Repository Role must begin with 'Proposed '")
+    if status in {"Baseline", "Final Baseline"} and role:
+        low = role.lower()
+        if "normative" not in low or "proposed" in low:
+            error(f"{rel(path)}: Baseline Repository Role must use non-proposed normative wording")
+    return metadata
+
+
+def parse_semver(value: str) -> tuple[int, int, int] | None:
+    m = SEMVER_RE.fullmatch(value)
+    return tuple(map(int, m.groups())) if m else None
+
+
+def markdown_rows(lines: list[str], start: int) -> tuple[list[str], list[list[str]]]:
+    while start < len(lines) and not lines[start].lstrip().startswith("|"):
+        if lines[start].startswith("#"):
+            return [], []
+        start += 1
+    if start >= len(lines):
+        return [], []
+    def cells(line: str) -> list[str]: return [c.strip() for c in line.strip().strip("|").split("|")]
+    header = cells(lines[start])
+    if start + 1 >= len(lines) or not re.match(r"^\s*\|?\s*:?-+", lines[start+1]):
+        return [], []
+    rows=[]
+    i=start+2
+    while i < len(lines) and lines[i].lstrip().startswith("|"):
+        rows.append(cells(lines[i])); i+=1
+    return header, rows
+
+
+def validate_version_history(path: Path, text: str, md: dict[str, str]) -> None:
+    headings = [(i, line) for i, line in enumerate(text.splitlines()) if re.match(r"^ {0,3}#{2,6}(?:\s+(?:Appendix\s+[A-Z]\.|\d+(?:\.\d+)*))?\s+(?:Version History|Change History)\s*$", line, re.I)]
+    if len(headings) != 1:
+        error(f"{rel(path)}: exactly one Version History or Change History heading is required; found {len(headings)}")
         return
-    for path in docs.rglob("*"):
-        if not path.is_file():
-            continue
-        suffix = path.suffix
-        if suffix.casefold() in {".md", ".markdown"} and suffix != ".md":
-            error(f"{rel(path)}: governed Markdown files must use the lowercase .md extension")
-
-
-def check_validation_requirements() -> None:
-    path = ROOT / "requirements-validation.txt"
-    if not path.exists():
+    lines=text.splitlines(); header, rows=markdown_rows(lines, headings[0][0]+1)
+    normalized=[h.strip().lower() for h in header]
+    aliases={"version":"version","date":"date","status":"status","summary":"summary","description":"summary"}
+    required={"version","date","status","summary"}
+    present={aliases[h] for h in normalized if h in aliases}
+    missing=required-present
+    if missing:
+        error(f"{rel(path)}: Version History missing required columns: {', '.join(sorted(missing))}")
         return
-    text = read_text(path)
-    if text != EXPECTED_REQUIREMENTS:
-        error(
-            f"{rel(path)}: must exactly pin PyYAML 6.0.3 with the approved source, "
-            "Python 3.10 Linux x86-64, and Python 3.12 Linux x86-64 SHA-256 hashes"
-        )
-
-
-def load_authority_registry() -> list[dict[str, object]]:
-    path = ROOT / "authority-registry.yaml"
-    if not path.exists():
-        return []
-    data = load_yaml(path)
-    if not isinstance(data, dict):
-        error(f"{rel(path)}: registry root must be a YAML mapping")
-        return []
-    required_root_fields = {
-        "registry_version",
-        "repository",
-        "source_of_truth",
-        "policy",
-        "documents",
-    }
-    if set(data) != required_root_fields:
-        missing = required_root_fields - set(data)
-        extra = set(data) - required_root_fields
-        detail: list[str] = []
-        if missing:
-            detail.append(f"missing {sorted(missing)}")
-        if extra:
-            detail.append(f"unexpected {sorted(extra)}")
-        error(f"{rel(path)}: registry root fields invalid: {'; '.join(detail)}")
-    if data.get("registry_version") != 1:
-        error(f"{rel(path)}: registry_version must be integer 1")
-    if data.get("repository") != "host-device-control-framework":
-        error(f"{rel(path)}: repository identity mismatch")
-    if data.get("source_of_truth") != "GitHub main":
-        error(f"{rel(path)}: source_of_truth must be exactly 'GitHub main'")
-    policy = data.get("policy")
-    expected_policy = {
-        "routing_order": "role-first-language-second",
-        "conflict_resolution": "topic-ownership-before-precedence",
-        "draft_effect": "proposed-until-explicitly-adopted",
-    }
-    if policy != expected_policy:
-        error(f"{rel(path)}: policy mapping must match the controlled authority-routing policy")
-    documents = data.get("documents")
-    if not isinstance(documents, list) or not documents:
-        error(f"{rel(path)}: documents must be a non-empty list")
-        return []
-
-    required_fields = {
-        "display_name",
-        "path",
-        "version",
-        "status",
-        "repository_role",
-        "readme_purpose",
-        "routing_role",
-        "applies_when",
-        "authority_topics",
-        "prerequisite_documents",
-    }
-    valid_entries: list[dict[str, object]] = []
-    seen_paths: set[str] = set()
-    seen_names: set[str] = set()
-    for index, entry in enumerate(documents):
-        prefix = f"{rel(path)}: documents[{index}]"
-        if not isinstance(entry, dict):
-            error(f"{prefix} must be a mapping")
+    idx={aliases[h]:i for i,h in enumerate(normalized) if h in aliases}
+    versions=[]; dates=[]
+    current=md.get("Document Version",""); status=md.get("Status","")
+    for row in rows:
+        if len(row)!=len(header):
+            error(f"{rel(path)}: Version History row has {len(row)} cells; expected {len(header)}")
             continue
-        if set(entry) != required_fields:
-            missing = required_fields - set(entry)
-            extra = set(entry) - required_fields
-            detail = []
-            if missing:
-                detail.append(f"missing {sorted(missing)}")
-            if extra:
-                detail.append(f"unexpected {sorted(extra)}")
-            error(f"{prefix} fields invalid: {'; '.join(detail)}")
-            continue
-        string_fields = required_fields - {"authority_topics", "prerequisite_documents"}
-        if any(not isinstance(entry[field], str) or not entry[field].strip() for field in string_fields):
-            error(f"{prefix}: all scalar fields must be non-empty strings")
-            continue
-        topics = entry["authority_topics"]
-        prerequisites = entry["prerequisite_documents"]
-        if not isinstance(topics, list) or not topics or any(not isinstance(item, str) or not item.strip() for item in topics):
-            error(f"{prefix}: authority_topics must be a non-empty string list")
-        if len(topics) != len(set(topics)):
-            error(f"{prefix}: authority_topics must not contain duplicates")
-        if not isinstance(prerequisites, list) or any(not isinstance(item, str) or not item.strip() for item in prerequisites):
-            error(f"{prefix}: prerequisite_documents must be a string list")
-        registry_path = entry["path"]
-        display_name = entry["display_name"]
-        if registry_path in seen_paths:
-            error(f"{prefix}: duplicate path {registry_path}")
-        if display_name in seen_names:
-            error(f"{prefix}: duplicate display_name {display_name}")
-        seen_paths.add(registry_path)
-        seen_names.add(display_name)
-        valid_entries.append(entry)
-
-    registry_paths = {entry["path"] for entry in valid_entries}
-    graph: dict[str, list[str]] = {}
-    for entry in valid_entries:
-        path_value = entry["path"]
-        prerequisites = entry["prerequisite_documents"]
-        if path_value in prerequisites:
-            error(f"{rel(path)}: {path_value} must not list itself as a prerequisite")
-        unknown = set(prerequisites) - registry_paths
-        if unknown:
-            error(f"{rel(path)}: {path_value} has unknown prerequisites: {', '.join(sorted(unknown))}")
-        graph[path_value] = [item for item in prerequisites if item in registry_paths and item != path_value]
-
-    state: dict[str, int] = {node: 0 for node in graph}
-    stack: list[str] = []
-    reported_cycles: set[tuple[str, ...]] = set()
-
-    def canonical_cycle(nodes: list[str]) -> tuple[str, ...]:
-        cycle = nodes[:-1]
-        rotations = [tuple(cycle[index:] + cycle[:index]) for index in range(len(cycle))]
-        return min(rotations)
-
-    def visit(node: str) -> None:
-        state[node] = 1
-        stack.append(node)
-        for prerequisite in graph[node]:
-            if state[prerequisite] == 0:
-                visit(prerequisite)
-            elif state[prerequisite] == 1:
-                start = stack.index(prerequisite)
-                cycle_nodes = stack[start:] + [prerequisite]
-                key = canonical_cycle(cycle_nodes)
-                if key not in reported_cycles:
-                    reported_cycles.add(key)
-                    error(
-                        f"{rel(path)}: prerequisite cycle detected: "
-                        + " -> ".join(cycle_nodes)
-                    )
-        stack.pop()
-        state[node] = 2
-
-    for node in sorted(graph):
-        if state[node] == 0:
-            visit(node)
-    return valid_entries
+        v=row[idx['version']]; sv=parse_semver(v)
+        if sv is None:
+            error(f"{rel(path)}: Version History value {v!r} must match vMAJOR.MINOR.PATCH"); continue
+        versions.append((v,sv))
+        date=row[idx['date']]
+        parsed_date=None
+        if date != "Not recorded":
+            try: parsed_date=dt.date.fromisoformat(date)
+            except ValueError: pass
+        if v==current and parsed_date is None:
+            error(f"{rel(path)}: current Version History date must be a real ISO YYYY-MM-DD date")
+        elif date!="Not recorded" and parsed_date is None:
+            error(f"{rel(path)}: Version History date {date!r} must be a real ISO date or 'Not recorded'")
+        if parsed_date: dates.append(parsed_date)
+        row_status=row[idx['status']]
+        if v==current and row_status!=status:
+            error(f"{rel(path)}: Version History status for {v} is {row_status!r}; metadata status is {status!r}")
+        elif row_status!="Not recorded" and row_status not in ALLOWED_STATUSES:
+            error(f"{rel(path)}: historical Version History status {row_status!r} must use the controlled enum or 'Not recorded'")
+        if not row[idx['summary']].strip():
+            error(f"{rel(path)}: Version History summary/description must not be empty")
+    names=[v for v,_ in versions]
+    if len(names)!=len(set(names)): error(f"{rel(path)}: Version History contains duplicate versions")
+    semvers=[v for _,v in versions]
+    asc=semvers==sorted(semvers); desc=semvers==sorted(semvers,reverse=True)
+    if len(semvers)>1 and not (asc or desc): error(f"{rel(path)}: Version History versions must be monotonic")
+    if current and names.count(current)!=1: error(f"{rel(path)}: current version {current} must appear exactly once in Version History table")
+    current_sv=parse_semver(current)
+    if current_sv and semvers and current_sv!=max(semvers):
+        highest='v'+'.'.join(map(str,max(semvers)))
+        error(f"{rel(path)}: current version {current} must be the highest Version History version ({highest})")
+    supersedes=md.get("Supersedes Document Version")
+    if len(names)<=1:
+        if supersedes is not None: error(f"{rel(path)}: Supersedes Document Version must be absent for an initial version")
+    else:
+        if supersedes is None:
+            error(f"{rel(path)}: Supersedes Document Version is required when Version History has multiple entries")
+        elif parse_semver(supersedes) is None:
+            error(f"{rel(path)}: Supersedes Document Version {supersedes!r} must match vMAJOR.MINOR.PATCH")
+        elif current_sv:
+            prior=max((sv for sv in semvers if sv<current_sv), default=None)
+            expected='v'+'.'.join(map(str,prior)) if prior else None
+            if supersedes!=expected:
+                error(f"{rel(path)}: Supersedes Document Version {supersedes!r} must identify immediate prior version {expected!r}")
 
 
-validate_markdown_extensions()
-md_files = sorted(path for path in ROOT.rglob("*") if path.is_file() and path.suffix == ".md")
-contents: dict[Path, str] = {}
-searchable_contents: dict[Path, str] = {}
-html_by_path: dict[Path, DocumentHTMLParser] = {}
-anchors_by_path: dict[Path, set[str]] = {}
-canonical: dict[str, Path] = {}
-documents: dict[str, tuple[Path, str, str, str]] = {}
+def governed_documents() -> list[Path]:
+    return sorted(p for p in (ROOT/"docs").rglob("*.md") if p.relative_to(ROOT) not in DIRECTORY_INDEX_ALLOWLIST)
 
-for path in md_files:
-    text = read_text(path)
-    contents[path] = text
-    searchable = governed_searchable_text(path, text)
-    searchable_contents[path] = searchable
-    html_parser = parse_html(path, remove_inline_code(searchable))
-    html_by_path[path] = html_parser
-    anchors_by_path[path.resolve()] = heading_anchors(remove_inline_code(searchable)) | html_parser.anchors
 
-for path in md_files:
-    searchable = searchable_contents[path]
-    check_links(path, searchable, html_by_path[path], anchors_by_path)
-    metadata = parse_metadata(path, searchable)
-    name = metadata.get("Canonical Filename") or metadata.get("Document Name")
-    version = metadata.get("Document Version")
-    status = metadata.get("Status")
-    supersedes = metadata.get("Supersedes Document Version")
-    role = metadata.get("Repository Role")
-    relative = rel(path)
-    is_directory_index = relative in DIRECTORY_INDEX_ALLOWLIST
-    is_docs_markdown = path.is_relative_to(ROOT / "docs")
+def validate_paths() -> None:
+    casefold: dict[str,str]={}
+    windows_reserved={"con","prn","aux","nul",*(f"com{i}" for i in range(1,10)),*(f"lpt{i}" for i in range(1,10))}
+    for path in sorted(ROOT.rglob("*")):
+        if any(part in {".git","__pycache__"} for part in path.parts): continue
+        rp=path.relative_to(ROOT)
+        if path.is_symlink(): error(f"{rp.as_posix()}: symbolic links are not allowed")
+        text=rp.as_posix()
+        if unicodedata.normalize("NFC",text)!=text: error(f"{text}: path must use Unicode NFC")
+        key=text.casefold()
+        if key in casefold and casefold[key]!=text: error(f"{text}: case-collides with {casefold[key]}")
+        casefold[key]=text
+        for part in rp.parts:
+            base=part.rstrip(" .").split(".",1)[0].casefold()
+            if part!=part.rstrip(" .") or base in windows_reserved:
+                error(f"{text}: non-portable Windows path component {part!r}")
+        if path.is_file() and path.suffix.lower()==".md" and path.suffix!=".md":
+            error(f"{text}: Markdown extension must be lowercase .md")
+    root_md={p.relative_to(ROOT) for p in ROOT.glob("*.md")}
+    unexpected=root_md-ROOT_MARKDOWN_ALLOWLIST
+    if unexpected: error(f"root Markdown files are not allowlisted: {', '.join(sorted(p.as_posix() for p in unexpected))}")
 
-    if path.name == "README.md" and is_docs_markdown and not is_directory_index:
-        error(f"{relative}: docs directory README is not in the approved non-normative index allowlist")
 
-    if is_directory_index:
-        if role != DIRECTORY_INDEX_ROLE:
-            error(f"{relative}: Repository Role must be {DIRECTORY_INDEX_ROLE!r}")
-        if name or version or status or supersedes:
-            error(f"{relative}: non-normative directory indexes must not declare authority metadata")
-        continue
+def validate_registry(metadata: dict[Path,dict[str,str]]) -> list[dict]:
+    obj=load_yaml_strict(REGISTRY)
+    if not isinstance(obj,dict): error("authority-registry.yaml: root must be a mapping"); return []
+    keys=set(obj)
+    if keys!=ROOT_REGISTRY_KEYS:
+        missing=ROOT_REGISTRY_KEYS-keys; extra=keys-ROOT_REGISTRY_KEYS
+        if missing: error(f"authority-registry.yaml: missing root fields: {', '.join(sorted(missing))}")
+        if extra: error(f"authority-registry.yaml: unexpected root fields: {', '.join(sorted(extra))}")
+    if obj.get("registry_version")!=1: error("authority-registry.yaml: registry_version must be 1")
+    if obj.get("repository")!="host-device-control-framework": error("authority-registry.yaml: repository must be host-device-control-framework")
+    if obj.get("source_of_truth")!="GitHub main": error("authority-registry.yaml: source_of_truth must be 'GitHub main'")
+    policy=obj.get("policy")
+    if not isinstance(policy,dict) or set(policy)!=POLICY_KEYS: error("authority-registry.yaml: policy must contain the exact controlled fields")
+    docs=obj.get("documents")
+    if not isinstance(docs,list): error("authority-registry.yaml: documents must be a list"); return []
+    paths=[]; topics=[]
+    governed={rel(p) for p in metadata}
+    for i,entry in enumerate(docs):
+        label=f"authority-registry.yaml documents[{i}]"
+        if not isinstance(entry,dict): error(f"{label}: entry must be a mapping"); continue
+        if set(entry)!=ENTRY_KEYS:
+            missing=ENTRY_KEYS-set(entry); extra=set(entry)-ENTRY_KEYS
+            if missing: error(f"{label}: missing fields: {', '.join(sorted(missing))}")
+            if extra: error(f"{label}: unexpected fields: {', '.join(sorted(extra))}")
+        path=entry.get("path")
+        if not isinstance(path,str): error(f"{label}: path must be a string"); continue
+        paths.append(path)
+        p=ROOT/path
+        if path not in governed: error(f"{label}: path is not a governed document: {path}")
+        md=metadata.get(p,{})
+        for field,key in (("version","Document Version"),("status","Status"),("repository_role","Repository Role")):
+            if entry.get(field)!=md.get(key): error(f"authority-registry.yaml {field} mismatch for {Path(path).name}")
+        for field in ("display_name","readme_purpose","routing_role","applies_when"):
+            if not isinstance(entry.get(field),str) or not entry[field].strip(): error(f"{label}: {field} must be non-empty text")
+        ats=entry.get("authority_topics")
+        if not isinstance(ats,list) or not ats or any(not isinstance(x,str) or not x.strip() for x in ats): error(f"{label}: authority_topics must be a non-empty list of text")
+        else: topics.extend(x.casefold() for x in ats)
+        prereq=entry.get("prerequisite_documents")
+        if not isinstance(prereq,list) or any(not isinstance(x,str) for x in prereq): error(f"{label}: prerequisite_documents must be a list of paths")
+    if len(paths)!=len(set(paths)): error("authority-registry.yaml: duplicate document paths")
+    expected=[rel(p) for p in metadata]
+    if set(paths)!=set(expected):
+        missing=set(expected)-set(paths); extra=set(paths)-set(expected)
+        if missing: error(f"authority-registry.yaml: missing governed documents: {', '.join(sorted(missing))}")
+        if extra: error(f"authority-registry.yaml: unexpected governed documents: {', '.join(sorted(extra))}")
+    dup_topics=[t for t,c in Counter(topics).items() if c>1]
+    if dup_topics: error(f"authority-registry.yaml: authority topics must be unique: {', '.join(sorted(dup_topics))}")
+    known=set(paths); graph={e.get('path'):e.get('prerequisite_documents',[]) for e in docs if isinstance(e,dict) and isinstance(e.get('path'),str)}
+    for source, prereqs in graph.items():
+        for target in prereqs:
+            if target not in known: error(f"authority-registry.yaml: unknown prerequisite {target!r} for {source}")
+            if target==source: error(f"authority-registry.yaml: document cannot depend on itself: {source}")
+    visiting=set(); visited=set()
+    def visit(node,stack):
+        if node in visiting:
+            cycle=stack[stack.index(node):]+[node]
+            error("authority-registry.yaml: prerequisite cycle detected: "+" -> ".join(cycle)); return
+        if node in visited: return
+        visiting.add(node); stack.append(node)
+        for nxt in graph.get(node,[]): visit(nxt,stack)
+        stack.pop(); visiting.remove(node); visited.add(node)
+    for node in graph: visit(node,[])
+    return docs
 
-    if is_docs_markdown and not (name and version and status and role):
-        error(
-            f"{relative}: every governed Markdown document under docs must declare "
-            "Canonical Filename or Document Name, Document Version, Status, and Repository Role"
-        )
 
-    if name:
-        if name != path.name:
-            error(f"{relative}: canonical filename {name!r} must match the actual filename")
-        if name in canonical:
-            error(f"duplicate canonical filename {name}: {rel(canonical[name])} and {relative}")
-        canonical[name] = path
+def parse_current_set(path: Path, heading_pattern: str) -> tuple[list[str],list[list[str]]]:
+    text=searchable(path,read_text(path)); lines=text.splitlines()
+    matches=[i for i,l in enumerate(lines) if re.fullmatch(heading_pattern,l.strip(),re.I)]
+    if len(matches)!=1:
+        error(f"{rel(path)}: expected exactly one controlled manifest heading; found {len(matches)}")
+        return [],[]
+    return markdown_rows(lines,matches[0]+1)
 
-    if name and version and status and role:
-        documents[name] = (path, version, status, role)
-        validate_status_role(path, status, role)
-        parse_version_history(path, searchable, version, status, supersedes)
-    elif version or status or name or supersedes or role:
-        error(f"{relative}: incomplete document metadata")
 
-required = [
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE",
-    "NOTICE.md",
-    "requirements-validation.txt",
-    "authority-registry.yaml",
-    "docs/framework/AI_Engineering_Usage_Guide.md",
-    "docs/framework/Coordinator_Node_Control_Framework.md",
-    "docs/framework/Framework_Application_Analysis_Template.md",
-    "docs/protocol/Protocol_YAML_Definition_Guide.md",
-    "docs/protocol/Protocol_YAML_Template.md",
-    "docs/coordinator/Coordinator_Software_Engineering_Rules.md",
-    "docs/coding-rules/Embedded_C_Coding_Rules.md",
-    "docs/coding-rules/CSharp_Coding_Rules.md",
-    "docs/validation/Repository_Validation_Checklist.md",
-    "tools/validate_repository.py",
-    "tests/test_validate_repository.py",
-    ".github/workflows/document-validation.yml",
-]
-required.extend(sorted(DIRECTORY_INDEX_ALLOWLIST))
-for required_path in required:
-    if not (ROOT / required_path).exists():
-        error(f"missing required path: {required_path}")
+def compare_human_tables(registry_docs: list[dict]) -> None:
+    header,rows=parse_current_set(ROOT_README,r"## Current Document Set")
+    if header:
+        if [h.lower() for h in header]!=["document","version","status","purpose"]: error("README.md: Current Document Set columns are invalid")
+        parsed=[]
+        for row in rows:
+            if len(row)!=4: error("README.md: Current Document Set row has wrong cell count"); continue
+            m=re.search(r"\]\(([^)]+)\)",row[0]);
+            if not m: error("README.md: Current Document Set Document cell must contain a Markdown link"); continue
+            parsed.append((m.group(1),row[1],row[2],row[3]))
+        expected=[(d['path'],d['version'],d['status'],d['readme_purpose']) for d in registry_docs]
+        if parsed!=expected: error("README.md: Current Document Set does not exactly match authority-registry.yaml order and fields")
+    header,rows=parse_current_set(AI_GUIDE,r"## 0\.2 Active Document Manifest")
+    if header:
+        if [h.lower() for h in header]!=["document","canonical repository path","active version","status","routing role"]: error("AI Engineering Usage Guide: Active Document Manifest columns are invalid")
+        parsed=[]
+        for row in rows:
+            if len(row)!=5: error("AI Engineering Usage Guide: manifest row has wrong cell count"); continue
+            parsed.append((strip_markup(row[1]),strip_markup(row[2]),row[3],row[4]))
+        expected=[(d['path'],d['version'],d['status'],d['routing_role']) for d in registry_docs]
+        if parsed!=expected: error("AI Engineering Usage Guide: Active Document Manifest does not exactly match authority-registry.yaml order and fields")
 
-registry_entries = load_authority_registry()
-registry_by_name: dict[str, dict[str, object]] = {}
-registry_paths: set[str] = set()
-for entry in registry_entries:
-    path_value = str(entry["path"])
-    canonical_name = Path(path_value).name
-    registry_by_name[canonical_name] = entry
-    registry_paths.add(path_value)
-    if canonical_name not in documents:
-        error(f"authority-registry.yaml references unknown governed document: {path_value}")
-        continue
-    actual_path, actual_version, actual_status, actual_role = documents[canonical_name]
-    if rel(actual_path) != path_value:
-        error(f"authority-registry.yaml path mismatch for {canonical_name}: {path_value}")
-    if entry["version"] != actual_version:
-        error(f"authority-registry.yaml version mismatch for {canonical_name}")
-    if entry["status"] != actual_status:
-        error(f"authority-registry.yaml status mismatch for {canonical_name}")
-    if entry["repository_role"] != actual_role:
-        error(f"authority-registry.yaml Repository Role mismatch for {canonical_name}")
 
-actual_paths = {rel(item[0]) for item in documents.values()}
-if registry_paths != actual_paths:
-    missing = actual_paths - registry_paths
-    extra = registry_paths - actual_paths
-    if missing:
-        error(f"authority-registry.yaml omits: {', '.join(sorted(missing))}")
-    if extra:
-        error(f"authority-registry.yaml has non-authority entries: {', '.join(sorted(extra))}")
+class HTMLTargets(html.parser.HTMLParser):
+    def __init__(self): super().__init__(); self.targets=[]; self.anchors=set()
+    def handle_starttag(self,tag,attrs):
+        for k,v in attrs:
+            if not v: continue
+            if k.lower() in {"id","name"}: self.anchors.add(v)
+            if (tag.lower()=="a" and k.lower()=="href") or (tag.lower()=="img" and k.lower()=="src"): self.targets.append(v)
 
-readme_path = ROOT / "README.md"
-readme = searchable_contents.get(readme_path, "")
-readme_header, readme_rows = parse_unique_markdown_table(readme_path, readme, "## Current Document Set")
-if [item.casefold() for item in readme_header] != ["document", "version", "status", "purpose"]:
-    error("README.md: Current Document Set header must be Document, Version, Status, Purpose")
-readme_names: list[str] = []
-for row in readme_rows:
-    if len(row) != 4:
-        continue
-    name, version, status, purpose = row
-    canonical_name = Path(name).name
-    readme_names.append(canonical_name)
-    if canonical_name not in documents:
-        error(f"README Current Document Set references unknown document: {canonical_name}")
-        continue
-    _, actual_version, actual_status, _ = documents[canonical_name]
-    entry = registry_by_name.get(canonical_name)
-    if version != actual_version or status != actual_status:
-        error(f"README mismatch for {canonical_name}: listed {version}/{status}, actual {actual_version}/{actual_status}")
-    if entry and purpose != entry["readme_purpose"]:
-        error(f"README Purpose mismatch for {canonical_name}")
-if len(readme_names) != len(set(readme_names)):
-    error("README.md: Current Document Set contains duplicate document rows")
-if set(readme_names) != set(documents):
-    missing = set(documents) - set(readme_names)
-    extra = set(readme_names) - set(documents)
-    if missing:
-        error(f"README Current Document Set omits: {', '.join(sorted(missing))}")
-    if extra:
-        error(f"README Current Document Set has non-authority entries: {', '.join(sorted(extra))}")
 
-guide_path = ROOT / "docs/framework/AI_Engineering_Usage_Guide.md"
-guide = searchable_contents.get(guide_path, "")
-manifest_header, manifest_rows = parse_unique_markdown_table(
-    guide_path, guide, "## 0.2 Active Document Manifest"
-)
-expected_manifest_header = [
-    "document",
-    "canonical repository path",
-    "active version",
-    "status",
-    "routing role",
-]
-if [item.casefold() for item in manifest_header] != expected_manifest_header:
-    error(f"{rel(guide_path)}: Active Document Manifest header is invalid")
-manifest_names: list[str] = []
-for row in manifest_rows:
-    if len(row) != 5:
-        continue
-    display_name, path_cell, version, status, routing_role = row
-    canonical_name = Path(path_cell).name
-    manifest_names.append(canonical_name)
-    if canonical_name not in documents:
-        error(f"AI manifest references unknown document: {path_cell}")
-        continue
-    actual_path, actual_version, actual_status, _ = documents[canonical_name]
-    entry = registry_by_name.get(canonical_name)
-    if rel(actual_path) != path_cell:
-        error(f"AI manifest path mismatch for {canonical_name}: {path_cell}")
-    if version != actual_version or status != actual_status:
-        error(f"AI manifest mismatch for {canonical_name}: listed {version}/{status}, actual {actual_version}/{actual_status}")
-    if entry:
-        if display_name != entry["display_name"]:
-            error(f"AI manifest display-name mismatch for {canonical_name}")
-        if routing_role != entry["routing_role"]:
-            error(f"AI manifest Routing Role mismatch for {canonical_name}")
-if len(manifest_names) != len(set(manifest_names)):
-    error(f"{rel(guide_path)}: Active Document Manifest contains duplicate document rows")
-if set(manifest_names) != set(documents):
-    missing = set(documents) - set(manifest_names)
-    extra = set(manifest_names) - set(documents)
-    if missing:
-        error(f"AI Active Document Manifest omits: {', '.join(sorted(missing))}")
-    if extra:
-        error(f"AI Active Document Manifest has non-authority entries: {', '.join(sorted(extra))}")
+def slugify(value: str) -> str:
+    value=re.sub(r"<[^>]+>","",value)
+    value=re.sub(r"(`+)(.*?)\1",r"\2",value)
+    value=unicodedata.normalize("NFKD",value).casefold()
+    value=re.sub(r"[^\w\- ]","",value,flags=re.UNICODE)
+    return re.sub(r"[-\s]+","-",value).strip("-")
 
-check_validation_requirements()
-check_workflow()
 
-if ERRORS:
-    print("Repository validation: FAIL")
-    for item in ERRORS:
-        print(f"- {item}")
-    sys.exit(1)
+def anchors_for(text: str) -> set[str]:
+    result=set(); counts=Counter()
+    lines=text.splitlines()
+    for i,line in enumerate(lines):
+        title=None
+        m=re.match(r"^ {0,3}#{1,6}\s+(.+?)(?:\s+#+)?$",line)
+        if m: title=m.group(1)
+        elif i+1<len(lines) and re.match(r"^ {0,3}(=+|-+)\s*$",lines[i+1]) and line.strip(): title=line.strip()
+        if title:
+            base=slugify(title); n=counts[base]; counts[base]+=1
+            result.add(base if n==0 else f"{base}-{n}")
+    return result
 
-print(
-    f"Repository validation: PASS ({len(md_files)} Markdown files checked, "
-    f"{len(documents)} governed documents, Python {sys.version_info.major}.{sys.version_info.minor}, "
-    f"PyYAML {yaml.__version__})"
-)
+
+def inline_targets(text: str) -> list[str]:
+    targets=[]; i=0
+    while True:
+        marker=text.find("](",i)
+        if marker<0: break
+        cur=marker+2; depth=1; esc=False; end=cur
+        while end<len(text):
+            ch=text[end]
+            if esc: esc=False
+            elif ch=="\\": esc=True
+            elif ch=="(": depth+=1
+            elif ch==")":
+                depth-=1
+                if depth==0: targets.append(text[cur:end]); end+=1; break
+            end+=1
+        i=max(end,marker+2)
+    targets += re.findall(r"(?m)^\s*\[[^\]]+\]:\s*(\S+)",text)
+    return targets
+
+
+def validate_links(markdown_files: list[Path]) -> None:
+    cleaned={}; anchors={}
+    for p in markdown_files:
+        t=searchable(p,read_text(p)); cleaned[p]=t; anchors[p]=anchors_for(t)
+        parser=HTMLTargets();
+        try: parser.feed(t)
+        except Exception as exc: error(f"{rel(p)}: HTML parsing failed: {exc}")
+        anchors[p]|=parser.anchors
+    for p,t in cleaned.items():
+        parser=HTMLTargets(); parser.feed(t)
+        for raw in inline_targets(t)+parser.targets:
+            target=raw.strip()
+            if target.startswith("<") and ">" in target: target=target[1:target.index(">")]
+            else: target=target.split(maxsplit=1)[0]
+            if not target: continue
+            parsed=urlsplit(target)
+            if parsed.scheme or target.startswith("//"): continue
+            path_part=unquote(parsed.path); fragment=unquote(parsed.fragment)
+            resolved=p if not path_part else (p.parent/path_part).resolve()
+            try: resolved.relative_to(ROOT.resolve())
+            except ValueError: error(f"{rel(p)}: link escapes repository: {target}"); continue
+            if not resolved.exists(): error(f"{rel(p)}: missing link or image target: {path_part or target}"); continue
+            if fragment and resolved.is_file() and resolved.suffix==".md" and fragment not in anchors.get(resolved,set()):
+                error(f"{rel(p)}: missing heading anchor in {rel(resolved)}: #{fragment}")
+
+
+def validate_workflow() -> None:
+    obj=load_yaml_strict(WORKFLOW)
+    if not isinstance(obj,dict): return
+    jobs=obj.get("jobs");
+    if not isinstance(jobs,dict) or set(jobs)!={"validate-documentation"}: error("workflow: expected exactly validate-documentation job"); return
+    job=jobs["validate-documentation"]
+    if job.get("runs-on")!="ubuntu-24.04": error("workflow: runs-on must be ubuntu-24.04")
+    matrix=((job.get("strategy") or {}).get("matrix") or {}).get("python-version")
+    if matrix!=["3.10","3.12"]: error("workflow: Python matrix must be exactly 3.10 and 3.12")
+    steps=job.get("steps")
+    if not isinstance(steps,list): error("workflow: steps must be a list"); return
+    uses=[s.get('uses','') for s in steps if isinstance(s,dict)]
+    if "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" not in uses: error("workflow: checkout action must use approved immutable SHA")
+    if "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1" not in uses: error("workflow: setup-python action must use approved immutable SHA")
+    runs=[s.get('run') for s in steps if isinstance(s,dict) and isinstance(s.get('run'),str)]
+    expected=[
+        "python -m pip install --disable-pip-version-check --require-hashes -r requirements-validation.txt",
+        "python tools/validate_repository.py",
+        "python -m unittest discover -s tests -v",
+    ]
+    for cmd in expected:
+        if runs.count(cmd)!=1: error(f"workflow: required exact unconditional run step missing or duplicated: {cmd}")
+    if any("\n" in r or "&&" in r or ";" in r for r in runs): error("workflow: validation commands must remain separate exact steps")
+
+
+def main() -> int:
+    if sys.version_info < (3,10): error("Python 3.10 or later is required")
+    validate_paths()
+    if not REGISTRY.exists(): error("authority-registry.yaml: missing")
+    if not REQUIREMENTS.exists(): error("requirements-validation.txt: missing")
+    elif read_text(REQUIREMENTS)!=EXPECTED_REQUIREMENTS: error("requirements-validation.txt: pinned dependency or approved hashes differ")
+    metadata={}
+    docs=governed_documents()
+    for p in docs:
+        t=searchable(p,read_text(p)); md=parse_metadata(p,t); metadata[p]=md; validate_version_history(p,t,md)
+    registry_docs=validate_registry(metadata)
+    compare_human_tables(registry_docs)
+    validate_workflow()
+    if os.environ.get("HDCF_VALIDATOR_FAST_TEST") != "1":
+        markdown_files=sorted(ROOT.rglob("*.md"))
+        validate_links(markdown_files)
+    if ERRORS:
+        for msg in dict.fromkeys(ERRORS): print(f"ERROR: {msg}")
+        print(f"Repository validation: FAIL ({len(dict.fromkeys(ERRORS))} error(s))")
+        return 1
+    print("Repository validation: PASS")
+    print(f"Governed documents: {len(docs)}")
+    print(f"Registry documents: {len(registry_docs)}")
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -3,13 +3,14 @@
 > UI Architecture, State Presentation, Responsiveness, and Control Feedback
 
 **Canonical Filename:** `Coordinator_UI_Engineering_Guide.md`  
-**Document Version:** v1.0.0  
+**Document Version:** v1.0.1  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, UI engineers, reviewers, test engineers, code generators, and AI-assisted engineering systems  
-**Repository Role:** Proposed topic-specific normative engineering authority for Coordinator UI implementation, subordinate to Coordinator Software Engineering Rules
+**Repository Role:** Proposed topic-specific normative engineering authority for Coordinator UI implementation, subordinate to Coordinator Software Engineering Rules  
+**Supersedes Document Version:** v1.0.0
 
 ---
 
@@ -39,6 +40,7 @@ This document is maintained as part of a personal engineering project. It is not
 | Version | Date | Status | Summary |
 |---|---|---|---|
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining UI architecture, state ownership, command feedback, connection and stale state, multi-Node binding, data visualization, responsiveness, alarms and events, validation, errors, units, accessibility, localization, persistence, engineering controls, testing, and anti-patterns. |
+| v1.0.1 | 2026-07-19 | Draft for Review | Hardened archive and package import against symbolic links, hard links, Windows reparse points, special filesystem entries, destination-link traversal, canonical-path escape, unintended overwrite, and time-of-check/time-of-use replacement. |
 
 ---
 
@@ -353,6 +355,8 @@ Error text should identify how the user can correct the value.
 Imported files, pasted text, drag-and-drop content, URLs, support bundles, images, and configuration data shall be treated as untrusted input. The UI shall not rely on file extension, displayed filename, or user selection as proof of content type or safety.
 
 The import path shall define size, count, nesting, encoding, decompression, path, and numeric bounds; validate content before state mutation; prevent path traversal and unintended overwrite; and report partial or rejected imports truthfully. Preview rendering shall not execute embedded active content.
+
+Archive or package import shall reject symbolic links, hard links, Windows reparse points, device files, named pipes, and other special filesystem entries unless an approved format explicitly requires and safely handles them. Every candidate output path shall be canonicalized immediately before creation and verified to remain within the designated extraction root. Extraction shall not follow existing links in the destination path, shall not replace a verified path component after validation, and shall fail closed when link replacement or another time-of-check/time-of-use change is detected.
 
 # 12. Units, Numeric Formatting, and Time
 
