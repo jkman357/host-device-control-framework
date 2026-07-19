@@ -1,103 +1,64 @@
 #!/usr/bin/env python3
-"""Deterministic structural validation for the documentation repository.
-
-Runtime requirement: Python 3.10 or later.
-Validation dependency: PyYAML 6.0.3 installed with approved SHA-256 hashes.
-CI validation runtimes: Python 3.10 and Python 3.12.
-"""
+"""Deterministic structural validation for host-device-control-framework."""
 from __future__ import annotations
 
-import datetime as dt
-import html.parser
-import os
+import argparse
+import collections
 import re
 import sys
-import unicodedata
-from collections import Counter
-from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from pathlib import Path, PurePosixPath
+from typing import Any, Iterable
+from urllib.parse import unquote
 
 import yaml
 
-ROOT = Path(__file__).resolve().parents[1]
-REGISTRY = ROOT / "authority-registry.yaml"
-ROOT_README = ROOT / "README.md"
-AI_GUIDE = ROOT / "docs/framework/AI_Engineering_Usage_Guide.md"
-WORKFLOW = ROOT / ".github/workflows/document-validation.yml"
-REQUIREMENTS = ROOT / "requirements-validation.txt"
-
-DIRECTORY_INDEX_ALLOWLIST = {
-    Path("docs/framework/README.md"),
-    Path("docs/protocol/README.md"),
-    Path("docs/coordinator/README.md"),
-    Path("docs/coding-rules/README.md"),
-    Path("docs/validation/README.md"),
-}
-ROOT_MARKDOWN_ALLOWLIST = {Path("README.md"), Path("CHANGELOG.md"), Path("NOTICE.md")}
-ALLOWED_STATUSES = {"Draft for Review", "Baseline", "Final Baseline", "Deprecated", "Retired"}
-REQUIRED_METADATA = ("Document Version", "Status", "Repository Role")
-IDENTITY_KEYS = ("Canonical Filename", "Document Name")
-SEMVER_RE = re.compile(r"^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
-ROOT_REGISTRY_KEYS = {"registry_version", "repository", "source_of_truth", "policy", "documents"}
-POLICY_KEYS = {"routing_order", "conflict_resolution", "draft_effect"}
-ENTRY_KEYS = {
+REQUIRED_REGISTRY_ROOT = {"registry_version", "repository", "source_of_truth", "policy", "documents"}
+REQUIRED_POLICY = {"routing_order", "conflict_resolution", "draft_effect"}
+REQUIRED_DOCUMENT_KEYS = {
     "display_name", "path", "version", "status", "repository_role", "readme_purpose",
     "routing_role", "applies_when", "authority_topics", "prerequisite_documents",
 }
-EXPECTED_REQUIREMENTS = """PyYAML==6.0.3 \\
-    --hash=sha256:d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f \\
-    --hash=sha256:9c7708761fccb9397fe64bbc0395abcae8c4bf7b0eac081e12b809bf47700d0b \\
-    --hash=sha256:ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc
-"""
-ERRORS: list[str] = []
-
-
-def rel(path: Path) -> str:
-    try:
-        return path.relative_to(ROOT).as_posix()
-    except ValueError:
-        return str(path)
-
-
-def error(message: str) -> None:
-    ERRORS.append(message)
-
-
-def read_text(path: Path) -> str:
-    try:
-        raw = path.read_bytes()
-    except OSError as exc:
-        error(f"{rel(path)}: cannot read file: {exc}")
-        return ""
-    if raw.startswith(b"\xef\xbb\xbf"):
-        error(f"{rel(path)}: UTF-8 BOM is not allowed")
-    if b"\x00" in raw:
-        error(f"{rel(path)}: NUL byte is not allowed")
-    if b"\r" in raw:
-        error(f"{rel(path)}: CR or CRLF line endings are not allowed")
-    try:
-        text = raw.decode("utf-8")
-    except UnicodeDecodeError as exc:
-        error(f"{rel(path)}: invalid UTF-8: {exc}")
-        return ""
-    if text and not text.endswith("\n"):
-        error(f"{rel(path)}: text file must end with a newline")
-    return text
+ALLOWED_STATUS = {"Draft for Review", "Baseline", "Final Baseline"}
+INDEX_ALLOWLIST = {
+    "docs/framework/README.md", "docs/protocol/README.md", "docs/coordinator/README.md",
+    "docs/node/README.md", "docs/coding-rules/README.md", "docs/validation/README.md",
+}
+NOTICE_HEADINGS = [
+    "Copyright Notice", "Personal Engineering Project Disclaimer", "No Employer or Company Representation",
+    "AI Assistance Disclosure", "Third-Party Standards and Trademark Notice", "File-Specific Notice Precedence",
+]
+CHECKLIST_PRINCIPLE = (
+    "Checklists do not independently create requirements. They provide review, traceability, and "
+    "evidence-capture views of requirements established by governing authority documents."
+)
+NEW_CHANGELOG_FILES = [
+    "Protocol_Compatibility_Rules.md", "Protocol_Registry_Governance.md", "Protocol_Security_Profile.md",
+    "Node_Software_Engineering_Rules.md", "Validation_Evidence_Guide.md", "Protocol_Validation_Checklist.md",
+    "Framework_Conformance_Checklist.md", "Coding_Rules_Review_Checklist.md",
+    "AI_Generated_Artifact_Validation_Guide.md",
+]
+SEMVER_RE = re.compile(r"^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
+META_RE = re.compile(r"^\*\*(?P<key>[^*]+):\*\*\s*(?P<value>.*?)\s{0,2}$")
+MD_LINK_RE = re.compile(r"!?\[[^\]]*\]\((?P<target><[^>]+>|(?:\\.|[^)])*)\)")
+HTML_LINK_RE = re.compile(r"<(?:a|img)\b[^>]*(?:href|src)=[\"'](?P<target>[^\"']+)[\"'][^>]*>", re.I)
+FENCE_RE = re.compile(r"^(?P<indent>\s*)(?P<mark>`{3,}|~{3,})")
+VERSIONED_FILENAME_RE = re.compile(
+    r"(?:_v\d+\.\d+\.\d+|(?:^|[_-])(?:Final|Baseline|Draft)(?:[_-]|\.)|(?:^|[_-])RC\d+|"
+    r"(?:^|[_-])20\d{2}[-_]\d{2}[-_]\d{2})(?=\.md$|[_-])",
+    re.I,
+)
 
 
 class UniqueKeyLoader(yaml.SafeLoader):
     pass
 
 
-def _construct_mapping(loader: UniqueKeyLoader, node: yaml.nodes.MappingNode, deep: bool = False):
-    mapping = {}
+def _construct_mapping(loader: UniqueKeyLoader, node: yaml.nodes.MappingNode, deep: bool = False) -> dict[Any, Any]:
+    mapping: dict[Any, Any] = {}
     for key_node, value_node in node.value:
         key = loader.construct_object(key_node, deep=deep)
         if key in mapping:
-            raise yaml.constructor.ConstructorError(
-                "while constructing a mapping", node.start_mark,
-                f"found duplicate key {key!r}", key_node.start_mark,
-            )
+            raise yaml.YAMLError(f"duplicate YAML key: {key!r}")
         mapping[key] = loader.construct_object(value_node, deep=deep)
     return mapping
 
@@ -105,457 +66,594 @@ def _construct_mapping(loader: UniqueKeyLoader, node: yaml.nodes.MappingNode, de
 UniqueKeyLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _construct_mapping)
 
 
-def load_yaml_strict(path: Path) -> object | None:
-    text = read_text(path)
-    # Registry/workflow files intentionally forbid YAML indirection and custom tags.
-    for token_type, plural_label in ((yaml.tokens.AnchorToken, "anchors"), (yaml.tokens.AliasToken, "aliases"), (yaml.tokens.TagToken, "tags")):
-        try:
-            if any(isinstance(token, token_type) for token in yaml.scan(text)):
-                error(f"{rel(path)}: YAML {plural_label} are not allowed")
-        except yaml.YAMLError as exc:
-            error(f"{rel(path)}: YAML tokenization failed: {exc}")
-            return None
-    if re.search(r"(?m)^\s*<<\s*:", text):
-        error(f"{rel(path)}: YAML merge keys are not allowed")
-    try:
-        return yaml.load(text, Loader=UniqueKeyLoader)
-    except yaml.YAMLError as exc:
-        error(f"{rel(path)}: invalid YAML: {exc}")
-        return None
+def read_text(path: Path) -> str:
+    data = path.read_bytes()
+    if data.startswith(b"\xef\xbb\xbf"):
+        raise ValueError("UTF-8 BOM is prohibited")
+    if b"\x00" in data:
+        raise ValueError("NUL byte is prohibited")
+    if b"\r" in data:
+        raise ValueError("CR line endings are prohibited")
+    text = data.decode("utf-8")
+    if text and not text.endswith("\n"):
+        raise ValueError("final newline is required")
+    return text
 
 
-def blank_preserving_newlines(value: str) -> str:
-    return "".join("\n" if c == "\n" else " " for c in value)
-
-
-def fence_free_text(path: Path, text: str) -> str:
+def mask_fenced_and_inline_code(text: str) -> str:
     out: list[str] = []
-    opening: tuple[str, int, int] | None = None
-    fence_re = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
-    for line_no, line in enumerate(text.splitlines(), 1):
-        match = fence_re.match(line)
-        if opening is None:
-            if match:
-                marker = match.group(1)
-                opening = (marker[0], len(marker), line_no)
-                out.append("")
-            else:
-                out.append(line)
+    fence: str | None = None
+    for line in text.splitlines():
+        m = FENCE_RE.match(line)
+        if m:
+            mark = m.group("mark")
+            if fence is None:
+                fence = mark[0]
+            elif mark[0] == fence:
+                fence = None
+            out.append("")
             continue
-        marker_char, marker_len, _ = opening
-        if match:
-            marker = match.group(1)
-            if marker[0] == marker_char and len(marker) >= marker_len and not match.group(2).strip():
-                opening = None
-        out.append("")
-    if opening is not None:
-        c, n, line_no = opening
-        error(f"{rel(path)}:{line_no}: unclosed fenced Code block opened with {c*n}")
-    return "\n".join(out) + ("\n" if text.endswith("\n") else "")
+        if fence is not None:
+            out.append("")
+            continue
+        line = re.sub(r"`[^`]*`", "", line)
+        out.append(line)
+    return "\n".join(out)
 
 
-def html_code_free_text(path: Path, text: str) -> str:
-    result = re.sub(r"<!--.*?-->", lambda m: blank_preserving_newlines(m.group(0)), text, flags=re.S)
-    complete = re.compile(r"<(?P<tag>pre|code|script|style)\b[^>]*>.*?</(?P=tag)\s*>", re.I | re.S)
-    while True:
-        result, count = complete.subn(lambda m: blank_preserving_newlines(m.group(0)), result)
-        if not count:
+def metadata(text: str) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for line in text.splitlines():
+        if line.startswith("## "):
             break
-    opening = re.search(r"<(pre|code|script|style)\b[^>]*>", result, re.I)
-    if opening:
-        line_no = result.count("\n", 0, opening.start()) + 1
-        error(f"{rel(path)}:{line_no}: unclosed HTML code/example block <{opening.group(1).lower()}>")
-        result = result[:opening.start()] + blank_preserving_newlines(result[opening.start():])
+        m = META_RE.match(line)
+        if m:
+            key = m.group("key").strip()
+            value = m.group("value").strip()
+            if key in result:
+                raise ValueError(f"duplicate metadata field: {key}")
+            result[key] = value
     return result
 
 
-def searchable(path: Path, text: str) -> str:
-    return html_code_free_text(path, fence_free_text(path, text))
-
-
-def strip_markup(value: str) -> str:
-    value = value.strip()
-    if value.startswith("`") and value.endswith("`") and len(value) >= 2:
-        value = value[1:-1]
-    return value.strip()
-
-
-def parse_metadata(path: Path, text: str) -> dict[str, str]:
-    lines = text.splitlines()
-    first_h2 = next((i for i, line in enumerate(lines) if re.match(r"^ {0,3}##\s+", line)), len(lines))
-    region = "\n".join(lines[:min(first_h2, 80)])
-    metadata: dict[str, str] = {}
-    for key in (*IDENTITY_KEYS, *REQUIRED_METADATA, "Supersedes Document Version"):
-        matches = re.findall(rf"(?m)^\*\*{re.escape(key)}:\*\*\s*(.*?)\s*$", region)
-        if len(matches) > 1:
-            error(f"{rel(path)}: metadata {key!r} must appear at most once in the opening metadata region")
-        if matches:
-            metadata[key] = strip_markup(matches[0])
-    identities = [key for key in IDENTITY_KEYS if key in metadata]
-    if len(identities) != 1:
-        error(f"{rel(path)}: exactly one of Canonical Filename or Document Name is required")
-    else:
-        if metadata[identities[0]] != path.name:
-            error(f"{rel(path)}: declared filename {metadata[identities[0]]!r} does not match {path.name!r}")
-    for key in REQUIRED_METADATA:
-        if key not in metadata:
-            error(f"{rel(path)}: missing required metadata: {key}")
-    version = metadata.get("Document Version", "")
-    if version and not SEMVER_RE.fullmatch(version):
-        error(f"{rel(path)}: Document Version {version!r} must match vMAJOR.MINOR.PATCH")
-    status = metadata.get("Status", "")
-    if status and status not in ALLOWED_STATUSES:
-        error(f"{rel(path)}: Status {status!r} is not controlled")
-    role = metadata.get("Repository Role", "")
-    if status == "Draft for Review" and role and not role.startswith("Proposed "):
-        error(f"{rel(path)}: Draft for Review Repository Role must begin with 'Proposed '")
-    if status in {"Baseline", "Final Baseline"} and role:
-        low = role.lower()
-        if "normative" not in low or "proposed" in low:
-            error(f"{rel(path)}: Baseline Repository Role must use non-proposed normative wording")
-    return metadata
-
-
-def parse_semver(value: str) -> tuple[int, int, int] | None:
-    m = SEMVER_RE.fullmatch(value)
-    return tuple(map(int, m.groups())) if m else None
-
-
-def markdown_rows(lines: list[str], start: int) -> tuple[list[str], list[list[str]]]:
-    while start < len(lines) and not lines[start].lstrip().startswith("|"):
-        if lines[start].startswith("#"):
-            return [], []
-        start += 1
-    if start >= len(lines):
-        return [], []
-    def cells(line: str) -> list[str]: return [c.strip() for c in line.strip().strip("|").split("|")]
-    header = cells(lines[start])
-    if start + 1 >= len(lines) or not re.match(r"^\s*\|?\s*:?-+", lines[start+1]):
-        return [], []
-    rows=[]
-    i=start+2
+def parse_pipe_table(lines: list[str], heading: str) -> list[list[str]]:
+    positions = [i for i, line in enumerate(lines) if line.strip() == heading]
+    if len(positions) != 1:
+        raise ValueError(f"expected exactly one {heading!r} heading, found {len(positions)}")
+    i = positions[0] + 1
+    while i < len(lines) and not lines[i].lstrip().startswith("|"):
+        if lines[i].startswith("#"):
+            raise ValueError(f"table missing under {heading}")
+        i += 1
+    rows: list[list[str]] = []
     while i < len(lines) and lines[i].lstrip().startswith("|"):
-        rows.append(cells(lines[i])); i+=1
-    return header, rows
+        row = lines[i].strip().strip("|")
+        cells = [c.strip() for c in re.split(r"(?<!\\)\|", row)]
+        rows.append(cells)
+        i += 1
+    if len(rows) < 2:
+        raise ValueError(f"table missing under {heading}")
+    return rows
 
 
-def validate_version_history(path: Path, text: str, md: dict[str, str]) -> None:
-    headings = [(i, line) for i, line in enumerate(text.splitlines()) if re.match(r"^ {0,3}#{2,6}(?:\s+(?:Appendix\s+[A-Z]\.|\d+(?:\.\d+)*))?\s+(?:Version History|Change History)\s*$", line, re.I)]
-    if len(headings) != 1:
-        error(f"{rel(path)}: exactly one Version History or Change History heading is required; found {len(headings)}")
-        return
-    lines=text.splitlines(); header, rows=markdown_rows(lines, headings[0][0]+1)
-    normalized=[h.strip().lower() for h in header]
-    aliases={"version":"version","date":"date","status":"status","summary":"summary","description":"summary"}
-    required={"version","date","status","summary"}
-    present={aliases[h] for h in normalized if h in aliases}
-    missing=required-present
-    if missing:
-        error(f"{rel(path)}: Version History missing required columns: {', '.join(sorted(missing))}")
-        return
-    idx={aliases[h]:i for i,h in enumerate(normalized) if h in aliases}
-    versions=[]; dates=[]
-    current=md.get("Document Version",""); status=md.get("Status","")
-    for row in rows:
-        if len(row)!=len(header):
-            error(f"{rel(path)}: Version History row has {len(row)} cells; expected {len(header)}")
+def anchor_slug(text: str) -> str:
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"[`*_~]", "", text).strip().lower()
+    text = re.sub(r"[^\w\-\s]", "", text, flags=re.UNICODE)
+    text = re.sub(r"[\s\-]+", "-", text).strip("-")
+    return text
+
+
+def anchors(text: str) -> set[str]:
+    masked = mask_fenced_and_inline_code(text)
+    base_counts: dict[str, int] = collections.defaultdict(int)
+    result: set[str] = set()
+    lines = masked.splitlines()
+    for i, line in enumerate(lines):
+        title: str | None = None
+        m = re.match(r"^#{1,6}\s+(.+?)\s*#*\s*$", line)
+        if m:
+            title = m.group(1)
+        elif i + 1 < len(lines) and line.strip() and re.match(r"^=+\s*$|^-+\s*$", lines[i + 1]):
+            title = line.strip()
+        if title is None:
             continue
-        v=row[idx['version']]; sv=parse_semver(v)
-        if sv is None:
-            error(f"{rel(path)}: Version History value {v!r} must match vMAJOR.MINOR.PATCH"); continue
-        versions.append((v,sv))
-        date=row[idx['date']]
-        parsed_date=None
-        if date != "Not recorded":
-            try: parsed_date=dt.date.fromisoformat(date)
-            except ValueError: pass
-        if v==current and parsed_date is None:
-            error(f"{rel(path)}: current Version History date must be a real ISO YYYY-MM-DD date")
-        elif date!="Not recorded" and parsed_date is None:
-            error(f"{rel(path)}: Version History date {date!r} must be a real ISO date or 'Not recorded'")
-        if parsed_date: dates.append(parsed_date)
-        row_status=row[idx['status']]
-        if v==current and row_status!=status:
-            error(f"{rel(path)}: Version History status for {v} is {row_status!r}; metadata status is {status!r}")
-        elif row_status!="Not recorded" and row_status not in ALLOWED_STATUSES:
-            error(f"{rel(path)}: historical Version History status {row_status!r} must use the controlled enum or 'Not recorded'")
-        if not row[idx['summary']].strip():
-            error(f"{rel(path)}: Version History summary/description must not be empty")
-    names=[v for v,_ in versions]
-    if len(names)!=len(set(names)): error(f"{rel(path)}: Version History contains duplicate versions")
-    semvers=[v for _,v in versions]
-    asc=semvers==sorted(semvers); desc=semvers==sorted(semvers,reverse=True)
-    if len(semvers)>1 and not (asc or desc): error(f"{rel(path)}: Version History versions must be monotonic")
-    if current and names.count(current)!=1: error(f"{rel(path)}: current version {current} must appear exactly once in Version History table")
-    current_sv=parse_semver(current)
-    if current_sv and semvers and current_sv!=max(semvers):
-        highest='v'+'.'.join(map(str,max(semvers)))
-        error(f"{rel(path)}: current version {current} must be the highest Version History version ({highest})")
-    supersedes=md.get("Supersedes Document Version")
-    if len(names)<=1:
-        if supersedes is not None: error(f"{rel(path)}: Supersedes Document Version must be absent for an initial version")
-    else:
-        if supersedes is None:
-            error(f"{rel(path)}: Supersedes Document Version is required when Version History has multiple entries")
-        elif parse_semver(supersedes) is None:
-            error(f"{rel(path)}: Supersedes Document Version {supersedes!r} must match vMAJOR.MINOR.PATCH")
-        elif current_sv:
-            prior=max((sv for sv in semvers if sv<current_sv), default=None)
-            expected='v'+'.'.join(map(str,prior)) if prior else None
-            if supersedes!=expected:
-                error(f"{rel(path)}: Supersedes Document Version {supersedes!r} must identify immediate prior version {expected!r}")
-
-
-def governed_documents() -> list[Path]:
-    return sorted(p for p in (ROOT/"docs").rglob("*.md") if p.relative_to(ROOT) not in DIRECTORY_INDEX_ALLOWLIST)
-
-
-def validate_paths() -> None:
-    casefold: dict[str,str]={}
-    windows_reserved={"con","prn","aux","nul",*(f"com{i}" for i in range(1,10)),*(f"lpt{i}" for i in range(1,10))}
-    for path in sorted(ROOT.rglob("*")):
-        if any(part in {".git","__pycache__"} for part in path.parts): continue
-        rp=path.relative_to(ROOT)
-        if path.is_symlink(): error(f"{rp.as_posix()}: symbolic links are not allowed")
-        text=rp.as_posix()
-        if unicodedata.normalize("NFC",text)!=text: error(f"{text}: path must use Unicode NFC")
-        key=text.casefold()
-        if key in casefold and casefold[key]!=text: error(f"{text}: case-collides with {casefold[key]}")
-        casefold[key]=text
-        for part in rp.parts:
-            base=part.rstrip(" .").split(".",1)[0].casefold()
-            if part!=part.rstrip(" .") or base in windows_reserved:
-                error(f"{text}: non-portable Windows path component {part!r}")
-        if path.is_file() and path.suffix.lower()==".md" and path.suffix!=".md":
-            error(f"{text}: Markdown extension must be lowercase .md")
-    root_md={p.relative_to(ROOT) for p in ROOT.glob("*.md")}
-    unexpected=root_md-ROOT_MARKDOWN_ALLOWLIST
-    if unexpected: error(f"root Markdown files are not allowlisted: {', '.join(sorted(p.as_posix() for p in unexpected))}")
-
-
-def validate_registry(metadata: dict[Path,dict[str,str]]) -> list[dict]:
-    obj=load_yaml_strict(REGISTRY)
-    if not isinstance(obj,dict): error("authority-registry.yaml: root must be a mapping"); return []
-    keys=set(obj)
-    if keys!=ROOT_REGISTRY_KEYS:
-        missing=ROOT_REGISTRY_KEYS-keys; extra=keys-ROOT_REGISTRY_KEYS
-        if missing: error(f"authority-registry.yaml: missing root fields: {', '.join(sorted(missing))}")
-        if extra: error(f"authority-registry.yaml: unexpected root fields: {', '.join(sorted(extra))}")
-    if obj.get("registry_version")!=1: error("authority-registry.yaml: registry_version must be 1")
-    if obj.get("repository")!="host-device-control-framework": error("authority-registry.yaml: repository must be host-device-control-framework")
-    if obj.get("source_of_truth")!="GitHub main": error("authority-registry.yaml: source_of_truth must be 'GitHub main'")
-    policy=obj.get("policy")
-    if not isinstance(policy,dict) or set(policy)!=POLICY_KEYS: error("authority-registry.yaml: policy must contain the exact controlled fields")
-    docs=obj.get("documents")
-    if not isinstance(docs,list): error("authority-registry.yaml: documents must be a list"); return []
-    paths=[]; topics=[]
-    governed={rel(p) for p in metadata}
-    for i,entry in enumerate(docs):
-        label=f"authority-registry.yaml documents[{i}]"
-        if not isinstance(entry,dict): error(f"{label}: entry must be a mapping"); continue
-        if set(entry)!=ENTRY_KEYS:
-            missing=ENTRY_KEYS-set(entry); extra=set(entry)-ENTRY_KEYS
-            if missing: error(f"{label}: missing fields: {', '.join(sorted(missing))}")
-            if extra: error(f"{label}: unexpected fields: {', '.join(sorted(extra))}")
-        path=entry.get("path")
-        if not isinstance(path,str): error(f"{label}: path must be a string"); continue
-        paths.append(path)
-        p=ROOT/path
-        if path not in governed: error(f"{label}: path is not a governed document: {path}")
-        md=metadata.get(p,{})
-        for field,key in (("version","Document Version"),("status","Status"),("repository_role","Repository Role")):
-            if entry.get(field)!=md.get(key): error(f"authority-registry.yaml {field} mismatch for {Path(path).name}")
-        for field in ("display_name","readme_purpose","routing_role","applies_when"):
-            if not isinstance(entry.get(field),str) or not entry[field].strip(): error(f"{label}: {field} must be non-empty text")
-        ats=entry.get("authority_topics")
-        if not isinstance(ats,list) or not ats or any(not isinstance(x,str) or not x.strip() for x in ats): error(f"{label}: authority_topics must be a non-empty list of text")
-        else: topics.extend(x.casefold() for x in ats)
-        prereq=entry.get("prerequisite_documents")
-        if not isinstance(prereq,list) or any(not isinstance(x,str) for x in prereq): error(f"{label}: prerequisite_documents must be a list of paths")
-    if len(paths)!=len(set(paths)): error("authority-registry.yaml: duplicate document paths")
-    expected=[rel(p) for p in metadata]
-    if set(paths)!=set(expected):
-        missing=set(expected)-set(paths); extra=set(paths)-set(expected)
-        if missing: error(f"authority-registry.yaml: missing governed documents: {', '.join(sorted(missing))}")
-        if extra: error(f"authority-registry.yaml: unexpected governed documents: {', '.join(sorted(extra))}")
-    dup_topics=[t for t,c in Counter(topics).items() if c>1]
-    if dup_topics: error(f"authority-registry.yaml: authority topics must be unique: {', '.join(sorted(dup_topics))}")
-    known=set(paths); graph={e.get('path'):e.get('prerequisite_documents',[]) for e in docs if isinstance(e,dict) and isinstance(e.get('path'),str)}
-    for source, prereqs in graph.items():
-        for target in prereqs:
-            if target not in known: error(f"authority-registry.yaml: unknown prerequisite {target!r} for {source}")
-            if target==source: error(f"authority-registry.yaml: document cannot depend on itself: {source}")
-    visiting=set(); visited=set()
-    def visit(node,stack):
-        if node in visiting:
-            cycle=stack[stack.index(node):]+[node]
-            error("authority-registry.yaml: prerequisite cycle detected: "+" -> ".join(cycle)); return
-        if node in visited: return
-        visiting.add(node); stack.append(node)
-        for nxt in graph.get(node,[]): visit(nxt,stack)
-        stack.pop(); visiting.remove(node); visited.add(node)
-    for node in graph: visit(node,[])
-    return docs
-
-
-def parse_current_set(path: Path, heading_pattern: str) -> tuple[list[str],list[list[str]]]:
-    text=searchable(path,read_text(path)); lines=text.splitlines()
-    matches=[i for i,l in enumerate(lines) if re.fullmatch(heading_pattern,l.strip(),re.I)]
-    if len(matches)!=1:
-        error(f"{rel(path)}: expected exactly one controlled manifest heading; found {len(matches)}")
-        return [],[]
-    return markdown_rows(lines,matches[0]+1)
-
-
-def compare_human_tables(registry_docs: list[dict]) -> None:
-    header,rows=parse_current_set(ROOT_README,r"## Current Document Set")
-    if header:
-        if [h.lower() for h in header]!=["document","version","status","purpose"]: error("README.md: Current Document Set columns are invalid")
-        parsed=[]
-        for row in rows:
-            if len(row)!=4: error("README.md: Current Document Set row has wrong cell count"); continue
-            m=re.search(r"\]\(([^)]+)\)",row[0]);
-            if not m: error("README.md: Current Document Set Document cell must contain a Markdown link"); continue
-            parsed.append((m.group(1),row[1],row[2],row[3]))
-        expected=[(d['path'],d['version'],d['status'],d['readme_purpose']) for d in registry_docs]
-        if parsed!=expected: error("README.md: Current Document Set does not exactly match authority-registry.yaml order and fields")
-    header,rows=parse_current_set(AI_GUIDE,r"## 0\.2 Active Document Manifest")
-    if header:
-        if [h.lower() for h in header]!=["document","canonical repository path","active version","status","routing role"]: error("AI Engineering Usage Guide: Active Document Manifest columns are invalid")
-        parsed=[]
-        for row in rows:
-            if len(row)!=5: error("AI Engineering Usage Guide: manifest row has wrong cell count"); continue
-            parsed.append((strip_markup(row[1]),strip_markup(row[2]),row[3],row[4]))
-        expected=[(d['path'],d['version'],d['status'],d['routing_role']) for d in registry_docs]
-        if parsed!=expected: error("AI Engineering Usage Guide: Active Document Manifest does not exactly match authority-registry.yaml order and fields")
-
-
-class HTMLTargets(html.parser.HTMLParser):
-    def __init__(self): super().__init__(); self.targets=[]; self.anchors=set()
-    def handle_starttag(self,tag,attrs):
-        for k,v in attrs:
-            if not v: continue
-            if k.lower() in {"id","name"}: self.anchors.add(v)
-            if (tag.lower()=="a" and k.lower()=="href") or (tag.lower()=="img" and k.lower()=="src"): self.targets.append(v)
-
-
-def slugify(value: str) -> str:
-    value=re.sub(r"<[^>]+>","",value)
-    value=re.sub(r"(`+)(.*?)\1",r"\2",value)
-    value=unicodedata.normalize("NFKD",value).casefold()
-    value=re.sub(r"[^\w\- ]","",value,flags=re.UNICODE)
-    return re.sub(r"[-\s]+","-",value).strip("-")
-
-
-def anchors_for(text: str) -> set[str]:
-    result=set(); counts=Counter()
-    lines=text.splitlines()
-    for i,line in enumerate(lines):
-        title=None
-        m=re.match(r"^ {0,3}#{1,6}\s+(.+?)(?:\s+#+)?$",line)
-        if m: title=m.group(1)
-        elif i+1<len(lines) and re.match(r"^ {0,3}(=+|-+)\s*$",lines[i+1]) and line.strip(): title=line.strip()
-        if title:
-            base=slugify(title); n=counts[base]; counts[base]+=1
-            result.add(base if n==0 else f"{base}-{n}")
+        base = anchor_slug(title)
+        if not base:
+            continue
+        n = base_counts[base]
+        result.add(base if n == 0 else f"{base}-{n}")
+        base_counts[base] += 1
     return result
 
 
-def inline_targets(text: str) -> list[str]:
-    targets=[]; i=0
-    while True:
-        marker=text.find("](",i)
-        if marker<0: break
-        cur=marker+2; depth=1; esc=False; end=cur
-        while end<len(text):
-            ch=text[end]
-            if esc: esc=False
-            elif ch=="\\": esc=True
-            elif ch=="(": depth+=1
-            elif ch==")":
-                depth-=1
-                if depth==0: targets.append(text[cur:end]); end+=1; break
-            end+=1
-        i=max(end,marker+2)
-    targets += re.findall(r"(?m)^\s*\[[^\]]+\]:\s*(\S+)",text)
-    return targets
+class Validator:
+    def __init__(self, root: Path):
+        self.root = root.resolve()
+        self.errors: list[str] = []
+        self.registry: dict[str, Any] = {}
+        self.documents: list[dict[str, Any]] = []
+
+    def error(self, where: str, message: str) -> None:
+        self.errors.append(f"{where}: {message}")
+
+    def run(self) -> list[str]:
+        checks = [
+            self.check_required_files,
+            self.check_text_encoding,
+            self.check_registry,
+            self.check_governed_set,
+            self.check_metadata,
+            self.check_registry_graph,
+            self.check_human_tables,
+            self.check_directory_indexes,
+            self.check_filename_policy,
+            self.check_links,
+            self.check_markdown_structure,
+            self.check_authority_boundaries,
+            self.check_notice,
+            self.check_changelog,
+            self.check_workflow,
+        ]
+        for check in checks:
+            try:
+                check()
+            except Exception as exc:  # keep collecting deterministic failures
+                self.error(check.__name__, f"unexpected validation exception: {exc}")
+        return self.errors
+
+    def files(self) -> Iterable[Path]:
+        for p in sorted(self.root.rglob("*")):
+            if p.is_file() and ".git" not in p.parts:
+                yield p
+
+    def check_required_files(self) -> None:
+        required = [
+            "README.md", "CHANGELOG.md", "LICENSE", "NOTICE.md", "authority-registry.yaml",
+            "requirements-validation.txt", ".github/workflows/document-validation.yml",
+            "tools/validate_repository.py", "tests/test_validate_repository.py",
+        ]
+        for rel in required:
+            if not (self.root / rel).is_file():
+                self.error(rel, "required repository file is missing")
+
+    def check_text_encoding(self) -> None:
+        for p in self.files():
+            if p.suffix.lower() not in {".md", ".yaml", ".yml", ".py", ".txt"} and p.name not in {"LICENSE"}:
+                continue
+            try:
+                read_text(p)
+            except Exception as exc:
+                self.error(p.relative_to(self.root).as_posix(), str(exc))
+
+    def check_registry(self) -> None:
+        path = self.root / "authority-registry.yaml"
+        if not path.is_file():
+            return
+        try:
+            text = read_text(path)
+            if re.search(r"(^|\s)[&*][A-Za-z0-9_-]+", mask_fenced_and_inline_code(text)):
+                self.error("authority-registry.yaml", "YAML anchors and aliases are prohibited")
+            self.registry = yaml.load(text, Loader=UniqueKeyLoader)
+        except Exception as exc:
+            self.error("authority-registry.yaml", f"invalid controlled YAML: {exc}")
+            return
+        if not isinstance(self.registry, dict):
+            self.error("authority-registry.yaml", "root must be a mapping")
+            return
+        keys = set(self.registry)
+        if keys != REQUIRED_REGISTRY_ROOT:
+            self.error("authority-registry.yaml", f"root fields must be exactly {sorted(REQUIRED_REGISTRY_ROOT)}, got {sorted(keys)}")
+        if self.registry.get("registry_version") != 1:
+            self.error("authority-registry.yaml", "registry_version must be 1")
+        if self.registry.get("repository") != "host-device-control-framework":
+            self.error("authority-registry.yaml", "repository identity mismatch")
+        if self.registry.get("source_of_truth") != "GitHub main":
+            self.error("authority-registry.yaml", "source_of_truth must be exactly 'GitHub main'")
+        policy = self.registry.get("policy")
+        if not isinstance(policy, dict) or set(policy) != REQUIRED_POLICY:
+            self.error("authority-registry.yaml", f"policy fields must be exactly {sorted(REQUIRED_POLICY)}")
+        else:
+            expected = {
+                "routing_order": "role-first-language-second",
+                "conflict_resolution": "topic-ownership-before-precedence",
+                "draft_effect": "proposed-until-explicitly-adopted",
+            }
+            for k, v in expected.items():
+                if policy.get(k) != v:
+                    self.error("authority-registry.yaml", f"policy.{k} must be {v!r}")
+        docs = self.registry.get("documents")
+        if not isinstance(docs, list) or not docs:
+            self.error("authority-registry.yaml", "documents must be a non-empty sequence")
+            return
+        self.documents = []
+        seen_path: set[str] = set()
+        seen_name: set[str] = set()
+        for i, d in enumerate(docs):
+            where = f"authority-registry.yaml documents[{i}]"
+            if not isinstance(d, dict):
+                self.error(where, "entry must be a mapping")
+                continue
+            if set(d) != REQUIRED_DOCUMENT_KEYS:
+                self.error(where, f"fields must be exactly {sorted(REQUIRED_DOCUMENT_KEYS)}")
+                continue
+            self.documents.append(d)
+            rel = d["path"]
+            if not isinstance(rel, str) or not rel.startswith("docs/") or not rel.endswith(".md"):
+                self.error(where, "path must be a docs/*.md path")
+            if rel.endswith("/README.md"):
+                self.error(where, "directory README files are indexes and shall not be governed documents")
+            if rel in seen_path:
+                self.error(where, f"duplicate path {rel}")
+            seen_path.add(rel)
+            name = str(d["display_name"]).strip().casefold()
+            if name in seen_name:
+                self.error(where, f"duplicate display_name {d['display_name']!r}")
+            seen_name.add(name)
+            if not SEMVER_RE.match(str(d["version"])):
+                self.error(where, f"invalid semantic version {d['version']!r}")
+            if d["status"] not in ALLOWED_STATUS:
+                self.error(where, f"invalid status {d['status']!r}")
+            for key in ("repository_role", "readme_purpose", "routing_role", "applies_when"):
+                if not isinstance(d[key], str) or not d[key].strip():
+                    self.error(where, f"{key} must be non-empty text")
+            if not isinstance(d["authority_topics"], list) or not d["authority_topics"]:
+                self.error(where, "authority_topics must be a non-empty sequence")
+            if not isinstance(d["prerequisite_documents"], list):
+                self.error(where, "prerequisite_documents must be a sequence")
+
+    def check_governed_set(self) -> None:
+        actual = {
+            p.relative_to(self.root).as_posix()
+            for p in (self.root / "docs").rglob("*.md")
+            if p.relative_to(self.root).as_posix() not in INDEX_ALLOWLIST
+        }
+        # Also reject uppercase Markdown extensions because they bypass lower-case glob expectations.
+        for p in (self.root / "docs").rglob("*"):
+            if p.is_file() and p.suffix.lower() == ".md" and p.suffix != ".md":
+                self.error(p.relative_to(self.root).as_posix(), "Markdown extension must be lowercase .md")
+        registered = {d["path"] for d in self.documents}
+        for rel in sorted(actual - registered):
+            self.error(rel, "governed Markdown exists but is not registered")
+        for rel in sorted(registered - actual):
+            self.error(rel, "registry entry does not resolve to a governed Markdown file")
+
+    def check_metadata(self) -> None:
+        canonical_seen: dict[str, str] = {}
+        identity_seen: dict[str, str] = {}
+        for d in self.documents:
+            rel = d["path"]
+            p = self.root / rel
+            if not p.is_file():
+                continue
+            try:
+                text = read_text(p)
+                meta = metadata(text)
+            except Exception as exc:
+                self.error(rel, f"metadata error: {exc}")
+                continue
+            canonical = meta.get("Canonical Filename") or meta.get("Document Name")
+            if canonical:
+                canonical = canonical.strip("`")
+            else:
+                canonical = p.name
+            if canonical != p.name:
+                self.error(rel, f"canonical filename {canonical!r} does not match path filename {p.name!r}")
+            key = canonical.casefold()
+            if key in canonical_seen:
+                self.error(rel, f"duplicate canonical document identity also used by {canonical_seen[key]}")
+            canonical_seen[key] = rel
+            doc_id = meta.get("Document ID")
+            if doc_id:
+                k = doc_id.casefold()
+                if k in identity_seen:
+                    self.error(rel, f"duplicate Document ID also used by {identity_seen[k]}")
+                identity_seen[k] = rel
+            expected = {
+                "Document Version": d["version"],
+                "Status": d["status"],
+                "Repository Role": d["repository_role"],
+            }
+            for field, value in expected.items():
+                if meta.get(field) != value:
+                    self.error(rel, f"metadata {field} must equal registry value {value!r}, got {meta.get(field)!r}")
+            m = SEMVER_RE.match(d["version"])
+            if m and tuple(map(int, m.groups())) != (1, 0, 0):
+                sup = meta.get("Supersedes Document Version")
+                if not sup or not SEMVER_RE.match(sup):
+                    self.error(rel, "non-initial version requires valid Supersedes Document Version metadata")
+            # Current version/status must occur in a Version History row.
+            hist_pattern = re.compile(rf"^\|\s*{re.escape(d['version'])}\s*\|[^\n]*\|\s*{re.escape(d['status'])}\s*\|", re.M)
+            if not hist_pattern.search(mask_fenced_and_inline_code(text)):
+                self.error(rel, "Version History lacks a row for the current version and status")
+
+    def check_registry_graph(self) -> None:
+        paths = {d["path"] for d in self.documents}
+        graph: dict[str, list[str]] = {}
+        topics: dict[str, str] = {}
+        for d in self.documents:
+            graph[d["path"]] = list(d["prerequisite_documents"])
+            for pre in d["prerequisite_documents"]:
+                if pre not in paths:
+                    self.error(d["path"], f"unknown prerequisite document {pre}")
+                if pre == d["path"]:
+                    self.error(d["path"], "document cannot require itself")
+            for topic in d["authority_topics"]:
+                norm = re.sub(r"\s+", " ", str(topic).strip().casefold())
+                if norm in topics:
+                    self.error(d["path"], f"duplicate exact authority topic {topic!r} also owned by {topics[norm]}")
+                topics[norm] = d["path"]
+        visiting: set[str] = set(); visited: set[str] = set()
+        def dfs(node: str, stack: list[str]) -> None:
+            if node in visiting:
+                self.error("authority-registry.yaml", "prerequisite cycle: " + " -> ".join(stack + [node]))
+                return
+            if node in visited:
+                return
+            visiting.add(node)
+            for nxt in graph.get(node, []):
+                if nxt in graph:
+                    dfs(nxt, stack + [node])
+            visiting.remove(node); visited.add(node)
+        for node in graph:
+            dfs(node, [])
+
+    def check_human_tables(self) -> None:
+        expected = {d["path"]: d for d in self.documents}
+        # Root Current Document Set.
+        p = self.root / "README.md"
+        if p.is_file():
+            try:
+                rows = parse_pipe_table(read_text(p).splitlines(), "## Current Document Set")
+                actual: dict[str, tuple[str, str, str]] = {}
+                for cells in rows[2:]:
+                    if len(cells) != 4:
+                        self.error("README.md", f"Current Document Set row must have 4 columns: {cells}")
+                        continue
+                    m = re.search(r"\]\((docs/[^)]+\.md)\)", cells[0])
+                    if not m:
+                        self.error("README.md", f"invalid document link in Current Document Set: {cells[0]}")
+                        continue
+                    actual[m.group(1)] = (cells[1], cells[2], cells[3])
+                if set(actual) != set(expected):
+                    self.error("README.md", f"Current Document Set paths differ from registry; missing={sorted(set(expected)-set(actual))}, extra={sorted(set(actual)-set(expected))}")
+                for rel, d in expected.items():
+                    if rel in actual and actual[rel] != (d["version"], d["status"], d["readme_purpose"]):
+                        self.error("README.md", f"Current Document Set fields mismatch for {rel}")
+            except Exception as exc:
+                self.error("README.md", str(exc))
+        # AI manifest.
+        rel_ai = "docs/framework/AI_Engineering_Usage_Guide.md"
+        p = self.root / rel_ai
+        if p.is_file():
+            try:
+                rows = parse_pipe_table(read_text(p).splitlines(), "## 0.2 Active Document Manifest")
+                actual: dict[str, tuple[str, str, str, str]] = {}
+                for cells in rows[2:]:
+                    if len(cells) != 5:
+                        self.error(rel_ai, f"Active Document Manifest row must have 5 columns: {cells}")
+                        continue
+                    path = cells[1].strip("`")
+                    actual[path] = (cells[0], cells[2].strip("`"), cells[3], cells[4])
+                if set(actual) != set(expected):
+                    self.error(rel_ai, f"Active Document Manifest paths differ from registry; missing={sorted(set(expected)-set(actual))}, extra={sorted(set(actual)-set(expected))}")
+                for rel, d in expected.items():
+                    tup=(d["display_name"],d["version"],d["status"],d["routing_role"])
+                    if rel in actual and actual[rel] != tup:
+                        self.error(rel_ai, f"Active Document Manifest fields mismatch for {rel}")
+            except Exception as exc:
+                self.error(rel_ai, str(exc))
+
+    def check_directory_indexes(self) -> None:
+        by_dir: dict[str, set[str]] = collections.defaultdict(set)
+        for d in self.documents:
+            pp = PurePosixPath(d["path"])
+            by_dir[pp.parent.as_posix()].add(pp.name)
+        for directory, expected in sorted(by_dir.items()):
+            rel = f"{directory}/README.md"
+            p = self.root / rel
+            if not p.is_file():
+                self.error(rel, "required directory index is missing")
+                continue
+            text = mask_fenced_and_inline_code(read_text(p))
+            found: set[str] = set()
+            for m in MD_LINK_RE.finditer(text):
+                target = m.group("target").strip("<>").split("#",1)[0]
+                if not target or "://" in target or target.startswith(('/', '#', 'mailto:')):
+                    continue
+                if "/" not in target and target.endswith(".md") and target != "README.md":
+                    found.add(unquote(target))
+            missing = expected - found
+            if missing:
+                self.error(rel, f"directory index omits governed documents: {sorted(missing)}")
+            # Same-directory governed-looking links not in registry are suspicious.
+            extra = {x for x in found - expected if (self.root/directory/x).is_file()}
+            if extra:
+                self.error(rel, f"directory index lists unregistered governed documents: {sorted(extra)}")
+
+    def check_filename_policy(self) -> None:
+        for p in (self.root / "docs").rglob("*.md"):
+            if VERSIONED_FILENAME_RE.search(p.name):
+                self.error(p.relative_to(self.root).as_posix(), "maintained Markdown filename embeds version, release status, RC, or date")
+            if any(ord(ch) > 127 for ch in p.name):
+                self.error(p.relative_to(self.root).as_posix(), "maintained Markdown filename must use stable English ASCII naming")
+
+    def check_links(self) -> None:
+        for p in [x for x in self.files() if x.suffix == ".md"]:
+            rel = p.relative_to(self.root).as_posix()
+            text = mask_fenced_and_inline_code(read_text(p))
+            targets = [m.group("target").strip("<>") for m in MD_LINK_RE.finditer(text)]
+            targets += [m.group("target") for m in HTML_LINK_RE.finditer(text)]
+            for raw in targets:
+                raw = raw.replace("\\)", ")").strip()
+                if not raw or raw.startswith(("#", "mailto:", "http://", "https://", "data:")):
+                    if raw.startswith("#") and raw[1:] not in anchors(read_text(p)):
+                        self.error(rel, f"missing local heading anchor {raw}")
+                    continue
+                target_path, sep, fragment = raw.partition("#")
+                target_path = unquote(target_path)
+                candidate = (p.parent / target_path).resolve()
+                try:
+                    candidate.relative_to(self.root)
+                except ValueError:
+                    self.error(rel, f"local link escapes repository: {raw}")
+                    continue
+                if not candidate.exists():
+                    self.error(rel, f"broken local link target: {raw}")
+                    continue
+                if fragment and candidate.is_file() and candidate.suffix == ".md":
+                    if unquote(fragment) not in anchors(read_text(candidate)):
+                        self.error(rel, f"missing target anchor in {raw}")
+
+    def check_markdown_structure(self) -> None:
+        for p in [x for x in self.files() if x.suffix == ".md"]:
+            rel = p.relative_to(self.root).as_posix()
+            text = read_text(p)
+            # Balanced fence parser.
+            fence: str | None = None
+            for n, line in enumerate(text.splitlines(), 1):
+                m = FENCE_RE.match(line)
+                if not m:
+                    continue
+                mark=m.group("mark")
+                if fence is None:
+                    fence=mark[0]
+                elif mark[0]==fence:
+                    fence=None
+            if fence is not None:
+                self.error(rel, "unclosed fenced code block")
+            # First visible heading should be H1 and there should be exactly one title before metadata.
+            headings=[]
+            masked=mask_fenced_and_inline_code(text)
+            for line in masked.splitlines():
+                m=re.match(r"^(#{1,6})\s+(.+)$",line)
+                if m: headings.append((len(m.group(1)),m.group(2).strip()))
+            if not headings or headings[0][0] != 1:
+                self.error(rel, "first visible heading must be level 1")
+            # Large upward heading-level jumps are usually structural mistakes.
+            prev=1
+            for level,title in headings[1:]:
+                if level > prev + 1:
+                    self.error(rel, f"heading level jumps from H{prev} to H{level} at {title!r}")
+                prev=level
+
+    def check_authority_boundaries(self) -> None:
+        # Dedicated Protocol governance must reside under docs/protocol.
+        names={"Protocol_Compatibility_Rules.md","Protocol_Registry_Governance.md","Protocol_Security_Profile.md"}
+        for p in (self.root / "docs").rglob("*.md"):
+            if p.name in names and p.parent != self.root/"docs/protocol":
+                self.error(p.relative_to(self.root).as_posix(), "Protocol governance document is outside docs/protocol")
+        # Node must be routed in both human and AI entry points.
+        for rel in ["README.md","docs/framework/AI_Engineering_Usage_Guide.md"]:
+            p=self.root/rel
+            if p.is_file():
+                text=read_text(p)
+                for token in ["docs/node/Node_Software_Engineering_Rules.md" if rel=="README.md" else "Node_Software_Engineering_Rules.md"]:
+                    if token not in text:
+                        self.error(rel, "Node Software Engineering Rules are not routed")
+        # Checklists are views, not independent normative authority.
+        for d in self.documents:
+            if d["path"].endswith("Checklist.md"):
+                p=self.root/d["path"]
+                if p.is_file() and CHECKLIST_PRINCIPLE not in read_text(p):
+                    self.error(d["path"], "missing common checklist non-authority principle")
+                role=d["repository_role"].casefold()
+                if "not" not in role or "authority" not in role:
+                    self.error(d["path"], "checklist repository_role must explicitly deny independent requirement authority")
+        # Validation docs must not claim independent Product authority in metadata.
+        for d in self.documents:
+            if d["path"].startswith("docs/validation/") and "not" not in d["repository_role"].casefold():
+                self.error(d["path"], "validation document repository_role must explicitly state its non-authority boundary")
+
+    def check_notice(self) -> None:
+        p=self.root/"NOTICE.md"
+        if not p.is_file(): return
+        text=read_text(p)
+        headings=[m.group(1).strip() for m in re.finditer(r"^##\s+(.+)$",text,re.M)]
+        if headings != NOTICE_HEADINGS:
+            self.error("NOTICE.md", f"required level-2 headings/order are {NOTICE_HEADINGS}, got {headings}")
+        required=[
+            "personal engineering research and methodology project",
+            "current or former employer",
+            "AI assistance does not transfer engineering authority or responsibility",
+            "does not reproduce or replace official MISRA, ISO, IEC, NIST, Microsoft, Oracle, C++",
+            "does not replace, amend, expand, or reduce the legal effect",
+            "(LICENSE)",
+        ]
+        for phrase in required:
+            if phrase not in text:
+                self.error("NOTICE.md", f"missing required notice language: {phrase!r}")
+
+    def check_changelog(self) -> None:
+        p=self.root/"CHANGELOG.md"
+        if not p.is_file(): return
+        text=read_text(p)
+        if "## Unreleased" not in text:
+            self.error("CHANGELOG.md", "missing Unreleased section")
+        for name in NEW_CHANGELOG_FILES:
+            if name not in text:
+                self.error("CHANGELOG.md", f"new governed document is not recorded: {name}")
+        for token in ["authority-registry.yaml", "Active Document Manifest", "NOTICE.md", "Validator"]:
+            if token.casefold() not in text.casefold():
+                self.error("CHANGELOG.md", f"missing synchronization/change record for {token}")
+
+    def check_workflow(self) -> None:
+        rel=".github/workflows/document-validation.yml"; p=self.root/rel
+        if not p.is_file(): return
+        try:
+            wf=yaml.load(read_text(p),Loader=UniqueKeyLoader)
+        except Exception as exc:
+            self.error(rel,f"invalid YAML: {exc}"); return
+        if not isinstance(wf,dict): self.error(rel,"workflow root must be mapping"); return
+        # PyYAML 1.1 can parse 'on' as True; accept either key but require declared events.
+        on=wf.get("on",wf.get(True))
+        if not isinstance(on,dict) or set(on)!={"push","pull_request"}:
+            self.error(rel,"workflow must enable exactly push and pull_request")
+        perms=wf.get("permissions")
+        if perms != {"contents":"read"}:
+            self.error(rel,"workflow permissions must be read-only contents")
+        jobs=wf.get("jobs")
+        if not isinstance(jobs,dict) or set(jobs)!={"validate-documentation"}:
+            self.error(rel,"workflow must contain exactly validate-documentation job")
+            return
+        job=jobs["validate-documentation"]
+        if job.get("runs-on")!="ubuntu-24.04": self.error(rel,"runner must be ubuntu-24.04")
+        versions=job.get("strategy",{}).get("matrix",{}).get("python-version")
+        if versions != ["3.10","3.12"]: self.error(rel,"Python matrix must be exactly 3.10 and 3.12")
+        steps=job.get("steps")
+        if not isinstance(steps,list): self.error(rel,"steps must be a sequence"); return
+        names=[x.get("name") for x in steps if isinstance(x,dict)]
+        required_names=["Check out repository","Set up Python ${{ matrix.python-version }}","Install validation dependencies","Validate repository documentation","Run validator regression tests"]
+        if names != required_names: self.error(rel,f"workflow steps must be exact and ordered: {required_names}")
+        for step in steps[:2]:
+            use=step.get("uses","")
+            if not re.match(r"^actions/(?:checkout|setup-python)@[0-9a-f]{40}$",use):
+                self.error(rel,f"GitHub Action must be pinned by full SHA: {use}")
+        runs=[x.get("run") for x in steps if isinstance(x,dict) and "run" in x]
+        expected_runs=[
+            "python -m pip install --disable-pip-version-check --require-hashes -r requirements-validation.txt",
+            "python tools/validate_repository.py",
+            "python -m unittest discover -s tests -v",
+        ]
+        if runs != expected_runs: self.error(rel,"workflow run commands must be exact, separate, and ordered")
 
 
-def validate_links(markdown_files: list[Path]) -> None:
-    cleaned={}; anchors={}
-    for p in markdown_files:
-        t=searchable(p,read_text(p)); cleaned[p]=t; anchors[p]=anchors_for(t)
-        parser=HTMLTargets();
-        try: parser.feed(t)
-        except Exception as exc: error(f"{rel(p)}: HTML parsing failed: {exc}")
-        anchors[p]|=parser.anchors
-    for p,t in cleaned.items():
-        parser=HTMLTargets(); parser.feed(t)
-        for raw in inline_targets(t)+parser.targets:
-            target=raw.strip()
-            if target.startswith("<") and ">" in target: target=target[1:target.index(">")]
-            else: target=target.split(maxsplit=1)[0]
-            if not target: continue
-            parsed=urlsplit(target)
-            if parsed.scheme or target.startswith("//"): continue
-            path_part=unquote(parsed.path); fragment=unquote(parsed.fragment)
-            resolved=p if not path_part else (p.parent/path_part).resolve()
-            try: resolved.relative_to(ROOT.resolve())
-            except ValueError: error(f"{rel(p)}: link escapes repository: {target}"); continue
-            if not resolved.exists(): error(f"{rel(p)}: missing link or image target: {path_part or target}"); continue
-            if fragment and resolved.is_file() and resolved.suffix==".md" and fragment not in anchors.get(resolved,set()):
-                error(f"{rel(p)}: missing heading anchor in {rel(resolved)}: #{fragment}")
-
-
-def validate_workflow() -> None:
-    obj=load_yaml_strict(WORKFLOW)
-    if not isinstance(obj,dict): return
-    jobs=obj.get("jobs");
-    if not isinstance(jobs,dict) or set(jobs)!={"validate-documentation"}: error("workflow: expected exactly validate-documentation job"); return
-    job=jobs["validate-documentation"]
-    if job.get("runs-on")!="ubuntu-24.04": error("workflow: runs-on must be ubuntu-24.04")
-    matrix=((job.get("strategy") or {}).get("matrix") or {}).get("python-version")
-    if matrix!=["3.10","3.12"]: error("workflow: Python matrix must be exactly 3.10 and 3.12")
-    steps=job.get("steps")
-    if not isinstance(steps,list): error("workflow: steps must be a list"); return
-    uses=[s.get('uses','') for s in steps if isinstance(s,dict)]
-    if "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" not in uses: error("workflow: checkout action must use approved immutable SHA")
-    if "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1" not in uses: error("workflow: setup-python action must use approved immutable SHA")
-    runs=[s.get('run') for s in steps if isinstance(s,dict) and isinstance(s.get('run'),str)]
-    expected=[
-        "python -m pip install --disable-pip-version-check --require-hashes -r requirements-validation.txt",
-        "python tools/validate_repository.py",
-        "python -m unittest discover -s tests -v",
-    ]
-    for cmd in expected:
-        if runs.count(cmd)!=1: error(f"workflow: required exact unconditional run step missing or duplicated: {cmd}")
-    if any("\n" in r or "&&" in r or ";" in r for r in runs): error("workflow: validation commands must remain separate exact steps")
+def validate(root: Path) -> list[str]:
+    return Validator(root).run()
 
 
 def main() -> int:
-    if sys.version_info < (3,10): error("Python 3.10 or later is required")
-    validate_paths()
-    if not REGISTRY.exists(): error("authority-registry.yaml: missing")
-    if not REQUIREMENTS.exists(): error("requirements-validation.txt: missing")
-    elif read_text(REQUIREMENTS)!=EXPECTED_REQUIREMENTS: error("requirements-validation.txt: pinned dependency or approved hashes differ")
-    metadata={}
-    docs=governed_documents()
-    for p in docs:
-        t=searchable(p,read_text(p)); md=parse_metadata(p,t); metadata[p]=md; validate_version_history(p,t,md)
-    registry_docs=validate_registry(metadata)
-    compare_human_tables(registry_docs)
-    validate_workflow()
-    if os.environ.get("HDCF_VALIDATOR_FAST_TEST") != "1":
-        markdown_files=sorted(ROOT.rglob("*.md"))
-        validate_links(markdown_files)
-    if ERRORS:
-        for msg in dict.fromkeys(ERRORS): print(f"ERROR: {msg}")
-        print(f"Repository validation: FAIL ({len(dict.fromkeys(ERRORS))} error(s))")
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--root",type=Path,default=Path(__file__).resolve().parents[1])
+    args=parser.parse_args()
+    errors=validate(args.root)
+    if errors:
+        print(f"Repository validation FAILED with {len(errors)} error(s):")
+        for e in errors: print(f"- {e}")
         return 1
-    print("Repository validation: PASS")
-    print(f"Governed documents: {len(docs)}")
-    print(f"Registry documents: {len(registry_docs)}")
+    print("Repository validation PASSED")
     return 0
 
-if __name__ == "__main__":
+
+if __name__=="__main__":
     raise SystemExit(main())

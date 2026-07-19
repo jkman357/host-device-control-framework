@@ -12,4 +12,4 @@ This directory contains cross-platform, cross-language authority documents for t
 
 ## Authority Boundary
 
-These documents define system roles, architecture, analysis methods, and governance. Protocol details belong in `../protocol/`; Coordinator implementation rules belong in `../coordinator/`; language implementation rules belong in `../coding-rules/`.
+These documents define system roles, architecture, analysis methods, and governance. Protocol details belong in `../protocol/`; Coordinator implementation rules belong in `../coordinator/`; Node implementation rules belong in `../node/`; language implementation rules belong in `../coding-rules/`; evidence and conformance views belong in `../validation/`.

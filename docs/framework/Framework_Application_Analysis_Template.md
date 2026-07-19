@@ -3,9 +3,9 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`  
 **Document ID:** FAAT  
-**Document Version:** v1.0.16  
+**Document Version:** v1.0.17  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.15  
+**Supersedes Document Version:** v1.0.16  
 **Document Type:** Reusable Analysis Template  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -15,11 +15,20 @@
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Coordinator_Software_Engineering_Rules.md`
+- `Node_Software_Engineering_Rules.md`
+- `Protocol_Compatibility_Rules.md`
+- `Protocol_Registry_Governance.md`
+- `Protocol_Security_Profile.md`
 - `Embedded_C_Coding_Rules.md`
 - `CSharp_Coding_Rules.md`
 - `Protocol_YAML_Definition_Guide.md`
 - `Protocol_YAML_Template.md`
 - `Repository_Validation_Checklist.md`
+- `Validation_Evidence_Guide.md`
+- `Protocol_Validation_Checklist.md`
+- `Framework_Conformance_Checklist.md`
+- `Coding_Rules_Review_Checklist.md`
+- `AI_Generated_Artifact_Validation_Guide.md`
 
 **First Issued:** 2026-07-15  
 **Last Revised:** 2026-07-19  
@@ -99,6 +108,7 @@ Other Coordinator/Node applications
 | v1.0.14 | 2026-07-18 | Not recorded | Ray Yang | Completed the Authority Boundary table by adding conditional authority ownership for cross-language Coordinator software engineering and Product-owned C# implementation; clarified that Draft authorities require explicit Project adoption or approved deviation; and preserved all existing application-analysis decisions and completion requirements. |
 | v1.0.15 | 2026-07-19 | Not recorded | Ray Yang | Updated authoring-reference versions after repository-wide Supersedes metadata completion; no Product-specific analysis conclusion was added. |
 | v1.0.16 | 2026-07-19 | Baseline | Ray Yang | Added explicit Repository Role metadata and migrated Version History to the governed Date/Status schema; no Product-analysis method or required evidence record changed. |
+| v1.0.17 | 2026-07-19 | Baseline | Ray Yang | Integrated conditional Protocol compatibility, Registry, security, and Node engineering authorities plus validation evidence and conformance views into authoring references, Authority Boundary, and Existing Framework Baseline records; no Product-specific decision was added. |
 
 ## 0.3 Template Usage Convention
 
@@ -160,12 +170,18 @@ authoring references, not automatic compatibility decisions for every Product:
 
 | Authority | Template Authoring Reference Version | Status at Authoring |
 |---|---:|---|
-| `Coordinator_Node_Control_Framework.md` | `v1.0.12` | Baseline |
-| `Protocol_YAML_Definition_Guide.md` | `v1.0.9` | Baseline |
-| `Protocol_YAML_Template.md` | `v1.0.9` | Baseline |
-| `Coordinator_Software_Engineering_Rules.md` | `v1.0.4` | Draft for Review |
-| `Embedded_C_Coding_Rules.md` | `v1.0.16` | Final Baseline |
+| `Coordinator_Node_Control_Framework.md` | `v1.0.14` | Baseline |
+| `Protocol_YAML_Definition_Guide.md` | `v1.0.11` | Baseline |
+| `Protocol_YAML_Template.md` | `v1.0.10` | Baseline |
+| `Protocol_Compatibility_Rules.md` | `v1.0.0` | Draft for Review |
+| `Protocol_Registry_Governance.md` | `v1.0.0` | Draft for Review |
+| `Protocol_Security_Profile.md` | `v1.0.0` | Draft for Review |
+| `Coordinator_Software_Engineering_Rules.md` | `v1.0.5` | Draft for Review |
+| `Node_Software_Engineering_Rules.md` | `v1.0.0` | Draft for Review |
+| `Embedded_C_Coding_Rules.md` | `v1.0.17` | Final Baseline |
 | `CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review |
+| `Repository_Validation_Checklist.md` | `v1.0.6` | Draft for Review |
+| `Validation_Evidence_Guide.md` | `v1.0.0` | Draft for Review |
 
 Every completed Application Analysis shall separately record:
 
@@ -227,13 +243,19 @@ This template records application-specific analysis and decisions. It shall not 
 |---|---|
 | Coordinator/Node roles, architecture, safety placement, timing principles, and governance | `Coordinator_Node_Control_Framework.md` |
 | Cross-language Coordinator software engineering | `Coordinator_Software_Engineering_Rules.md` when approved or explicitly adopted for Project use; otherwise record an approved deviation or `N/A` rationale |
+| Cross-language Node software engineering | `Node_Software_Engineering_Rules.md` when approved or explicitly adopted for Project use; otherwise record an approved deviation or `N/A` rationale |
 | Embedded C implementation rules | `Embedded_C_Coding_Rules.md` |
 | Product-owned C# implementation rules | `CSharp_Coding_Rules.md` when approved or explicitly adopted for Project use; otherwise record an approved deviation or `N/A` rationale |
-| Protocol YAML fields, semantics, validation, and compatibility rules | `Protocol_YAML_Definition_Guide.md` |
+| Protocol YAML syntax, semantics, machine-verifiable representation, validation, and Code Generation | `Protocol_YAML_Definition_Guide.md` |
+| Protocol compatibility, version consequences, negotiation, deprecation, and removal | `Protocol_Compatibility_Rules.md` when approved or explicitly adopted for Project use |
+| Protocol identifier Registry and allocation lifecycle | `Protocol_Registry_Governance.md` when approved or explicitly adopted for Project use |
+| Protocol security-profile and secure-session lifecycle governance | `Protocol_Security_Profile.md` when approved or explicitly adopted for Project use |
 | Reusable Project Protocol skeleton | `Protocol_YAML_Template.md` |
 | Product behavior and domain requirements | Application Profile, SRS, Hazard Analysis, and Product specifications |
 | Actual wire contract | `<Application>_protocol.yaml` |
 | Actual implementation | Coordinator/Node design specifications and source code |
+| Validation evidence identity, execution state, traceability, and adequacy | `Validation_Evidence_Guide.md` when approved or explicitly adopted for Project use |
+| Protocol, Framework, Coding Rules, repository, and AI-artifact conformance views | Applicable document under `../validation/`; Checklists do not independently create requirements |
 | Test procedure and result | Test specifications and reports |
 
 One normative rule shall have one authority location.
@@ -344,17 +366,22 @@ State the criteria used to decide whether the application can proceed.
 
 | Item | Minimum Compatible Version | Version Used for This Analysis | Source Commit, Tag, or Release | Compatibility Evidence |
 |---|---:|---:|---|---|
-| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.12>` | `<TBD>` | `<Evidence>` |
-| `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.9>` | `<TBD>` | `<Evidence>` |
-| `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.9>` | `<TBD>` | `<Evidence>` |
-| `Coordinator_Software_Engineering_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.4>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
-| `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.16>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
+| `Coordinator_Node_Control_Framework.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.14>` | `<TBD>` | `<Evidence>` |
+| `Protocol_YAML_Definition_Guide.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.11>` | `<TBD>` | `<Evidence>` |
+| `Protocol_YAML_Template.md` | `<TBD after compatibility review>` | `<TBD; authoring reference: v1.0.10>` | `<TBD>` | `<Evidence>` |
+| `Protocol_Compatibility_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.0>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Protocol_Registry_Governance.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.0>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Protocol_Security_Profile.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.0>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Coordinator_Software_Engineering_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.5>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Node_Software_Engineering_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.0>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Embedded_C_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.17>` | `<TBD or N/A>` | `<Evidence or N/A rationale>` |
 | `CSharp_Coding_Rules.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.4>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
+| `Repository_Validation_Checklist.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.6>` | `<TBD or N/A>` | `<Executed structural evidence or N/A rationale>` |
+| `Validation_Evidence_Guide.md` | `<TBD or N/A>` | `<TBD or N/A; authoring reference: v1.0.0>` | `<TBD or N/A>` | `<Evidence, approved Draft use, deviation, or N/A rationale>` |
 
 `Coordinator_Software_Engineering_Rules.md` is required when Coordinator-owned software is in scope.
-`CSharp_Coding_Rules.md` is required when Product-owned C# is in scope. If either authority remains `Draft for Review`,
-the completed analysis shall record whether the Project explicitly accepts that Draft, applies an approved deviation,
-or marks it `N/A` with rationale. A Draft authority shall not be represented as an approved Product Baseline silently.
+`Node_Software_Engineering_Rules.md` is required when Node-owned software is in scope and the Project adopts this Draft.
+`CSharp_Coding_Rules.md` is required when Product-owned C# is in scope. Protocol governance Drafts are required when their topics are in scope and the Project adopts them. For every Draft authority, the completed analysis shall record whether the Project explicitly accepts that Draft, applies an approved deviation, or marks it `N/A` with rationale. A Draft authority shall not be represented as an approved Product Baseline silently.
 
 Additional input artifacts:
 

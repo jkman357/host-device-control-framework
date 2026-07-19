@@ -3,18 +3,19 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.0.10  
+**Document Version:** v1.0.11  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.9  
+**Supersedes Document Version:** v1.0.10  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
+**Related Governance:** `Protocol_Compatibility_Rules.md`, `Protocol_Registry_Governance.md`, `Protocol_Security_Profile.md`  
 **Related Application Analysis:** `Framework_Application_Analysis_Template.md`  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
-**Repository Role:** Normative Protocol YAML definition and governance authority  
+**Repository Role:** Normative Protocol YAML syntax, semantics, machine-verifiable representation, validation, and Code Generation authority  
 **First Issued:** 2026-07-15  
 **Last Revised:** 2026-07-19  
 Copyright © 2026 Ray Yang. All rights reserved.
@@ -63,8 +64,8 @@ Firmware Update Contract
 
 This document does not define the actual commands of one Product. It establishes a reusable baseline for:
 
-> Protocol YAML syntax, semantics, validation, code generation, compatibility, and governance
-> across Coordinator/Node Projects.
+> Protocol YAML syntax, semantics, machine-verifiable representation, validation, and code generation
+> across Coordinator/Node Projects. Compatibility, Registry, and Security governance decisions are owned by the dedicated Protocol authorities and represented here for Schema Validation and Semantic Lint.
 
 Each Product or Project shall create its own Protocol YAML, for example:
 
@@ -84,9 +85,12 @@ Coordinator_Node_Control_Framework
     Defines system roles, layering, responsibility boundaries,
     communication principles, security boundaries, and engineering governance.
 
+Protocol_Compatibility_Rules / Protocol_Registry_Governance / Protocol_Security_Profile
+    Define compatibility, identifier lifecycle, and security-profile governance decisions.
+
 Protocol_YAML_Definition_Guide
-    Defines how Protocol YAML describes the wire contract and how
-    Schema Validation, Semantic Lint, Code Generation, and compatibility work.
+    Defines how Protocol YAML represents the wire contract and governance decisions for
+    Schema Validation, Semantic Lint, and Code Generation.
 
 <Application>_protocol.yaml
     Defines the actual Message IDs, Payloads, Enums, Ranges, Wire Format,
@@ -209,6 +213,7 @@ The keywords in this document have the following meanings:
 | v1.0.8 | 2026-07-18 | Not recorded | Required an exact machine-verifiable Fragment Header and complete reassembly behavior; prohibited opaque security-critical Handshake payloads and required named canonical request/response structs; replaced numeric Profile-ID downgrade ordering with explicit allowlists, preference, security level, and deprecation state; defined Device-issued Firmware Update resume authorization bound to transaction, Manifest, Device, Host, and security version; and required a positive data-bearing payload at the minimum MTU. |
 | v1.0.9 | 2026-07-19 | Not recorded | Added explicit Supersedes metadata required by repository governance; no normative Protocol YAML definition rules changed. |
 | v1.0.10 | 2026-07-19 | Baseline | Added explicit Repository Role metadata and migrated Version History to the governed Date/Status schema; no normative Protocol YAML semantics changed. |
+| v1.0.11 | 2026-07-19 | Baseline | Clarified topic ownership: compatibility policy, identifier allocation lifecycle, and security-profile governance now belong to their dedicated Protocol authorities, while this Guide retains YAML representation, semantic-lint, validation, and Code Generation ownership; no Project wire contract changed. |
 
 ---
 

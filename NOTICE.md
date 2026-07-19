@@ -1,29 +1,37 @@
 # Repository Notice
 
-Copyright © 2026 Ray Yang. All rights reserved.
+## Copyright Notice
 
-## Repository Status
+Copyright © 2026 Ray Yang. All rights reserved except where the repository-level [`LICENSE`](LICENSE) or a file-specific notice states otherwise.
 
-This repository is maintained by Ray Yang as a personal engineering project. The materials in this repository do not represent the official policies, specifications, designs, coding standards, or documentation of any employer, company, or organization.
+## Personal Engineering Project Disclaimer
 
-## AI Assistance
+This repository is maintained as a personal engineering research and methodology project. It is provided for inspection, discussion, and engineering development under the applicable repository terms.
 
-Generative AI tools were used to assist with drafting, editing, organization, translation, consistency review, technical review, and artifact generation.
+The materials are not a substitute for Product requirements, professional engineering judgment, qualified review, physical validation, security assessment, legal advice, regulatory approval, certification, or an applicable third-party standard.
 
-The engineering concepts, architecture, rule selection, revisions, and final editorial decisions in Baseline and Final Baseline artifacts are reviewed and approved by Ray Yang. Draft for Review artifacts remain subject to human review and approval.
+## No Employer or Company Representation
 
-## Third-Party Materials
+This repository does not represent the official policies, specifications, designs, coding standards, documentation, opinions, approval, certification, adoption, or endorsement of any current or former employer, client, customer, partner, supplier, or other company or organization.
 
-Third-party standards, publications, trademarks, source code, libraries, licenses, and legal notices remain the property of their respective owners.
+No organization should be inferred to have adopted, approved, certified, sponsored, or endorsed this repository merely because an author or contributor has a past or present relationship with that organization.
 
-References to third-party materials do not imply ownership, endorsement, affiliation, or authorization.
+## AI Assistance Disclosure
 
-MISRA and MISRA C are associated with The MISRA Consortium. Materials in this repository that reference MISRA C do not reproduce or replace the official MISRA publications.
+Generative AI tools may have been used to assist with drafting, review, restructuring, translation, consistency checking, implementation support, test preparation, and artifact generation.
 
-Microsoft product names, .NET, C#, and related trademarks remain the property of their respective owners. References are provided for engineering context and do not imply affiliation or endorsement.
+AI assistance does not transfer engineering authority or responsibility. Human review, engineering judgment, source verification, test execution, approval, and final responsibility remain required. AI-generated text, code, tests, analyses, and reports shall not be treated as executed evidence, Product approval, or compliance proof without the required human and objective validation.
 
-## File-Specific Notices
+## Third-Party Standards and Trademark Notice
 
-When a file contains its own copyright, license, attribution, or third-party notice, that file-specific notice takes precedence for the applicable material.
+Third-party standards, publications, specifications, source code, libraries, licenses, names, and trademarks remain the property of their respective owners and are subject to their own terms.
 
-See [`LICENSE`](LICENSE) for repository-level usage terms.
+This repository does not reproduce or replace official MISRA, ISO, IEC, NIST, Microsoft, Oracle, C++, or other third-party standards and publications. References are provided only for engineering context, identification, interoperability, or attribution and do not imply affiliation, authorization, ownership, or endorsement.
+
+Users remain responsible for obtaining lawful access to applicable official standards and for complying with third-party licenses and notices.
+
+## File-Specific Notice Precedence
+
+When a file or included third-party component contains a more specific copyright, license, attribution, or use restriction, that file-specific or third-party notice applies to the relevant material and takes precedence over this general notice to the extent of the conflict.
+
+This `NOTICE.md` provides repository information only. It does not replace, amend, expand, or reduce the legal effect of the repository-level [`LICENSE`](LICENSE).

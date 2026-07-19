@@ -1,231 +1,161 @@
 # Host-Device Control Framework
 
-An AI-consumable engineering authority set for Coordinator/Node control systems in which a PC, SoC, MCU, Gateway, mobile application, production tool, or service tool communicates with and controls an embedded Node.
+A reusable, AI-consumable engineering authority set for designing, implementing, reviewing, and validating systems in which a **Coordinator** supervises one or more **Nodes**.
 
-The repository is designed primarily to guide and constrain AI-assisted engineering work. It defines how AI should route authority, analyze a new application, design a Protocol, generate or review implementation, and report validation evidence.
-
-Human engineers remain responsible for Product intent, architecture approval, hardware and system measurement, safety and security decisions, deviations, residual risk, and release approval.
+The repository is maintained as a personal engineering methodology project. GitHub `main` is the sole source of truth for maintained repository content. Detached packages require immutable source identity and integrity records.
 
 ## Intended Operating Model
 
 ```text
-Human requirements, constraints, and decision boundaries
-        |
-        v
-AI reads the applicable authority documents
-        |
-        v
-AI analyzes, designs, generates, reviews, and validates
-        |
-        v
-AI reports assumptions, conflicts, findings, and evidence state
-        |
-        v
-Human reviews decisions and validates actual system behavior
+Human Product Authority
+    defines requirements, risks, constraints, and approval
+            ↓
+Repository Authority Set
+    routes architecture, Protocol, role, language, and validation decisions
+            ↓
+AI and Human Engineering Work
+    analyzes, designs, implements, reviews, and generates tests
+            ↓
+Objective Evidence and Human Acceptance
+    builds, executes, measures, reviews, and approves the bounded result
 ```
+
+AI may accelerate engineering work, but it cannot own Product authority, fabricate evidence, self-approve, or replace target validation and responsible human judgment.
 
 ## Documentation Domains
 
-| Directory | Authority Domain |
+| Directory | Responsibility |
 |---|---|
-| [`docs/framework/`](docs/framework/) | Cross-platform architecture, AI usage, and framework application analysis |
-| [`docs/protocol/`](docs/protocol/) | Protocol YAML definition, template, compatibility, and governance |
-| [`docs/coordinator/`](docs/coordinator/) | Cross-language Coordinator software engineering rules and topic-specific implementation guides |
-| [`docs/coding-rules/`](docs/coding-rules/) | Programming-language implementation and coding rules |
-| [`docs/validation/`](docs/validation/) | Validation methods, evidence guidance, conformance checklists, and reports |
+| [`docs/framework/`](docs/framework/) | AI routing, reusable Coordinator/Node architecture, and Product application analysis |
+| [`docs/protocol/`](docs/protocol/) | Protocol YAML representation, compatibility, Registry, and security governance shared by Coordinator and Node |
+| [`docs/coordinator/`](docs/coordinator/) | Coordinator-specific software realization |
+| [`docs/node/`](docs/node/) | Node-specific software realization |
+| [`docs/coding-rules/`](docs/coding-rules/) | Programming-language implementation authorities |
+| [`docs/validation/`](docs/validation/) | Evidence methods and conformance/review views that do not independently create requirements |
 
 ## Current Document Set
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.18 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
-| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.0.13 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
-| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.0.16 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
-| [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.0.10 | Baseline | Protocol YAML syntax, semantics, Registry rules, security, compatibility, validation, Code Generation, and governance |
+| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.20 | Draft for Review | AI entry point, authority routing, task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.0.14 | Baseline | Reusable architecture, responsibility boundaries, timing, safety placement, security, Firmware Update, Runtime, validation, and governance |
+| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.0.17 | Baseline | Method for applying the Framework to a Product, including Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
+| [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.0.11 | Baseline | Protocol YAML syntax, semantics, machine-verifiable governance representation, Schema Validation, Semantic Lint, and Code Generation |
 | [`Protocol_YAML_Template.md`](docs/protocol/Protocol_YAML_Template.md) | v1.0.10 | Baseline | Reusable Project Protocol YAML starting structure and review checklists |
+| [`Protocol_Compatibility_Rules.md`](docs/protocol/Protocol_Compatibility_Rules.md) | v1.0.0 | Draft for Review | Protocol semantic-version consequences, compatibility dimensions, change classification, mixed-version operation, negotiation, deprecation, removal, and evidence |
+| [`Protocol_Registry_Governance.md`](docs/protocol/Protocol_Registry_Governance.md) | v1.0.0 | Draft for Review | Message and Capability identifier namespaces, allocation, uniqueness, lifecycle, retirement, non-reuse, merge control, generated artifacts, and evidence |
+| [`Protocol_Security_Profile.md`](docs/protocol/Protocol_Security_Profile.md) | v1.0.0 | Draft for Review | Security applicability, authenticated Session lifecycle, authorization, record protection, replay, Counter, Rekey, reconnect, credentials, environment separation, Firmware Update relationship, and evidence |
 | [`Coordinator_Software_Engineering_Rules.md`](docs/coordinator/Coordinator_Software_Engineering_Rules.md) | v1.0.5 | Draft for Review | Cross-language Coordinator architecture, lifecycle, concurrency, diagnostics, configuration, security, testing, and release rules |
 | [`Coordinator_Architecture_Patterns.md`](docs/coordinator/Coordinator_Architecture_Patterns.md) | v1.0.0 | Draft for Review | Coordinator layering, dependency direction, state ownership, command and receive pipelines, lifecycle, multi-Node isolation, and architecture review patterns |
 | [`Coordinator_Concurrency_Guide.md`](docs/coordinator/Coordinator_Concurrency_Guide.md) | v1.0.0 | Draft for Review | Coordinator execution-context ownership, asynchronous I/O, cancellation, timeout, backpressure, connection generations, overload, and bounded shutdown |
 | [`Coordinator_Logging_Guide.md`](docs/coordinator/Coordinator_Logging_Guide.md) | v1.0.1 | Draft for Review | Structured diagnostic events, correlation, redaction, injection resistance, bounded delivery, retention, export, and logging-failure behavior |
 | [`Coordinator_Testing_Guide.md`](docs/coordinator/Coordinator_Testing_Guide.md) | v1.0.1 | Draft for Review | Coordinator test layers, Protocol and Transport coverage, deterministic race testing, fault injection, fuzzing, simulator governance, and evidence integrity |
 | [`Coordinator_UI_Engineering_Guide.md`](docs/coordinator/Coordinator_UI_Engineering_Guide.md) | v1.0.1 | Draft for Review | Coordinator presentation state, command feedback, stale data, multi-Node binding, responsiveness, visualization, input safety, and engineering controls |
+| [`Node_Software_Engineering_Rules.md`](docs/node/Node_Software_Engineering_Rules.md) | v1.0.0 | Draft for Review | Node layering, execution contexts, local state and command ownership, safety, lifecycle, resources, telemetry, persistence, diagnostics, Bootloader handoff, target tests, and AI controls |
 | [`Embedded_C_Coding_Rules.md`](docs/coding-rules/Embedded_C_Coding_Rules.md) | v1.0.17 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 | [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.4 | Draft for Review | Product-owned C# language and .NET implementation rules |
-| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.5 | Draft for Review | Repository structural, manifest, canonical-reference, evidence-state, and detached-package checks |
+| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.6 | Draft for Review | Repository structural, manifest, canonical-reference, evidence-state, and detached-package checks |
+| [`Validation_Evidence_Guide.md`](docs/validation/Validation_Evidence_Guide.md) | v1.0.0 | Draft for Review | Evidence types, identity, traceability, reproducibility, ownership, environment, tools, result, anomaly, retention, integrity, and AI limitations |
+| [`Protocol_Validation_Checklist.md`](docs/validation/Protocol_Validation_Checklist.md) | v1.0.0 | Draft for Review | Traceable review and evidence-capture view for Protocol YAML, semantics, Registry, compatibility, security, robustness, vectors, and interoperability |
+| [`Framework_Conformance_Checklist.md`](docs/validation/Framework_Conformance_Checklist.md) | v1.0.0 | Draft for Review | Traceable Framework role, authority, layering, lifecycle, reconnect, safety, security, Bootloader, configuration, generation, deviation, and evidence view |
+| [`Coding_Rules_Review_Checklist.md`](docs/validation/Coding_Rules_Review_Checklist.md) | v1.0.0 | Draft for Review | Common review entry point for applicable language Coding Rules, types, arithmetic, resources, errors, concurrency, APIs, state machines, generated code, analysis, tests, and deviations |
+| [`AI_Generated_Artifact_Validation_Guide.md`](docs/validation/AI_Generated_Artifact_Validation_Guide.md) | v1.0.0 | Draft for Review | Authority and prompt control, hallucination and stale-source detection, code/document/test boundaries, execution evidence, target verification, security, licensing, approval, and records |
 
-The machine-readable [`authority-registry.yaml`](authority-registry.yaml) is the controlled source for document identity, version, status, Repository Role, applicability, authority topics, prerequisites, README purpose, and AI manifest routing-role fields. The validator requires the registry and both human-readable tables to agree.
+The machine-readable [`authority-registry.yaml`](authority-registry.yaml) is the controlled source for document identity, version, status, Repository Role, applicability, authority topics, prerequisites, README purpose, and AI manifest routing-role fields. The validator requires the registry, this table, directory indexes, and the AI Active Document Manifest to agree.
 
 ## AI Task Routing
 
 ```text
+Any AI-assisted engineering task
+    -> AI Engineering Usage Guide
+    -> Identify Product, role, language, Protocol, and evidence boundary
+
 Architecture or system-boundary task
-    -> AI Engineering Usage Guide
     -> Coordinator/Node Control Framework
+    -> Framework Application Analysis Template for Product application
 
-New Product or application task
-    -> AI Engineering Usage Guide
-    -> Coordinator/Node Control Framework
-    -> Framework Application Analysis Template
+Protocol definition task
+    -> Protocol YAML Definition Guide and Template
+    -> Protocol Compatibility Rules when change/evolution is in scope
+    -> Protocol Registry Governance when identifiers are in scope
+    -> Protocol Security Profile when security is in scope
 
-Protocol task
-    -> AI Engineering Usage Guide
-    -> Coordinator/Node Control Framework
-    -> Protocol YAML Definition Guide
-    -> Protocol YAML Template
-    -> Completed Application Analysis and Product requirements
+Coordinator implementation task
+    -> Coordinator Software Engineering Rules
+    -> Applicable Coordinator topic Guide
+    -> Applicable language Coding Rules
 
-Implementation generation or review
-    -> Identify the actual role for each relationship: Coordinator, Node, Tool/Service, or mixed
-    -> Apply the system and role-level authority for that role
-    -> Apply the Coding Rules for the implementation language
-    -> Apply the approved Project Protocol YAML when communication is in scope
-    -> Apply the approved SDD, platform constraints, and Product requirements
+Node implementation task
+    -> Node Software Engineering Rules
+    -> Applicable Protocol authorities
+    -> Applicable language Coding Rules
 
-Embedded C generation or review
-    -> AI Engineering Usage Guide
-    -> Embedded C Coding Rules
-    -> Coordinator/Node Control Framework when a Coordinator/Node boundary is in scope
-    -> Coordinator Software Engineering Rules only when the Embedded C code performs or supports a Coordinator role
-    -> Applicable Project Protocol YAML, SDD, hardware specification, and platform constraints
-
-C# generation or review
-    -> AI Engineering Usage Guide
-    -> C# Coding Rules
-    -> Applicable architecture or role framework
-    -> Coordinator Software Engineering Rules only when the code performs or supports a Coordinator role
-    -> Approved Project Protocol YAML and software design when applicable
-
-Validation or conformance task
-    -> AI Engineering Usage Guide
-    -> Repository Validation Checklist for repository-level checks
-    -> Applicable authority documents
-    -> Approved Product requirements and design
-    -> Actual build, test, measurement, log, and review evidence
+Validation or release claim
+    -> Validation Evidence Guide
+    -> Applicable Protocol, Framework, Coding Rules, Repository, or AI-artifact validation view
 ```
 
-Implementation routing is role-first and language-second. A programming language does not determine whether software is a Coordinator, Node, Tool/Service, or mixed-role component. When a Coordinator role is present, both the Coordinator role-level authority and the applicable language-level authority apply; neither substitutes for the other. A `Draft for Review` authority remains proposed until explicitly accepted or approved for Project use.
-
-While `AI_Engineering_Usage_Guide.md` remains `Draft for Review`, its routing is provisional. Direct human instructions and approved topic authority documents take precedence.
+Routing is **role-first and language-second**. A language does not determine whether software is a Coordinator or Node. Resolve conflicts by topic ownership before applying document precedence.
 
 ## Filename and Release Artifact Policy
 
-Maintained Markdown authority files inside the controlled Git repository use stable canonical filenames.
+Maintained Markdown filenames use stable canonical names without embedded document versions, release labels, RC suffixes, or dates. Document versions remain in metadata and Version History.
 
-```text
-Canonical path:      docs/framework/Coordinator_Node_Control_Framework.md
-Document version:    vMAJOR.MINOR.PATCH
-Immutable history:   Git commit, tag, or GitHub Release
-```
-
-A new PATCH or MINOR revision updates the canonical file and its internal `Document Version`; it does not create another parallel maintained authority file.
-
-Immutable release artifacts, audit packages, external deliverables, and detached snapshots include the approved version or a controlled Baseline identifier in the distributed filename. Detached artifacts preserve the canonical source filename and source Git commit, tag, or Release. A controlled detached authority-set package shall include package identity, input source identity, document versions and statuses, and a file-integrity hash list.
+Immutable identity belongs in Git commits, tags, Releases, package manifests, and release-package filenames. A detached package should identify the source commit/tag/Release and include a file manifest and hash record appropriate to its distribution process.
 
 ## Authority Boundary
 
-```text
-AI Engineering Usage Guide
-    Routes AI tasks, active versions, evidence states, and approval boundaries.
+- `AI_Engineering_Usage_Guide.md` owns AI routing, evidence-state reporting, prohibited AI behavior, and the human approval boundary.
+- `Coordinator_Node_Control_Framework.md` owns reusable roles, architecture, responsibility boundaries, timing, safety placement, security placement, Runtime, Firmware Update architecture, and governance.
+- `Framework_Application_Analysis_Template.md` owns the method and records used to apply the Framework to a Product.
+- `Protocol_Compatibility_Rules.md` owns Protocol change classification, version consequences, mixed-version operation, deprecation, and removal.
+- `Protocol_Registry_Governance.md` owns identifier allocation, namespaces, lifecycle, retirement, and non-reuse.
+- `Protocol_Security_Profile.md` owns Protocol security applicability and secure-session lifecycle governance.
+- `Protocol_YAML_Definition_Guide.md` owns the machine-verifiable representation, Semantic Lint, validation, and Code Generation of the wire contract and governance decisions.
+- `Coordinator_Software_Engineering_Rules.md` and its topic Guides own Coordinator-specific realization within their declared scope.
+- `Node_Software_Engineering_Rules.md` owns Node-specific realization.
+- Language Coding Rules own language-level implementation rules.
+- Validation Guides and Checklists expose evidence, traceability, review, and conformance views; they do not independently create Product, Framework, Protocol, role, or coding requirements.
+- Approved Product requirements, risk controls, SDD, hardware specifications, Project Protocol, and configuration remain Product/Project authorities.
 
-Coordinator/Node Control Framework
-    Defines reusable architecture, roles, layering, timing, safety placement,
-    security boundaries, Firmware Update architecture, and governance.
-
-Framework Application Analysis Template
-    Defines the method for applying the Framework to a Product.
-
-Protocol YAML Definition Guide
-    Defines Protocol YAML rules and validation requirements.
-
-Protocol YAML Template
-    Provides a reusable Project Protocol starting structure.
-
-<Application>_protocol.yaml
-    Defines the approved Project-specific machine-verifiable wire contract.
-
-Coordinator Software Engineering Rules
-    Defines cross-language Coordinator software architecture and minimum engineering requirements.
-
-Coordinator Architecture Patterns
-    Owns detailed Coordinator layering, dependency direction, state ownership, command and receive pipelines, lifecycle realization, multi-Node isolation, and architecture-review patterns.
-
-Coordinator Concurrency Guide
-    Owns detailed execution-context ownership, asynchronous I/O, cancellation, timeout, bounded queues, backpressure, connection generations, overload, and shutdown behavior.
-
-Coordinator Logging Guide
-    Owns detailed structured diagnostic events, correlation, redaction, injection resistance, bounded delivery, retention, export, and logging-failure behavior.
-
-Coordinator Testing Guide
-    Owns detailed Coordinator engineering-test strategy, deterministic race and fault testing, fuzzing, simulator governance, and evidence classification.
-
-Coordinator UI Engineering Guide
-    Owns detailed Coordinator presentation-state realization, command feedback, stale-data behavior, responsiveness, visualization, untrusted-content handling, and engineering controls.
-
-Embedded C Coding Rules
-    Defines Product-owned Embedded C implementation requirements.
-
-C# Coding Rules
-    Defines Product-owned C# language and .NET implementation requirements.
-
-Application Profile / SRS / Hazard Analysis
-    Defines approved Product-specific behavior, limits, hazards, and rationale.
-
-Source Code, builds, logs, measurements, and test reports
-    Provide as-built evidence; they do not silently override approved authority.
-```
-
-One normative rule should have one authority location. Authority is resolved by topic before any precedence list is applied. Repeated text in a non-owning document is a derived conformance summary and does not override the owning authority.
+A Draft for Review is proposed authority until explicitly adopted or promoted by an authorized human process.
 
 ## Engineering Principles
 
-- Coordinator and Node are platform-independent system roles.
-- Protocol and Transport remain decoupled.
-- The Node retains hard real-time control, fundamental safety protection, and local Fault Reaction.
-- UI and Application code do not assemble wire frames directly.
-- Telemetry is replaceable complete summarized state; Stream is ordered non-replaceable records or samples.
-- Application and Bootloader use separate Secure Sessions, Key Contexts, counters, and Anti-Replay state.
-- Public Discovery is minimal, ephemeral, rate-limited, non-authoritative, transcript-bound, and revalidated after authentication.
-- Handshake Profiles reject mismatch and downgrade without silent fallback; every Key Context has an explicit Counter/Rekey lifecycle.
-- Plaintext Message, security overhead, secured Record, reassembly, and Fragment size domains remain distinct.
-- Firmware Update Transaction identity remains separate from Secure Session identity.
-- Protocol-generated artifacts are deterministic, traceable, and not edited manually.
-- Every queue, Buffer, record, Fragmentation path, and reassembly path is bounded.
-- Syntax validation does not prove semantic correctness or structural-preservation completeness.
-- AI shall report only validation that was actually executed and shall not self-approve a Baseline or release.
+1. Separate Product authority from reusable framework guidance.
+2. Treat Coordinator and Node as relationship roles, not fixed hardware or language identities.
+3. Keep Protocol meaning independent from concrete Transport implementation where required.
+4. Preserve Node authoritative actual state and local safety ownership.
+5. Make identifiers, compatibility, security, optionality, error behavior, and lifecycle machine-verifiable.
+6. Bound time, memory, queues, buffers, retries, histories, shutdown, and failure behavior.
+7. Distinguish generated output, review, execution, target verification, and human approval.
+8. Require traceable evidence for claims; a successful tool proves only its implemented boundary.
+9. Prevent AI from inventing requirements, secrets, APIs, tests, evidence, or approval.
+10. Keep GitHub `main` and controlled release identities as the authoritative repository history.
 
 ## Intended Engineering Flow
 
 ```text
-AI Engineering Usage Guide
-        |
-        v
-Coordinator/Node Control Framework
-        |
-        v
+Product Requirements and Risk Controls
+        ↓
 Framework Application Analysis
-        |
-        v
-Application Profile / SRS / Hazard Analysis
-        |
-        v
-Project Protocol YAML
-        |
-        +--> Schema Validation
-        +--> Semantic Lint
-        +--> Compatibility Review
-        +--> Code Generation
-        +--> Documentation
-        +--> Golden Test Vectors
-        |
-        v
-Coordinator and Node implementations
-        |
-        v
-Target timing / resource / safety / security / recovery evidence
-        |
-        v
-Human-approved Project Baseline
+        ↓
+Coordinator / Node Responsibility Mapping
+        ↓
+Protocol YAML + Compatibility + Registry + Security Decisions
+        ↓
+Coordinator and Node Software Architecture
+        ↓
+Language-Specific Implementation Rules
+        ↓
+Generated and Handwritten Implementation
+        ↓
+Protocol / Framework / Coding / AI Artifact Validation
+        ↓
+Objective Evidence, Human Review, and Release Decision
 ```
+
+After the current authority set is adopted and validated, expansion should focus on executable tooling and proof: Protocol schema, semantic linter, compatibility checker, generators, Golden Test Vectors, reference Coordinator/Node implementations, and interoperability tests rather than adding overlapping core authorities.
 
 ## Repository Structure
 
@@ -233,10 +163,13 @@ Human-approved Project Baseline
 host-device-control-framework/
 ├── README.md
 ├── CHANGELOG.md
-├── NOTICE.md
-├── requirements-validation.txt
-├── authority-registry.yaml
 ├── LICENSE
+├── NOTICE.md
+├── authority-registry.yaml
+├── requirements-validation.txt
+├── .github/
+│   └── workflows/
+│       └── document-validation.yml
 ├── docs/
 │   ├── framework/
 │   │   ├── README.md
@@ -246,7 +179,10 @@ host-device-control-framework/
 │   ├── protocol/
 │   │   ├── README.md
 │   │   ├── Protocol_YAML_Definition_Guide.md
-│   │   └── Protocol_YAML_Template.md
+│   │   ├── Protocol_YAML_Template.md
+│   │   ├── Protocol_Compatibility_Rules.md
+│   │   ├── Protocol_Registry_Governance.md
+│   │   └── Protocol_Security_Profile.md
 │   ├── coordinator/
 │   │   ├── README.md
 │   │   ├── Coordinator_Software_Engineering_Rules.md
@@ -255,25 +191,32 @@ host-device-control-framework/
 │   │   ├── Coordinator_Logging_Guide.md
 │   │   ├── Coordinator_Testing_Guide.md
 │   │   └── Coordinator_UI_Engineering_Guide.md
+│   ├── node/
+│   │   ├── README.md
+│   │   └── Node_Software_Engineering_Rules.md
 │   ├── coding-rules/
 │   │   ├── README.md
 │   │   ├── Embedded_C_Coding_Rules.md
 │   │   └── CSharp_Coding_Rules.md
 │   └── validation/
 │       ├── README.md
-│       └── Repository_Validation_Checklist.md
+│       ├── Repository_Validation_Checklist.md
+│       ├── Validation_Evidence_Guide.md
+│       ├── Protocol_Validation_Checklist.md
+│       ├── Framework_Conformance_Checklist.md
+│       ├── Coding_Rules_Review_Checklist.md
+│       └── AI_Generated_Artifact_Validation_Guide.md
 ├── tools/
 │   └── validate_repository.py
-├── tests/
-│   └── test_validate_repository.py
-└── .github/
-    └── workflows/
-        └── document-validation.yml
+└── tests/
+    └── test_validate_repository.py
 ```
+
+Directory `README.md` files are non-normative indexes. All other maintained Markdown under `docs/` is governed through `authority-registry.yaml`.
 
 ## Repository Validation
 
-Install the pinned validation dependency, run the structural validator, and execute its regression tests:
+Run locally:
 
 ```bash
 python -m pip install --disable-pip-version-check --require-hashes -r requirements-validation.txt
@@ -281,24 +224,20 @@ python tools/validate_repository.py
 python -m unittest discover -s tests -v
 ```
 
-A passing result is structural evidence only. It does not approve Draft documents or prove Product suitability, security, regulatory compliance, or actual system behavior.
+The validator checks repository structure, registry equality, metadata/version/status, directory indexes, AI manifest, stable filenames, links, headings, fences, tables, NOTICE sections, routing, workflow controls, and regression-protected governance failures.
+
+A passing result does not prove semantic correctness, Product suitability, safety, security adequacy, regulatory compliance, physical behavior, or human approval.
 
 ## Current Status
 
-The repository contains personal engineering documents and baselines maintained by Ray Yang. They do not represent the official policies, specifications, designs, coding standards, or documentation of any employer, company, or organization.
+The repository now contains the intended core authority layers for Framework, Protocol governance, Coordinator, Node, language implementation, validation evidence, and AI-assisted artifact control. New Protocol, Node, and validation documents remain **Draft for Review** until explicitly adopted.
 
-Document-level review is ongoing. Practical validation through engineering tools, Mock and Reference Implementations, real Project application, target measurement, and recovery testing remains ongoing. Draft for Review documents do not constitute automatic Baseline approval.
+The next engineering phase is executable validation and reference implementation rather than uncontrolled document expansion.
 
 ## Authorship and AI Assistance
 
-The engineering concepts, architecture, rule selection, revisions, and final editorial decisions in Baseline and Final Baseline artifacts are reviewed and approved by Ray Yang. Draft for Review artifacts remain subject to human review and approval.
-
-Generative AI tools were used to assist with drafting, editing, organization, translation, consistency review, technical review, and artifact generation. AI-assisted content is not accepted solely because it is syntactically correct. Published content remains subject to human technical review and approval.
+Ray Yang maintains the engineering direction and editorial decisions. Generative AI tools may assist drafting, review, restructuring, consistency checking, implementation support, and artifact generation. See [`NOTICE.md`](NOTICE.md) for the full disclosure and no-company-representation statement.
 
 ## Copyright and Usage
 
-Copyright © 2026 Ray Yang. All rights reserved.
-
-Public visibility is provided for inspection, traceability, and review only. It does not grant permission to reproduce, modify, redistribute, publish, sublicense, sell, adopt, or incorporate the materials into another Project.
-
-See [`LICENSE`](LICENSE) for usage terms and [`NOTICE.md`](NOTICE.md) for repository, AI-assistance, and third-party notices.
+Copyright © 2026 Ray Yang. See [`LICENSE`](LICENSE) and [`NOTICE.md`](NOTICE.md). Third-party materials remain subject to their own terms.

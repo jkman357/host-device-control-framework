@@ -15,6 +15,6 @@ This directory contains approved and proposed cross-language software engineerin
 
 ## Authority Boundary
 
-Coordinator and Node are system roles, not fixed hardware or language identities. This directory does not own C#, Java, C++, or other language syntax and style rules; those belong in `../coding-rules/`.
+Coordinator and Node are system roles, not fixed hardware or language identities. This directory does not own Node-specific realization; that belongs in `../node/`. It also does not own C#, Java, C++, or other language syntax and style rules; those belong in `../coding-rules/`. Shared compatibility, Registry, and security governance belongs in `../protocol/`.
 
 `Coordinator_Software_Engineering_Rules.md` owns cross-topic Coordinator minimum rules. Each topic-specific Guide remains proposed until explicitly adopted for Project use and then owns only the detailed realization topic declared in its metadata and Authority Boundary. A Guide shall not weaken the Framework, Project requirements, Protocol authority, Coordinator Software Engineering Rules, or applicable language rules.

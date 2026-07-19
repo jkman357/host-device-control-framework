@@ -3,7 +3,7 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`  
 **Document ID:** AIEUG  
-**Document Version:** v1.0.18  
+**Document Version:** v1.0.20  
 **Status:** Draft for Review  
 **Document Type:** AI Usage and Authority Routing Guide  
 **Primary Narrative Language:** English  
@@ -11,7 +11,7 @@
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
 **Repository Role:** Proposed normative AI task-routing and repository-governance authority  
-**Supersedes Document Version:** v1.0.17  
+**Supersedes Document Version:** v1.0.19  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -119,6 +119,8 @@ materially rewritten by AI shall begin as `Draft for Review`.
 | v1.0.16 | 2026-07-19 | Draft for Review | Synchronized validation routing for exact Registry root fields, controlled GitHub-main source identity, acyclic prerequisite relationships, and the fixed ubuntu-24.04 CI runner; retained Draft for Review status pending human approval. |
 | v1.0.17 | 2026-07-19 | Draft for Review | Integrated five topic-specific Coordinator Guides into the Active Document Manifest, stable canonical paths, authority routing, and Coordinator implementation selection; updated Coordinator Software Engineering Rules routing to v1.0.5; retained all new Guides as proposed Draft authorities pending explicit Project adoption. |
 | v1.0.18 | 2026-07-19 | Draft for Review | Synchronized the machine-readable authority registry and human-readable authority views for the five Coordinator Guides; routed Logging, Testing, and UI Guide v1.0.1; clarified archive-import safety and the distinction between hash-based corruption detection and independently anchored authenticity or adversarial-tamper evidence. |
+| v1.0.19 | 2026-07-19 | Draft for Review | Integrated Protocol compatibility, Registry, and security governance; Node software engineering; validation evidence and conformance views; AI-generated artifact validation; and expanded NOTICE and repository-validation routing. Retained all new documents as Draft for Review pending explicit human adoption. |
+| v1.0.20 | 2026-07-19 | Draft for Review | Synchronized routing for Framework v1.0.14 and Framework Application Analysis Template v1.0.17 after integrating the new Protocol, Node, validation-evidence, conformance, and AI-artifact authorities; retained Draft for Review status pending human approval. |
 
 ## 0.2 Active Document Manifest
 
@@ -130,20 +132,29 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.18` | Draft for Review | AI authority routing and operating controls |
-| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.0.13` | Baseline | Reusable architecture and governance |
-| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.0.16` | Baseline | Application-analysis method and required records |
-| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.0.10` | Baseline | Protocol YAML semantics and validation rules |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.20` | Draft for Review | AI authority routing and operating controls |
+| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.0.14` | Baseline | Reusable architecture and governance |
+| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.0.17` | Baseline | Application-analysis method and required records |
+| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.0.11` | Baseline | Protocol YAML representation, semantic validation, and Code Generation rules |
 | Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.0.10` | Baseline | Reusable Project Protocol starting structure |
+| Protocol Compatibility Rules | `docs/protocol/Protocol_Compatibility_Rules.md` | `v1.0.0` | Draft for Review | Protocol compatibility, evolution, and mixed-version rules |
+| Protocol Registry Governance | `docs/protocol/Protocol_Registry_Governance.md` | `v1.0.0` | Draft for Review | Protocol identifier Registry and allocation lifecycle rules |
+| Protocol Security Profile | `docs/protocol/Protocol_Security_Profile.md` | `v1.0.0` | Draft for Review | Protocol security-profile and secure-session lifecycle rules |
 | Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.0.5` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
 | Coordinator Architecture Patterns | `docs/coordinator/Coordinator_Architecture_Patterns.md` | `v1.0.0` | Draft for Review | Detailed Coordinator architecture-pattern and structural-realization rules |
 | Coordinator Concurrency Guide | `docs/coordinator/Coordinator_Concurrency_Guide.md` | `v1.0.0` | Draft for Review | Detailed Coordinator concurrency, cancellation, backpressure, and shutdown rules |
 | Coordinator Logging Guide | `docs/coordinator/Coordinator_Logging_Guide.md` | `v1.0.1` | Draft for Review | Detailed Coordinator logging, redaction, delivery, retention, and export rules |
 | Coordinator Testing Guide | `docs/coordinator/Coordinator_Testing_Guide.md` | `v1.0.1` | Draft for Review | Detailed Coordinator engineering-test strategy and evidence-classification rules |
 | Coordinator UI Engineering Guide | `docs/coordinator/Coordinator_UI_Engineering_Guide.md` | `v1.0.1` | Draft for Review | Detailed Coordinator UI implementation and presentation-state realization rules |
+| Node Software Engineering Rules | `docs/node/Node_Software_Engineering_Rules.md` | `v1.0.0` | Draft for Review | Cross-language Node architecture and engineering rules |
 | Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.17` | Final Baseline | Product-owned Embedded C implementation rules |
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.5` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.6` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
+| Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.0.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
+| Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.0.0` | Draft for Review | Protocol validation and evidence-capture checklist |
+| Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.0.0` | Draft for Review | Framework conformance and evidence-capture checklist |
+| Coding Rules Review Checklist | `docs/validation/Coding_Rules_Review_Checklist.md` | `v1.0.0` | Draft for Review | Language Coding Rules review and evidence-capture checklist |
+| AI-Generated Artifact Validation Guide | `docs/validation/AI_Generated_Artifact_Validation_Guide.md` | `v1.0.0` | Draft for Review | AI-generated artifact validation and human-approval controls |
 
 Version-routing rules:
 
@@ -167,15 +178,24 @@ docs/framework/Coordinator_Node_Control_Framework.md
 docs/framework/Framework_Application_Analysis_Template.md
 docs/protocol/Protocol_YAML_Definition_Guide.md
 docs/protocol/Protocol_YAML_Template.md
+docs/protocol/Protocol_Compatibility_Rules.md
+docs/protocol/Protocol_Registry_Governance.md
+docs/protocol/Protocol_Security_Profile.md
 docs/coordinator/Coordinator_Software_Engineering_Rules.md
 docs/coordinator/Coordinator_Architecture_Patterns.md
 docs/coordinator/Coordinator_Concurrency_Guide.md
 docs/coordinator/Coordinator_Logging_Guide.md
 docs/coordinator/Coordinator_Testing_Guide.md
 docs/coordinator/Coordinator_UI_Engineering_Guide.md
+docs/node/Node_Software_Engineering_Rules.md
 docs/coding-rules/Embedded_C_Coding_Rules.md
 docs/coding-rules/CSharp_Coding_Rules.md
 docs/validation/Repository_Validation_Checklist.md
+docs/validation/Validation_Evidence_Guide.md
+docs/validation/Protocol_Validation_Checklist.md
+docs/validation/Framework_Conformance_Checklist.md
+docs/validation/Coding_Rules_Review_Checklist.md
+docs/validation/AI_Generated_Artifact_Validation_Guide.md
 ```
 
 The canonical repository path identifies the maintained authority document. The `Document Version` metadata identifies
@@ -404,11 +424,13 @@ For defining or modifying the Project wire contract:
 ```text
 Read:
 1. Coordinator_Node_Control_Framework.md
-2. Protocol_YAML_Definition_Guide.md
-3. Protocol_YAML_Template.md
-4. Framework_Application_Analysis_Template.md or completed Project Analysis
-5. Product requirements and Application Profile
-6. Existing <Application>_protocol.yaml when modifying an existing Protocol
+2. Protocol_YAML_Definition_Guide.md and Protocol_YAML_Template.md
+3. Protocol_Compatibility_Rules.md when versioning, change, negotiation, or deprecation is in scope
+4. Protocol_Registry_Governance.md when identifiers, namespaces, allocation, or lifecycle is in scope
+5. Protocol_Security_Profile.md when security applicability, Session, Counter, Rekey, credential, or update security is in scope
+6. Framework_Application_Analysis_Template.md or completed Project Analysis
+7. Product requirements and Application Profile
+8. Existing <Application>_protocol.yaml when modifying an existing Protocol
 ```
 
 Required output:
@@ -434,8 +456,9 @@ Read:
 2. Embedded_C_Coding_Rules.md
 3. Coordinator_Node_Control_Framework.md when a Coordinator/Node boundary or reusable Framework rule is in scope
 4. Coordinator_Software_Engineering_Rules.md when the Embedded C code performs or supports a Coordinator role
-5. Project <Application>_protocol.yaml when communication is in scope
-6. The applicable Coordinator SDD, Node SDD, Tool Design, State Machines, Hardware specification, and platform constraints
+5. Node_Software_Engineering_Rules.md when the Embedded C code performs or supports a Node role
+6. Project <Application>_protocol.yaml and applicable Protocol governance when communication is in scope
+7. The applicable Coordinator SDD, Node SDD, Tool Design, State Machines, Hardware specification, and platform constraints
 ```
 
 Required output:
@@ -461,8 +484,9 @@ Read:
 2. Embedded_C_Coding_Rules.md
 3. Coordinator_Node_Control_Framework.md when a Coordinator/Node boundary or reusable Framework rule is in scope
 4. Coordinator_Software_Engineering_Rules.md when the code performs or supports a Coordinator role
-5. Project Protocol YAML when communication is in scope
-6. The applicable SDD, Tool Design, State Machine, hardware specification, and platform constraints
+5. Node_Software_Engineering_Rules.md when the code performs or supports a Node role
+6. Project Protocol YAML when communication is in scope
+7. The applicable SDD, Tool Design, State Machine, hardware specification, and platform constraints
 ```
 
 Required output:
@@ -486,11 +510,14 @@ For reviewing an existing Protocol YAML:
 
 ```text
 Read:
-1. Protocol_YAML_Definition_Guide.md
-2. Protocol_YAML_Template.md
-3. Coordinator_Node_Control_Framework.md
-4. Completed Application Analysis
-5. Existing Project Protocol YAML
+1. Protocol_YAML_Definition_Guide.md and Protocol_YAML_Template.md
+2. Protocol_Compatibility_Rules.md
+3. Protocol_Registry_Governance.md
+4. Protocol_Security_Profile.md
+5. Coordinator_Node_Control_Framework.md
+6. Completed Application Analysis and Product requirements
+7. Existing Project Protocol YAML
+8. Protocol_Validation_Checklist.md and Validation_Evidence_Guide.md
 ```
 
 Review at least:
@@ -547,9 +574,10 @@ For creating tests:
 Read:
 1. Product requirements and acceptance criteria
 2. Coordinator_Node_Control_Framework.md
-3. Project Protocol YAML
-4. Relevant Coding Rules and SDDs
+3. Project Protocol YAML and applicable Protocol governance documents
+4. Relevant Coordinator or Node Rules, Coding Rules, and SDDs
 5. Completed Application Analysis
+6. Validation_Evidence_Guide.md and the applicable validation checklist
 ```
 
 Required coverage may include:
@@ -580,12 +608,14 @@ Read:
 1. This Guide
 2. Coordinator_Node_Control_Framework.md when a Coordinator/Node role or Protocol boundary is in scope
 3. Coordinator_Software_Engineering_Rules.md when the implementation performs or supports a Coordinator role
-4. Applicable language Coding Rules
-5. CSharp_Coding_Rules.md when Product-owned C# is in scope
-6. Approved Project Protocol YAML when communication is in scope
-7. Approved Coordinator SDD, Tool Design Specification, or other applicable software design
-8. Completed Application Analysis and Product requirements
-9. Applicable platform, security, UI, and test standards
+4. Node_Software_Engineering_Rules.md when the implementation performs or supports a Node role
+5. Applicable language Coding Rules
+6. CSharp_Coding_Rules.md when Product-owned C# is in scope
+7. Approved Project Protocol YAML and applicable Protocol governance documents when communication is in scope
+8. Approved Coordinator SDD, Node SDD, Tool Design Specification, or other applicable software design
+9. Completed Application Analysis and Product requirements
+10. Applicable platform, security, UI, and test standards
+11. Validation_Evidence_Guide.md and the applicable conformance or review checklist when a completion or release claim is in scope
 ```
 
 Required output:
@@ -606,7 +636,38 @@ Node, Tool, Service, and mixed-role software shall likewise use the authorities 
 Neither role nor language authority replaces the other. The Embedded C Coding Rules shall not be applied mechanically
 to another language, and non-C software shall not be presumed to perform a Coordinator role.
 
-## 3.10 Engineering Tooling Task
+## 3.10 Node Implementation Task
+
+For Node architecture, implementation, or review:
+
+```text
+Read:
+1. This Guide
+2. Coordinator_Node_Control_Framework.md
+3. Node_Software_Engineering_Rules.md
+4. Applicable Protocol governance and Project Protocol YAML
+5. Applicable language Coding Rules
+6. Product requirements, Node SDD, hardware specifications, risk controls, and platform constraints
+7. Validation_Evidence_Guide.md and applicable validation checklists
+```
+
+Required output shall preserve Node authoritative state, local safety, execution-context ownership, bounded resources, command validation, startup/recovery, Bootloader handoff, target evidence, and unresolved hardware assumptions.
+
+## 3.11 AI-Generated Artifact Validation Task
+
+For validating AI-assisted code, documents, Protocols, tests, analyses, reports, or evidence:
+
+```text
+Read:
+1. AI_Generated_Artifact_Validation_Guide.md
+2. Validation_Evidence_Guide.md
+3. The governing Product, Framework, Protocol, role, language, security, and external source authorities
+4. The actual prompt/input record, generated output, tool execution output, human edits, and approval record
+```
+
+Do not accept self-approval, fabricated execution, unavailable-source claims, unverified APIs, stale source assumptions, or compliance declarations without executed evidence and authorized human approval.
+
+## 3.12 Engineering Tooling Task
 
 For Schema, Semantic Lint, Code Generator, packet decoder, compatibility checker, Mock Coordinator, Mock Node,
 Simulator, or CI quality-gate work:
@@ -615,13 +676,15 @@ Simulator, or CI quality-gate work:
 Read:
 1. This Guide
 2. Coordinator_Node_Control_Framework.md
-3. Protocol_YAML_Definition_Guide.md
-4. Protocol_YAML_Template.md
+3. Protocol_YAML_Definition_Guide.md and Protocol_YAML_Template.md
+4. Protocol_Compatibility_Rules.md, Protocol_Registry_Governance.md, and Protocol_Security_Profile.md as applicable
 5. Coordinator_Software_Engineering_Rules.md when the tool implements, simulates, or validates Coordinator behavior
-6. Embedded_C_Coding_Rules.md when generating or validating C artifacts
-7. CSharp_Coding_Rules.md when generating or validating C# artifacts
-8. Approved Project Protocol YAML and Test Vectors
-9. Repository_Validation_Checklist.md when repository structure, manifests, links, or release packaging are in scope
+6. Node_Software_Engineering_Rules.md when the tool implements, simulates, or validates Node behavior
+7. Embedded_C_Coding_Rules.md when generating or validating C artifacts
+8. CSharp_Coding_Rules.md when generating or validating C# artifacts
+9. Approved Project Protocol YAML and Golden Test Vectors
+10. Validation_Evidence_Guide.md and the applicable validation checklist
+11. Repository_Validation_Checklist.md when repository structure, manifests, links, or release packaging are in scope
 ```
 
 Required output:

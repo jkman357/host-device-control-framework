@@ -1,26 +1,29 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`  
-**Document Version:** v1.0.5  
+**Document Version:** v1.0.6  
 **Status:** Draft for Review  
-**Supersedes Document Version:** v1.0.4  
+**Supersedes Document Version:** v1.0.5  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
 **Repository Role:** Proposed operational validation method; not a Product or architecture authority  
+
+Copyright © 2026 Ray Yang. All rights reserved unless a repository-level license states otherwise.
 
 ---
 
 ## Version History
 
 | Version | Date | Status | Summary |
-| --- | --- | --- | --- |
-| v1.0.0 | 2026-07-18 | Draft for Review | Established automated and human repository checks for canonical paths, document manifests, version and status consistency, links, Markdown structure, evidence claims, role routing, Draft authority handling, and detached-package traceability. |
-| v1.0.1 | 2026-07-18 | Draft for Review | Completed repository-validation enforcement by requiring the GitHub Actions workflow, exact authority-manifest set equality, marker-aware fenced-Code parsing, inline/image/reference-link and Markdown-anchor validation, Version History table-scoped checks, explicit Python runtime requirements, and Authority Boundary coverage for Coordinator and C# rule documents. |
-| v1.0.2 | 2026-07-18 | Draft for Review | Updated GitHub Actions to checkout v7 and setup-python v6; added Python 3.10 and 3.12 CI matrix validation; required complete metadata for every non-README Markdown document under docs; added semantic-version, current-version, ordering, and declared Supersedes-chain checks; and added automated validator regression tests. |
-| v1.0.3 | 2026-07-19 | Draft for Review | Closed validator parsing and governance bypasses by excluding fenced examples from metadata, Version History, and manifest parsing; requiring unique opening-region metadata and mandatory Supersedes chains; parsing Workflow YAML structurally; pinning Actions by immutable SHA; governing directory indexes and Markdown extensions; validating HTML and balanced-parenthesis links plus Setext anchors; and expanding persistent regression tests. |
-| v1.0.4 | 2026-07-19 | Draft for Review | Hardened Status and Repository Role governance, opening metadata placement, HTML code-example exclusion, exact Workflow step execution, critical-heading uniqueness, machine-readable authority-registry consistency, complete Version History row/date/status validation, true HTML-anchor parsing, dependency hash pinning, and persistent regression coverage. |
+|---|---|---|---|
+| v1.0.6 | 2026-07-19 | Draft for Review | Added the common checklist non-authority principle and coverage for Protocol, Node, validation, NOTICE, folder-index, routing, synchronization, and governance-regression checks. |
 | v1.0.5 | 2026-07-19 | Draft for Review | Required the exact authority-registry root schema and controlled GitHub-main source identity, rejected prerequisite dependency cycles, fixed the CI runner to ubuntu-24.04, and added persistent regression tests for all three controls. |
+| v1.0.4 | 2026-07-19 | Draft for Review | Hardened Status and Repository Role governance, opening metadata placement, HTML code-example exclusion, exact Workflow step execution, critical-heading uniqueness, machine-readable authority-registry consistency, complete Version History row/date/status validation, true HTML-anchor parsing, dependency hash pinning, and persistent regression coverage. |
+| v1.0.3 | 2026-07-19 | Draft for Review | Closed validator parsing and governance bypasses by excluding fenced examples from metadata, Version History, and manifest parsing; requiring unique opening-region metadata and mandatory Supersedes chains; parsing Workflow YAML structurally; pinning Actions by immutable SHA; governing directory indexes and Markdown extensions; validating HTML and balanced-parenthesis links plus Setext anchors; and expanding persistent regression tests. |
+| v1.0.2 | 2026-07-18 | Draft for Review | Updated GitHub Actions to checkout v7 and setup-python v6; added Python 3.10 and 3.12 CI matrix validation; required complete metadata for every non-README Markdown document under docs; added semantic-version, current-version, ordering, and declared Supersedes-chain checks; and added automated validator regression tests. |
+| v1.0.1 | 2026-07-18 | Draft for Review | Completed repository-validation enforcement by requiring the GitHub Actions workflow, exact authority-manifest set equality, marker-aware fenced-Code parsing, inline/image/reference-link and Markdown-anchor validation, Version History table-scoped checks, explicit Python runtime requirements, and Authority Boundary coverage for Coordinator and C# rule documents. |
+| v1.0.0 | 2026-07-18 | Draft for Review | Established automated and human repository checks for canonical paths, document manifests, version and status consistency, links, Markdown structure, evidence claims, role routing, Draft authority handling, and detached-package traceability. |
 
 ---
 
@@ -69,9 +72,9 @@ The automated validator shall check at least:
 - Defined and non-duplicated reference-link identifiers.
 - Unique canonical filenames.
 - Complete canonical filename, document version, Status, and Repository Role metadata for every governed Markdown document under `docs/`; fenced and HTML code examples shall not satisfy metadata requirements.
-- Status uses the controlled enum `Draft for Review`, `Baseline`, `Final Baseline`, `Deprecated`, or `Retired`; Repository Role is mandatory and compatible with Status.
+- Status uses the controlled enum `Draft for Review`, `Baseline`, or `Final Baseline`; Repository Role is mandatory and compatible with Status.
 - Each metadata key appears exactly once in the opening metadata region before the first level-2 heading in the document and line 80.
-- Only the five approved directory-index `README.md` files are exempt from authority metadata, and each declares `Repository Role: Non-normative directory index`.
+- Only the six approved directory-index `README.md` files are exempt from authority metadata, and each declares `Repository Role: Non-normative directory index`.
 - Governed Markdown filenames use the lowercase `.md` extension; `.MD` and `.markdown` variants are rejected.
 - Document versions use `vMAJOR.MINOR.PATCH`, Version History versions are unique and monotonic, and the metadata version is the highest listed version.
 - Version History has `Version`, `Date`, `Status`, and `Summary` or `Description` columns; every row has the header cell count and a non-empty summary.
@@ -85,6 +88,11 @@ The automated validator shall check at least:
 - Registry root fields are exactly `registry_version`, `repository`, `source_of_truth`, `policy`, and `documents`; `source_of_truth` is exactly `GitHub main`.
 - Registry applicability, authority-topic, prerequisite, README-purpose, and AI-routing-role fields are non-empty and internally valid.
 - Registry prerequisite relationships reference known documents and form an acyclic directed graph.
+- Exact authority-topic strings are uniquely owned, preventing duplicate declared topic assignment.
+- Every governed document is listed by its same-directory `README.md`; Protocol governance files remain under `docs/protocol/`; and Node Rules are routed by both the root README and AI Guide.
+- Validation Checklists contain the common non-authority statement and validation Repository Roles explicitly deny independent requirement authority.
+- `NOTICE.md` contains the six required sections and mandatory personal-project, no-company-representation, AI-assistance, third-party, and LICENSE-precedence language.
+- `CHANGELOG.md` records each newly introduced governed document and synchronization of Registry, Manifest, NOTICE, and Validator behavior.
 - Manifest path, version, status, Purpose, display-name, and Routing Role consistency with the authority registry.
 - Draft documents use `Proposed` Repository Role wording; Baseline and Final Baseline documents use non-proposed normative wording.
 - Required canonical authority paths exist.
@@ -94,6 +102,8 @@ The automated validator shall check at least:
 - Validator regression tests retain expected pass/fail behavior for fenced metadata and history examples, missing or duplicate metadata, missing Supersedes declarations, invalid Workflow YAML or structure, unapproved directory indexes, non-lowercase Markdown extensions, balanced-parenthesis and HTML links, Setext anchors, version-chain failures, exact Registry root fields, controlled source identity, prerequisite cycles, fixed CI runner, and incomplete Python matrices.
 
 A passing automated result proves only the checks implemented by the validator. It does not prove semantic correctness, Product suitability, or human approval.
+
+> Checklists do not independently create requirements. They provide review, traceability, and evidence-capture views of requirements established by governing authority documents.
 
 # 4. Human Semantic Checks
 

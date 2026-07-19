@@ -8,6 +8,14 @@ Individual authority documents retain their own internal Version History and app
 
 ### Added
 
+- Added `docs/protocol/Protocol_Compatibility_Rules.md` for Protocol version consequences, change classification, mixed-version operation, deprecation, removal, and compatibility evidence.
+- Added `docs/protocol/Protocol_Registry_Governance.md` for Message and Capability ID allocation, namespaces, lifecycle, retirement, non-reuse, merge control, and generated Registry artifacts.
+- Added `docs/protocol/Protocol_Security_Profile.md` for secure-session applicability, authentication, authorization, record protection, replay, Counter, Rekey, reconnect, credential, Bootloader, and Firmware Update security governance.
+- Added `docs/node/README.md` and `docs/node/Node_Software_Engineering_Rules.md` for Node-specific architecture realization, execution contexts, state and command ownership, local safety, bounded resources, diagnostics, Bootloader handoff, and target evidence.
+- Added `docs/validation/Validation_Evidence_Guide.md`, `Protocol_Validation_Checklist.md`, `Framework_Conformance_Checklist.md`, `Coding_Rules_Review_Checklist.md`, and `AI_Generated_Artifact_Validation_Guide.md`.
+- Added explicit validation regression coverage for unregistered authorities, missing Registry files, table and folder-index divergence, metadata mismatch, illegal filenames, broken references, checklist authority leakage, Protocol-domain placement, Node routing, NOTICE sections, and CHANGELOG synchronization.
+
+
 - Added five proposed topic-specific Coordinator authorities: architecture patterns, concurrency, logging, testing, and UI engineering Guides.
 - Added `authority-registry.yaml` as the machine-readable source for authority identity, role, applicability, topics, prerequisites, README purpose, and AI routing-role metadata.
 - Added SHA-256 hashes for the PyYAML source distribution and the Python 3.10/3.12 Linux x86-64 CI wheels.
@@ -23,6 +31,13 @@ Individual authority documents retain their own internal Version History and app
 - Added `requirements-validation.txt` with the pinned PyYAML validation dependency.
 
 ### Changed
+
+- Updated AI Engineering Usage Guide to v1.0.20, Coordinator/Node Control Framework to v1.0.14, Framework Application Analysis Template to v1.0.17, Protocol YAML Definition Guide to v1.0.11, and Repository Validation Checklist to v1.0.6.
+- Split Protocol topic ownership so dedicated compatibility, Registry, and security documents own governance decisions while the Protocol YAML Definition Guide retains machine-verifiable representation, Semantic Lint, validation, and Code Generation ownership.
+- Expanded `authority-registry.yaml` and synchronized the root Current Document Set, AI Active Document Manifest, stable canonical path list, directory indexes, authority routing, Repository Structure, and validation guidance for 23 governed documents.
+- Reworked `NOTICE.md` with Copyright Notice, Personal Engineering Project Disclaimer, No Employer or Company Representation, AI Assistance Disclosure, Third-Party Standards and Trademark Notice, and File-Specific Notice Precedence.
+- Defined the validation documents as evidence and conformance views that do not independently create Product, Framework, Protocol, role, or Coding Rules requirements.
+
 
 - Updated AI Engineering Usage Guide to v1.0.18; retained Coordinator Software Engineering Rules v1.0.5; and updated Coordinator Logging, Testing, and UI Engineering Guides to v1.0.1.
 - Synchronized `authority-registry.yaml`, the root Current Document Set, the AI Active Document Manifest, the Coordinator directory index, the root Authority Boundary, and the root Repository Structure for all five Coordinator Guides.
@@ -77,6 +92,12 @@ Individual authority documents retain their own internal Version History and app
 - Updated `Repository_Validation_Checklist.md` to v1.0.3.
 
 ### Fixed
+
+- Prevented Protocol governance documents from being misrouted as Coordinator-owned authority.
+- Closed the missing Node-specific engineering-authority layer between the reusable Framework and language Coding Rules.
+- Closed validation-evidence and AI-generated-artifact approval gaps, including fabricated evidence, self-approval, stale-source, unavailable-source, and unverified-API claims.
+- Required directory indexes, authority registry, root document table, AI manifest, NOTICE, routing, and CHANGELOG claims to remain structurally synchronized.
+
 
 - Rejected missing or unexpected authority-registry root fields and uncontrolled `source_of_truth` values.
 - Added directed-graph cycle detection for authority prerequisite relationships.

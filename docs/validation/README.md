@@ -2,17 +2,34 @@
 
 **Repository Role:** Non-normative directory index
 
-This directory contains validation methods, evidence guidance, conformance checklists, structural review reports,
-compatibility reports, and controlled validation records that apply across the repository.
+This directory contains evidence guidance, review checklists, conformance views, and AI-artifact validation methods that apply across the repository.
 
-## Current Documents
+## Documents
 
-- [`Repository_Validation_Checklist.md`](Repository_Validation_Checklist.md) — repository structural, manifest,
-  canonical-reference, version, evidence-state, and package-traceability checks.
+- [`Repository_Validation_Checklist.md`](Repository_Validation_Checklist.md) — **Draft for Review / operational checklist** for repository structure, authority manifests, references, metadata, CI, and package integrity.
+- [`Validation_Evidence_Guide.md`](Validation_Evidence_Guide.md) — **Draft for Review / operational evidence method** for evidence identity, traceability, reproducibility, ownership, review, anomalies, retention, and AI limitations.
+- [`Protocol_Validation_Checklist.md`](Protocol_Validation_Checklist.md) — **Draft for Review / conformance checklist** for Protocol definition, compatibility, Registry, security, malformed input, and interoperability evidence.
+- [`Framework_Conformance_Checklist.md`](Framework_Conformance_Checklist.md) — **Draft for Review / conformance checklist** for Framework role boundaries, layering, lifecycle, reconnect, safety, Bootloader, deviation, and evidence.
+- [`Coding_Rules_Review_Checklist.md`](Coding_Rules_Review_Checklist.md) — **Draft for Review / common review entry point** for applicable language Coding Rules and their evidence.
+- [`AI_Generated_Artifact_Validation_Guide.md`](AI_Generated_Artifact_Validation_Guide.md) — **Draft for Review / operational validation method** for AI-assisted code, documents, tests, analyses, and generated evidence.
+
+## Required Reading Order
+
+1. Identify the governing Product, Framework, Protocol, role, language, and Project authorities.
+2. Use [`Validation_Evidence_Guide.md`](Validation_Evidence_Guide.md) to define acceptable evidence and evidence state.
+3. Select the applicable checklist or AI-artifact Guide.
+4. Record findings, evidence references, anomalies, deviations, reviewer, and approval state.
+5. Return any requirement question to the owning authority rather than rewriting it in a checklist.
+
+## Common Checklist Principle
+
+> Checklists do not independently create requirements. They provide review, traceability, and evidence-capture views of requirements established by governing authority documents.
+
+A checklist item marked `N/A` shall include a rationale when applicability is not obvious. A blank item is not evidence of conformance.
 
 ## Tooling
 
-The repository-level automated checks are implemented by:
+Repository structural validation is implemented by:
 
 ```text
 requirements-validation.txt
@@ -24,27 +41,15 @@ tests/test_validate_repository.py
 Install the pinned dependency before local execution:
 
 ```bash
-python -m pip install --disable-pip-version-check -r requirements-validation.txt
+python -m pip install --disable-pip-version-check --require-hashes -r requirements-validation.txt
+python tools/validate_repository.py
+python -m unittest discover -s tests -v
 ```
 
-The script checks deterministic structural properties. It does not prove semantic correctness, Product suitability,
-regulatory compliance, security adequacy, or human approval.
-
-## Planned Content
-
-Future documents may include:
-
-- Framework conformance checklists.
-- Protocol structural and semantic validation guidance.
-- Coding-rule review checklists.
-- AI-generated artifact validation guidance.
-- Cross-implementation compatibility reports.
-- Golden-vector and recovery-test evidence guidance.
+A passing automated result proves only the checks implemented by the validator. It does not prove semantic correctness, Product suitability, security adequacy, regulatory compliance, physical behavior, or human approval.
 
 ## Authority Boundary
 
-Validation artifacts report methods, execution state, findings, and evidence. They do not silently redefine Product
-requirements, Framework rules, Protocol contracts, coding rules, or approval status.
+Validation artifacts expose methods, evidence states, findings, and conformance views. They do not silently redefine Product requirements, Framework rules, Protocol contracts, role-specific engineering rules, Coding Rules, risk controls, or approval status.
 
-A document shall not claim that a test, build, analysis, measurement, or review passed unless that activity was
-actually executed and its evidence is available. A passing repository-validation script is structural evidence only.
+A document shall not claim that a build, test, analysis, measurement, inspection, or review passed unless that activity was actually executed and its evidence is available.

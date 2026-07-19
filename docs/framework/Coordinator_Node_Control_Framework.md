@@ -3,9 +3,9 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.0.13  
+**Document Version:** v1.0.14  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.12  
+**Supersedes Document Version:** v1.0.13  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -14,12 +14,19 @@
 **Repository Role:** Normative architecture and framework-governance authority  
 **Related Documents:**
 - `Coordinator_Software_Engineering_Rules.md`
+- `Node_Software_Engineering_Rules.md`
+- `Protocol_Compatibility_Rules.md`
+- `Protocol_Registry_Governance.md`
+- `Protocol_Security_Profile.md`
 - `Embedded_C_Coding_Rules.md`
 - `CSharp_Coding_Rules.md`
 - `Protocol_YAML_Definition_Guide.md`
 - `Protocol_YAML_Template.md`
 - `Framework_Application_Analysis_Template.md`
 - `Repository_Validation_Checklist.md`
+- `Validation_Evidence_Guide.md`
+- `Framework_Conformance_Checklist.md`
+- `AI_Generated_Artifact_Validation_Guide.md`
 
 **First Issued:** 2026-07-15  
 **Last Revised:** 2026-07-19  
@@ -272,6 +279,7 @@ Markdown filename.
 | v1.0.11 | 2026-07-18 | Not recorded | Clarified that programming languages do not determine Coordinator, Node, Tool, or Service roles; made the Draft Coordinator and C# rules applicable only after explicit Project adoption or approval; marked their Authority Matrix entries as proposed while Draft; and added repository validation and detached-package traceability expectations without changing Protocol wire semantics. |
 | v1.0.12 | 2026-07-19 | Not recorded | Added explicit Supersedes metadata required by repository governance; no normative Framework architecture requirements changed. |
 | v1.0.13 | 2026-07-19 | Baseline | Added explicit Repository Role metadata and migrated Version History to the governed Date/Status schema; no normative Framework architecture requirements changed. |
+| v1.0.14 | 2026-07-19 | Baseline | Integrated the dedicated Protocol compatibility, Registry, and security governance authorities; Node-specific software engineering authority; and validation evidence/conformance views into Related Documents and the Authority Matrix. All new documents remain conditional Draft authorities; no reusable architecture or wire-contract semantics changed. |
 
 ## 0.6 Core Conclusions
 
@@ -2915,8 +2923,12 @@ This Baseline establishes the following decisions:
 | Timing, bandwidth, and safety placement | This Framework plus Product Requirements and Hazard Analysis |
 | Message IDs, Payloads, Wire Format, and security fields | Project Protocol YAML |
 | Protocol YAML authoring and validation rules | `Protocol_YAML_Definition_Guide.md` |
+| Protocol compatibility, version consequences, mixed-version operation, deprecation, and removal | `Protocol_Compatibility_Rules.md` when approved or explicitly adopted for Project use; proposed authority while Draft for Review |
+| Protocol identifier Registry, namespace, allocation, retirement, and non-reuse | `Protocol_Registry_Governance.md` when approved or explicitly adopted for Project use; proposed authority while Draft for Review |
+| Protocol security-profile and secure-session lifecycle governance | `Protocol_Security_Profile.md` when approved or explicitly adopted for Project use; proposed authority while Draft for Review |
 | Reusable YAML skeleton | `Protocol_YAML_Template.md` |
 | Cross-language Coordinator software architecture and engineering rules | `Coordinator_Software_Engineering_Rules.md` when approved or explicitly adopted for Project use; proposed authority while Draft for Review |
+| Cross-language Node software architecture and engineering rules | `Node_Software_Engineering_Rules.md` when approved or explicitly adopted for Project use; proposed authority while Draft for Review |
 | Embedded C implementation rules | `Embedded_C_Coding_Rules.md` |
 | C# language and .NET implementation rules | `CSharp_Coding_Rules.md` when approved or explicitly adopted for Project use; proposed authority while Draft for Review |
 | Product command semantics | Application Profile and SRS |
@@ -2926,6 +2938,9 @@ This Baseline establishes the following decisions:
 | Hazard and safe state | Hazard Analysis and System Requirements |
 | Test procedure and result | Test Specification and Test Report |
 | Repository structural and package-integrity validation | `Repository_Validation_Checklist.md`, executed validator output, and retained package hashes |
+| Validation evidence identity, execution state, traceability, and adequacy | `Validation_Evidence_Guide.md` when approved or explicitly adopted for Project use; proposed operational method while Draft for Review |
+| Framework conformance review and evidence capture | `Framework_Conformance_Checklist.md`; the Checklist does not independently create requirements |
+| AI-generated artifact validation and human approval controls | `AI_Generated_Artifact_Validation_Guide.md`; the Guide does not replace owning engineering authorities |
 
 ---
 
