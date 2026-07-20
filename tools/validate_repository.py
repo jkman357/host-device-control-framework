@@ -73,6 +73,7 @@ REQUIRED_FILES = {
     "examples/framework-conformance-claim.yaml",
     "tools/validate_repository.py",
     "tools/validate_protocol.py",
+    "tools/verify_external_anchor.py",
     "tests/test_validate_repository.py",
     "tests/test_validate_protocol.py",
     "tests/test_security_regressions.py",
@@ -149,11 +150,11 @@ REQUIRED_CONFORMANCE_MARKERS = {
 }
 REQUIRED_CONFORMANCE_CHECK_IDS = {
     "F-006", "F-007", "F-008", "F-009", "F-00A", "F-00B", "F-00C", "F-00D",
-    "F-00E", "F-00F", "F-00G", "F-00H", "F-00I",
+    "F-00E", "F-00F", "F-00G", "F-00H", "F-00I", "F-00J",
 }
 LEGAL_BASELINE_ROOT_KEYS = {
     "baseline_version",
-    "repository",
+    "repository_identity",
     "purpose",
     "local_validator_scope",
     "external_authorization_required",
@@ -161,14 +162,29 @@ LEGAL_BASELINE_ROOT_KEYS = {
     "external_anchor",
 }
 LEGAL_PROTECTED_DOCUMENTS = {"LICENSE", "NOTICE.md", "CONTRIBUTING.md"}
+LEGAL_REPOSITORY_IDENTITY = {
+    "host": "github.com",
+    "owner": "jkman357",
+    "name": "host-device-control-framework",
+    "canonical_url": "https://github.com/jkman357/host-device-control-framework",
+}
 LEGAL_EXTERNAL_ANCHOR_KEYS = {
     "required",
+    "activation_state",
+    "repository_content_claims_activation",
     "accepted_modes",
     "signed_tag_name",
+    "tag_target_rule",
     "verification",
+    "verifier_path",
+    "verifier_mode",
     "repository_validator_verification",
     "codeowners_path",
     "protection_requirements_path",
+}
+CANONICAL_CLAIM_EXAMPLE_SOURCE = {
+    "commit_sha": "e516fa1d58bd99014b965f37215db85ae594704b",
+    "document_version": "v1.1.4",
 }
 REQUIRED_CODEOWNER_PATHS = {
     "/LICENSE",
@@ -179,6 +195,7 @@ REQUIRED_CODEOWNER_PATHS = {
     "/.github/CODEOWNERS",
     "/.github/REPOSITORY_PROTECTION.md",
     "/tools/validate_repository.py",
+    "/tools/verify_external_anchor.py",
     "/tests/test_validate_repository.py",
     "/docs/framework/Coordinator_Node_Control_Framework.md",
     "/docs/framework/Framework_Application_Analysis_Template.md",
@@ -193,6 +210,10 @@ REQUIRED_PROTECTION_MARKERS = {
     "signed-tag mode",
     "protected-merge mode",
     "signed-tag mode is the minimum practical external anchor",
+    "external-evidence-required",
+    "never self-asserts that the anchor is active",
+    "repository release freeze",
+    "a zip, branch name, working tree, or mutable `main` state is not freeze evidence",
     "updating a digest in the same commit is not, by itself, approval",
 }
 THIRD_PARTY_MANIFEST_ROOT_KEYS = {
@@ -979,8 +1000,8 @@ def check_legal_baseline_and_protection(root: Path, findings: list[Finding]) -> 
     version = baseline.get("baseline_version")
     if not isinstance(version, int) or isinstance(version, bool) or version < 1:
         findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "baseline_version must be a positive integer"))
-    if baseline.get("repository") != "host-device-control-framework":
-        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "repository identity is invalid"))
+    if baseline.get("repository_identity") != LEGAL_REPOSITORY_IDENTITY:
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "canonical repository identity is invalid"))
     if baseline.get("purpose") != "legal-text-change-detection":
         findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "purpose must state legal-text-change-detection"))
     if baseline.get("local_validator_scope") != "digest-consistency-only":
@@ -1017,7 +1038,12 @@ def check_legal_baseline_and_protection(root: Path, findings: list[Finding]) -> 
         if not isinstance(tag, str) or re.fullmatch(r"legal-baseline-v[1-9][0-9]*", tag) is None or tag != f"legal-baseline-v{version}":
             findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "signed tag name must match baseline_version"))
         expected_anchor_values = {
+            "activation_state": "external-evidence-required",
+            "repository_content_claims_activation": False,
+            "tag_target_rule": "exact-commit-containing-matching-baseline",
             "verification": "external-to-repository",
+            "verifier_path": "tools/verify_external_anchor.py",
+            "verifier_mode": "signed-tag-only",
             "repository_validator_verification": "not-available",
             "codeowners_path": ".github/CODEOWNERS",
             "protection_requirements_path": ".github/REPOSITORY_PROTECTION.md",
@@ -1212,6 +1238,14 @@ def check_conformance_claim_assets(root: Path, findings: list[Finding]) -> None:
     for error in errors:
         location = ".".join(str(item) for item in error.absolute_path) or "<root>"
         findings.append(Finding("CLAIM-002", _relative(root, example_path), f"claim example fails at {location}: {error.message}"))
+
+    if isinstance(example, dict):
+        source = example.get("framework_source")
+        identity = source.get("repository_identity") if isinstance(source, dict) else None
+        if identity != LEGAL_REPOSITORY_IDENTITY:
+            findings.append(Finding("CLAIM-003", _relative(root, example_path), "canonical example repository identity is invalid"))
+        if not isinstance(source, dict) or any(source.get(key) != value for key, value in CANONICAL_CLAIM_EXAMPLE_SOURCE.items()):
+            findings.append(Finding("CLAIM-003", _relative(root, example_path), "canonical example commit and Framework document version are not the controlled immutable source pair"))
 
 
 def check_legal_and_conformance_boundaries(

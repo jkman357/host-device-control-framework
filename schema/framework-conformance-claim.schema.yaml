@@ -1,5 +1,5 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-$id: https://example.invalid/host-device-control-framework/framework-conformance-claim.schema.yaml
+$id: https://github.com/jkman357/host-device-control-framework/schema/framework-conformance-claim.schema.yaml
 title: Framework Conformance Claim Record
 type: object
 additionalProperties: false
@@ -26,7 +26,7 @@ required:
   - withdrawal_or_revocation_reason
 properties:
   schema_version:
-    const: 1
+    const: 2
   claim_id:
     type: string
     pattern: '^[A-Z0-9][A-Z0-9._-]{2,63}$'
@@ -66,9 +66,17 @@ properties:
   framework_source:
     type: object
     additionalProperties: false
-    required: [repository, commit_sha, document_path, document_version]
+    required: [repository_identity, commit_sha, document_path, document_version]
     properties:
-      repository: {const: host-device-control-framework}
+      repository_identity:
+        type: object
+        additionalProperties: false
+        required: [host, owner, name, canonical_url]
+        properties:
+          host: {const: github.com}
+          owner: {const: jkman357}
+          name: {const: host-device-control-framework}
+          canonical_url: {const: 'https://github.com/jkman357/host-device-control-framework'}
       commit_sha: {type: string, pattern: '^[0-9a-f]{40}$'}
       document_path: {const: docs/framework/Coordinator_Node_Control_Framework.md}
       document_version: {type: string, pattern: '^v[0-9]+\.[0-9]+\.[0-9]+$'}

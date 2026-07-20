@@ -8,7 +8,7 @@ policy:
 documents:
 - display_name: AI Engineering Usage Guide
   path: docs/framework/AI_Engineering_Usage_Guide.md
-  version: v1.0.25
+  version: v1.0.26
   status: Draft for Review
   repository_role: Proposed normative AI task-routing and repository-governance authority
   readme_purpose: AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, prohibited behaviors,
@@ -23,11 +23,11 @@ documents:
   prerequisite_documents: []
 - display_name: Coordinator/Node Control Framework
   path: docs/framework/Coordinator_Node_Control_Framework.md
-  version: v1.1.4
+  version: v1.1.5
   status: Baseline
   repository_role: Normative architecture and framework-governance authority
   readme_purpose: Generalized Single-Node and Multi-Node architecture, role and target boundaries, timing, safety, security,
-    Firmware Update, Runtime, validation, conformance lifecycle, and governance
+    Firmware Update, Runtime, canonical source identity, conformance lifecycle, and governance
   routing_role: Generalized Single-Node and Multi-Node architecture and governance
   applies_when: A task defines or reviews Coordinator/Node roles, boundaries, architecture, Protocol layering, Runtime, safety
     placement, security, or Firmware Update behavior.
@@ -42,11 +42,11 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Framework Application Analysis Template
   path: docs/framework/Framework_Application_Analysis_Template.md
-  version: v1.1.1
+  version: v1.1.2
   status: Baseline
   repository_role: Normative framework-application analysis method
   readme_purpose: Method for applying the Framework to a Product, including topology, identity, resources, Reuse Classification,
-    pre-validation claim-boundary baseline, Protocol inputs, risks, Gaps, MVP, and acceptance evidence
+    canonical source identity, pre-validation claim-boundary baseline, Protocol inputs, risks, Gaps, MVP, and acceptance evidence
   routing_role: Application, topology, resource, and acceptance analysis method
   applies_when: The Framework is applied to a new Product, application, platform, or Product revision.
   authority_topics:
@@ -341,12 +341,13 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Repository Validation Checklist
   path: docs/validation/Repository_Validation_Checklist.md
-  version: v1.0.10
+  version: v1.0.11
   status: Draft for Review
   repository_role: Proposed operational validation method; not a Product or architecture authority
-  readme_purpose: Repository structural, registry, legal-baseline, external-protection, third-party byte/evidence, executable
-    Protocol schema/fixture, evidence-state, and detached-package checks
-  routing_role: Repository structural, legal-baseline, external-protection, third-party byte/evidence, and evidence checks
+  readme_purpose: Repository structural, registry, canonical claim-source, legal-baseline, external-anchor, release-freeze,
+    third-party byte/evidence, executable Protocol schema/fixture, evidence-state, and detached-package checks
+  routing_role: Repository structural, canonical claim-source, legal-baseline, external-anchor, release-freeze, third-party
+    byte/evidence, and evidence checks
   applies_when: Repository content, authority manifests, detached packages, or validation tooling are changed or reviewed.
   authority_topics:
   - repository structural validation
@@ -399,12 +400,12 @@ documents:
   - docs/protocol/Protocol_Security_Profile.md
 - display_name: Framework Conformance Checklist
   path: docs/validation/Framework_Conformance_Checklist.md
-  version: v1.1.4
+  version: v1.1.5
   status: Draft for Review
   repository_role: Proposed operational Framework conformance checklist; not an independent architecture or Product requirement
     authority
-  readme_purpose: Traceable Framework role, authority, Multi-Node isolation, immutable targeting, lifecycle, claim-boundary
-    baseline, claim lifecycle, safety, security, deviation, restoration, and evidence view
+  readme_purpose: Traceable Framework role, authority, canonical source identity, Multi-Node isolation, immutable targeting,
+    lifecycle, claim-boundary baseline, claim lifecycle, safety, security, deviation, restoration, and evidence view
   routing_role: Framework and Multi-Node conformance, claim lifecycle, deviation, and restoration evidence-capture checklist
   applies_when: A Product architecture or implementation is reviewed for conformance with the adopted Coordinator/Node Framework
     and application analysis.

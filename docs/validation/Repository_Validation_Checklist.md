@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.0.10
+**Document Version:** v1.0.11
 **Status:** Draft for Review
-**Supersedes Document Version:** v1.0.9
+**Supersedes Document Version:** v1.0.10
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.11 | 2026-07-20 | Draft for Review | Added claim-schema v2 canonical repository identity, canonical example commit/version pairing, explicit external-anchor activation state, signed-tag verification tooling, and immutable release-freeze checks. |
 | v1.0.10 | 2026-07-20 | Draft for Review | Bound third-party entries to actual repository and source-evidence bytes; externalized legal digest baselines; required CODEOWNERS and external anchor governance; and added conformance-claim schema validation. |
 | v1.0.9 | 2026-07-20 | Draft for Review | Added normalized visible-text integrity controls for legal documents, controlled third-party-material manifest validation, Full and Scoped conformance classification checks, self-declaration boundaries, and regression tests for hidden, fenced, duplicated, and semantically reversed legal clauses. |
 | v1.0.8 | 2026-07-20 | Draft for Review | Added regression-protected checks for the GitHub Terms limited-rights carve-out, lawfully authorized file-specific notice exceptions, the no-unsolicited-contribution policy, and the Framework conformance-restoration path. |
@@ -129,10 +130,12 @@ A reviewer shall verify:
 - LICENSE, NOTICE, CONTRIBUTING, and README usage language are consistent with the intended publication and contribution model.
 - The normalized visible text of controlled legal documents matches the approved baseline; HTML comments and fenced examples do not satisfy legal clauses, while visible duplication, negation, contradiction, or semantic reversal fails validation.
 - Framework conformance controls require explicit Full, Scoped, or Nonconforming classification, included-boundary satisfaction, pre-validation scope baselines, claim lifecycle and invalidation control, residual-deviation restrictions, and the self-declaration and signatory-bounded assessment boundary.
-- `legal-baseline.yaml` provides local legal-text change detection only; authenticity and authorization of a baseline change require the external signed-tag or protected-merge control defined by `.github/REPOSITORY_PROTECTION.md`.
+- `legal-baseline.yaml` provides local legal-text change detection only, records `external-evidence-required`, and never self-asserts activation; authenticity and authorization require the external signed-tag or protected-merge control defined by `.github/REPOSITORY_PROTECTION.md`.
+- `tools/verify_external_anchor.py` verifies signed-tag mode against the canonical origin, annotated tag type, valid signature, exact target commit, and matching tagged legal-baseline bytes; GitHub ruleset or protected-merge evidence remains external.
+- A repository content freeze is recognized only through an immutable signed release tag or controlled GitHub Release that identifies the exact final commit; a ZIP or mutable branch is not freeze evidence.
 - `.github/CODEOWNERS` covers legal, conformance, third-party, validator, baseline, and governance-control files.
 - Third-party entries are entire-file only and bind actual repository bytes, retained source-evidence bytes, notice text, controlled approver identity, approval reference, and obligation evidence.
-- `schema/framework-conformance-claim.schema.yaml` and its canonical example validate claim identity, classification, lifecycle, boundary baseline, source identity, evidence, supersession, and re-evaluation triggers.
+- `schema/framework-conformance-claim.schema.yaml` v2 and its canonical example validate claim identity, classification, lifecycle, boundary baseline, globally unique repository host/owner/name/URL, immutable commit/document-version pairing, evidence, supersession, and re-evaluation triggers.
 - File-specific or third-party notices are authorized, scoped to identified material, and do not silently relicense unrelated repository content.
 - A restored conformance claim is supported by correction or explicit exclusion from the claim scope, repeated invalidated activities, regenerated evidence, residual-risk approval, and a final scoped record.
 

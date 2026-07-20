@@ -3,9 +3,9 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`
 **Document ID:** FAAT
-**Document Version:** v1.1.1
+**Document Version:** v1.1.2
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.0
+**Supersedes Document Version:** v1.1.1
 **Document Type:** Reusable Analysis Template
 **Primary Narrative Language:** English
 **Author:** Ray Yang
@@ -91,6 +91,7 @@ Other Coordinator/Node applications
 
 | Version | Date | Status | Author | Description |
 | --- | --- | --- | --- | --- |
+| v1.1.2 | 2026-07-20 | Baseline | Ray Yang | Added canonical Framework repository host, owner, name, URL, immutable source revision, and document version fields to the pre-validation conformance claim-boundary baseline. |
 | v1.1.1 | 2026-07-20 | Baseline | Ray Yang | Added a pre-validation conformance claim-boundary baseline, revision identity, included and excluded boundaries, and post-failure anti-retroactivity requirements. |
 | v1.1.0 | 2026-07-19 | Baseline | Ray Yang | Added mandatory Multi-Node topology, identity, addressing, lifecycle, operation, security, shared-resource, Firmware Update, validation, and acceptance analysis records for independent links, shared buses, and routed gateways while retaining the existing Single-Node application path. |
 | v1.0.0 | 2026-07-15 | Not recorded | Ray Yang | Established the initial reusable Application Analysis template. |
@@ -177,6 +178,12 @@ Before conformance validation begins, the Project shall approve and revision-con
 | Approved By | `<Owner / authority>` |
 | Intended Claim Classification | Full Framework Conformance / Scoped Framework Conformance / Nonconforming |
 | Product or Project Revision | `<TBD>` |
+| Framework Repository Host | `github.com` |
+| Framework Repository Owner | `jkman357` |
+| Framework Repository Name | `host-device-control-framework` |
+| Framework Canonical Repository URL | `https://github.com/jkman357/host-device-control-framework` |
+| Framework Source Commit, Tag, or Release | `<immutable identity>` |
+| Framework Document Version | `<vMAJOR.MINOR.PATCH>` |
 | Included Components, Capabilities, Lifecycle Phases, Artifacts, and Interfaces | `<TBD; non-empty and materially meaningful>` |
 | Excluded Boundaries | `<TBD or None>` |
 | Applicability Decision Set | `<Controlled record identity>` |
@@ -210,6 +217,7 @@ Every completed Application Analysis shall separately record:
 ```text
 Minimum Compatible Version
 Version Used for This Analysis
+Canonical Repository Host, Owner, Name, and URL
 Source Git Commit, Tag, or Release
 Compatibility evidence and rationale
 ```

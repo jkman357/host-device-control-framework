@@ -36,6 +36,7 @@ requirements-validation.txt
 schema/protocol.schema.yaml
 tools/validate_repository.py
 tools/validate_protocol.py
+tools/verify_external_anchor.py
 tests/fixtures/protocol/
 tests/test_validate_repository.py
 tests/test_validate_protocol.py
@@ -49,6 +50,8 @@ python -m pip install --disable-pip-version-check --require-hashes -r requiremen
 python tools/validate_repository.py
 python tools/validate_protocol.py tests/fixtures/protocol/valid_*.yaml
 python -m unittest discover -s tests -v
+# After creating the signed legal-baseline tag:
+python tools/verify_external_anchor.py --commit "$(git rev-parse HEAD)"
 ```
 
 A passing automated result proves only the checks implemented by the validator. It does not prove semantic correctness, Product suitability, security adequacy, regulatory compliance, physical behavior, or human approval.

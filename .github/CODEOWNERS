@@ -8,6 +8,7 @@
 /.github/CODEOWNERS @jkman357
 /.github/REPOSITORY_PROTECTION.md @jkman357
 /tools/validate_repository.py @jkman357
+/tools/verify_external_anchor.py @jkman357
 /tests/test_validate_repository.py @jkman357
 /docs/framework/Coordinator_Node_Control_Framework.md @jkman357
 /docs/framework/Framework_Application_Analysis_Template.md @jkman357

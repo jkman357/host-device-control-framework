@@ -1,8 +1,8 @@
 # Framework Conformance Checklist
 
 **Canonical Filename:** `Framework_Conformance_Checklist.md`
-**Document Version:** v1.1.4
-**Supersedes Document Version:** v1.1.3
+**Document Version:** v1.1.5
+**Supersedes Document Version:** v1.1.4
 **Status:** Draft for Review
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-19
@@ -30,6 +30,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.5 | 2026-07-20 | Draft for Review | Added canonical repository identity and immutable Framework source-pair checks so a short repository name or mismatched commit/document version cannot support a conformance claim. |
 | v1.1.4 | 2026-07-20 | Draft for Review | Added included-boundary satisfaction, residual-deviation restrictions, pre-validation boundary baseline, claim lifecycle, re-evaluation, withdrawal, and signatory-bounded assessment checks. |
 | v1.1.3 | 2026-07-20 | Draft for Review | Added Full, Scoped, and Nonconforming claim classification; explicit scoped-claim presentation; non-excludable controls; failure-driven exclusion prohibition; and Project self-declaration versus author or maintainer certification checks. |
 | v1.1.2 | 2026-07-20 | Draft for Review | Added scoped conformance-claim identity, authorized-deviation criteria, and the formal correction, repeated-validation, regenerated-evidence, residual-risk approval, and final-record path required before conformance may be claimed or restored. |
@@ -63,6 +64,7 @@ For each item record the governing section, applicability, method, evidence, res
 - [ ] F-00G The claim boundary and applicability baseline were approved and revision-controlled before validation began; post-failure exclusions rely only on pre-existing objective records, and a materially changed boundary creates a new claim revision.
 - [ ] F-00H The claim record includes claim ID, issuer identity and authority, issue date, lifecycle status, claimed revision, boundary-baseline identity, evidence set, validity conditions, supersession links, and withdrawal or revocation information when applicable.
 - [ ] F-00I Product, implementation, authority, evidence, hazard, defect, security, deviation, or compensating-control changes trigger re-evaluation when they could affect the claim, and invalid claims are withdrawn, revoked, or superseded.
+- [ ] F-00J Framework source identity includes canonical repository host, owner, repository name, canonical URL, immutable commit, document path, and document version; the commit and document version are verified to have existed together.
 
 # 3. Role and Authority Boundary
 

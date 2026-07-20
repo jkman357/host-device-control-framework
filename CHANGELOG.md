@@ -6,6 +6,12 @@ Individual authority documents retain their own internal Version History and app
 
 ## Unreleased
 
+- Corrected the canonical Framework conformance example to the immutable `e516fa1d58bd99014b965f37215db85ae594704b` / Framework `v1.1.4` source pair and upgraded claim schema v2 to require canonical GitHub host, owner, repository name, and URL.
+
+- Made external legal-baseline activation explicitly fail-closed through `external-evidence-required`, added signed-tag verification tooling, and prohibited repository content or detached ZIPs from self-asserting anchor activation.
+
+- Declared the repository content frozen as the `v1.0.0` release candidate; immutable freeze identity is established only by the final signed tag or controlled GitHub Release.
+
 - Required Scoped claims to satisfy every applicable requirement within each included boundary; restricted residual deviations; froze the claim boundary before validation; and added claim lifecycle, invalidation, supersession, withdrawal, and signatory-bounded assessment rules.
 - Added `schema/framework-conformance-claim.schema.yaml` and a canonical machine-validatable Framework conformance claim example.
 - Upgraded `third-party-materials.yaml` to bind entire repository files to actual content hashes, retained source-evidence hashes, controlled notices, approver identities, approval references, and obligation evidence.
@@ -53,6 +59,8 @@ Individual authority documents retain their own internal Version History and app
 - Added `requirements-validation.txt` with the pinned PyYAML validation dependency.
 
 ### Changed
+
+- Updated AI Engineering Usage Guide to v1.0.26, Coordinator/Node Control Framework and Framework Conformance Checklist to v1.1.5, Framework Application Analysis Template to v1.1.2, and Repository Validation Checklist to v1.0.11; synchronized canonical claim-source identity, external-anchor state, release-freeze guidance, registry, README, AI manifest, validator, and regression tests.
 
 - Updated AI Engineering Usage Guide to v1.0.25, Coordinator/Node Control Framework and Framework Conformance Checklist to v1.1.4, Framework Application Analysis Template to v1.1.1, and Repository Validation Checklist to v1.0.10; synchronized the registry, README, AI manifest, legal controls, third-party manifest, claim schema, validator, and regression tests.
 - Updated AI Engineering Usage Guide to v1.0.24, Coordinator/Node Control Framework and Framework Conformance Checklist to v1.1.3, and Repository Validation Checklist to v1.0.9; synchronized the registry, README, AI manifest, legal controls, third-party manifest, validator, and regression tests.

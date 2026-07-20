@@ -1,5 +1,9 @@
 baseline_version: 1
-repository: host-device-control-framework
+repository_identity:
+  host: github.com
+  owner: jkman357
+  name: host-device-control-framework
+  canonical_url: https://github.com/jkman357/host-device-control-framework
 purpose: legal-text-change-detection
 local_validator_scope: digest-consistency-only
 external_authorization_required: true
@@ -12,11 +16,16 @@ protected_documents:
     normalized_visible_sha256: 79369fb93ee3d947d9dc1c49419b370f34d6f20c1fa8297287e5eda7b9d7ad96
 external_anchor:
   required: true
+  activation_state: external-evidence-required
+  repository_content_claims_activation: false
   accepted_modes:
   - signed-tag
   - protected-merge-with-code-owner-review
   signed_tag_name: legal-baseline-v1
+  tag_target_rule: exact-commit-containing-matching-baseline
   verification: external-to-repository
+  verifier_path: tools/verify_external_anchor.py
+  verifier_mode: signed-tag-only
   repository_validator_verification: not-available
   codeowners_path: .github/CODEOWNERS
   protection_requirements_path: .github/REPOSITORY_PROTECTION.md

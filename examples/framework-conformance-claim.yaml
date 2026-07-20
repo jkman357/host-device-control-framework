@@ -1,4 +1,6 @@
-schema_version: 1
+# This canonical example intentionally claims against the immutable e516fa1
+# Framework source, where Coordinator_Node_Control_Framework.md is v1.1.4.
+schema_version: 2
 claim_id: EXAMPLE-CLAIM-001
 issuer:
   legal_or_organizational_name: Example Project Authority
@@ -17,8 +19,12 @@ claim_boundary:
   excluded:
     - Product enclosure and mechanical design
 framework_source:
-  repository: host-device-control-framework
-  commit_sha: 8f65a8e135c22fbc5b10add7d9601ced73586a67
+  repository_identity:
+    host: github.com
+    owner: jkman357
+    name: host-device-control-framework
+    canonical_url: https://github.com/jkman357/host-device-control-framework
+  commit_sha: e516fa1d58bd99014b965f37215db85ae594704b
   document_path: docs/framework/Coordinator_Node_Control_Framework.md
   document_version: v1.1.4
 adopted_authorities:

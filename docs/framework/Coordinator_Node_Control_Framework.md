@@ -3,9 +3,9 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`
 **Document ID:** CNCF
-**Document Version:** v1.1.4
+**Document Version:** v1.1.5
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.3
+**Supersedes Document Version:** v1.1.4
 **Document Type:** Master Architecture and Engineering Governance Baseline
 **Primary Narrative Language:** English
 **Author:** Ray Yang
@@ -265,6 +265,7 @@ Markdown filename.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.5 | 2026-07-20 | Baseline | Required globally unambiguous Framework source identity in conformance records, bound the canonical example to the actual e516fa1/v1.1.4 source pair, and clarified that repository and legal-baseline freeze status exists only through externally verifiable immutable release or anchor evidence. |
 | v1.1.4 | 2026-07-20 | Baseline | Closed Scoped Conformance satisfaction and residual-deviation ambiguity; required a pre-validation claim-boundary baseline, claim lifecycle and invalidation records, and signatory-bounded assessment agreements. |
 | v1.1.3 | 2026-07-20 | Baseline | Distinguished Full Framework Conformance, Scoped Framework Conformance, and Nonconforming status; prohibited failure-driven scope laundering; defined non-excludable governance controls; and clarified that conformance is a Project self-declaration rather than author or maintainer certification. |
 | v1.1.2 | 2026-07-20 | Baseline | Defined scoped conformance claims, distinguished authorized deviations from unauthorized bypasses, and established the correction, repeated-review, regenerated-evidence, residual-risk approval, and recorded-approval path required before conformance may be claimed or restored. |
@@ -2657,7 +2658,7 @@ Full, Scoped, or Nonconforming classification
 Product or Project identity and exact claimed revision
 Pre-validation claim-boundary baseline ID and revision
 Included and excluded boundaries
-Framework repository, source commit/tag/Release, document path, and version
+Framework repository host, owner, repository name, canonical repository URL, source commit/tag/Release, document path, and version
 Adopted Project authorities and applicability decisions
 Evidence-set identity and approval record
 Deviations, limitations, expiry or review conditions
@@ -2667,6 +2668,10 @@ Withdrawal or revocation reason when applicable
 ```
 
 Claim lifecycle status shall be one of `active`, `superseded`, `withdrawn`, or `revoked`. A claim applies only to its identified Product or Project revision. A change to hardware, software, Protocol, configuration, Framework authority, applicability, risk control, evidence validity, known defect, hazard, security finding, deviation condition, or compensating control shall trigger documented re-evaluation when it could affect the claim. An invalidated claim shall be withdrawn, revoked, or superseded; it shall not remain presented as active.
+
+A repository short name is not a globally unique Framework source identity. Every claim shall record the canonical repository host, owner, repository name, and canonical URL together with an immutable source commit and the corresponding Framework document version. A commit/document-version pair shall identify content that actually existed together; a later document version shall not be attributed retroactively to an earlier commit.
+
+Repository-local files may state that external anchor evidence is required, but they shall not self-assert that a legal baseline or release freeze is externally activated. A repository or legal baseline is treated as frozen only when an immutable signed tag, protected-merge evidence, or controlled Release identifies the exact commit. A detached ZIP is distribution evidence, not independent freeze or authorization evidence.
 
 Artifacts, implementations, analyses, or conformance claims produced by bypassing, disabling, ignoring, or materially misapplying applicable Framework requirements, required reviews, validation activities, or approval controls shall not claim conformance with this Framework for the affected scope.
 

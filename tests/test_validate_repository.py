@@ -525,6 +525,60 @@ class RepositoryValidatorTests(unittest.TestCase):
         path.write_text(text, encoding="utf-8")
         self.assertIn("CLAIM-002", self.rules())
 
+    def test_claim_schema_requires_canonical_repository_owner(self) -> None:
+        path = self.root / "examples/framework-conformance-claim.yaml"
+        text = path.read_text(encoding="utf-8").replace("owner: jkman357", "owner: another-owner", 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("CLAIM-002", self.rules())
+
+    def test_claim_schema_requires_canonical_repository_url(self) -> None:
+        path = self.root / "examples/framework-conformance-claim.yaml"
+        text = path.read_text(encoding="utf-8").replace(
+            "canonical_url: https://github.com/jkman357/host-device-control-framework",
+            "canonical_url: https://github.com/another-owner/host-device-control-framework",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("CLAIM-002", self.rules())
+
+    def test_canonical_claim_example_rejects_commit_version_mismatch(self) -> None:
+        path = self.root / "examples/framework-conformance-claim.yaml"
+        text = path.read_text(encoding="utf-8").replace("document_version: v1.1.4", "document_version: v1.1.5", 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("CLAIM-003", self.rules())
+
+    def test_legal_baseline_cannot_self_assert_external_activation(self) -> None:
+        path = self.root / "legal-baseline.yaml"
+        text = path.read_text(encoding="utf-8").replace(
+            "repository_content_claims_activation: false",
+            "repository_content_claims_activation: true",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("LEGAL-003", self.rules())
+
+    def test_external_anchor_verifier_is_codeowned(self) -> None:
+        path = self.root / ".github/CODEOWNERS"
+        text = path.read_text(encoding="utf-8").replace(
+            "/tools/verify_external_anchor.py @jkman357",
+            "/tools/verify_external_anchor.py @someone-else",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("GOV-003", self.rules())
+
+    def test_github_remote_normalization(self) -> None:
+        import importlib.util
+        module_path = self.root / "tools/verify_external_anchor.py"
+        spec = importlib.util.spec_from_file_location("verify_external_anchor", module_path)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        self.assertEqual(module.normalize_github_repository("https://github.com/jkman357/host-device-control-framework.git"), "jkman357/host-device-control-framework")
+        self.assertEqual(module.normalize_github_repository("git@github.com:jkman357/host-device-control-framework.git"), "jkman357/host-device-control-framework")
+        self.assertIsNone(module.normalize_github_repository("https://example.com/jkman357/host-device-control-framework"))
+
     def test_full_scoped_and_nonconforming_classifications_are_required(self) -> None:
         path = self.root / "docs/framework/Coordinator_Node_Control_Framework.md"
         text = path.read_text(encoding="utf-8").replace(
