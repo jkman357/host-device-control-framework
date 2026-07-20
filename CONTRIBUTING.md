@@ -10,6 +10,15 @@ Do not submit a pull request containing proposed repository content unless the m
 
 Issue reports and high-level suggestions may be provided for discussion. They should not include third-party confidential information, proprietary source material, copied standards text, or other content that the submitter is not authorized to disclose. The maintainer may independently evaluate an idea without accepting the submitted expression or material as a repository contribution.
 
+
+## Patent, Invention, and Trademark Boundary
+
+Submitting an issue, suggestion, proposal, design concept, or other communication does not grant a patent license, patent covenant, waiver, trademark license, endorsement right, or authorization to practice an invention.
+
+Patent-sensitive, invention-specific, employer-owned, or trademark-bearing material shall not be submitted unless ownership, authority, confidentiality, and applicable patent or trademark rights have been addressed by a separate written agreement. A submitter remains responsible for confirming that the submission does not disclose another party's trade secret, confidential invention, unpublished patent material, or employer-owned intellectual property.
+
+Independent evaluation of an idea by the maintainer does not create an implied license, confidential relationship, patent covenant, ownership transfer, or obligation to use the submitted expression.
+
 ## Requirements for an Authorized Contribution
 
 When a contribution is separately authorized, the contributor shall:

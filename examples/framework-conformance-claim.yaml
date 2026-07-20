@@ -1,0 +1,50 @@
+schema_version: 1
+claim_id: EXAMPLE-CLAIM-001
+issuer:
+  legal_or_organizational_name: Example Project Authority
+  authority: Product approval authority
+issued_date: '2026-07-20'
+lifecycle_status: active
+classification: Scoped Framework Conformance
+product_or_project: Example Coordinator/Node Project
+claimed_revision: example-revision-1
+claim_boundary:
+  baseline_id: EXAMPLE-BOUNDARY-001
+  baseline_revision: '1'
+  approved_before_validation: true
+  included:
+    - Coordinator-to-Node Protocol interface
+  excluded:
+    - Product enclosure and mechanical design
+framework_source:
+  repository: host-device-control-framework
+  commit_sha: 8f65a8e135c22fbc5b10add7d9601ced73586a67
+  document_path: docs/framework/Coordinator_Node_Control_Framework.md
+  document_version: v1.1.4
+adopted_authorities:
+  - docs/framework/Coordinator_Node_Control_Framework.md
+  - docs/framework/Framework_Application_Analysis_Template.md
+applicability_decisions:
+  - EXAMPLE-APPLICABILITY-001
+evidence_set:
+  - EXAMPLE-EVIDENCE-SET-001
+deviations: []
+approval_record: EXAMPLE-APPROVAL-001
+validity_conditions:
+  - Claimed revision and evidence set remain unchanged
+reevaluation_triggers:
+  - product-revision-change
+  - software-change
+  - hardware-change
+  - protocol-change
+  - configuration-change
+  - framework-authority-change
+  - applicability-change
+  - evidence-invalidation
+  - new-defect-or-hazard
+  - new-security-finding
+  - deviation-condition-change
+  - compensating-control-failure
+supersedes: null
+superseded_by: null
+withdrawal_or_revocation_reason: null

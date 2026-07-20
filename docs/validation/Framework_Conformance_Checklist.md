@@ -1,14 +1,14 @@
 # Framework Conformance Checklist
 
-**Canonical Filename:** `Framework_Conformance_Checklist.md`  
-**Document Version:** v1.1.3  
-**Supersedes Document Version:** v1.1.2  
-**Status:** Draft for Review  
-**Document Owner:** Ray Yang  
-**Initial Release Date:** 2026-07-19  
-**Language:** English  
-**Intended Audience:** Product owners, system architects, Coordinator and Node engineers, reviewers, test engineers, and AI-assisted engineering systems  
-**Repository Role:** Proposed operational Framework conformance checklist; not an independent architecture or Product requirement authority  
+**Canonical Filename:** `Framework_Conformance_Checklist.md`
+**Document Version:** v1.1.4
+**Supersedes Document Version:** v1.1.3
+**Status:** Draft for Review
+**Document Owner:** Ray Yang
+**Initial Release Date:** 2026-07-19
+**Language:** English
+**Intended Audience:** Product owners, system architects, Coordinator and Node engineers, reviewers, test engineers, and AI-assisted engineering systems
+**Repository Role:** Proposed operational Framework conformance checklist; not an independent architecture or Product requirement authority
 **Related Documents:**
 - `../framework/Coordinator_Node_Control_Framework.md`
 - `../framework/Framework_Application_Analysis_Template.md`
@@ -30,6 +30,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.4 | 2026-07-20 | Draft for Review | Added included-boundary satisfaction, residual-deviation restrictions, pre-validation boundary baseline, claim lifecycle, re-evaluation, withdrawal, and signatory-bounded assessment checks. |
 | v1.1.3 | 2026-07-20 | Draft for Review | Added Full, Scoped, and Nonconforming claim classification; explicit scoped-claim presentation; non-excludable controls; failure-driven exclusion prohibition; and Project self-declaration versus author or maintainer certification checks. |
 | v1.1.2 | 2026-07-20 | Draft for Review | Added scoped conformance-claim identity, authorized-deviation criteria, and the formal correction, repeated-validation, regenerated-evidence, residual-risk approval, and final-record path required before conformance may be claimed or restored. |
 | v1.1.1 | 2026-07-20 | Draft for Review | Added checks that work produced through bypassed, disabled, ignored, or materially misapplied Framework controls cannot claim conformance and that the human or organization accepting or approving a deviation remains identified as responsible for the decision and resulting outcomes. |
@@ -55,8 +56,13 @@ For each item record the governing section, applicability, method, evidence, res
 - [ ] F-009 Every Full or Scoped claim satisfies the non-excludable controls for truthful claim presentation, source identity, authorized applicability, deviation approval, evidence integrity, human approval responsibility, and applicable safety, security, regulatory, statutory, and contractual requirements.
 - [ ] F-00A A scope exclusion is independently justified by the approved Framework Application Analysis and objective Project facts; it is not created or expanded after a failure solely to avoid correction, validation, approval, or disclosure.
 - [ ] F-00B Artifacts, implementations, analyses, or claims affected by bypassed, disabled, ignored, or materially misapplied controls do not claim conformance for the affected boundary, and an unauthorized bypass is not relabeled as an approved deviation.
-- [ ] F-00C Conformance is claimed or restored only after affected artifacts and dependent outputs are corrected or a permissible exclusion is independently justified, invalidated activities are completed or repeated, required evidence is regenerated, remaining residual deviations are approved and disclosed, and the final record identifies classification, scope, evidence, approvals, exclusions, and unresolved limitations.
-- [ ] F-00D The claim is recorded as the issuer's Project-scoped self-declaration and does not imply assessment, certification, approval, endorsement, warranty, acceptance, or responsibility by the Framework author, repository maintainer, copyright holder, contributor, AI system, tool provider, or another third party.
+- [ ] F-00C Conformance is claimed or restored only after formal disposition, correction, repeated omitted or invalidated activities, regenerated evidence, and a complete final conformance record; a residual deviation does not satisfy an applicable requirement within the included boundary.
+- [ ] F-00D The claim is a Project self-declaration unless a separate written agreement identifies named signatories, assessor authority, scope, revision, and evidence; that agreement binds only its signatories and does not amend repository terms or imply author or maintainer participation unless expressly signed in that role.
+- [ ] F-00E Every included boundary of a Scoped claim satisfies all Framework requirements determined applicable to that boundary, and no unresolved deviation contradicts the claim.
+- [ ] F-00F The claimed boundary is non-empty and materially meaningful and is not formed solely by declaring substantive technical requirements `Not Applicable`.
+- [ ] F-00G The claim boundary and applicability baseline were approved and revision-controlled before validation began; post-failure exclusions rely only on pre-existing objective records, and a materially changed boundary creates a new claim revision.
+- [ ] F-00H The claim record includes claim ID, issuer identity and authority, issue date, lifecycle status, claimed revision, boundary-baseline identity, evidence set, validity conditions, supersession links, and withdrawal or revocation information when applicable.
+- [ ] F-00I Product, implementation, authority, evidence, hazard, defect, security, deviation, or compensating-control changes trigger re-evaluation when they could affect the claim, and invalid claims are withdrawn, revoked, or superseded.
 
 # 3. Role and Authority Boundary
 

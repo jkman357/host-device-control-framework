@@ -1,17 +1,17 @@
 # Coordinator/Node Cross-Platform Embedded Control Framework
 
 
-**Document Name:** `Coordinator_Node_Control_Framework.md`  
-**Document ID:** CNCF  
-**Document Version:** v1.1.3  
-**Status:** Baseline  
-**Supersedes Document Version:** v1.1.2  
-**Document Type:** Master Architecture and Engineering Governance Baseline  
-**Primary Narrative Language:** English  
-**Author:** Ray Yang  
-**Maintainer:** Ray Yang  
-**Repository:** `host-device-control-framework`  
-**Repository Role:** Normative architecture and framework-governance authority  
+**Document Name:** `Coordinator_Node_Control_Framework.md`
+**Document ID:** CNCF
+**Document Version:** v1.1.4
+**Status:** Baseline
+**Supersedes Document Version:** v1.1.3
+**Document Type:** Master Architecture and Engineering Governance Baseline
+**Primary Narrative Language:** English
+**Author:** Ray Yang
+**Maintainer:** Ray Yang
+**Repository:** `host-device-control-framework`
+**Repository Role:** Normative architecture and framework-governance authority
 **Related Documents:**
 - `Coordinator_Software_Engineering_Rules.md`
 - `Node_Software_Engineering_Rules.md`
@@ -28,8 +28,8 @@
 - `Framework_Conformance_Checklist.md`
 - `AI_Generated_Artifact_Validation_Guide.md`
 
-**First Issued:** 2026-07-15  
-**Last Revised:** 2026-07-20  
+**First Issued:** 2026-07-15
+**Last Revised:** 2026-07-20
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -265,6 +265,7 @@ Markdown filename.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.4 | 2026-07-20 | Baseline | Closed Scoped Conformance satisfaction and residual-deviation ambiguity; required a pre-validation claim-boundary baseline, claim lifecycle and invalidation records, and signatory-bounded assessment agreements. |
 | v1.1.3 | 2026-07-20 | Baseline | Distinguished Full Framework Conformance, Scoped Framework Conformance, and Nonconforming status; prohibited failure-driven scope laundering; defined non-excludable governance controls; and clarified that conformance is a Project self-declaration rather than author or maintainer certification. |
 | v1.1.2 | 2026-07-20 | Baseline | Defined scoped conformance claims, distinguished authorized deviations from unauthorized bypasses, and established the correction, repeated-review, regenerated-evidence, residual-risk approval, and recorded-approval path required before conformance may be claimed or restored. |
 | v1.1.1 | 2026-07-20 | Baseline | Added explicit Framework-level conformance-claim integrity and deviation-accountability rules: work produced by bypassing, disabling, ignoring, or materially misapplying applicable requirements, reviews, validation activities, or approval controls cannot claim Framework conformance, and responsibility remains with the human or organization accepting or approving the deviation. |
@@ -2608,7 +2609,7 @@ Implementation details belong in the Reference Implementation and design specifi
 
 ## 9.11 Conformance Claim Integrity, Deviation Accountability, and Restoration
 
-Framework conformance is a Project-scoped self-declaration made by the person or organization issuing the claim, unless a separate written assessment or certification agreement explicitly states otherwise. A conformance claim does not imply review, certification, approval, endorsement, warranty, acceptance, or responsibility by the Framework author, repository maintainer, copyright holder, contributor, AI system, tool provider, or any third party.
+Framework conformance is a Project-scoped self-declaration made by the person or organization issuing the claim, unless a separate written assessment or certification agreement expressly identifies its named signatories, assessor authority, claimed boundary, revision, and evidence basis. Any such agreement binds only its named signatories and stated scope. It does not amend the repository `LICENSE` or `NOTICE.md` and does not imply participation, authorization, certification, endorsement, warranty, acceptance, or responsibility by the Framework author or maintainer unless that person is an express signatory acting in the stated role.
 
 Every claim shall use exactly one of the following classifications:
 
@@ -2620,9 +2621,11 @@ Nonconforming
 
 `Full Framework Conformance` means that, for the declared Product or Project boundary and revision, all Framework requirements determined applicable by the approved Framework Application Analysis have been satisfied, all non-excludable controls have been satisfied, and no unresolved deviation contradicts the claim. An approved `Not Applicable` determination is permitted only when supported by the Application Analysis and objective Project facts.
 
-`Scoped Framework Conformance` means that the claim is intentionally limited to explicitly named components, capabilities, lifecycle phases, artifacts, interfaces, or revisions. The exact phrase `Scoped Framework Conformance` shall appear wherever the claim is presented. The claim shall identify its included and excluded boundaries and shall not be abbreviated, promoted, or represented as full, system-wide, Product-wide, or release-wide conformance.
+`Scoped Framework Conformance` means that the claim is intentionally limited to explicitly named components, capabilities, lifecycle phases, artifacts, interfaces, or revisions. Within every included boundary, all Framework requirements determined applicable to that boundary shall be satisfied, all non-excludable controls shall be satisfied, and no unresolved deviation shall contradict the claim. The exact phrase `Scoped Framework Conformance` shall appear wherever the claim is presented. The claim shall identify its included and excluded boundaries and shall not be abbreviated, promoted, or represented as full, system-wide, Product-wide, or release-wide conformance.
 
-`Nonconforming` applies when the claimed boundary does not satisfy the conditions for Full or Scoped Framework Conformance, when required evidence or approval is missing, or when the claim classification or scope would be misleading.
+A Full or Scoped claim shall identify a non-empty, materially meaningful engineering boundary. A claim shall not be based solely on declaring all substantive technical requirements `Not Applicable`, nor may it omit the functions, interfaces, lifecycle phases, or evidence necessary to understand the practical meaning of the claim.
+
+`Nonconforming` applies when the claimed boundary does not satisfy the conditions for Full or Scoped Framework Conformance, when required evidence or approval is missing, when an applicable requirement remains unsatisfied within the included boundary, or when the claim classification, scope, lifecycle status, or presentation would be misleading.
 
 The following controls are non-excludable from every Full or Scoped Framework Conformance claim:
 
@@ -2635,19 +2638,43 @@ Required evidence identity, integrity, and execution-state accuracy
 Human review, approval, and retained professional responsibility
 Applicable safety, security, regulatory, statutory, and contractual requirements
 Prohibition of fabricated, misleading, or materially incomplete claims
+Claim lifecycle, supersession, withdrawal, revocation, and re-evaluation control
 ```
 
-A scope exclusion shall be independently justified by the approved Framework Application Analysis and objective Project facts. It shall not be created or expanded solely after a requirement, activity, artifact, or evidence item has failed in order to avoid correction, validation, approval, or disclosure. After a failure is known, an exclusion may be accepted only when an authorized Project authority determines and records that the excluded item was genuinely outside the intended claim boundary or not applicable before the failure, and records the rationale, evidence, impact, and approval. Otherwise the affected item remains nonconforming until corrected and revalidated.
+The intended claim boundary and applicability baseline shall be approved, revision-controlled, and identified before conformance validation begins. After a failure is known, an exclusion may rely only on pre-existing objective records showing that the item was outside the approved boundary or was already supported as `Not Applicable`. A newly created or materially changed boundary constitutes a new claim revision and shall not retroactively restore or rewrite the status of an earlier claim.
 
-Every conformance claim shall identify the claimed Product or Project scope, claim classification, applicable Framework version and source identity, Project authorities explicitly adopted for that scope, approved `Not Applicable` determinations, residual deviations, exclusions, evidence identity, and approval record.
+A scope exclusion shall be independently justified by the approved Framework Application Analysis and objective Project facts. It shall not be created or expanded solely after a requirement, activity, artifact, or evidence item has failed in order to avoid correction, validation, approval, or disclosure. Otherwise the affected boundary remains nonconforming until corrected and revalidated under a new or updated claim record.
+
+An approved deviation does not satisfy an applicable Framework requirement. A deviation may remain associated with a Full or Scoped claim only when it applies exclusively outside the included claim boundary, records a disclosed limitation that does not contradict any applicable requirement within the included boundary, or reflects a formally approved change to the Project requirement or applicability decision completed before the conformance assessment. A residual deviation that leaves an applicable requirement unsatisfied within the included boundary requires `Nonconforming` classification.
+
+Every conformance claim shall use a controlled record containing at least:
+
+```text
+Claim ID and claim-record schema version
+Issuer legal or organizational identity and issuer authority
+Issue date and lifecycle status
+Full, Scoped, or Nonconforming classification
+Product or Project identity and exact claimed revision
+Pre-validation claim-boundary baseline ID and revision
+Included and excluded boundaries
+Framework repository, source commit/tag/Release, document path, and version
+Adopted Project authorities and applicability decisions
+Evidence-set identity and approval record
+Deviations, limitations, expiry or review conditions
+Validity conditions and mandatory re-evaluation triggers
+Supersedes and superseded-by relationships
+Withdrawal or revocation reason when applicable
+```
+
+Claim lifecycle status shall be one of `active`, `superseded`, `withdrawn`, or `revoked`. A claim applies only to its identified Product or Project revision. A change to hardware, software, Protocol, configuration, Framework authority, applicability, risk control, evidence validity, known defect, hazard, security finding, deviation condition, or compensating control shall trigger documented re-evaluation when it could affect the claim. An invalidated claim shall be withdrawn, revoked, or superseded; it shall not remain presented as active.
 
 Artifacts, implementations, analyses, or conformance claims produced by bypassing, disabling, ignoring, or materially misapplying applicable Framework requirements, required reviews, validation activities, or approval controls shall not claim conformance with this Framework for the affected scope.
 
 A bypass is not converted into an authorized deviation merely because it was performed, documented, or accepted informally. An authorized deviation requires a designated approval authority, a bounded scope, rationale, risk and impact assessment, compensating controls where applicable, objective evidence, an approval record, and an expiry, removal, or review condition.
 
-Approval of a deviation accepts only the documented residual risk within the approver's assigned authority. It does not make an uncorrected or inadequately validated artifact conforming, transfer responsibility to this Framework, repository, AI system, tool, author, or maintainer, or remove the responsibilities retained by implementers, reviewers, Product authorities, and other assigned roles.
+Approval of a deviation accepts only the documented residual risk within the approver's assigned authority. It does not make an unsatisfied applicable requirement conforming, transfer responsibility to this Framework, repository, AI system, tool, author, or maintainer, or remove the responsibilities retained by implementers, reviewers, Product authorities, and other assigned roles.
 
-Conformance may be claimed or restored only after the deviation has been formally dispositioned; the affected artifact and its dependent outputs have been corrected, or a permissible exclusion has been independently justified under this section; omitted, bypassed, or invalidated reviews, validation activities, and approval controls have been completed or repeated; objective evidence has been regenerated where required; remaining residual deviations have been approved and disclosed within the claim; and the final conformance record identifies the classification, resulting scope, evidence, approvals, exclusions, and unresolved limitations.
+Conformance may be claimed or restored only after the deviation has been formally dispositioned; the affected artifact and dependent outputs have been corrected; omitted, bypassed, or invalidated reviews, validation activities, and approval controls have been completed or repeated; objective evidence has been regenerated where required; any remaining deviations satisfy the limited association conditions in this section and are fully disclosed; and the final conformance record identifies the claim revision, lifecycle status, classification, resulting scope, evidence, approvals, exclusions, limitations, validity conditions, and re-evaluation triggers.
 
 Unauthorized bypasses and unapproved deviations remain nonconforming and shall be reported to the responsible human authority rather than being normalized as accepted practice.
 

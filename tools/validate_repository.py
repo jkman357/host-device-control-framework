@@ -13,7 +13,7 @@ from typing import Any, Iterable
 from urllib.parse import unquote
 
 import yaml
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, FormatChecker
 from jsonschema.exceptions import SchemaError
 
 from validate_protocol import (
@@ -61,10 +61,16 @@ REQUIRED_FILES = {
     "LICENSE",
     "NOTICE.md",
     "third-party-materials.yaml",
+    "legal-baseline.yaml",
+    "third-party-evidence/README.md",
+    ".github/CODEOWNERS",
+    ".github/REPOSITORY_PROTECTION.md",
     "authority-registry.yaml",
     "requirements-validation.txt",
     ".github/workflows/document-validation.yml",
     "schema/protocol.schema.yaml",
+    "schema/framework-conformance-claim.schema.yaml",
+    "examples/framework-conformance-claim.yaml",
     "tools/validate_repository.py",
     "tools/validate_protocol.py",
     "tests/test_validate_repository.py",
@@ -98,51 +104,108 @@ REQUIRED_VALIDATION_COMMANDS = [
 ]
 
 REQUIRED_LICENSE_MARKERS = {
-    "copyright claims in this repository apply only to the human-authored selection",
-    "exclude third-party materials and any material that is not eligible for copyright protection",
-    "limited rights granted through github under github's applicable terms of service",
+    "rights expressly provided by github's applicable terms of service to github, its affiliates, and other github users",
+    "distinct rights expressly provided by github's applicable terms of service",
+    "do not constitute an additional repository license",
     "rights or exceptions provided by applicable law",
-    "does not by itself grant any additional right",
+    "no patent, trademark, or other implied license",
+    "whether expressly, by implication, estoppel, or otherwise",
     "no warranty and limitation of liability",
     "nothing in this disclaimer excludes or limits liability that cannot lawfully be excluded or limited",
     "registered in `third-party-materials.yaml`",
     "third-party material id: <id>",
+    "partial-file exceptions are not accepted",
+    "registered repository-content hash",
     "does not alter the terms applicable to the remaining repository materials",
-}
-CONTROLLED_LEGAL_DOCUMENT_HASHES = {
-    "LICENSE": "aefe2eb84241649058f77fe6232a7c22d19c7c7384f6fc6ad623f3f1ee5a14fd",
-    "NOTICE.md": "d82cc310701a141d83e51babf5bfb1f74ce25f98991a09d726339b156d619e59",
-    "CONTRIBUTING.md": "507f12193fc626bad6a77f4679b98cedef2f09c80664c7dec0109b887bb1f593",
 }
 REQUIRED_CONTRIBUTION_MARKERS = {
     "external code, documentation, tests, designs, generated artifacts, or other copyrightable contributions are not accepted unless",
     "separate written contribution agreement",
     "do not submit a pull request",
     "does not by itself transfer ownership",
+    "does not grant a patent license, patent covenant, waiver, trademark license",
+    "patent-sensitive, invention-specific, employer-owned, or trademark-bearing material shall not be submitted",
     "does not amend the repository-level",
 }
 REQUIRED_CONFORMANCE_MARKERS = {
     "framework conformance is a project-scoped self-declaration",
+    "any such agreement binds only its named signatories and stated scope",
     "full framework conformance",
     "scoped framework conformance",
+    "within every included boundary",
+    "non-empty, materially meaningful engineering boundary",
     "nonconforming",
     "non-excludable from every full or scoped framework conformance claim",
+    "intended claim boundary and applicability baseline shall be approved",
+    "new claim revision and shall not retroactively",
     "shall not be created or expanded solely after",
+    "an approved deviation does not satisfy an applicable framework requirement",
+    "claim lifecycle status shall be one of",
+    "invalidated claim shall be withdrawn, revoked, or superseded",
     "conformance may be claimed or restored only after",
     "omitted, bypassed, or invalidated reviews, validation activities, and approval controls have been completed or repeated",
     "objective evidence has been regenerated where required",
     "unauthorized bypasses and unapproved deviations remain nonconforming",
 }
 REQUIRED_CONFORMANCE_CHECK_IDS = {
-    "F-006", "F-007", "F-008", "F-009", "F-00A", "F-00B", "F-00C", "F-00D"
+    "F-006", "F-007", "F-008", "F-009", "F-00A", "F-00B", "F-00C", "F-00D",
+    "F-00E", "F-00F", "F-00G", "F-00H", "F-00I",
 }
-THIRD_PARTY_MANIFEST_ROOT_KEYS = {"manifest_version", "repository", "policy", "materials"}
+LEGAL_BASELINE_ROOT_KEYS = {
+    "baseline_version",
+    "repository",
+    "purpose",
+    "local_validator_scope",
+    "external_authorization_required",
+    "protected_documents",
+    "external_anchor",
+}
+LEGAL_PROTECTED_DOCUMENTS = {"LICENSE", "NOTICE.md", "CONTRIBUTING.md"}
+LEGAL_EXTERNAL_ANCHOR_KEYS = {
+    "required",
+    "accepted_modes",
+    "signed_tag_name",
+    "verification",
+    "repository_validator_verification",
+    "codeowners_path",
+    "protection_requirements_path",
+}
+REQUIRED_CODEOWNER_PATHS = {
+    "/LICENSE",
+    "/NOTICE.md",
+    "/CONTRIBUTING.md",
+    "/legal-baseline.yaml",
+    "/third-party-materials.yaml",
+    "/.github/CODEOWNERS",
+    "/.github/REPOSITORY_PROTECTION.md",
+    "/tools/validate_repository.py",
+    "/tests/test_validate_repository.py",
+    "/docs/framework/Coordinator_Node_Control_Framework.md",
+    "/docs/framework/Framework_Application_Analysis_Template.md",
+    "/docs/validation/Framework_Conformance_Checklist.md",
+    "/docs/validation/Repository_Validation_Checklist.md",
+    "/schema/framework-conformance-claim.schema.yaml",
+    "/examples/framework-conformance-claim.yaml",
+}
+REQUIRED_PROTECTION_MARKERS = {
+    "repository-local hashes and tests provide change detection only",
+    "authorization therefore requires a control enforced outside the repository content",
+    "signed-tag mode",
+    "protected-merge mode",
+    "signed-tag mode is the minimum practical external anchor",
+    "updating a digest in the same commit is not, by itself, approval",
+}
+THIRD_PARTY_MANIFEST_ROOT_KEYS = {
+    "manifest_version", "repository", "policy", "approval_authorities", "materials"
+}
 THIRD_PARTY_POLICY = {
     "default_terms": "LICENSE",
-    "exception_authority": "repository-maintainer",
-    "exception_effect": "registered-material-only",
+    "exception_authority": "controlled-approval-authority",
+    "exception_effect": "registered-entire-file-only",
     "required_file_marker": "Third-Party Material ID: <id>",
+    "source_evidence_root": "third-party-evidence",
 }
+THIRD_PARTY_AUTHORITY_KEYS = {"display_name", "role"}
 THIRD_PARTY_ENTRY_KEYS = {
     "id",
     "path",
@@ -150,12 +213,17 @@ THIRD_PARTY_ENTRY_KEYS = {
     "scope",
     "rights_holder",
     "source",
+    "content_sha256",
     "license_or_notice",
-    "accepted_by",
+    "notice_path",
+    "accepted_by_id",
     "accepted_date",
-    "source_sha256",
+    "approval_reference",
     "obligations",
+    "obligation_evidence",
 }
+THIRD_PARTY_SCOPE_KEYS = {"type", "value"}
+THIRD_PARTY_SOURCE_KEYS = {"locator", "evidence_path", "sha256"}
 
 
 @dataclass(frozen=True)
@@ -869,6 +937,113 @@ def _safe_repository_path(root: Path, value: Any) -> Path | None:
     return resolved
 
 
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _is_nonzero_sha256(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+        and value != "0" * 64
+    )
+
+
+def _codeowner_mapping(text: str) -> dict[str, list[str]]:
+    result: dict[str, list[str]] = {}
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split()
+        if len(parts) >= 2:
+            result[parts[0]] = parts[1:]
+    return result
+
+
+def check_legal_baseline_and_protection(root: Path, findings: list[Finding]) -> None:
+    baseline_path = root / "legal-baseline.yaml"
+    try:
+        baseline = _load_unique_yaml(_read_text(baseline_path))
+    except (OSError, UnicodeError, yaml.YAMLError) as exc:
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", f"cannot load legal baseline: {exc}"))
+        return
+
+    if not isinstance(baseline, dict) or set(baseline) != LEGAL_BASELINE_ROOT_KEYS:
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "root keys must exactly match the controlled schema"))
+        return
+    version = baseline.get("baseline_version")
+    if not isinstance(version, int) or isinstance(version, bool) or version < 1:
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "baseline_version must be a positive integer"))
+    if baseline.get("repository") != "host-device-control-framework":
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "repository identity is invalid"))
+    if baseline.get("purpose") != "legal-text-change-detection":
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "purpose must state legal-text-change-detection"))
+    if baseline.get("local_validator_scope") != "digest-consistency-only":
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "local validator scope must remain digest-consistency-only"))
+    if baseline.get("external_authorization_required") is not True:
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "external authorization must be explicitly required"))
+
+    protected = baseline.get("protected_documents")
+    if not isinstance(protected, dict) or set(protected) != LEGAL_PROTECTED_DOCUMENTS:
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "protected document set must exactly match the controlled set"))
+    else:
+        for relative in sorted(LEGAL_PROTECTED_DOCUMENTS):
+            record = protected.get(relative)
+            if not isinstance(record, dict) or set(record) != {"normalized_visible_sha256"}:
+                findings.append(Finding("LEGAL-003", "legal-baseline.yaml", f"invalid digest record for {relative}"))
+                continue
+            expected = record.get("normalized_visible_sha256")
+            if not _is_nonzero_sha256(expected):
+                findings.append(Finding("LEGAL-003", "legal-baseline.yaml", f"invalid digest for {relative}"))
+                continue
+            path = root / relative
+            actual = _visible_sha256(_read_text(path)) if path.is_file() else "missing"
+            if actual != expected:
+                findings.append(Finding("LEGAL-002", relative, "normalized visible legal text differs from legal-baseline.yaml; local validation detects the change but does not authorize a new legal baseline"))
+
+    anchor = baseline.get("external_anchor")
+    if not isinstance(anchor, dict) or set(anchor) != LEGAL_EXTERNAL_ANCHOR_KEYS:
+        findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "external_anchor keys must exactly match the controlled schema"))
+    else:
+        expected_modes = ["signed-tag", "protected-merge-with-code-owner-review"]
+        if anchor.get("required") is not True or anchor.get("accepted_modes") != expected_modes:
+            findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "external anchor requirement or accepted modes are invalid"))
+        tag = anchor.get("signed_tag_name")
+        if not isinstance(tag, str) or re.fullmatch(r"legal-baseline-v[1-9][0-9]*", tag) is None or tag != f"legal-baseline-v{version}":
+            findings.append(Finding("LEGAL-003", "legal-baseline.yaml", "signed tag name must match baseline_version"))
+        expected_anchor_values = {
+            "verification": "external-to-repository",
+            "repository_validator_verification": "not-available",
+            "codeowners_path": ".github/CODEOWNERS",
+            "protection_requirements_path": ".github/REPOSITORY_PROTECTION.md",
+        }
+        for key, expected in expected_anchor_values.items():
+            if anchor.get(key) != expected:
+                findings.append(Finding("LEGAL-003", "legal-baseline.yaml", f"external anchor field {key} is invalid"))
+
+    owners_path = root / ".github/CODEOWNERS"
+    try:
+        mapping = _codeowner_mapping(_read_text(owners_path))
+    except (OSError, UnicodeError) as exc:
+        findings.append(Finding("GOV-003", ".github/CODEOWNERS", f"cannot read CODEOWNERS: {exc}"))
+    else:
+        for path_pattern in sorted(REQUIRED_CODEOWNER_PATHS):
+            owners = mapping.get(path_pattern)
+            if owners != ["@jkman357"]:
+                findings.append(Finding("GOV-003", ".github/CODEOWNERS", f"required controlled owner mapping is missing or altered: {path_pattern} @jkman357"))
+
+    protection_path = root / ".github/REPOSITORY_PROTECTION.md"
+    protection = _visible_text(_read_text(protection_path)).casefold() if protection_path.is_file() else ""
+    for marker in sorted(REQUIRED_PROTECTION_MARKERS):
+        if marker not in protection:
+            findings.append(Finding("GOV-003", ".github/REPOSITORY_PROTECTION.md", f"required external-governance marker is missing or altered: {marker}"))
+
+
 def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
     path = root / "third-party-materials.yaml"
     if not path.is_file():
@@ -882,10 +1057,23 @@ def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
     if not isinstance(document, dict) or set(document) != THIRD_PARTY_MANIFEST_ROOT_KEYS:
         findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest root keys must exactly match the controlled schema"))
         return
-    if document.get("manifest_version") != 1 or document.get("repository") != "host-device-control-framework":
+    if document.get("manifest_version") != 2 or document.get("repository") != "host-device-control-framework":
         findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest identity is invalid"))
     if document.get("policy") != THIRD_PARTY_POLICY:
         findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest policy must exactly match the controlled fail-closed policy"))
+
+    authorities = document.get("approval_authorities")
+    if not isinstance(authorities, dict) or not authorities:
+        findings.append(Finding("TPM-001", "third-party-materials.yaml", "approval_authorities must be a non-empty mapping"))
+        authorities = {}
+    else:
+        for authority_id, authority in authorities.items():
+            if not isinstance(authority_id, str) or re.fullmatch(r"[a-z0-9][a-z0-9._-]{0,63}", authority_id) is None:
+                findings.append(Finding("TPM-001", "third-party-materials.yaml", "approval authority IDs must be controlled lowercase identifiers"))
+                continue
+            if not isinstance(authority, dict) or set(authority) != THIRD_PARTY_AUTHORITY_KEYS or not all(isinstance(authority.get(k), str) and authority[k].strip() for k in THIRD_PARTY_AUTHORITY_KEYS):
+                findings.append(Finding("TPM-001", "third-party-materials.yaml", f"invalid approval authority: {authority_id}"))
+
     materials = document.get("materials")
     if not isinstance(materials, list):
         findings.append(Finding("TPM-001", "third-party-materials.yaml", "materials must be an array"))
@@ -903,36 +1091,127 @@ def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
         if material_id in seen_ids:
             findings.append(Finding("TPM-002", location, f"duplicate material id: {material_id}"))
         seen_ids.add(material_id)
-        for field in ("path", "marker_path", "scope", "rights_holder", "source", "license_or_notice", "accepted_by"):
+
+        for field in ("path", "marker_path", "rights_holder", "license_or_notice", "notice_path", "accepted_by_id", "approval_reference"):
             if not isinstance(entry.get(field), str) or not entry[field].strip():
                 findings.append(Finding("TPM-002", location, f"{field} must be a non-empty string"))
+
+        scope = entry.get("scope")
+        if not isinstance(scope, dict) or set(scope) != THIRD_PARTY_SCOPE_KEYS or scope != {"type": "entire-file", "value": "entire-file"}:
+            findings.append(Finding("TPM-002", location, "scope must be the controlled entire-file scope; partial-file exceptions are prohibited"))
+
+        source = entry.get("source")
+        if not isinstance(source, dict) or set(source) != THIRD_PARTY_SOURCE_KEYS:
+            findings.append(Finding("TPM-002", location, "source must contain locator, evidence_path, and sha256"))
+            source = {}
+        elif not isinstance(source.get("locator"), str) or not source["locator"].strip():
+            findings.append(Finding("TPM-002", location, "source locator must be a non-empty string"))
+
         try:
             accepted_date = date.fromisoformat(entry.get("accepted_date", ""))
-            if accepted_date.isoformat() != entry.get("accepted_date"):
+            if accepted_date.isoformat() != entry.get("accepted_date") or accepted_date > date.today():
                 raise ValueError
         except (TypeError, ValueError):
-            findings.append(Finding("TPM-002", location, "accepted_date must be a real YYYY-MM-DD date"))
-        source_hash = entry.get("source_sha256")
-        if not isinstance(source_hash, str) or re.fullmatch(r"[0-9a-f]{64}", source_hash) is None:
-            findings.append(Finding("TPM-002", location, "source_sha256 must be a lowercase SHA-256 value"))
+            findings.append(Finding("TPM-002", location, "accepted_date must be a real, non-future YYYY-MM-DD date"))
+
+        if entry.get("accepted_by_id") not in authorities:
+            findings.append(Finding("TPM-002", location, "accepted_by_id must identify a controlled approval authority"))
+        approval_reference = entry.get("approval_reference")
+        if not isinstance(approval_reference, str) or re.fullmatch(r"(?:signed-tag|protected-merge|external-record):[A-Za-z0-9._:/@+-]+", approval_reference) is None:
+            findings.append(Finding("TPM-002", location, "approval_reference must use a controlled external reference prefix"))
+
+        content_hash = entry.get("content_sha256")
+        source_hash = source.get("sha256") if isinstance(source, dict) else None
+        if not _is_nonzero_sha256(content_hash):
+            findings.append(Finding("TPM-002", location, "content_sha256 must be a non-zero lowercase SHA-256 value"))
+        if not _is_nonzero_sha256(source_hash):
+            findings.append(Finding("TPM-002", location, "source sha256 must be a non-zero lowercase SHA-256 value"))
+
         obligations = entry.get("obligations")
-        if not isinstance(obligations, list) or not all(isinstance(item, str) and item.strip() for item in obligations):
-            findings.append(Finding("TPM-002", location, "obligations must be an array of non-empty strings"))
+        evidence = entry.get("obligation_evidence")
+        if not isinstance(obligations, list) or not all(isinstance(item, str) and item.strip() for item in obligations) or len(set(obligations)) != len(obligations):
+            findings.append(Finding("TPM-002", location, "obligations must be a unique array of non-empty strings"))
+            obligations = []
+        if not isinstance(evidence, list) or not all(isinstance(item, str) and item.strip() for item in evidence) or len(evidence) != len(obligations):
+            findings.append(Finding("TPM-002", location, "obligation_evidence must provide one repository evidence path per obligation"))
+            evidence = []
+
         target = _safe_repository_path(root, entry.get("path", ""))
         marker_path = _safe_repository_path(root, entry.get("marker_path", ""))
+        notice_path = _safe_repository_path(root, entry.get("notice_path", ""))
+        source_evidence = _safe_repository_path(root, source.get("evidence_path", "") if isinstance(source, dict) else "")
         if target is None or not target.is_file():
             findings.append(Finding("TPM-003", location, "registered material path must identify an existing repository file"))
-        if marker_path is None or not marker_path.is_file():
-            findings.append(Finding("TPM-003", location, "marker_path must identify an existing repository text file"))
+        elif _is_nonzero_sha256(content_hash) and _sha256_file(target) != content_hash:
+            findings.append(Finding("TPM-003", location, "content_sha256 does not match the actual repository file bytes"))
+
+        expected_evidence_prefix = (root / "third-party-evidence" / material_id).resolve()
+        if source_evidence is None or not source_evidence.is_file():
+            findings.append(Finding("TPM-003", location, "source evidence path must identify a retained repository file"))
         else:
+            try:
+                source_evidence.relative_to(expected_evidence_prefix)
+            except ValueError:
+                findings.append(Finding("TPM-003", location, "source evidence must be stored under third-party-evidence/<id>/"))
+            if _is_nonzero_sha256(source_hash) and _sha256_file(source_evidence) != source_hash:
+                findings.append(Finding("TPM-003", location, "source sha256 does not match retained source-evidence bytes"))
+
+        if marker_path is None or not marker_path.is_file() or notice_path is None or not notice_path.is_file() or marker_path != notice_path:
+            findings.append(Finding("TPM-003", location, "marker_path and notice_path must identify the same existing controlled notice file"))
+        else:
+            is_text_target = False
+            if target is not None and target.is_file():
+                try:
+                    target.read_text(encoding="utf-8")
+                    is_text_target = True
+                except (UnicodeDecodeError, OSError):
+                    is_text_target = False
+            expected_sidecar = target.with_name(target.name + ".NOTICE.md") if target is not None else None
+            if is_text_target and marker_path != target:
+                findings.append(Finding("TPM-003", location, "text material must carry its marker and notice in the registered file itself"))
+            if not is_text_target and target is not None and marker_path != expected_sidecar:
+                findings.append(Finding("TPM-003", location, "binary material must use the exact adjacent <filename>.NOTICE.md sidecar"))
             try:
                 marker_text = _visible_text(_read_text(marker_path))
             except (UnicodeDecodeError, OSError):
-                findings.append(Finding("TPM-003", location, "marker_path must be readable UTF-8 text"))
+                findings.append(Finding("TPM-003", location, "controlled notice must be readable UTF-8 text"))
             else:
                 marker = f"Third-Party Material ID: {material_id}"
+                notice_identity = f"License or Notice: {entry.get('license_or_notice', '')}"
                 if marker not in marker_text:
                     findings.append(Finding("TPM-003", location, f"required visible marker is missing: {marker}"))
+                if notice_identity not in marker_text:
+                    findings.append(Finding("TPM-003", location, f"registered license or notice identity is missing: {notice_identity}"))
+
+        for evidence_value in evidence:
+            evidence_path = _safe_repository_path(root, evidence_value)
+            if evidence_path is None or not evidence_path.is_file():
+                findings.append(Finding("TPM-003", location, f"obligation evidence path is missing or unsafe: {evidence_value}"))
+            else:
+                try:
+                    evidence_path.relative_to(expected_evidence_prefix)
+                except ValueError:
+                    findings.append(Finding("TPM-003", location, "obligation evidence must be stored under third-party-evidence/<id>/"))
+
+
+def check_conformance_claim_assets(root: Path, findings: list[Finding]) -> None:
+    schema_path = root / "schema/framework-conformance-claim.schema.yaml"
+    example_path = root / "examples/framework-conformance-claim.yaml"
+    try:
+        schema = _load_unique_yaml(_read_text(schema_path))
+        Draft202012Validator.check_schema(schema)
+    except (OSError, UnicodeError, yaml.YAMLError, SchemaError) as exc:
+        findings.append(Finding("CLAIM-001", _relative(root, schema_path), f"claim schema cannot be loaded or is invalid: {exc}"))
+        return
+    try:
+        example = _load_unique_yaml(_read_text(example_path))
+    except (OSError, UnicodeError, yaml.YAMLError) as exc:
+        findings.append(Finding("CLAIM-002", _relative(root, example_path), f"claim example cannot be loaded: {exc}"))
+        return
+    errors = sorted(Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(example), key=lambda error: list(error.absolute_path))
+    for error in errors:
+        location = ".".join(str(item) for item in error.absolute_path) or "<root>"
+        findings.append(Finding("CLAIM-002", _relative(root, example_path), f"claim example fails at {location}: {error.message}"))
 
 
 def check_legal_and_conformance_boundaries(
@@ -946,17 +1225,7 @@ def check_legal_and_conformance_boundaries(
                 Finding("LEGAL-001", "LICENSE", f"required licensing marker is missing or altered: {marker}")
             )
 
-    for relative, expected_hash in CONTROLLED_LEGAL_DOCUMENT_HASHES.items():
-        path = root / relative
-        actual_hash = _visible_sha256(_read_text(path)) if path.is_file() else "missing"
-        if actual_hash != expected_hash:
-            findings.append(
-                Finding(
-                    "LEGAL-002",
-                    relative,
-                    "normalized visible legal text differs from the controlled baseline; visible duplication, negation, contradiction, or semantic edits require an explicit baseline update",
-                )
-            )
+    check_legal_baseline_and_protection(root, findings)
 
     contribution_path = root / "CONTRIBUTING.md"
     contribution_text = _visible_text(_read_text(contribution_path)).casefold() if contribution_path.is_file() else ""
@@ -983,6 +1252,7 @@ def check_legal_and_conformance_boundaries(
             )
 
     check_third_party_materials(root, findings)
+    check_conformance_claim_assets(root, findings)
 
 
 def _normalize_command(command: str) -> str:
@@ -1312,8 +1582,11 @@ def check_changelog(root: Path, findings: list[Finding]) -> None:
         "validate_protocol.py",
         "protocol.schema.yaml",
         "third-party-materials.yaml",
+        "legal-baseline.yaml",
+        "framework-conformance-claim.schema.yaml",
         "Scoped Framework Conformance",
-        "normalized visible-text",
+        "signed-tag",
+        "patent",
     ]
     for term in required:
         if term not in section:

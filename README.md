@@ -1,6 +1,6 @@
 # Host-Device Control Framework
 
-A reusable, AI-consumable engineering authority set for designing, implementing, reviewing, and validating systems in which a **Coordinator** supervises one or more **Nodes**.
+A reusable-by-design, AI-consumable reference engineering authority set for evaluating, designing, reviewing, and validating systems in which a **Coordinator** supervises one or more **Nodes**. “Reusable” describes the architecture of the material; it is not a public license grant. Reproduction, implementation, adaptation, incorporation, distribution, or other use requires authorization under [`LICENSE`](LICENSE), GitHub's applicable Terms of Service, or applicable law.
 
 The repository is maintained as a personal engineering methodology project. GitHub `main` is the sole source of truth for maintained repository content. Detached packages require immutable source identity and integrity records.
 
@@ -37,9 +37,9 @@ AI may accelerate engineering work, but it cannot own Product authority, fabrica
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.24 | Draft for Review | AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, prohibited behaviors, and human approval boundary |
-| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.1.3 | Baseline | Reusable Single-Node and Multi-Node architecture, role and target boundaries, timing, safety, security, Firmware Update, Runtime, validation, and governance |
-| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.1.0 | Baseline | Method for applying the Framework to a Product, including topology, identity, resource, Reuse Classification, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
+| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.25 | Draft for Review | AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, prohibited behaviors, and human approval boundary |
+| [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.1.4 | Baseline | Generalized Single-Node and Multi-Node architecture, role and target boundaries, timing, safety, security, Firmware Update, Runtime, validation, conformance lifecycle, and governance |
+| [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.1.1 | Baseline | Method for applying the Framework to a Product, including topology, identity, resources, Reuse Classification, pre-validation claim-boundary baseline, Protocol inputs, risks, Gaps, MVP, and acceptance evidence |
 | [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.1.0 | Baseline | Protocol YAML syntax, Multi-Node node_model semantics, machine-verifiable governance representation, Schema Validation, Semantic Lint, and Code Generation |
 | [`Protocol_YAML_Template.md`](docs/protocol/Protocol_YAML_Template.md) | v1.1.0 | Baseline | Reusable Single-Node and Multi-Node Project Protocol YAML starting structure, examples, and review checklists |
 | [`Protocol_Compatibility_Rules.md`](docs/protocol/Protocol_Compatibility_Rules.md) | v1.1.0 | Draft for Review | Protocol change classification, Single-Node and Multi-Node compatibility, mixed-version operation, migration, deprecation, removal, and evidence |
@@ -54,10 +54,10 @@ AI may accelerate engineering work, but it cannot own Product authority, fabrica
 | [`Node_Software_Engineering_Rules.md`](docs/node/Node_Software_Engineering_Rules.md) | v1.1.0 | Draft for Review | Node identity, addressing, target validation, broadcast response, Session isolation, lifecycle, resources, safety, telemetry, diagnostics, Bootloader handoff, and target tests |
 | [`Embedded_C_Coding_Rules.md`](docs/coding-rules/Embedded_C_Coding_Rules.md) | v1.0.17 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 | [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.4 | Draft for Review | Product-owned C# language and .NET implementation rules |
-| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.9 | Draft for Review | Repository structural, registry, manifest, legal-boundary, contribution-policy, executable Protocol schema/fixture, evidence-state, and detached-package checks |
+| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.10 | Draft for Review | Repository structural, registry, legal-baseline, external-protection, third-party byte/evidence, executable Protocol schema/fixture, evidence-state, and detached-package checks |
 | [`Validation_Evidence_Guide.md`](docs/validation/Validation_Evidence_Guide.md) | v1.1.0 | Draft for Review | Evidence identity, traceability, reproducibility, execution state, Multi-Node topology and isolation records, ownership, anomaly, retention, integrity, and AI limitations |
 | [`Protocol_Validation_Checklist.md`](docs/validation/Protocol_Validation_Checklist.md) | v1.1.0 | Draft for Review | Traceable Protocol YAML, node_model, topology, identity, addressing, targeting, scope, security, compatibility, fixture, and interoperability evidence view |
-| [`Framework_Conformance_Checklist.md`](docs/validation/Framework_Conformance_Checklist.md) | v1.1.3 | Draft for Review | Traceable Framework role, authority, Multi-Node topology and isolation, immutable targeting, lifecycle, resources, safety, security, update, deviation, restoration, and evidence view |
+| [`Framework_Conformance_Checklist.md`](docs/validation/Framework_Conformance_Checklist.md) | v1.1.4 | Draft for Review | Traceable Framework role, authority, Multi-Node isolation, immutable targeting, lifecycle, claim-boundary baseline, claim lifecycle, safety, security, deviation, restoration, and evidence view |
 | [`Coding_Rules_Review_Checklist.md`](docs/validation/Coding_Rules_Review_Checklist.md) | v1.0.0 | Draft for Review | Common review entry point for applicable language Coding Rules, types, arithmetic, resources, errors, concurrency, APIs, state machines, generated code, analysis, tests, and deviations |
 | [`AI_Generated_Artifact_Validation_Guide.md`](docs/validation/AI_Generated_Artifact_Validation_Guide.md) | v1.1.0 | Draft for Review | Authority, prompt, stale-source, invented-topology, identity/address confusion, code/document/test, execution evidence, target verification, security, approval, and records |
 
@@ -167,11 +167,19 @@ host-device-control-framework/
 ├── LICENSE
 ├── NOTICE.md
 ├── third-party-materials.yaml
+├── legal-baseline.yaml
+├── third-party-evidence/
+│   └── README.md
+├── examples/
+│   └── framework-conformance-claim.yaml
 ├── authority-registry.yaml
 ├── requirements-validation.txt
 ├── schema/
-│   └── protocol.schema.yaml
+│   ├── protocol.schema.yaml
+│   └── framework-conformance-claim.schema.yaml
 ├── .github/
+│   ├── CODEOWNERS
+│   ├── REPOSITORY_PROTECTION.md
 │   └── workflows/
 │       └── document-validation.yml
 ├── docs/
@@ -237,7 +245,7 @@ python tools/validate_protocol.py tests/fixtures/protocol/valid_*.yaml
 python -m unittest discover -s tests -v
 ```
 
-The repository validator checks structure, registry equality, metadata/version/status, directory indexes, the AI manifest, stable filenames, links, headings, fences, tables, controlled LICENSE/NOTICE/contribution boundaries, third-party-material registration, Framework claim-classification and restoration controls, routing, workflow controls, the Protocol schema, valid/invalid semantic fixtures, and regression-protected governance failures. `validate_protocol.py` may also be run directly against Project Protocol YAML files.
+The repository validator checks structure, registry equality, metadata/version/status, directory indexes, the AI manifest, stable filenames, links, headings, fences, tables, controlled LICENSE/NOTICE/contribution boundaries, the externalized legal digest baseline, CODEOWNERS coverage, third-party material byte and evidence binding, Framework claim-classification and lifecycle controls, the conformance-claim schema and example, routing, workflow controls, the Protocol schema, valid/invalid semantic fixtures, and regression-protected governance failures. `validate_protocol.py` may also be run directly against Project Protocol YAML files.
 
 A passing result does not prove semantic correctness, Product suitability, safety, security adequacy, regulatory compliance, physical behavior, or human approval.
 
@@ -253,8 +261,8 @@ Ray Yang maintains the engineering direction and editorial decisions. Generative
 
 ## Copyright, Usage, and Contributions
 
-Copyright © 2026 Ray Yang. See [`LICENSE`](LICENSE), [`NOTICE.md`](NOTICE.md), and [`third-party-materials.yaml`](third-party-materials.yaml). Copyright claims are limited to protectable human-authored contributions and exclude third-party or legally unprotectable material. Public GitHub availability grants only the limited platform rights required by GitHub's applicable Terms of Service and does not create an additional repository license.
+Copyright © 2026 Ray Yang. See [`LICENSE`](LICENSE), [`NOTICE.md`](NOTICE.md), and [`third-party-materials.yaml`](third-party-materials.yaml). Copyright claims are limited to protectable human-authored contributions and exclude third-party or legally unprotectable material. Public GitHub availability grants GitHub, its Affiliates, and other GitHub Users only the distinct rights expressly provided by GitHub's applicable Terms of Service and does not create an additional repository, patent, trademark, endorsement, or other implied license.
 
 External contributions are not accepted unless a separate prior written contribution agreement is in place. See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-Framework conformance is the claim issuer's Project-scoped self-declaration. Claims shall be identified as `Full Framework Conformance`, `Scoped Framework Conformance`, or `Nonconforming`. Neither claim classification implies author, maintainer, or third-party certification, and a scoped claim shall not be presented as full or Product-wide conformance.
+Framework conformance is the claim issuer's Project-scoped self-declaration. Claims shall be identified as `Full Framework Conformance`, `Scoped Framework Conformance`, or `Nonconforming`; every included Scoped boundary shall satisfy all applicable requirements. Claims use a pre-validation boundary baseline and controlled lifecycle record. Neither claim classification implies author, maintainer, or third-party certification, and a separate assessment agreement binds only its named signatories and stated scope.

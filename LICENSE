@@ -6,11 +6,15 @@ Copyright claims in this repository apply only to the human-authored selection, 
 
 NO LICENSE GRANTED
 
-Except for the limited rights granted through GitHub under GitHub's applicable Terms of Service, and except for rights or exceptions provided by applicable law, no copyright license is granted to reproduce, modify, distribute, publish, sublicense, sell, commercially exploit, or otherwise use the original materials in this repository unless permission is explicitly stated for specific material or granted separately in writing by the applicable copyright holder.
+Except for rights expressly provided by GitHub's applicable Terms of Service to GitHub, its Affiliates, and other GitHub Users, and except for rights or exceptions provided by applicable law, no copyright license is granted to reproduce, modify, distribute, publish, sublicense, sell, commercially exploit, implement, incorporate, or otherwise use the original materials in this repository unless permission is explicitly stated for specific material or granted separately in writing by the applicable copyright holder.
 
-Making this repository public permits viewing and forking through the GitHub service only to the extent required by GitHub's applicable Terms of Service and functionality. Public availability does not by itself grant any additional right to reuse, modify, redistribute, publish, sublicense, sell, commercially exploit, or incorporate the materials into another Project outside those limited platform rights.
+Making this repository public grants GitHub, its Affiliates, and other GitHub Users only the distinct rights expressly provided by GitHub's applicable Terms of Service. Those platform and through-the-Service rights do not constitute an additional repository license outside the scope permitted by the applicable GitHub Terms or applicable law.
 
 Permission may be granted separately in writing by the applicable copyright holder.
+
+NO PATENT, TRADEMARK, OR OTHER IMPLIED LICENSE
+
+No patent license, patent covenant, trademark license, right of endorsement, right to use a name or mark, or other intellectual-property license is granted, whether expressly, by implication, estoppel, or otherwise, except where separately stated in a written agreement by the applicable rights holder.
 
 NO WARRANTY AND LIMITATION OF LIABILITY
 
@@ -24,8 +28,10 @@ Nothing in this disclaimer excludes or limits liability that cannot lawfully be 
 
 FILE-SPECIFIC AND THIRD-PARTY NOTICES
 
-A file-specific copyright, license, attribution, or use notice takes precedence only for the material it clearly identifies, only to the extent that the notice is lawfully authorized by the applicable rights holder, and only when the exception is expressly accepted by the maintainer and registered in `third-party-materials.yaml`.
+A file-specific copyright, license, attribution, or use notice takes precedence only for the complete material file it clearly identifies, only to the extent that the notice is lawfully authorized by the applicable rights holder, and only when the exception is expressly accepted under the controlled approval authority and registered in `third-party-materials.yaml`.
 
-Each accepted exception shall identify its controlled manifest entry through a visible `Third-Party Material ID: <id>` marker in or immediately adjacent to the affected material. A file-specific notice that is absent from the manifest, lacks the required marker, exceeds its registered scope, or is accidental, unauthorized, ambiguous, or copied shall not be interpreted as granting rights beyond those that the applicable rights holder had authority and intent to grant.
+Each accepted exception shall identify its controlled manifest entry through a visible `Third-Party Material ID: <id>` marker in the affected text file or in the exact controlled sidecar notice required for a binary file. The registered repository-content hash, retained source-evidence hash, rights notice, approval reference, and obligation evidence shall match the manifest. Partial-file exceptions are not accepted; third-party material requiring different terms shall be isolated into a separately registered file.
+
+A file-specific notice that is absent from the manifest, lacks the required marker, is not bound to the registered repository bytes and retained source evidence, exceeds its registered scope, or is accidental, unauthorized, ambiguous, or copied shall not be interpreted as granting rights beyond those that the applicable rights holder had authority and intent to grant.
 
 A third-party notice applies only to the specifically identified and registered third-party material and does not alter the terms applicable to the remaining repository materials.

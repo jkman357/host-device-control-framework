@@ -1,8 +1,13 @@
-manifest_version: 1
+manifest_version: 2
 repository: host-device-control-framework
 policy:
   default_terms: LICENSE
-  exception_authority: repository-maintainer
-  exception_effect: registered-material-only
+  exception_authority: controlled-approval-authority
+  exception_effect: registered-entire-file-only
   required_file_marker: "Third-Party Material ID: <id>"
+  source_evidence_root: third-party-evidence
+approval_authorities:
+  ray-yang:
+    display_name: Ray Yang
+    role: repository-maintainer
 materials: []

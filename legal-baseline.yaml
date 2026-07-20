@@ -1,0 +1,22 @@
+baseline_version: 1
+repository: host-device-control-framework
+purpose: legal-text-change-detection
+local_validator_scope: digest-consistency-only
+external_authorization_required: true
+protected_documents:
+  LICENSE:
+    normalized_visible_sha256: a1bc91c768b9b24035d7f7ccf940f8762c4a24faf327e083c3bd8718f4084b0d
+  NOTICE.md:
+    normalized_visible_sha256: b334a6648c91c96cf0684b4514e3028395614f78a9fec4cc138c97130bcf11e7
+  CONTRIBUTING.md:
+    normalized_visible_sha256: 79369fb93ee3d947d9dc1c49419b370f34d6f20c1fa8297287e5eda7b9d7ad96
+external_anchor:
+  required: true
+  accepted_modes:
+  - signed-tag
+  - protected-merge-with-code-owner-review
+  signed_tag_name: legal-baseline-v1
+  verification: external-to-repository
+  repository_validator_verification: not-available
+  codeowners_path: .github/CODEOWNERS
+  protection_requirements_path: .github/REPOSITORY_PROTECTION.md

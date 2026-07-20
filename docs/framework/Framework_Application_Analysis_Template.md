@@ -1,17 +1,17 @@
 # Framework Application Analysis Template
 
 
-**Document Name:** `Framework_Application_Analysis_Template.md`  
-**Document ID:** FAAT  
-**Document Version:** v1.1.0  
-**Status:** Baseline  
-**Supersedes Document Version:** v1.0.17  
-**Document Type:** Reusable Analysis Template  
-**Primary Narrative Language:** English  
-**Author:** Ray Yang  
-**Maintainer:** Ray Yang  
-**Repository:** `host-device-control-framework`  
-**Repository Role:** Normative framework-application analysis method  
+**Document Name:** `Framework_Application_Analysis_Template.md`
+**Document ID:** FAAT
+**Document Version:** v1.1.1
+**Status:** Baseline
+**Supersedes Document Version:** v1.1.0
+**Document Type:** Reusable Analysis Template
+**Primary Narrative Language:** English
+**Author:** Ray Yang
+**Maintainer:** Ray Yang
+**Repository:** `host-device-control-framework`
+**Repository Role:** Normative framework-application analysis method
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Coordinator_Software_Engineering_Rules.md`
@@ -30,8 +30,8 @@
 - `Coding_Rules_Review_Checklist.md`
 - `AI_Generated_Artifact_Validation_Guide.md`
 
-**First Issued:** 2026-07-15  
-**Last Revised:** 2026-07-19  
+**First Issued:** 2026-07-15
+**Last Revised:** 2026-07-19
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -91,6 +91,7 @@ Other Coordinator/Node applications
 
 | Version | Date | Status | Author | Description |
 | --- | --- | --- | --- | --- |
+| v1.1.1 | 2026-07-20 | Baseline | Ray Yang | Added a pre-validation conformance claim-boundary baseline, revision identity, included and excluded boundaries, and post-failure anti-retroactivity requirements. |
 | v1.1.0 | 2026-07-19 | Baseline | Ray Yang | Added mandatory Multi-Node topology, identity, addressing, lifecycle, operation, security, shared-resource, Firmware Update, validation, and acceptance analysis records for independent links, shared buses, and routed gateways while retaining the existing Single-Node application path. |
 | v1.0.0 | 2026-07-15 | Not recorded | Ray Yang | Established the initial reusable Application Analysis template. |
 | v1.0.1 | 2026-07-15 | Not recorded | Ray Yang | Added Security and Access Control analysis, Framework compatibility revalidation, and Gap owner/status tracking. |
@@ -164,7 +165,27 @@ and shall be replaced or removed when the completed analysis is baselined.
 A completed Product analysis shall not retain unresolved placeholders silently. Every remaining `<TBD>` shall
 appear in the Open Question or Action Item Register with an Owner and target condition.
 
-## 0.4 Framework Compatibility and Revalidation
+## 0.4 Conformance Claim-Boundary Baseline
+
+Before conformance validation begins, the Project shall approve and revision-control the intended claim boundary and applicability baseline. This record is an input to validation; it shall not be created retroactively after a failure.
+
+| Item | Value |
+|---|---|
+| Claim Boundary Baseline ID | `<TBD>` |
+| Baseline Revision | `<TBD>` |
+| Approved Date | `<YYYY-MM-DD>` |
+| Approved By | `<Owner / authority>` |
+| Intended Claim Classification | Full Framework Conformance / Scoped Framework Conformance / Nonconforming |
+| Product or Project Revision | `<TBD>` |
+| Included Components, Capabilities, Lifecycle Phases, Artifacts, and Interfaces | `<TBD; non-empty and materially meaningful>` |
+| Excluded Boundaries | `<TBD or None>` |
+| Applicability Decision Set | `<Controlled record identity>` |
+| Validation Start Date | `<YYYY-MM-DD>` |
+| Supersedes Boundary Baseline | `<TBD or None>` |
+
+After a failure is known, an exclusion may rely only on pre-existing objective records from this approved baseline. A newly created or materially changed boundary is a new claim revision and shall not retroactively change the result or status of an earlier claim.
+
+## 0.5 Framework Compatibility and Revalidation
 
 The following versions identify the authority set used to author and self-check this reusable Template. They are
 authoring references, not automatic compatibility decisions for every Product:
@@ -236,7 +257,7 @@ Affected tests and measurements
 Application Analysis version history
 ```
 
-## 0.5 Authority Boundary
+## 0.6 Authority Boundary
 
 This template records application-specific analysis and decisions. It shall not redefine rules owned elsewhere.
 
@@ -264,7 +285,7 @@ One normative rule shall have one authority location.
 Architecture, Protocol, security, Firmware Update, and implementation statements repeated in this Template are
 derived conformance summaries. They guide analysis but do not override the document that owns the topic.
 
-## 0.6 Analysis Completion Gate
+## 0.7 Analysis Completion Gate
 
 This analysis is complete only when:
 

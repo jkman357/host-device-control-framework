@@ -1,0 +1,17 @@
+# Legal and governance trust boundary. Enforcement requires the external repository
+# protection controls documented in .github/REPOSITORY_PROTECTION.md.
+/LICENSE @jkman357
+/NOTICE.md @jkman357
+/CONTRIBUTING.md @jkman357
+/legal-baseline.yaml @jkman357
+/third-party-materials.yaml @jkman357
+/.github/CODEOWNERS @jkman357
+/.github/REPOSITORY_PROTECTION.md @jkman357
+/tools/validate_repository.py @jkman357
+/tests/test_validate_repository.py @jkman357
+/docs/framework/Coordinator_Node_Control_Framework.md @jkman357
+/docs/framework/Framework_Application_Analysis_Template.md @jkman357
+/docs/validation/Framework_Conformance_Checklist.md @jkman357
+/docs/validation/Repository_Validation_Checklist.md @jkman357
+/schema/framework-conformance-claim.schema.yaml @jkman357
+/examples/framework-conformance-claim.yaml @jkman357

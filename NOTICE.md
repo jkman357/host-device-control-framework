@@ -18,11 +18,13 @@ The materials are not a substitute for Product requirements, professional engine
 
 ## Framework Conformance Claims
 
-Framework conformance is a Project-scoped self-declaration made by the person or organization issuing the claim, unless a separate written assessment or certification agreement explicitly states otherwise.
+Framework conformance is a Project-scoped self-declaration made by the person or organization issuing the claim, unless a separate written assessment or certification agreement expressly identifies its named signatories, assessor authority, claimed boundary, revision, and evidence basis.
 
-A conformance claim does not imply review, certification, approval, endorsement, warranty, acceptance, or responsibility by the Framework author, repository maintainer, copyright holder, contributor, AI system, tool provider, or any third party. The claim issuer remains responsible for the accuracy, scope, evidence, approvals, exclusions, and presentation of the claim.
+Any separate assessment or certification agreement binds only its named signatories and applies only to the scope expressly identified in that agreement. It does not amend this repository's `LICENSE` or this Notice and does not imply participation, authorization, certification, endorsement, warranty, acceptance, or responsibility by the Framework author or maintainer unless that person is an express signatory acting in the stated role.
 
-A claim identified by the Framework as `Scoped Framework Conformance` shall not be presented, abbreviated, or promoted as full or product-wide Framework conformance.
+A conformance claim does not imply review, certification, approval, endorsement, warranty, acceptance, or responsibility by the Framework author, repository maintainer, copyright holder, contributor, AI system, tool provider, or any third party. The claim issuer remains responsible for the accuracy, scope, evidence, approvals, exclusions, lifecycle status, and presentation of the claim.
+
+A claim identified by the Framework as `Scoped Framework Conformance` shall not be presented, abbreviated, or promoted as full or product-wide Framework conformance. A claim applies only to its identified revision and remains valid only while its stated validity conditions continue to hold.
 
 ## No Employer or Company Representation
 
@@ -46,9 +48,11 @@ Users remain responsible for obtaining lawful access to applicable official stan
 
 ## File-Specific Notice Precedence
 
-A file-specific copyright, license, attribution, or use notice takes precedence only for the material it clearly identifies, only to the extent lawfully authorized by the applicable rights holder, and only when the exception is expressly accepted by the maintainer and registered in [`third-party-materials.yaml`](third-party-materials.yaml).
+A file-specific copyright, license, attribution, or use notice takes precedence only for the complete material file it clearly identifies, only to the extent lawfully authorized by the applicable rights holder, and only when the exception is accepted by a controlled approval authority and registered in [`third-party-materials.yaml`](third-party-materials.yaml).
 
-Each accepted exception shall carry the visible `Third-Party Material ID: <id>` marker required by the manifest. A notice that is not registered, lacks the required marker, exceeds the registered scope, or is accidental, unauthorized, ambiguous, or copied does not create a repository licensing exception.
+Each accepted exception shall carry the visible `Third-Party Material ID: <id>` marker in the affected text file or in the exact controlled sidecar notice required for a binary file. The manifest shall bind the exception to the actual repository-content hash, retained source-evidence hash, rights notice, approval reference, and obligation evidence. Partial-file exceptions are not accepted; differently licensed material shall be isolated into a separately registered file.
+
+A notice that is not registered, lacks the required marker, is not bound to the registered bytes and evidence, exceeds the registered scope, or is accidental, unauthorized, ambiguous, or copied does not create a repository licensing exception.
 
 A third-party notice applies only to the specifically identified and registered third-party material and does not alter the terms applicable to the remaining repository materials.
 

@@ -1,0 +1,162 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://example.invalid/host-device-control-framework/framework-conformance-claim.schema.yaml
+title: Framework Conformance Claim Record
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - claim_id
+  - issuer
+  - issued_date
+  - lifecycle_status
+  - classification
+  - product_or_project
+  - claimed_revision
+  - claim_boundary
+  - framework_source
+  - adopted_authorities
+  - applicability_decisions
+  - evidence_set
+  - deviations
+  - approval_record
+  - validity_conditions
+  - reevaluation_triggers
+  - supersedes
+  - superseded_by
+  - withdrawal_or_revocation_reason
+properties:
+  schema_version:
+    const: 1
+  claim_id:
+    type: string
+    pattern: '^[A-Z0-9][A-Z0-9._-]{2,63}$'
+  issuer:
+    type: object
+    additionalProperties: false
+    required: [legal_or_organizational_name, authority]
+    properties:
+      legal_or_organizational_name: {type: string, minLength: 1}
+      authority: {type: string, minLength: 1}
+  issued_date:
+    type: string
+    format: date
+  lifecycle_status:
+    enum: [active, superseded, withdrawn, revoked]
+  classification:
+    enum: [Full Framework Conformance, Scoped Framework Conformance, Nonconforming]
+  product_or_project: {type: string, minLength: 1}
+  claimed_revision: {type: string, minLength: 1}
+  claim_boundary:
+    type: object
+    additionalProperties: false
+    required: [baseline_id, baseline_revision, approved_before_validation, included, excluded]
+    properties:
+      baseline_id: {type: string, minLength: 1}
+      baseline_revision: {type: string, minLength: 1}
+      approved_before_validation: {const: true}
+      included:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items: {type: string, minLength: 1}
+      excluded:
+        type: array
+        uniqueItems: true
+        items: {type: string, minLength: 1}
+  framework_source:
+    type: object
+    additionalProperties: false
+    required: [repository, commit_sha, document_path, document_version]
+    properties:
+      repository: {const: host-device-control-framework}
+      commit_sha: {type: string, pattern: '^[0-9a-f]{40}$'}
+      document_path: {const: docs/framework/Coordinator_Node_Control_Framework.md}
+      document_version: {type: string, pattern: '^v[0-9]+\.[0-9]+\.[0-9]+$'}
+  adopted_authorities:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items: {type: string, minLength: 1}
+  applicability_decisions:
+    type: array
+    items: {type: string, minLength: 1}
+  evidence_set:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items: {type: string, minLength: 1}
+  deviations:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, relationship_to_claim, status]
+      properties:
+        id: {type: string, minLength: 1}
+        relationship_to_claim:
+          enum: [outside-included-boundary, non-contradictory-limitation, pre-assessment-authority-change]
+        status: {enum: [approved, closed]}
+  approval_record: {type: string, minLength: 1}
+  validity_conditions:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items: {type: string, minLength: 1}
+  reevaluation_triggers:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items:
+      enum:
+        - product-revision-change
+        - software-change
+        - hardware-change
+        - protocol-change
+        - configuration-change
+        - framework-authority-change
+        - applicability-change
+        - evidence-invalidation
+        - new-defect-or-hazard
+        - new-security-finding
+        - deviation-condition-change
+        - compensating-control-failure
+  supersedes:
+    anyOf: [{type: 'null'}, {type: string, minLength: 1}]
+  superseded_by:
+    anyOf: [{type: 'null'}, {type: string, minLength: 1}]
+  withdrawal_or_revocation_reason:
+    anyOf: [{type: 'null'}, {type: string, minLength: 1}]
+allOf:
+  - if:
+      properties: {classification: {const: Full Framework Conformance}}
+    then:
+      properties:
+        claim_boundary:
+          properties:
+            excluded: {maxItems: 0}
+        deviations: {maxItems: 0}
+  - if:
+      properties: {classification: {const: Scoped Framework Conformance}}
+    then:
+      properties:
+        claim_boundary:
+          properties:
+            excluded: {minItems: 1}
+  - if:
+      properties: {lifecycle_status: {const: superseded}}
+    then:
+      properties:
+        superseded_by: {type: string, minLength: 1}
+        withdrawal_or_revocation_reason: {type: 'null'}
+  - if:
+      properties: {lifecycle_status: {enum: [withdrawn, revoked]}}
+    then:
+      required: [withdrawal_or_revocation_reason]
+      properties:
+        withdrawal_or_revocation_reason: {type: string, minLength: 1}
+  - if:
+      properties: {lifecycle_status: {const: active}}
+    then:
+      properties:
+        superseded_by: {type: 'null'}
+        withdrawal_or_revocation_reason: {type: 'null'}

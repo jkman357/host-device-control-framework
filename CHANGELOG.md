@@ -6,6 +6,13 @@ Individual authority documents retain their own internal Version History and app
 
 ## Unreleased
 
+- Required Scoped claims to satisfy every applicable requirement within each included boundary; restricted residual deviations; froze the claim boundary before validation; and added claim lifecycle, invalidation, supersession, withdrawal, and signatory-bounded assessment rules.
+- Added `schema/framework-conformance-claim.schema.yaml` and a canonical machine-validatable Framework conformance claim example.
+- Upgraded `third-party-materials.yaml` to bind entire repository files to actual content hashes, retained source-evidence hashes, controlled notices, approver identities, approval references, and obligation evidence.
+- Externalized legal-text digests to `legal-baseline.yaml`; added CODEOWNERS and external signed-tag or protected-merge requirements; and clarified that repository-local validation provides change detection rather than independent authorization.
+- Corrected the GitHub Terms carve-out to distinguish rights granted to GitHub, its Affiliates, and other GitHub Users.
+- Added patent, invention, trademark, endorsement, and other implied-license boundaries.
+- Aligned the root README so reusable-by-design language does not imply a public implementation or reuse license.
 - Hardened CI and Protocol validation against conditional execution, expression-based continue-on-error, legacy-profile fail-open, weak field typing, fixture-oracle gaps, empty input, and unbounded diagnostic output.
 - Added Framework-level conformance-claim integrity and human or organizational deviation accountability; aligned the Framework Conformance Checklist; and added repository `AS IS`, no-warranty, independent-review, and limitation-of-liability terms to the existing `LICENSE`.
 - Added the GitHub Terms limited-platform-rights carve-out, lawfully authorized file-specific notice boundaries, a no-unsolicited-contribution policy, and a formal conformance correction/revalidation/evidence restoration path.
@@ -47,6 +54,7 @@ Individual authority documents retain their own internal Version History and app
 
 ### Changed
 
+- Updated AI Engineering Usage Guide to v1.0.25, Coordinator/Node Control Framework and Framework Conformance Checklist to v1.1.4, Framework Application Analysis Template to v1.1.1, and Repository Validation Checklist to v1.0.10; synchronized the registry, README, AI manifest, legal controls, third-party manifest, claim schema, validator, and regression tests.
 - Updated AI Engineering Usage Guide to v1.0.24, Coordinator/Node Control Framework and Framework Conformance Checklist to v1.1.3, and Repository Validation Checklist to v1.0.9; synchronized the registry, README, AI manifest, legal controls, third-party manifest, validator, and regression tests.
 - Updated AI Engineering Usage Guide to v1.0.23, Coordinator/Node Control Framework and Framework Conformance Checklist to v1.1.2, and Repository Validation Checklist to v1.0.8; synchronized the registry, README, AI manifest, validator, and regression tests.
 - Clarified that public GitHub visibility grants only GitHub Terms platform rights, restricted file-specific precedence to authorized scoped exceptions, and protected those boundaries with automated validation.

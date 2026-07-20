@@ -8,11 +8,11 @@ policy:
 documents:
 - display_name: AI Engineering Usage Guide
   path: docs/framework/AI_Engineering_Usage_Guide.md
-  version: v1.0.24
+  version: v1.0.25
   status: Draft for Review
   repository_role: Proposed normative AI task-routing and repository-governance authority
-  readme_purpose: AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, prohibited behaviors, and human approval
-    boundary
+  readme_purpose: AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, prohibited behaviors,
+    and human approval boundary
   routing_role: AI authority routing and operating controls
   applies_when: Any AI-assisted engineering task uses this repository or a detached authority-set package.
   authority_topics:
@@ -23,14 +23,14 @@ documents:
   prerequisite_documents: []
 - display_name: Coordinator/Node Control Framework
   path: docs/framework/Coordinator_Node_Control_Framework.md
-  version: v1.1.3
+  version: v1.1.4
   status: Baseline
   repository_role: Normative architecture and framework-governance authority
-  readme_purpose: Reusable Single-Node and Multi-Node architecture, role and target boundaries, timing, safety, security, Firmware Update, Runtime,
-    validation, and governance
-  routing_role: Reusable Single-Node and Multi-Node architecture and governance
-  applies_when: A task defines or reviews Coordinator/Node roles, boundaries, architecture, Protocol layering, Runtime, safety placement, security,
-    or Firmware Update behavior.
+  readme_purpose: Generalized Single-Node and Multi-Node architecture, role and target boundaries, timing, safety, security,
+    Firmware Update, Runtime, validation, conformance lifecycle, and governance
+  routing_role: Generalized Single-Node and Multi-Node architecture and governance
+  applies_when: A task defines or reviews Coordinator/Node roles, boundaries, architecture, Protocol layering, Runtime, safety
+    placement, security, or Firmware Update behavior.
   authority_topics:
   - Coordinator and Node roles
   - reusable architecture
@@ -42,11 +42,11 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Framework Application Analysis Template
   path: docs/framework/Framework_Application_Analysis_Template.md
-  version: v1.1.0
+  version: v1.1.1
   status: Baseline
   repository_role: Normative framework-application analysis method
-  readme_purpose: Method for applying the Framework to a Product, including topology, identity, resource, Reuse Classification, Protocol inputs,
-    risks, Gaps, MVP, and acceptance evidence
+  readme_purpose: Method for applying the Framework to a Product, including topology, identity, resources, Reuse Classification,
+    pre-validation claim-boundary baseline, Protocol inputs, risks, Gaps, MVP, and acceptance evidence
   routing_role: Application, topology, resource, and acceptance analysis method
   applies_when: The Framework is applied to a new Product, application, platform, or Product revision.
   authority_topics:
@@ -62,9 +62,10 @@ documents:
   path: docs/protocol/Protocol_YAML_Definition_Guide.md
   version: v1.1.0
   status: Baseline
-  repository_role: Normative Protocol YAML syntax, semantics, machine-verifiable representation, validation, and Code Generation authority
-  readme_purpose: Protocol YAML syntax, Multi-Node node_model semantics, machine-verifiable governance representation, Schema Validation, Semantic
-    Lint, and Code Generation
+  repository_role: Normative Protocol YAML syntax, semantics, machine-verifiable representation, validation, and Code Generation
+    authority
+  readme_purpose: Protocol YAML syntax, Multi-Node node_model semantics, machine-verifiable governance representation, Schema
+    Validation, Semantic Lint, and Code Generation
   routing_role: Protocol YAML representation and Multi-Node semantic-validation rules
   applies_when: A Project Protocol YAML is designed, reviewed, linted, versioned, or used for Code Generation.
   authority_topics:
@@ -98,11 +99,11 @@ documents:
   version: v1.1.0
   status: Draft for Review
   repository_role: Proposed normative Protocol compatibility and evolution authority shared by Coordinator and Node implementations
-  readme_purpose: Protocol change classification, Single-Node and Multi-Node compatibility, mixed-version operation, migration, deprecation, removal,
-    and evidence
+  readme_purpose: Protocol change classification, Single-Node and Multi-Node compatibility, mixed-version operation, migration,
+    deprecation, removal, and evidence
   routing_role: Protocol compatibility, Multi-Node migration, and mixed-version rules
-  applies_when: A Protocol change, version negotiation, mixed-version claim, deprecation, removal, or compatibility review is designed or evaluated
-    and this Draft is explicitly adopted or approved for Project use.
+  applies_when: A Protocol change, version negotiation, mixed-version claim, deprecation, removal, or compatibility review
+    is designed or evaluated and this Draft is explicitly adopted or approved for Project use.
   authority_topics:
   - Protocol compatibility classification
   - Protocol version consequences
@@ -117,12 +118,13 @@ documents:
   path: docs/protocol/Protocol_Registry_Governance.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed normative Protocol identifier Registry and allocation-governance authority shared by Coordinator and Node implementations
-  readme_purpose: Protocol identifiers plus distinct Node identity, runtime address, route, allocation, lifecycle, retirement, non-reuse, merge
-    control, and evidence
+  repository_role: Proposed normative Protocol identifier Registry and allocation-governance authority shared by Coordinator
+    and Node implementations
+  readme_purpose: Protocol identifiers plus distinct Node identity, runtime address, route, allocation, lifecycle, retirement,
+    non-reuse, merge control, and evidence
   routing_role: Protocol identifiers and Node identity/address/route governance
-  applies_when: A governed Protocol identifier, namespace, range, allocation, deprecation, retirement, merge, or generated Registry artifact is
-    designed or reviewed and this Draft is explicitly adopted or approved for Project use.
+  applies_when: A governed Protocol identifier, namespace, range, allocation, deprecation, retirement, merge, or generated
+    Registry artifact is designed or reviewed and this Draft is explicitly adopted or approved for Project use.
   authority_topics:
   - Protocol identifier allocation
   - Protocol namespace governance
@@ -138,12 +140,14 @@ documents:
   path: docs/protocol/Protocol_Security_Profile.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed normative Protocol security-profile and secure-session governance authority shared by Coordinator and Node implementations
-  readme_purpose: Security applicability, per-Node identity and Session binding, authorization, replay, Counter, Rekey, reconnect, credentials,
-    Firmware Update, and evidence
+  repository_role: Proposed normative Protocol security-profile and secure-session governance authority shared by Coordinator
+    and Node implementations
+  readme_purpose: Security applicability, per-Node identity and Session binding, authorization, replay, Counter, Rekey, reconnect,
+    credentials, Firmware Update, and evidence
   routing_role: Protocol security-profile and per-Node Session-isolation rules
-  applies_when: Protocol security applicability, Handshake, authentication, authorization, record protection, replay, Counter, Rekey, reconnect,
-    credential, Bootloader, or Firmware Update security is designed or reviewed and this Draft is explicitly adopted or approved for Project use.
+  applies_when: Protocol security applicability, Handshake, authentication, authorization, record protection, replay, Counter,
+    Rekey, reconnect, credential, Bootloader, or Firmware Update security is designed or reviewed and this Draft is explicitly
+    adopted or approved for Project use.
   authority_topics:
   - Protocol security-profile applicability
   - secure-session and authorization lifecycle
@@ -161,10 +165,11 @@ documents:
   version: v1.1.0
   status: Draft for Review
   repository_role: Proposed normative engineering authority for Coordinator-owned software
-  readme_purpose: Cross-language Coordinator architecture, per-Node ownership and isolation, lifecycle, concurrency, diagnostics, configuration,
-    security, testing, and release rules
+  readme_purpose: Cross-language Coordinator architecture, per-Node ownership and isolation, lifecycle, concurrency, diagnostics,
+    configuration, security, testing, and release rules
   routing_role: Cross-language Coordinator architecture and engineering rules
-  applies_when: Software performs or directly supports a Coordinator role and the Draft is explicitly adopted or approved for Project use.
+  applies_when: Software performs or directly supports a Coordinator role and the Draft is explicitly adopted or approved
+    for Project use.
   authority_topics:
   - Coordinator software architecture
   - lifecycle and concurrency
@@ -178,13 +183,14 @@ documents:
   path: docs/coordinator/Coordinator_Architecture_Patterns.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed topic-specific normative engineering authority for Coordinator architecture patterns, subordinate to Coordinator Software
-    Engineering Rules
-  readme_purpose: Coordinator layering, Node Registry and Context, immutable target binding, per-Node state and resources, shared-bus scheduling,
-    aggregate state, and multi-target patterns
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator architecture patterns, subordinate
+    to Coordinator Software Engineering Rules
+  readme_purpose: Coordinator layering, Node Registry and Context, immutable target binding, per-Node state and resources,
+    shared-bus scheduling, aggregate state, and multi-target patterns
   routing_role: Detailed Coordinator Multi-Node architecture and structural-realization rules
-  applies_when: Coordinator structure, layering, dependency direction, state ownership, command or receive pipelines, lifecycle realization, or
-    multi-Node isolation is designed or reviewed and this Draft is explicitly adopted or approved for Project use.
+  applies_when: Coordinator structure, layering, dependency direction, state ownership, command or receive pipelines, lifecycle
+    realization, or multi-Node isolation is designed or reviewed and this Draft is explicitly adopted or approved for Project
+    use.
   authority_topics:
   - Coordinator layering and dependency direction
   - Coordinator state ownership
@@ -199,13 +205,14 @@ documents:
   path: docs/coordinator/Coordinator_Concurrency_Guide.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed topic-specific normative engineering authority for Coordinator concurrency, subordinate to Coordinator Software Engineering
-    Rules
-  readme_purpose: Per-Node and aggregate execution ownership, asynchronous I/O, cancellation, queues, fairness, backpressure, connection generations,
-    overload, and bounded shutdown
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator concurrency, subordinate to Coordinator
+    Software Engineering Rules
+  readme_purpose: Per-Node and aggregate execution ownership, asynchronous I/O, cancellation, queues, fairness, backpressure,
+    connection generations, overload, and bounded shutdown
   routing_role: Detailed per-Node concurrency, fairness, backpressure, and shutdown rules
-  applies_when: Coordinator execution contexts, asynchronous I/O, cancellation, timeout, queueing, backpressure, reconnect generation, overload,
-    or shutdown behavior is designed or reviewed and this Draft is explicitly adopted or approved for Project use.
+  applies_when: Coordinator execution contexts, asynchronous I/O, cancellation, timeout, queueing, backpressure, reconnect
+    generation, overload, or shutdown behavior is designed or reviewed and this Draft is explicitly adopted or approved for
+    Project use.
   authority_topics:
   - Coordinator execution-context ownership
   - Coordinator asynchronous I/O and cancellation
@@ -220,13 +227,13 @@ documents:
   path: docs/coordinator/Coordinator_Logging_Guide.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed topic-specific normative engineering authority for Coordinator logging implementation, subordinate to Coordinator
-    Software Engineering Rules
-  readme_purpose: Structured per-Node diagnostics, identity, route, Session and correlation context, redaction, bounded delivery, retention, export,
-    and logger-failure behavior
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator logging implementation, subordinate
+    to Coordinator Software Engineering Rules
+  readme_purpose: Structured per-Node diagnostics, identity, route, Session and correlation context, redaction, bounded delivery,
+    retention, export, and logger-failure behavior
   routing_role: Detailed per-Node logging, redaction, delivery, retention, and export rules
-  applies_when: Coordinator diagnostic logging, correlation, redaction, bounded delivery, retention, export, evidence-integrity, or logger-failure
-    behavior is designed or reviewed and this Draft is explicitly adopted or approved for Project use.
+  applies_when: Coordinator diagnostic logging, correlation, redaction, bounded delivery, retention, export, evidence-integrity,
+    or logger-failure behavior is designed or reviewed and this Draft is explicitly adopted or approved for Project use.
   authority_topics:
   - Coordinator diagnostic event structure
   - Coordinator logging correlation and redaction
@@ -241,13 +248,13 @@ documents:
   path: docs/coordinator/Coordinator_Testing_Guide.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed topic-specific normative engineering authority for Coordinator engineering tests, subordinate to Coordinator Software
-    Engineering Rules
-  readme_purpose: Coordinator test layers plus Multi-Node isolation, targeting, race, conflict, shared-resource, broadcast, update, simulator,
-    fuzz, and evidence coverage
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator engineering tests, subordinate
+    to Coordinator Software Engineering Rules
+  readme_purpose: Coordinator test layers plus Multi-Node isolation, targeting, race, conflict, shared-resource, broadcast,
+    update, simulator, fuzz, and evidence coverage
   routing_role: Detailed Coordinator Multi-Node engineering-test and evidence rules
-  applies_when: Coordinator unit, component, integration, system, concurrency, fault, fuzz, simulator, CI, or evidence testing is planned, implemented,
-    reviewed, or reported and this Draft is explicitly adopted or approved for Project use.
+  applies_when: Coordinator unit, component, integration, system, concurrency, fault, fuzz, simulator, CI, or evidence testing
+    is planned, implemented, reviewed, or reported and this Draft is explicitly adopted or approved for Project use.
   authority_topics:
   - Coordinator test strategy and layers
   - Coordinator deterministic race and fault testing
@@ -262,13 +269,14 @@ documents:
   path: docs/coordinator/Coordinator_UI_Engineering_Guide.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed topic-specific normative engineering authority for Coordinator UI implementation, subordinate to Coordinator Software
-    Engineering Rules
-  readme_purpose: Node selection and immutable operation binding, aggregate and per-Node views, partial results, stale state, responsiveness,
-    visualization, and input safety
+  repository_role: Proposed topic-specific normative engineering authority for Coordinator UI implementation, subordinate
+    to Coordinator Software Engineering Rules
+  readme_purpose: Node selection and immutable operation binding, aggregate and per-Node views, partial results, stale state,
+    responsiveness, visualization, and input safety
   routing_role: Detailed Multi-Node Coordinator UI and operation-binding rules
-  applies_when: A Coordinator UI presents Node state, issues commands, handles external content, visualizes data, or implements operational, service,
-    production, or laboratory workflows and this Draft is explicitly adopted or approved for Project use.
+  applies_when: A Coordinator UI presents Node state, issues commands, handles external content, visualizes data, or implements
+    operational, service, production, or laboratory workflows and this Draft is explicitly adopted or approved for Project
+    use.
   authority_topics:
   - Coordinator presentation-state realization
   - Coordinator command feedback and stale-data display
@@ -284,10 +292,11 @@ documents:
   version: v1.1.0
   status: Draft for Review
   repository_role: Proposed normative engineering authority for Node-owned software realization
-  readme_purpose: Node identity, addressing, target validation, broadcast response, Session isolation, lifecycle, resources, safety, telemetry,
-    diagnostics, Bootloader handoff, and target tests
+  readme_purpose: Node identity, addressing, target validation, broadcast response, Session isolation, lifecycle, resources,
+    safety, telemetry, diagnostics, Bootloader handoff, and target tests
   routing_role: Cross-language Node identity, targeting, lifecycle, and engineering rules
-  applies_when: Software performs or directly supports a Node role and this Draft is explicitly adopted or approved for Project use.
+  applies_when: Software performs or directly supports a Node role and this Draft is explicitly adopted or approved for Project
+    use.
   authority_topics:
   - Node software architecture
   - Node execution-context and command ownership
@@ -302,7 +311,8 @@ documents:
   version: v1.0.17
   status: Final Baseline
   repository_role: Normative language and implementation authority for Product-owned Embedded C code
-  readme_purpose: Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules
+  readme_purpose: Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol,
+    and review rules
   routing_role: Product-owned Embedded C implementation rules
   applies_when: Product-owned Embedded C code is generated, modified, reviewed, or validated.
   authority_topics:
@@ -320,8 +330,8 @@ documents:
   repository_role: Proposed normative language and implementation authority for Product-owned C# code
   readme_purpose: Product-owned C# language and .NET implementation rules
   routing_role: Product-owned C# language and .NET implementation rules
-  applies_when: Product-owned C# code is generated, modified, reviewed, or validated and the Draft is explicitly adopted or approved for Project
-    use.
+  applies_when: Product-owned C# code is generated, modified, reviewed, or validated and the Draft is explicitly adopted or
+    approved for Project use.
   authority_topics:
   - C# language rules
   - .NET resource and concurrency behavior
@@ -331,12 +341,12 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Repository Validation Checklist
   path: docs/validation/Repository_Validation_Checklist.md
-  version: v1.0.9
+  version: v1.0.10
   status: Draft for Review
   repository_role: Proposed operational validation method; not a Product or architecture authority
-  readme_purpose: Repository structural, registry, manifest, legal-boundary, contribution-policy, executable Protocol schema/fixture, evidence-state,
-    and detached-package checks
-  routing_role: Repository structural, manifest, reference, legal-boundary, contribution-policy, and evidence checks
+  readme_purpose: Repository structural, registry, legal-baseline, external-protection, third-party byte/evidence, executable
+    Protocol schema/fixture, evidence-state, and detached-package checks
+  routing_role: Repository structural, legal-baseline, external-protection, third-party byte/evidence, and evidence checks
   applies_when: Repository content, authority manifests, detached packages, or validation tooling are changed or reviewed.
   authority_topics:
   - repository structural validation
@@ -350,12 +360,13 @@ documents:
   path: docs/validation/Validation_Evidence_Guide.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed operational validation-evidence method; not a Product, architecture, Protocol, role, or language authority
-  readme_purpose: Evidence identity, traceability, reproducibility, execution state, Multi-Node topology and isolation records, ownership, anomaly,
-    retention, integrity, and AI limitations
+  repository_role: Proposed operational validation-evidence method; not a Product, architecture, Protocol, role, or language
+    authority
+  readme_purpose: Evidence identity, traceability, reproducibility, execution state, Multi-Node topology and isolation records,
+    ownership, anomaly, retention, integrity, and AI limitations
   routing_role: Validation evidence identity, execution-state, and adequacy method
-  applies_when: An engineering claim, review, test, analysis, inspection, generated report, release decision, or AI-assisted evidence record is
-    prepared or evaluated.
+  applies_when: An engineering claim, review, test, analysis, inspection, generated report, release decision, or AI-assisted
+    evidence record is prepared or evaluated.
   authority_topics:
   - validation evidence classification
   - evidence traceability and reproducibility
@@ -368,9 +379,10 @@ documents:
   path: docs/validation/Protocol_Validation_Checklist.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed operational Protocol conformance checklist; not an independent Protocol or Product requirement authority
-  readme_purpose: Traceable Protocol YAML, node_model, topology, identity, addressing, targeting, scope, security, compatibility, fixture, and
-    interoperability evidence view
+  repository_role: Proposed operational Protocol conformance checklist; not an independent Protocol or Product requirement
+    authority
+  readme_purpose: Traceable Protocol YAML, node_model, topology, identity, addressing, targeting, scope, security, compatibility,
+    fixture, and interoperability evidence view
   routing_role: Protocol and Multi-Node validation evidence-capture checklist
   applies_when: A Project Protocol definition or implementation is reviewed or validated against its governing authorities.
   authority_topics:
@@ -387,14 +399,15 @@ documents:
   - docs/protocol/Protocol_Security_Profile.md
 - display_name: Framework Conformance Checklist
   path: docs/validation/Framework_Conformance_Checklist.md
-  version: v1.1.3
+  version: v1.1.4
   status: Draft for Review
-  repository_role: Proposed operational Framework conformance checklist; not an independent architecture or Product requirement authority
-  readme_purpose: Traceable Framework role, authority, Multi-Node topology and isolation, immutable targeting, lifecycle, resources, safety, security,
-    update, deviation, restoration, and evidence view
-  routing_role: Framework and Multi-Node conformance, deviation, and restoration evidence-capture checklist
-  applies_when: A Product architecture or implementation is reviewed for conformance with the adopted Coordinator/Node Framework and application
-    analysis.
+  repository_role: Proposed operational Framework conformance checklist; not an independent architecture or Product requirement
+    authority
+  readme_purpose: Traceable Framework role, authority, Multi-Node isolation, immutable targeting, lifecycle, claim-boundary
+    baseline, claim lifecycle, safety, security, deviation, restoration, and evidence view
+  routing_role: Framework and Multi-Node conformance, claim lifecycle, deviation, and restoration evidence-capture checklist
+  applies_when: A Product architecture or implementation is reviewed for conformance with the adopted Coordinator/Node Framework
+    and application analysis.
   authority_topics:
   - Framework role-boundary conformance view
   - Framework lifecycle and reconnect evidence view
@@ -409,9 +422,10 @@ documents:
   path: docs/validation/Coding_Rules_Review_Checklist.md
   version: v1.0.0
   status: Draft for Review
-  repository_role: Proposed operational common Coding Rules review checklist; not an independent language or Product requirement authority
-  readme_purpose: Common review entry point for applicable language Coding Rules, types, arithmetic, resources, errors, concurrency, APIs, state
-    machines, generated code, analysis, tests, and deviations
+  repository_role: Proposed operational common Coding Rules review checklist; not an independent language or Product requirement
+    authority
+  readme_purpose: Common review entry point for applicable language Coding Rules, types, arithmetic, resources, errors, concurrency,
+    APIs, state machines, generated code, analysis, tests, and deviations
   routing_role: Language Coding Rules review and evidence-capture checklist
   applies_when: Product-owned source code is reviewed against the applicable current or future language Coding Rules authority.
   authority_topics:
@@ -425,10 +439,10 @@ documents:
   path: docs/validation/AI_Generated_Artifact_Validation_Guide.md
   version: v1.1.0
   status: Draft for Review
-  repository_role: Proposed operational AI-artifact validation method; not an independent Product, architecture, Protocol, role, coding, safety,
-    security, or compliance authority
-  readme_purpose: Authority, prompt, stale-source, invented-topology, identity/address confusion, code/document/test, execution evidence, target
-    verification, security, approval, and records
+  repository_role: Proposed operational AI-artifact validation method; not an independent Product, architecture, Protocol,
+    role, coding, safety, security, or compliance authority
+  readme_purpose: Authority, prompt, stale-source, invented-topology, identity/address confusion, code/document/test, execution
+    evidence, target verification, security, approval, and records
   routing_role: AI-generated artifact validation and human-approval controls
   applies_when: AI assists with an engineering artifact, review, analysis, test, report, package, or evidence claim.
   authority_topics:
