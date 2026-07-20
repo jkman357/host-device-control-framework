@@ -8,9 +8,11 @@ Individual authority documents retain their own internal Version History and app
 
 - Hardened CI and Protocol validation against conditional execution, expression-based continue-on-error, legacy-profile fail-open, weak field typing, fixture-oracle gaps, empty input, and unbounded diagnostic output.
 - Added Framework-level conformance-claim integrity and human or organizational deviation accountability; aligned the Framework Conformance Checklist; and added repository `AS IS`, no-warranty, independent-review, and limitation-of-liability terms to the existing `LICENSE`.
+- Added the GitHub Terms limited-platform-rights carve-out, lawfully authorized file-specific notice boundaries, a no-unsolicited-contribution policy, and a formal conformance correction/revalidation/evidence restoration path.
 
 ### Added
 
+- Added `CONTRIBUTING.md` to require a separate prior written agreement before external repository contributions are accepted.
 - Added `schema/protocol.schema.yaml` as the controlled structural schema for the backward-compatible conditional `node_model`.
 - Added `tools/validate_protocol.py` with actionable rule, YAML path, expected value, actual value, and correction diagnostics for Multi-Node semantic validation.
 - Added valid Single-Node, independent-link, shared-bus, and routed-gateway fixtures plus invalid conflict, addressing, broadcast, scope, lifecycle, resource, and Firmware Update fixtures.
@@ -40,6 +42,8 @@ Individual authority documents retain their own internal Version History and app
 
 ### Changed
 
+- Updated AI Engineering Usage Guide to v1.0.23, Coordinator/Node Control Framework and Framework Conformance Checklist to v1.1.2, and Repository Validation Checklist to v1.0.8; synchronized the registry, README, AI manifest, validator, and regression tests.
+- Clarified that public GitHub visibility grants only GitHub Terms platform rights, restricted file-specific precedence to authorized scoped exceptions, and protected those boundaries with automated validation.
 - Updated AI Engineering Usage Guide to v1.0.22, Coordinator/Node Control Framework to v1.1.1, and Framework Conformance Checklist to v1.1.1; synchronized `authority-registry.yaml`, the root Current Document Set, and the AI Active Document Manifest.
 - Made document-version metadata regression tests derive the active version from the tested file instead of depending on a hard-coded Framework version.
 - Activated Draft 2020-12 Protocol schema validation before semantic linting and rejected duplicate YAML keys fail-closed.

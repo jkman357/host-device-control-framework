@@ -32,6 +32,12 @@ Users remain responsible for obtaining lawful access to applicable official stan
 
 ## File-Specific Notice Precedence
 
-When a file or included third-party component contains a more specific copyright, license, attribution, or use restriction, that file-specific or third-party notice applies to the relevant material and takes precedence over this general notice to the extent of the conflict.
+A file-specific copyright, license, attribution, or use notice takes precedence only for the material it clearly identifies, only to the extent lawfully authorized by the applicable rights holder, and only when expressly accepted into this repository by the maintainer as an authorized licensing or notice exception.
+
+A third-party notice applies only to the specifically identified third-party material and does not alter the terms applicable to the remaining repository materials. An accidental, unauthorized, ambiguous, or copied notice does not create a repository licensing exception.
 
 This `NOTICE.md` provides repository information only. It does not replace, amend, expand, or reduce the legal effect of the repository-level [`LICENSE`](LICENSE).
+
+## External Contributions
+
+External contributions are not accepted unless a separate written contribution agreement has been executed in advance. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the repository contribution boundary.

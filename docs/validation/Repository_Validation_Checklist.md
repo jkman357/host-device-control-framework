@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`  
-**Document Version:** v1.0.7  
+**Document Version:** v1.0.8  
 **Status:** Draft for Review  
-**Supersedes Document Version:** v1.0.6  
+**Supersedes Document Version:** v1.0.7  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.8 | 2026-07-20 | Draft for Review | Added regression-protected checks for the GitHub Terms limited-rights carve-out, lawfully authorized file-specific notice exceptions, the no-unsolicited-contribution policy, and the Framework conformance-restoration path. |
 | v1.0.7 | 2026-07-19 | Draft for Review | Added controlled Protocol schema, semantic-lint tool, Multi-Node fixtures, regression-test, workflow, and detached-package evidence checks. |
 | v1.0.6 | 2026-07-19 | Draft for Review | Added the common checklist non-authority principle and coverage for Protocol, Node, validation, NOTICE, folder-index, routing, synchronization, and governance-regression checks. |
 | v1.0.5 | 2026-07-19 | Draft for Review | Required the exact authority-registry root schema and controlled GitHub-main source identity, rejected prerequisite dependency cycles, fixed the CI runner to ubuntu-24.04, and added persistent regression tests for all three controls. |
@@ -93,7 +94,10 @@ The automated validator shall check at least:
 - Exact authority-topic strings are uniquely owned, preventing duplicate declared topic assignment.
 - Every governed document is listed by its same-directory `README.md`; Protocol governance files remain under `docs/protocol/`; and Node Rules are routed by both the root README and AI Guide.
 - Validation Checklists contain the common non-authority statement and validation Repository Roles explicitly deny independent requirement authority.
-- `NOTICE.md` contains the six required sections and mandatory personal-project, no-company-representation, AI-assistance, third-party, and LICENSE-precedence language.
+- `LICENSE` preserves the GitHub Terms limited-platform-rights carve-out, applicable-law exceptions, no-additional-rights boundary, no-warranty and liability terms, and lawfully authorized file-specific or third-party notice scope.
+- `CONTRIBUTING.md` states that external contributions require a separate prior written agreement and that unsolicited submissions do not create an inbound repository license or acceptance obligation.
+- `NOTICE.md` contains the required repository sections, limits file-specific notice precedence to lawfully authorized and expressly accepted exceptions, and links the contribution boundary.
+- The Framework and Framework Conformance Checklist retain the scoped conformance-claim, authorized-deviation, and correction/revalidation/evidence restoration requirements.
 - `CHANGELOG.md` records each newly introduced governed document and synchronization of Registry, Manifest, NOTICE, and Validator behavior.
 - Manifest path, version, status, Purpose, display-name, and Routing Role consistency with the authority registry.
 - Draft documents use `Proposed` Repository Role wording; Baseline and Final Baseline documents use non-proposed normative wording.
@@ -119,7 +123,9 @@ A reviewer shall verify:
 - Protocol wire definitions remain owned by the Project Protocol authority.
 - Security, safety, and Product decisions remain owned by their approved authorities.
 - Validation claims do not exceed retained evidence.
-- LICENSE and README usage language are consistent with the intended publication model.
+- LICENSE, NOTICE, CONTRIBUTING, and README usage language are consistent with the intended publication and contribution model.
+- File-specific or third-party notices are authorized, scoped to identified material, and do not silently relicense unrelated repository content.
+- A restored conformance claim is supported by correction or explicit exclusion from the claim scope, repeated invalidated activities, regenerated evidence, residual-risk approval, and a final scoped record.
 
 # 5. Detached Package Checks
 

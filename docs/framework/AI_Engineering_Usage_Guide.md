@@ -3,7 +3,7 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`  
 **Document ID:** AIEUG  
-**Document Version:** v1.0.22  
+**Document Version:** v1.0.23  
 **Status:** Draft for Review  
 **Document Type:** AI Usage and Authority Routing Guide  
 **Primary Narrative Language:** English  
@@ -11,7 +11,7 @@
 **Maintainer:** Ray Yang  
 **Repository:** `host-device-control-framework`  
 **Repository Role:** Proposed normative AI task-routing and repository-governance authority  
-**Supersedes Document Version:** v1.0.21  
+**Supersedes Document Version:** v1.0.22  
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -100,6 +100,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.0.23 | 2026-07-20 | Draft for Review | Synchronized active routing for Coordinator/Node Control Framework v1.1.2, Framework Conformance Checklist v1.1.2, and Repository Validation Checklist v1.0.8 after defining conformance restoration and hardening repository licensing, notice, and contribution boundaries. |
 | v1.0.22 | 2026-07-20 | Draft for Review | Synchronized active routing for Coordinator/Node Control Framework v1.1.1 and Framework Conformance Checklist v1.1.1 after adding Framework-level conformance-claim integrity and human or organizational deviation accountability; retained Draft for Review status pending human approval. |
 | v1.0.21 | 2026-07-19 | Draft for Review | Synchronized the active authority manifest and routed Multi-Node architecture, Protocol representation, Coordinator/Node realization, security, compatibility, and validation tasks to their governing documents and executable checks. |
 | v1.0.0 | 2026-07-18 | Not recorded | Established the AI-consumable repository positioning, authority priority, task routing, required AI inputs and outputs, prohibited behaviors, review severity, evidence requirements, prompt pattern, standard workflows, human approval boundary, completion checklist, and Baseline decisions. |
@@ -134,8 +135,8 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.22` | Draft for Review | AI authority routing and operating controls |
-| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.1` | Baseline | Reusable Single-Node and Multi-Node architecture and governance |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.23` | Draft for Review | AI authority routing and operating controls |
+| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.2` | Baseline | Reusable Single-Node and Multi-Node architecture and governance |
 | Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.1.0` | Baseline | Application, topology, resource, and acceptance analysis method |
 | Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.1.0` | Baseline | Protocol YAML representation and Multi-Node semantic-validation rules |
 | Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.1.0` | Baseline | Reusable Single-Node and Multi-Node Protocol starting structure |
@@ -151,10 +152,10 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 | Node Software Engineering Rules | `docs/node/Node_Software_Engineering_Rules.md` | `v1.1.0` | Draft for Review | Cross-language Node identity, targeting, lifecycle, and engineering rules |
 | Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.17` | Final Baseline | Product-owned Embedded C implementation rules |
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.7` | Draft for Review | Repository structural, manifest, reference, and evidence checks |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.8` | Draft for Review | Repository structural, manifest, reference, legal-boundary, contribution-policy, and evidence checks |
 | Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.1.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
 | Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.1.0` | Draft for Review | Protocol and Multi-Node validation evidence-capture checklist |
-| Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.1.1` | Draft for Review | Framework and Multi-Node conformance evidence-capture checklist |
+| Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.1.2` | Draft for Review | Framework and Multi-Node conformance, deviation, and restoration evidence-capture checklist |
 | Coding Rules Review Checklist | `docs/validation/Coding_Rules_Review_Checklist.md` | `v1.0.0` | Draft for Review | Language Coding Rules review and evidence-capture checklist |
 | AI-Generated Artifact Validation Guide | `docs/validation/AI_Generated_Artifact_Validation_Guide.md` | `v1.1.0` | Draft for Review | AI-generated artifact validation and human-approval controls |
 

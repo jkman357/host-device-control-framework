@@ -2,11 +2,11 @@ Copyright © 2026 Ray Yang. All rights reserved.
 
 NO LICENSE GRANTED
 
-Unless otherwise explicitly stated in a specific file or granted separately in writing by the copyright holder, no license is granted to reproduce, modify, distribute, publish, sublicense, sell, or use the original materials in this repository.
+Except for the limited rights granted through GitHub under GitHub's applicable Terms of Service, and except for rights or exceptions provided by applicable law, no copyright license is granted to reproduce, modify, distribute, publish, sublicense, sell, commercially exploit, or otherwise use the original materials in this repository unless permission is explicitly stated for specific material or granted separately in writing by the applicable copyright holder.
 
-Public availability on GitHub does not constitute permission to reuse, modify, redistribute, publish, sublicense, sell, or incorporate the materials into another Project.
+Making this repository public permits viewing and forking through the GitHub service only to the extent required by GitHub's applicable Terms of Service and functionality. Public availability does not by itself grant any additional right to reuse, modify, redistribute, publish, sublicense, sell, commercially exploit, or incorporate the materials into another Project outside those limited platform rights.
 
-Permission may be granted separately in writing by the copyright holder.
+Permission may be granted separately in writing by the applicable copyright holder.
 
 NO WARRANTY AND LIMITATION OF LIABILITY
 
@@ -16,4 +16,8 @@ Any person or organization that evaluates, relies upon, or applies these materia
 
 To the maximum extent permitted by applicable law, the copyright holder and contributors shall not be liable for any direct, indirect, incidental, special, consequential, or other loss or damage arising from access to, reliance upon, or application of these materials.
 
-When a file contains its own copyright, license, attribution, or third-party notice, that file-specific notice takes precedence for the applicable material.
+FILE-SPECIFIC AND THIRD-PARTY NOTICES
+
+A file-specific copyright, license, attribution, or use notice takes precedence only for the material it clearly identifies, only to the extent that the notice is lawfully authorized by the applicable rights holder, and only when it has been expressly accepted into this repository by the maintainer as an authorized licensing or notice exception.
+
+A third-party notice applies only to the specifically identified third-party material and does not alter the terms applicable to the remaining repository materials. An accidental, unauthorized, ambiguous, or copied notice shall not be interpreted as granting rights beyond those that the applicable rights holder had authority and intent to grant.

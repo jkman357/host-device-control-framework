@@ -215,6 +215,48 @@ class RepositoryValidatorTests(unittest.TestCase):
         ]
         self.assertEqual([], related)
 
+    def test_github_terms_carve_out_is_required(self) -> None:
+        path = self.root / "LICENSE"
+        text = path.read_text(encoding="utf-8").replace(
+            "limited rights granted through GitHub under GitHub's applicable Terms of Service",
+            "no platform rights",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("LEGAL-001", self.rules())
+
+    def test_file_specific_notice_authorization_is_required(self) -> None:
+        path = self.root / "LICENSE"
+        text = path.read_text(encoding="utf-8").replace(
+            "expressly accepted into this repository by the maintainer as an authorized licensing or notice exception",
+            "present in a file",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("LEGAL-001", self.rules())
+
+    def test_contribution_policy_is_required(self) -> None:
+        (self.root / "CONTRIBUTING.md").unlink()
+        rules = self.rules()
+        self.assertIn("REP-001", rules)
+        self.assertIn("CONTRIB-001", rules)
+
+    def test_conformance_restoration_path_is_required(self) -> None:
+        path = self.root / "docs/framework/Coordinator_Node_Control_Framework.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "Conformance may be claimed or restored only after",
+            "Conformance may be claimed at discretion after",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("GOV-001", self.rules())
+
+    def test_conformance_restoration_check_is_required(self) -> None:
+        path = self.root / "docs/validation/Framework_Conformance_Checklist.md"
+        text = path.read_text(encoding="utf-8").replace("F-009", "F-099", 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("GOV-002", self.rules())
+
 
 if __name__ == "__main__":
     unittest.main()

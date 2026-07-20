@@ -8,7 +8,7 @@ policy:
 documents:
 - display_name: AI Engineering Usage Guide
   path: docs/framework/AI_Engineering_Usage_Guide.md
-  version: v1.0.22
+  version: v1.0.23
   status: Draft for Review
   repository_role: Proposed normative AI task-routing and repository-governance authority
   readme_purpose: AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, prohibited behaviors, and human approval
@@ -23,7 +23,7 @@ documents:
   prerequisite_documents: []
 - display_name: Coordinator/Node Control Framework
   path: docs/framework/Coordinator_Node_Control_Framework.md
-  version: v1.1.1
+  version: v1.1.2
   status: Baseline
   repository_role: Normative architecture and framework-governance authority
   readme_purpose: Reusable Single-Node and Multi-Node architecture, role and target boundaries, timing, safety, security, Firmware Update, Runtime,
@@ -331,12 +331,12 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Repository Validation Checklist
   path: docs/validation/Repository_Validation_Checklist.md
-  version: v1.0.7
+  version: v1.0.8
   status: Draft for Review
   repository_role: Proposed operational validation method; not a Product or architecture authority
-  readme_purpose: Repository structural, registry, manifest, canonical-reference, executable Protocol schema/fixture, evidence-state, and detached-package
-    checks
-  routing_role: Repository structural, manifest, reference, and evidence checks
+  readme_purpose: Repository structural, registry, manifest, legal-boundary, contribution-policy, executable Protocol schema/fixture, evidence-state,
+    and detached-package checks
+  routing_role: Repository structural, manifest, reference, legal-boundary, contribution-policy, and evidence checks
   applies_when: Repository content, authority manifests, detached packages, or validation tooling are changed or reviewed.
   authority_topics:
   - repository structural validation
@@ -387,12 +387,12 @@ documents:
   - docs/protocol/Protocol_Security_Profile.md
 - display_name: Framework Conformance Checklist
   path: docs/validation/Framework_Conformance_Checklist.md
-  version: v1.1.1
+  version: v1.1.2
   status: Draft for Review
   repository_role: Proposed operational Framework conformance checklist; not an independent architecture or Product requirement authority
   readme_purpose: Traceable Framework role, authority, Multi-Node topology and isolation, immutable targeting, lifecycle, resources, safety, security,
-    update, deviation, and evidence view
-  routing_role: Framework and Multi-Node conformance evidence-capture checklist
+    update, deviation, restoration, and evidence view
+  routing_role: Framework and Multi-Node conformance, deviation, and restoration evidence-capture checklist
   applies_when: A Product architecture or implementation is reviewed for conformance with the adopted Coordinator/Node Framework and application
     analysis.
   authority_topics:

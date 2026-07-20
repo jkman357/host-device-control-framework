@@ -55,6 +55,7 @@ INDEX_READMES = {
 REQUIRED_FILES = {
     "README.md",
     "CHANGELOG.md",
+    "CONTRIBUTING.md",
     "LICENSE",
     "NOTICE.md",
     "authority-registry.yaml",
@@ -75,6 +76,7 @@ REQUIRED_NOTICE_HEADINGS = {
     "AI Assistance Disclosure",
     "Third-Party Standards and Trademark Notice",
     "File-Specific Notice Precedence",
+    "External Contributions",
 }
 CONTROLLED_METADATA = (
     "Document Version",
@@ -89,6 +91,29 @@ REQUIRED_VALIDATION_COMMANDS = [
     "python tools/validate_repository.py",
     "python -m unittest discover -s tests -v",
 ]
+
+REQUIRED_LICENSE_MARKERS = {
+    "limited rights granted through github under github's applicable terms of service",
+    "rights or exceptions provided by applicable law",
+    "does not by itself grant any additional right",
+    "no warranty and limitation of liability",
+    "expressly accepted into this repository by the maintainer as an authorized licensing or notice exception",
+    "does not alter the terms applicable to the remaining repository materials",
+}
+REQUIRED_CONTRIBUTION_MARKERS = {
+    "external code, documentation, tests, designs, generated artifacts, or other copyrightable contributions are not accepted unless",
+    "separate written contribution agreement",
+    "do not submit a pull request",
+    "does not by itself transfer ownership",
+    "does not amend the repository-level",
+}
+REQUIRED_CONFORMANCE_MARKERS = {
+    "conformance may be claimed or restored only after",
+    "omitted, bypassed, or invalidated reviews, validation activities, and approval controls have been completed or repeated",
+    "objective evidence has been regenerated where required",
+    "unauthorized bypasses and unapproved deviations remain nonconforming",
+}
+REQUIRED_CONFORMANCE_CHECK_IDS = {"F-006", "F-007", "F-008", "F-009"}
 
 
 @dataclass(frozen=True)
@@ -779,6 +804,41 @@ def check_notice_and_checklists(root: Path, findings: list[Finding]) -> None:
             )
 
 
+def check_legal_and_conformance_boundaries(
+    root: Path, findings: list[Finding]
+) -> None:
+    license_text = _read_text(root / "LICENSE").casefold() if (root / "LICENSE").is_file() else ""
+    for marker in sorted(REQUIRED_LICENSE_MARKERS):
+        if marker not in license_text:
+            findings.append(
+                Finding("LEGAL-001", "LICENSE", f"required licensing marker is missing or altered: {marker}")
+            )
+
+    contribution_path = root / "CONTRIBUTING.md"
+    contribution_text = _visible_text(_read_text(contribution_path)).casefold() if contribution_path.is_file() else ""
+    for marker in sorted(REQUIRED_CONTRIBUTION_MARKERS):
+        if marker not in contribution_text:
+            findings.append(
+                Finding("CONTRIB-001", "CONTRIBUTING.md", f"required contribution-policy marker is missing or altered: {marker}")
+            )
+
+    framework_path = root / "docs/framework/Coordinator_Node_Control_Framework.md"
+    framework_text = _visible_text(_read_text(framework_path)).casefold() if framework_path.is_file() else ""
+    for marker in sorted(REQUIRED_CONFORMANCE_MARKERS):
+        if marker not in framework_text:
+            findings.append(
+                Finding("GOV-001", _relative(root, framework_path), f"required conformance-restoration marker is missing or altered: {marker}")
+            )
+
+    checklist_path = root / "docs/validation/Framework_Conformance_Checklist.md"
+    checklist_text = _visible_text(_read_text(checklist_path)) if checklist_path.is_file() else ""
+    for check_id in sorted(REQUIRED_CONFORMANCE_CHECK_IDS):
+        if not re.search(rf"^\s*- \[ \] {re.escape(check_id)}\b", checklist_text, re.MULTILINE):
+            findings.append(
+                Finding("GOV-002", _relative(root, checklist_path), f"required conformance check is missing: {check_id}")
+            )
+
+
 def _normalize_command(command: str) -> str:
     return " ".join(command.replace("\\\n", " ").split())
 
@@ -1129,6 +1189,7 @@ def validate(root: Path | str) -> list[Finding]:
     check_links(root, findings)
     check_filename_policy(root, findings)
     check_notice_and_checklists(root, findings)
+    check_legal_and_conformance_boundaries(root, findings)
     check_workflow(root, findings)
     check_protocol_assets(root, findings)
     check_changelog(root, findings)

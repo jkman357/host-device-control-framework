@@ -3,9 +3,9 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.1.1  
+**Document Version:** v1.1.2  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.1.1  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -265,6 +265,7 @@ Markdown filename.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.2 | 2026-07-20 | Baseline | Defined scoped conformance claims, distinguished authorized deviations from unauthorized bypasses, and established the correction, repeated-review, regenerated-evidence, residual-risk approval, and recorded-approval path required before conformance may be claimed or restored. |
 | v1.1.1 | 2026-07-20 | Baseline | Added explicit Framework-level conformance-claim integrity and deviation-accountability rules: work produced by bypassing, disabling, ignoring, or materially misapplying applicable requirements, reviews, validation activities, or approval controls cannot claim Framework conformance, and responsibility remains with the human or organization accepting or approving the deviation. |
 | v1.1.0 | 2026-07-19 | Baseline | Established the complete Multi-Node architecture baseline for independent links, shared multidrop buses, and routed gateways; distinguished stable identity, runtime address, route, connection generation, Protocol and Secure Sessions; and defined per-Node isolation, lifecycle, targeting, shared-resource, broadcast, multi-target, Firmware Update, and fault-containment requirements while preserving Single-Node compatibility. |
 | v1.0.0 | 2026-07-15 | Not recorded | Integrated the Embedded Device Control Framework v1.4.2 and Coordinator/Node Architecture v1.2.1 into one Master Baseline. |
@@ -2604,11 +2605,19 @@ Product requirements belong in the SRS, Application Profile, Hazard Analysis, or
 
 Implementation details belong in the Reference Implementation and design specifications.
 
-## 9.11 Conformance Claim Integrity and Deviation Accountability
+## 9.11 Conformance Claim Integrity, Deviation Accountability, and Restoration
 
-Artifacts, implementations, analyses, or conformance claims produced by bypassing, disabling, ignoring, or materially misapplying applicable Framework requirements, required reviews, validation activities, or approval controls shall not claim conformance with this Framework.
+A Framework conformance claim shall identify the claimed Product or Project scope, the applicable Framework version and source identity, the Project authorities explicitly adopted for that scope, and any approved `Not Applicable` determinations or residual deviations.
 
-Responsibility for accepting any such deviation and its resulting outcomes remains with the human or organization making or approving that decision.
+Artifacts, implementations, analyses, or conformance claims produced by bypassing, disabling, ignoring, or materially misapplying applicable Framework requirements, required reviews, validation activities, or approval controls shall not claim conformance with this Framework for the affected scope.
+
+A bypass is not converted into an authorized deviation merely because it was performed, documented, or accepted informally. An authorized deviation requires a designated approval authority, a bounded scope, rationale, risk and impact assessment, compensating controls where applicable, objective evidence, an approval record, and an expiry, removal, or review condition.
+
+Approval of a deviation accepts only the documented residual risk within the approver's assigned authority. It does not make an uncorrected or inadequately validated artifact conforming, transfer responsibility to this Framework, repository, AI system, tool, author, or maintainer, or remove the responsibilities retained by implementers, reviewers, Product authorities, and other assigned roles.
+
+Conformance may be claimed or restored only after the deviation has been formally dispositioned; the affected artifact and its dependent outputs have been corrected, or the nonconforming portion has been explicitly excluded from the claimed scope; omitted, bypassed, or invalidated reviews, validation activities, and approval controls have been completed or repeated; objective evidence has been regenerated where required; remaining residual deviations have been approved and excluded from the conformance claim scope; and the final conformance record identifies the resulting scope, evidence, approvals, exclusions, and unresolved limitations.
+
+Unauthorized bypasses and unapproved deviations remain nonconforming and shall be reported to the responsible human authority rather than being normalized as accepted practice.
 
 ---
 
