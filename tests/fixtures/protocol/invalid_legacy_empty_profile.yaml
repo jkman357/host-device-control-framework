@@ -1,0 +1,13 @@
+# Expected: FAIL PY-LEGACY-001 and PY-LEGACY-002.
+schema_version: '999.999'
+document: {}
+protocol: {}
+wire_format: {}
+id_allocation: {}
+namespaces: []
+services: []
+enums: []
+errors: []
+messages: []
+compatibility: {}
+code_generation: {}

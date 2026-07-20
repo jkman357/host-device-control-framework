@@ -213,11 +213,13 @@ host-device-control-framework/
 │   └── validate_protocol.py
 └── tests/
     ├── fixtures/
-    │   └── protocol/
-    │       ├── valid_*.yaml
-    │       └── invalid_*.yaml
+    │   ├── protocol/
+    │   │   ├── valid_*.yaml
+    │   │   └── invalid_*.yaml
+    │   └── protocol_expectations.yaml
     ├── test_validate_repository.py
-    └── test_validate_protocol.py
+    ├── test_validate_protocol.py
+    └── test_security_regressions.py
 ```
 
 Directory `README.md` files are non-normative indexes. All other maintained Markdown under `docs/` is governed through `authority-registry.yaml`.

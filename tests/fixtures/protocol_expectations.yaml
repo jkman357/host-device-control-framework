@@ -1,0 +1,31 @@
+version: 1
+valid:
+  valid_legacy_single_node.yaml: []
+  valid_multi_independent.yaml: []
+  valid_multi_shared_bus.yaml: []
+  valid_routed_gateway.yaml: []
+  valid_single_node.yaml: []
+invalid:
+  invalid_address_reuse_session.yaml:
+    - PY-MN-033
+  invalid_bounded_parallel_update.yaml:
+    - PY-MN-040
+  invalid_broadcast_response_policy.yaml:
+    - PY-MN-021
+  invalid_group_session_without_profile.yaml:
+    - PY-MN-030
+  invalid_maximum_nodes_zero.yaml:
+    - PY-MN-004
+  invalid_multi_target_partial_failure.yaml:
+    - PY-MN-024
+  invalid_shared_bus_without_addressing.yaml:
+    - PY-MN-016
+  invalid_legacy_empty_profile.yaml:
+    - PY-LEGACY-001
+    - PY-LEGACY-002
+  invalid_boolean_string.yaml:
+    - PY-SCHEMA-001
+  invalid_scope_typo.yaml:
+    - PY-SCHEMA-001
+  invalid_identity_conflict_policy.yaml:
+    - PY-SCHEMA-001

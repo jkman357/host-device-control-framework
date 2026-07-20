@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 import tempfile
 import unittest
-import sys
+
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -17,10 +19,19 @@ class ProtocolValidatorTests(unittest.TestCase):
             with self.subTest(path=path.name):
                 self.assertEqual([], validate_path(path))
 
-    def test_invalid_fixtures_fail(self) -> None:
+    def test_invalid_fixtures_fail_with_expected_rules(self) -> None:
+        manifest = yaml.safe_load(
+            (ROOT / "tests/fixtures/protocol_expectations.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
         for path in sorted((ROOT / "tests/fixtures/protocol").glob("invalid_*.yaml")):
             with self.subTest(path=path.name):
-                self.assertTrue(validate_path(path))
+                issues = validate_path(path)
+                self.assertTrue(issues)
+                actual = {issue.rule for issue in issues}
+                expected = set(manifest["invalid"][path.name])
+                self.assertTrue(expected.issubset(actual), (path.name, expected, actual))
 
     def test_schema_validation_rejects_wrong_root_field_types(self) -> None:
         document = {
@@ -41,8 +52,14 @@ class ProtocolValidatorTests(unittest.TestCase):
         self.assertTrue(any(issue.rule == "PY-SCHEMA-001" for issue in issues))
 
     def test_duplicate_yaml_key_fails_closed(self) -> None:
-        text = (ROOT / "tests/fixtures/protocol/valid_legacy_single_node.yaml").read_text(encoding="utf-8")
-        text = text.replace("schema_version: '1.0'", "schema_version: '1.0'\nschema_version: '2.0'", 1)
+        text = (
+            ROOT / "tests/fixtures/protocol/valid_legacy_single_node.yaml"
+        ).read_text(encoding="utf-8")
+        text = text.replace(
+            "schema_version: '1.0'",
+            "schema_version: '1.0'\nschema_version: '2.0'",
+            1,
+        )
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "duplicate.yaml"
             path.write_text(text, encoding="utf-8")
@@ -65,7 +82,9 @@ class ProtocolValidatorTests(unittest.TestCase):
 
     def test_schema_itself_is_draft_2020_12_valid(self) -> None:
         schema = load_schema()
-        self.assertEqual("https://json-schema.org/draft/2020-12/schema", schema["$schema"])
+        self.assertEqual(
+            "https://json-schema.org/draft/2020-12/schema", schema["$schema"]
+        )
 
 
 if __name__ == "__main__":

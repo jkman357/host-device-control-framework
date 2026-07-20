@@ -16,7 +16,11 @@ class RepositoryValidatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name) / "repository"
-        shutil.copytree(ROOT, self.root, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        shutil.copytree(
+            ROOT,
+            self.root,
+            ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        )
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -32,7 +36,10 @@ class RepositoryValidatorTests(unittest.TestCase):
 
     def test_duplicate_registry_key_fails_closed(self) -> None:
         path = self.root / "authority-registry.yaml"
-        path.write_text("registry_version: 1\n" + path.read_text(encoding="utf-8"), encoding="utf-8")
+        path.write_text(
+            "registry_version: 1\n" + path.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
         self.assertIn("REG-001", self.rules())
 
     def test_uppercase_markdown_extension_cannot_escape_governance(self) -> None:
@@ -47,14 +54,22 @@ class RepositoryValidatorTests(unittest.TestCase):
         path = self.root / "docs/framework/Coordinator_Node_Control_Framework.md"
         text = path.read_text(encoding="utf-8")
         text = text.replace("**Document Version:** v1.1.0  \n", "", 1)
-        text = text.replace("# Coordinator/Node", "# Coordinator/Node\n\n```text\n**Document Version:** v1.1.0\n```", 1)
+        text = text.replace(
+            "# Coordinator/Node",
+            "# Coordinator/Node\n\n```text\n**Document Version:** v1.1.0\n```",
+            1,
+        )
         path.write_text(text, encoding="utf-8")
         self.assertIn("DOC-008", self.rules())
 
     def test_duplicate_visible_metadata_is_rejected(self) -> None:
         path = self.root / "docs/framework/Coordinator_Node_Control_Framework.md"
         text = path.read_text(encoding="utf-8")
-        text = text.replace("**Document Version:** v1.1.0  \n", "**Document Version:** v1.1.0  \n**Document Version:** v1.1.0  \n", 1)
+        text = text.replace(
+            "**Document Version:** v1.1.0  \n",
+            "**Document Version:** v1.1.0  \n**Document Version:** v1.1.0  \n",
+            1,
+        )
         path.write_text(text, encoding="utf-8")
         self.assertIn("DOC-008", self.rules())
 
@@ -80,8 +95,8 @@ class RepositoryValidatorTests(unittest.TestCase):
         path = self.root / ".github/workflows/document-validation.yml"
         text = path.read_text(encoding="utf-8")
         text = text.replace(
-            "- name: Validate repository documentation\n        run:",
-            "- name: Validate repository documentation\n        if: false\n        run:",
+            "      - name: Validate repository documentation\n        run:",
+            "      - name: Validate repository documentation\n        if: false\n        run:",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -91,8 +106,8 @@ class RepositoryValidatorTests(unittest.TestCase):
         path = self.root / ".github/workflows/document-validation.yml"
         text = path.read_text(encoding="utf-8")
         text = text.replace(
-            "- name: Run validator regression tests\n        run:",
-            "- name: Run validator regression tests\n        continue-on-error: true\n        run:",
+            "      - name: Run validator regression tests\n        run:",
+            "      - name: Run validator regression tests\n        continue-on-error: true\n        run:",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -100,7 +115,9 @@ class RepositoryValidatorTests(unittest.TestCase):
 
     def test_workflow_duplicate_yaml_key_is_rejected(self) -> None:
         path = self.root / ".github/workflows/document-validation.yml"
-        text = path.read_text(encoding="utf-8").replace("name: Document validation", "name: First\nname: Document validation", 1)
+        text = path.read_text(encoding="utf-8").replace(
+            "name: Document validation", "name: First\nname: Document validation", 1
+        )
         path.write_text(text, encoding="utf-8")
         self.assertIn("CI-001", self.rules())
 
@@ -111,12 +128,25 @@ class RepositoryValidatorTests(unittest.TestCase):
 
     def test_setext_heading_anchor_is_recognized(self) -> None:
         path = self.root / "setext_test.md"
-        path.write_text("Setext Heading\n==============\n\n[Jump](#setext-heading)\n", encoding="utf-8")
-        self.assertNotIn("LINK-001", {finding.rule for finding in validate(self.root) if finding.path.startswith("setext_test.md")})
+        path.write_text(
+            "Setext Heading\n==============\n\n[Jump](#setext-heading)\n",
+            encoding="utf-8",
+        )
+        self.assertNotIn(
+            "LINK-001",
+            {
+                finding.rule
+                for finding in validate(self.root)
+                if finding.path.startswith("setext_test.md")
+            },
+        )
 
     def test_missing_setext_anchor_is_rejected(self) -> None:
         path = self.root / "setext_test.md"
-        path.write_text("Setext Heading\n==============\n\n[Jump](#missing)\n", encoding="utf-8")
+        path.write_text(
+            "Setext Heading\n==============\n\n[Jump](#missing)\n",
+            encoding="utf-8",
+        )
         self.assertIn("LINK-001", self.rules())
 
     def test_undefined_reference_style_link_is_rejected(self) -> None:
@@ -126,7 +156,7 @@ class RepositoryValidatorTests(unittest.TestCase):
 
     def test_html_link_is_validated(self) -> None:
         path = self.root / "html_test.md"
-        path.write_text("# Test\n\n<a href=\"missing.md\">Missing</a>\n", encoding="utf-8")
+        path.write_text("# Test\n\n<a href=\"Missing.md\">Missing</a>\n", encoding="utf-8")
         self.assertIn("LINK-003", self.rules())
 
     def test_link_escape_is_rejected(self) -> None:
@@ -147,7 +177,9 @@ class RepositoryValidatorTests(unittest.TestCase):
 
     def test_protocol_schema_type_error_fails_valid_fixture(self) -> None:
         path = self.root / "tests/fixtures/protocol/valid_legacy_single_node.yaml"
-        text = path.read_text(encoding="utf-8").replace("document:\n", "document: []\nlegacy_document:\n", 1)
+        text = path.read_text(encoding="utf-8").replace(
+            "document:\n", "document: []\nlegacy_document:\n", 1
+        )
         path.write_text(text, encoding="utf-8")
         self.assertIn("PROTO-005", self.rules())
 
@@ -162,13 +194,19 @@ class RepositoryValidatorTests(unittest.TestCase):
 
     def test_reference_definition_target_is_checked(self) -> None:
         path = self.root / "reference_target.md"
-        path.write_text("# Test\n\n[Target][ref]\n\n[ref]: missing.md\n", encoding="utf-8")
+        path.write_text(
+            "# Test\n\n[Target][ref]\n\n[ref]: missing.md\n", encoding="utf-8"
+        )
         self.assertIn("LINK-003", self.rules())
 
     def test_valid_html_link_to_existing_file_passes(self) -> None:
         path = self.root / "html_valid.md"
         path.write_text("# Test\n\n<a href=\"README.md\">Readme</a>\n", encoding="utf-8")
-        related = [finding for finding in validate(self.root) if finding.path.startswith("html_valid.md")]
+        related = [
+            finding
+            for finding in validate(self.root)
+            if finding.path.startswith("html_valid.md")
+        ]
         self.assertEqual([], related)
 
 

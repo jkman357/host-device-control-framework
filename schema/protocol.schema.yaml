@@ -18,6 +18,7 @@ required:
 properties:
   schema_version:
     type: string
+    pattern: '^\d+\.\d+$'
   document:
     type: object
   protocol:
@@ -40,6 +41,8 @@ properties:
     type: object
   code_generation:
     type: object
+  security_profile:
+    type: object
   node_model:
     type: object
     required:
@@ -59,32 +62,107 @@ properties:
         enum: [single_node, independent_links, shared_multidrop_bus, routed_gateway]
       maximum_nodes:
         type: integer
-        minimum: 1
       maximum_online_nodes:
         type: integer
-        minimum: 1
       identity:
         type: object
         required: [node_id_required, uniqueness_scope, persistence]
+        properties:
+          node_id_required:
+            type: boolean
+          uniqueness_scope:
+            type: string
+            enum: [protocol_instance, product, global]
+          persistence:
+            type: string
+            enum: [stable, session, connection]
+        additionalProperties: false
       addressing:
         type: object
         required: [method, address_assignment, target_required_on_wire, broadcast]
+        properties:
+          method:
+            type: string
+            enum: [connection_bound, frame_address, route_bound]
+          address_assignment:
+            type: string
+            enum: [not_applicable, assigned, discovered, static, dynamic]
+          target_required_on_wire:
+            type: boolean
+          broadcast:
+            type: object
+            required: [supported, response_policy]
+            properties:
+              supported:
+                type: boolean
+              response_policy:
+                type: string
+                enum: [not_applicable, slotted, coordinator_polled, no_response, uncontrolled]
+            additionalProperties: false
+        additionalProperties: false
       multi_target:
         type: object
         required: [supported, partial_failure_policy]
+        properties:
+          supported:
+            type: boolean
+          partial_failure_policy:
+            type: string
+            enum: [not_applicable, per_target_result, best_effort, all_or_nothing]
+        additionalProperties: false
       scope:
         type: object
         required: [protocol_session, secure_session, sequence, correlation]
+        properties:
+          protocol_session:
+            type: string
+            enum: [global, connection, per_node, group]
+          secure_session:
+            type: string
+            enum: [global, connection, per_node, group]
+          sequence:
+            type: string
+            enum: [global, connection, per_node, per_node_session, group]
+          correlation:
+            type: string
+            enum: [global, connection, per_node, per_node_session, group]
+        additionalProperties: false
       lifecycle:
         type: object
         required:
           - identity_conflict_policy
           - address_reuse_requires_new_connection_generation
           - address_reuse_requires_new_secure_session
+        properties:
+          identity_conflict_policy:
+            type: string
+            enum: [reject, quarantine, reject_and_quarantine, not_applicable, ignore]
+          address_reuse_requires_new_connection_generation:
+            type: boolean
+          address_reuse_requires_new_secure_session:
+            type: boolean
+        additionalProperties: false
       resources:
         type: object
         required: [maximum_pending_requests_per_node, maximum_total_pending_requests]
+        properties:
+          maximum_pending_requests_per_node:
+            type: integer
+          maximum_total_pending_requests:
+            type: integer
+        additionalProperties: false
       firmware_update:
         type: object
         required: [target_scope, concurrency]
+        properties:
+          target_scope:
+            type: string
+            enum: [single_node, multi_target]
+          concurrency:
+            type: string
+            enum: [one_at_a_time, bounded_parallel]
+          maximum_parallel_updates:
+            type: integer
+        additionalProperties: false
+    additionalProperties: false
 additionalProperties: true

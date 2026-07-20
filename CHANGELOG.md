@@ -6,6 +6,8 @@ Individual authority documents retain their own internal Version History and app
 
 ## Unreleased
 
+- Hardened CI and Protocol validation against conditional execution, expression-based continue-on-error, legacy-profile fail-open, weak field typing, fixture-oracle gaps, empty input, and unbounded diagnostic output.
+
 ### Added
 
 - Added `schema/protocol.schema.yaml` as the controlled structural schema for the backward-compatible conditional `node_model`.
