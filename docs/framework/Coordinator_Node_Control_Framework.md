@@ -3,9 +3,9 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`  
 **Document ID:** CNCF  
-**Document Version:** v1.1.0  
+**Document Version:** v1.1.1  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.14  
+**Supersedes Document Version:** v1.1.0  
 **Document Type:** Master Architecture and Engineering Governance Baseline  
 **Primary Narrative Language:** English  
 **Author:** Ray Yang  
@@ -29,7 +29,7 @@
 - `AI_Generated_Artifact_Validation_Guide.md`
 
 **First Issued:** 2026-07-15  
-**Last Revised:** 2026-07-19  
+**Last Revised:** 2026-07-20  
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -265,6 +265,7 @@ Markdown filename.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.1 | 2026-07-20 | Baseline | Added explicit Framework-level conformance-claim integrity and deviation-accountability rules: work produced by bypassing, disabling, ignoring, or materially misapplying applicable requirements, reviews, validation activities, or approval controls cannot claim Framework conformance, and responsibility remains with the human or organization accepting or approving the deviation. |
 | v1.1.0 | 2026-07-19 | Baseline | Established the complete Multi-Node architecture baseline for independent links, shared multidrop buses, and routed gateways; distinguished stable identity, runtime address, route, connection generation, Protocol and Secure Sessions; and defined per-Node isolation, lifecycle, targeting, shared-resource, broadcast, multi-target, Firmware Update, and fault-containment requirements while preserving Single-Node compatibility. |
 | v1.0.0 | 2026-07-15 | Not recorded | Integrated the Embedded Device Control Framework v1.4.2 and Coordinator/Node Architecture v1.2.1 into one Master Baseline. |
 | v1.0.1 | 2026-07-15 | Not recorded | Removed duplicate Protocol/Transport text, corrected Part XI numbering, removed obsolete normative references, removed the duplicate Baseline conclusion, and completed structural and Markdown validation without changing design semantics. |
@@ -2602,6 +2603,12 @@ Protocol field details belong in the Protocol Guide and Project Protocol YAML.
 Product requirements belong in the SRS, Application Profile, Hazard Analysis, or UI Specification.
 
 Implementation details belong in the Reference Implementation and design specifications.
+
+## 9.11 Conformance Claim Integrity and Deviation Accountability
+
+Artifacts, implementations, analyses, or conformance claims produced by bypassing, disabling, ignoring, or materially misapplying applicable Framework requirements, required reviews, validation activities, or approval controls shall not claim conformance with this Framework.
+
+Responsibility for accepting any such deviation and its resulting outcomes remains with the human or organization making or approving that decision.
 
 ---
 

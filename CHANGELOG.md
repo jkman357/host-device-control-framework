@@ -7,6 +7,7 @@ Individual authority documents retain their own internal Version History and app
 ## Unreleased
 
 - Hardened CI and Protocol validation against conditional execution, expression-based continue-on-error, legacy-profile fail-open, weak field typing, fixture-oracle gaps, empty input, and unbounded diagnostic output.
+- Added Framework-level conformance-claim integrity and human or organizational deviation accountability; aligned the Framework Conformance Checklist; and added repository `AS IS`, no-warranty, independent-review, and limitation-of-liability terms to the existing `LICENSE`.
 
 ### Added
 
@@ -39,6 +40,8 @@ Individual authority documents retain their own internal Version History and app
 
 ### Changed
 
+- Updated AI Engineering Usage Guide to v1.0.22, Coordinator/Node Control Framework to v1.1.1, and Framework Conformance Checklist to v1.1.1; synchronized `authority-registry.yaml`, the root Current Document Set, and the AI Active Document Manifest.
+- Made document-version metadata regression tests derive the active version from the tested file instead of depending on a hard-coded Framework version.
 - Activated Draft 2020-12 Protocol schema validation before semantic linting and rejected duplicate YAML keys fail-closed.
 - Replaced workflow substring checks with structural validation of the required unconditional validation steps and commands.
 - Hardened governed-document metadata, Markdown fence, link, heading, filename-extension, Registry duplicate-key, and current `Unreleased` CHANGELOG validation.

@@ -53,10 +53,13 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_fenced_metadata_is_not_accepted(self) -> None:
         path = self.root / "docs/framework/Coordinator_Node_Control_Framework.md"
         text = path.read_text(encoding="utf-8")
-        text = text.replace("**Document Version:** v1.1.0  \n", "", 1)
+        version_line = next(
+            line for line in text.splitlines() if line.startswith("**Document Version:** ")
+        )
+        text = text.replace(version_line + "\n", "", 1)
         text = text.replace(
             "# Coordinator/Node",
-            "# Coordinator/Node\n\n```text\n**Document Version:** v1.1.0\n```",
+            f"# Coordinator/Node\n\n```text\n{version_line.rstrip()}\n```",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -65,9 +68,12 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_duplicate_visible_metadata_is_rejected(self) -> None:
         path = self.root / "docs/framework/Coordinator_Node_Control_Framework.md"
         text = path.read_text(encoding="utf-8")
+        version_line = next(
+            line for line in text.splitlines() if line.startswith("**Document Version:** ")
+        )
         text = text.replace(
-            "**Document Version:** v1.1.0  \n",
-            "**Document Version:** v1.1.0  \n**Document Version:** v1.1.0  \n",
+            version_line + "\n",
+            version_line + "\n" + version_line + "\n",
             1,
         )
         path.write_text(text, encoding="utf-8")
