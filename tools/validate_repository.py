@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from datetime import date
+import hashlib
 from pathlib import Path
 import re
 from typing import Any, Iterable
@@ -58,6 +60,7 @@ REQUIRED_FILES = {
     "CONTRIBUTING.md",
     "LICENSE",
     "NOTICE.md",
+    "third-party-materials.yaml",
     "authority-registry.yaml",
     "requirements-validation.txt",
     ".github/workflows/document-validation.yml",
@@ -71,7 +74,9 @@ REQUIRED_FILES = {
 }
 REQUIRED_NOTICE_HEADINGS = {
     "Copyright Notice",
+    "Copyright Scope",
     "Personal Engineering Project Disclaimer",
+    "Framework Conformance Claims",
     "No Employer or Company Representation",
     "AI Assistance Disclosure",
     "Third-Party Standards and Trademark Notice",
@@ -93,12 +98,21 @@ REQUIRED_VALIDATION_COMMANDS = [
 ]
 
 REQUIRED_LICENSE_MARKERS = {
+    "copyright claims in this repository apply only to the human-authored selection",
+    "exclude third-party materials and any material that is not eligible for copyright protection",
     "limited rights granted through github under github's applicable terms of service",
     "rights or exceptions provided by applicable law",
     "does not by itself grant any additional right",
     "no warranty and limitation of liability",
-    "expressly accepted into this repository by the maintainer as an authorized licensing or notice exception",
+    "nothing in this disclaimer excludes or limits liability that cannot lawfully be excluded or limited",
+    "registered in `third-party-materials.yaml`",
+    "third-party material id: <id>",
     "does not alter the terms applicable to the remaining repository materials",
+}
+CONTROLLED_LEGAL_DOCUMENT_HASHES = {
+    "LICENSE": "aefe2eb84241649058f77fe6232a7c22d19c7c7384f6fc6ad623f3f1ee5a14fd",
+    "NOTICE.md": "d82cc310701a141d83e51babf5bfb1f74ce25f98991a09d726339b156d619e59",
+    "CONTRIBUTING.md": "507f12193fc626bad6a77f4679b98cedef2f09c80664c7dec0109b887bb1f593",
 }
 REQUIRED_CONTRIBUTION_MARKERS = {
     "external code, documentation, tests, designs, generated artifacts, or other copyrightable contributions are not accepted unless",
@@ -108,12 +122,40 @@ REQUIRED_CONTRIBUTION_MARKERS = {
     "does not amend the repository-level",
 }
 REQUIRED_CONFORMANCE_MARKERS = {
+    "framework conformance is a project-scoped self-declaration",
+    "full framework conformance",
+    "scoped framework conformance",
+    "nonconforming",
+    "non-excludable from every full or scoped framework conformance claim",
+    "shall not be created or expanded solely after",
     "conformance may be claimed or restored only after",
     "omitted, bypassed, or invalidated reviews, validation activities, and approval controls have been completed or repeated",
     "objective evidence has been regenerated where required",
     "unauthorized bypasses and unapproved deviations remain nonconforming",
 }
-REQUIRED_CONFORMANCE_CHECK_IDS = {"F-006", "F-007", "F-008", "F-009"}
+REQUIRED_CONFORMANCE_CHECK_IDS = {
+    "F-006", "F-007", "F-008", "F-009", "F-00A", "F-00B", "F-00C", "F-00D"
+}
+THIRD_PARTY_MANIFEST_ROOT_KEYS = {"manifest_version", "repository", "policy", "materials"}
+THIRD_PARTY_POLICY = {
+    "default_terms": "LICENSE",
+    "exception_authority": "repository-maintainer",
+    "exception_effect": "registered-material-only",
+    "required_file_marker": "Third-Party Material ID: <id>",
+}
+THIRD_PARTY_ENTRY_KEYS = {
+    "id",
+    "path",
+    "marker_path",
+    "scope",
+    "rights_holder",
+    "source",
+    "license_or_notice",
+    "accepted_by",
+    "accepted_date",
+    "source_sha256",
+    "obligations",
+}
 
 
 @dataclass(frozen=True)
@@ -192,6 +234,15 @@ def _visible_text(text: str) -> str:
     lines = uncommented.splitlines()
     inside, _ = _fence_ranges(lines)
     return "\n".join("" if inside[index] else line for index, line in enumerate(lines))
+
+
+def _normalized_visible_text(text: str) -> str:
+    """Return a whitespace-normalized representation of legally visible text."""
+    return " ".join(_visible_text(text).split())
+
+
+def _visible_sha256(text: str) -> str:
+    return hashlib.sha256(_normalized_visible_text(text).encode("utf-8")).hexdigest()
 
 
 def _opening_metadata_region(text: str) -> str:
@@ -804,14 +855,107 @@ def check_notice_and_checklists(root: Path, findings: list[Finding]) -> None:
             )
 
 
+def _safe_repository_path(root: Path, value: Any) -> Path | None:
+    if not isinstance(value, str) or not value:
+        return None
+    candidate = Path(value)
+    if candidate.is_absolute() or ".." in candidate.parts or value != candidate.as_posix():
+        return None
+    resolved = (root / candidate).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError:
+        return None
+    return resolved
+
+
+def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
+    path = root / "third-party-materials.yaml"
+    if not path.is_file():
+        findings.append(Finding("TPM-001", "third-party-materials.yaml", "controlled third-party material manifest is missing"))
+        return
+    try:
+        document = _load_unique_yaml(_read_text(path))
+    except yaml.YAMLError as exc:
+        findings.append(Finding("TPM-001", "third-party-materials.yaml", f"invalid YAML: {exc}"))
+        return
+    if not isinstance(document, dict) or set(document) != THIRD_PARTY_MANIFEST_ROOT_KEYS:
+        findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest root keys must exactly match the controlled schema"))
+        return
+    if document.get("manifest_version") != 1 or document.get("repository") != "host-device-control-framework":
+        findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest identity is invalid"))
+    if document.get("policy") != THIRD_PARTY_POLICY:
+        findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest policy must exactly match the controlled fail-closed policy"))
+    materials = document.get("materials")
+    if not isinstance(materials, list):
+        findings.append(Finding("TPM-001", "third-party-materials.yaml", "materials must be an array"))
+        return
+    seen_ids: set[str] = set()
+    for index, entry in enumerate(materials):
+        location = f"third-party-materials.yaml:materials[{index}]"
+        if not isinstance(entry, dict) or set(entry) != THIRD_PARTY_ENTRY_KEYS:
+            findings.append(Finding("TPM-002", location, "entry keys must exactly match the controlled schema"))
+            continue
+        material_id = entry.get("id")
+        if not isinstance(material_id, str) or re.fullmatch(r"[a-z0-9][a-z0-9._-]{0,63}", material_id) is None:
+            findings.append(Finding("TPM-002", location, "id must be a controlled lowercase identifier"))
+            continue
+        if material_id in seen_ids:
+            findings.append(Finding("TPM-002", location, f"duplicate material id: {material_id}"))
+        seen_ids.add(material_id)
+        for field in ("path", "marker_path", "scope", "rights_holder", "source", "license_or_notice", "accepted_by"):
+            if not isinstance(entry.get(field), str) or not entry[field].strip():
+                findings.append(Finding("TPM-002", location, f"{field} must be a non-empty string"))
+        try:
+            accepted_date = date.fromisoformat(entry.get("accepted_date", ""))
+            if accepted_date.isoformat() != entry.get("accepted_date"):
+                raise ValueError
+        except (TypeError, ValueError):
+            findings.append(Finding("TPM-002", location, "accepted_date must be a real YYYY-MM-DD date"))
+        source_hash = entry.get("source_sha256")
+        if not isinstance(source_hash, str) or re.fullmatch(r"[0-9a-f]{64}", source_hash) is None:
+            findings.append(Finding("TPM-002", location, "source_sha256 must be a lowercase SHA-256 value"))
+        obligations = entry.get("obligations")
+        if not isinstance(obligations, list) or not all(isinstance(item, str) and item.strip() for item in obligations):
+            findings.append(Finding("TPM-002", location, "obligations must be an array of non-empty strings"))
+        target = _safe_repository_path(root, entry.get("path", ""))
+        marker_path = _safe_repository_path(root, entry.get("marker_path", ""))
+        if target is None or not target.is_file():
+            findings.append(Finding("TPM-003", location, "registered material path must identify an existing repository file"))
+        if marker_path is None or not marker_path.is_file():
+            findings.append(Finding("TPM-003", location, "marker_path must identify an existing repository text file"))
+        else:
+            try:
+                marker_text = _visible_text(_read_text(marker_path))
+            except (UnicodeDecodeError, OSError):
+                findings.append(Finding("TPM-003", location, "marker_path must be readable UTF-8 text"))
+            else:
+                marker = f"Third-Party Material ID: {material_id}"
+                if marker not in marker_text:
+                    findings.append(Finding("TPM-003", location, f"required visible marker is missing: {marker}"))
+
+
 def check_legal_and_conformance_boundaries(
     root: Path, findings: list[Finding]
 ) -> None:
-    license_text = _read_text(root / "LICENSE").casefold() if (root / "LICENSE").is_file() else ""
+    license_path = root / "LICENSE"
+    license_text = _visible_text(_read_text(license_path)).casefold() if license_path.is_file() else ""
     for marker in sorted(REQUIRED_LICENSE_MARKERS):
         if marker not in license_text:
             findings.append(
                 Finding("LEGAL-001", "LICENSE", f"required licensing marker is missing or altered: {marker}")
+            )
+
+    for relative, expected_hash in CONTROLLED_LEGAL_DOCUMENT_HASHES.items():
+        path = root / relative
+        actual_hash = _visible_sha256(_read_text(path)) if path.is_file() else "missing"
+        if actual_hash != expected_hash:
+            findings.append(
+                Finding(
+                    "LEGAL-002",
+                    relative,
+                    "normalized visible legal text differs from the controlled baseline; visible duplication, negation, contradiction, or semantic edits require an explicit baseline update",
+                )
             )
 
     contribution_path = root / "CONTRIBUTING.md"
@@ -827,7 +971,7 @@ def check_legal_and_conformance_boundaries(
     for marker in sorted(REQUIRED_CONFORMANCE_MARKERS):
         if marker not in framework_text:
             findings.append(
-                Finding("GOV-001", _relative(root, framework_path), f"required conformance-restoration marker is missing or altered: {marker}")
+                Finding("GOV-001", _relative(root, framework_path), f"required conformance-governance marker is missing or altered: {marker}")
             )
 
     checklist_path = root / "docs/validation/Framework_Conformance_Checklist.md"
@@ -837,6 +981,8 @@ def check_legal_and_conformance_boundaries(
             findings.append(
                 Finding("GOV-002", _relative(root, checklist_path), f"required conformance check is missing: {check_id}")
             )
+
+    check_third_party_materials(root, findings)
 
 
 def _normalize_command(command: str) -> str:
@@ -1165,6 +1311,9 @@ def check_changelog(root: Path, findings: list[Finding]) -> None:
         "node_model",
         "validate_protocol.py",
         "protocol.schema.yaml",
+        "third-party-materials.yaml",
+        "Scoped Framework Conformance",
+        "normalized visible-text",
     ]
     for term in required:
         if term not in section:

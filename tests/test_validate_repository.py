@@ -228,12 +228,14 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_file_specific_notice_authorization_is_required(self) -> None:
         path = self.root / "LICENSE"
         text = path.read_text(encoding="utf-8").replace(
-            "expressly accepted into this repository by the maintainer as an authorized licensing or notice exception",
+            "registered in `third-party-materials.yaml`",
             "present in a file",
             1,
         )
         path.write_text(text, encoding="utf-8")
-        self.assertIn("LEGAL-001", self.rules())
+        rules = self.rules()
+        self.assertIn("LEGAL-001", rules)
+        self.assertIn("LEGAL-002", rules)
 
     def test_contribution_policy_is_required(self) -> None:
         (self.root / "CONTRIBUTING.md").unlink()
@@ -254,6 +256,183 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_conformance_restoration_check_is_required(self) -> None:
         path = self.root / "docs/validation/Framework_Conformance_Checklist.md"
         text = path.read_text(encoding="utf-8").replace("F-009", "F-099", 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("GOV-002", self.rules())
+
+    def test_visible_legal_semantic_reversal_is_rejected(self) -> None:
+        path = self.root / "LICENSE"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\nThe preceding no-license and no-warranty terms do not apply.\n",
+            encoding="utf-8",
+        )
+        self.assertIn("LEGAL-002", self.rules())
+
+    def test_html_comment_cannot_restore_removed_legal_clause(self) -> None:
+        path = self.root / "LICENSE"
+        marker = "limited rights granted through GitHub under GitHub's applicable Terms of Service"
+        text = path.read_text(encoding="utf-8").replace(marker, "no platform carve-out", 1)
+        text += f"\n<!-- {marker} -->\n"
+        path.write_text(text, encoding="utf-8")
+        rules = self.rules()
+        self.assertIn("LEGAL-001", rules)
+        self.assertIn("LEGAL-002", rules)
+
+    def test_fenced_example_cannot_restore_removed_legal_clause(self) -> None:
+        path = self.root / "LICENSE"
+        marker = "registered in `third-party-materials.yaml`"
+        text = path.read_text(encoding="utf-8").replace(marker, "present somewhere", 1)
+        text += f"\n```text\n{marker}\n```\n"
+        path.write_text(text, encoding="utf-8")
+        rules = self.rules()
+        self.assertIn("LEGAL-001", rules)
+        self.assertIn("LEGAL-002", rules)
+
+    def test_duplicate_visible_legal_clause_is_rejected(self) -> None:
+        path = self.root / "LICENSE"
+        text = path.read_text(encoding="utf-8")
+        paragraph = "Permission may be granted separately in writing by the applicable copyright holder."
+        path.write_text(text + "\n" + paragraph + "\n", encoding="utf-8")
+        self.assertIn("LEGAL-002", self.rules())
+
+    def test_third_party_manifest_is_required(self) -> None:
+        (self.root / "third-party-materials.yaml").unlink()
+        rules = self.rules()
+        self.assertIn("REP-001", rules)
+        self.assertIn("TPM-001", rules)
+
+    def test_third_party_manifest_policy_is_fail_closed(self) -> None:
+        path = self.root / "third-party-materials.yaml"
+        text = path.read_text(encoding="utf-8").replace(
+            "exception_effect: registered-material-only",
+            "exception_effect: any-file-notice",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("TPM-001", self.rules())
+
+    def test_third_party_manifest_entry_requires_visible_marker(self) -> None:
+        material = self.root / "third-party-example.txt"
+        material.write_text("Third-party example without marker.\n", encoding="utf-8")
+        manifest = self.root / "third-party-materials.yaml"
+        manifest.write_text(
+            """manifest_version: 1
+repository: host-device-control-framework
+policy:
+  default_terms: LICENSE
+  exception_authority: repository-maintainer
+  exception_effect: registered-material-only
+  required_file_marker: "Third-Party Material ID: <id>"
+materials:
+- id: example-material
+  path: third-party-example.txt
+  marker_path: third-party-example.txt
+  scope: entire file
+  rights_holder: Example Rights Holder
+  source: controlled example source
+  license_or_notice: Example Notice 1.0
+  accepted_by: Ray Yang
+  accepted_date: "2026-07-20"
+  source_sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+  obligations: []
+""",
+            encoding="utf-8",
+        )
+        self.assertIn("TPM-003", self.rules())
+
+    def test_valid_registered_third_party_material_passes_manifest_checks(self) -> None:
+        material = self.root / "third-party-example.txt"
+        material.write_text(
+            "Third-Party Material ID: example-material\nThird-party example.\n",
+            encoding="utf-8",
+        )
+        manifest = self.root / "third-party-materials.yaml"
+        manifest.write_text(
+            """manifest_version: 1
+repository: host-device-control-framework
+policy:
+  default_terms: LICENSE
+  exception_authority: repository-maintainer
+  exception_effect: registered-material-only
+  required_file_marker: "Third-Party Material ID: <id>"
+materials:
+- id: example-material
+  path: third-party-example.txt
+  marker_path: third-party-example.txt
+  scope: entire file
+  rights_holder: Example Rights Holder
+  source: controlled example source
+  license_or_notice: Example Notice 1.0
+  accepted_by: Ray Yang
+  accepted_date: "2026-07-20"
+  source_sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+  obligations: []
+""",
+            encoding="utf-8",
+        )
+        related = {finding.rule for finding in validate(self.root) if finding.rule.startswith("TPM-")}
+        self.assertEqual(set(), related)
+
+    def test_third_party_manifest_wrong_field_type_fails_without_crashing(self) -> None:
+        manifest = self.root / "third-party-materials.yaml"
+        manifest.write_text(
+            """manifest_version: 1
+repository: host-device-control-framework
+policy:
+  default_terms: LICENSE
+  exception_authority: repository-maintainer
+  exception_effect: registered-material-only
+  required_file_marker: "Third-Party Material ID: <id>"
+materials:
+- id: example-material
+  path: 123
+  marker_path: []
+  scope: entire file
+  rights_holder: Example Rights Holder
+  source: controlled example source
+  license_or_notice: Example Notice 1.0
+  accepted_by: Ray Yang
+  accepted_date: "2026-07-20"
+  source_sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+  obligations: []
+""",
+            encoding="utf-8",
+        )
+        rules = self.rules()
+        self.assertIn("TPM-002", rules)
+        self.assertIn("TPM-003", rules)
+
+    def test_full_scoped_and_nonconforming_classifications_are_required(self) -> None:
+        path = self.root / "docs/framework/Coordinator_Node_Control_Framework.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "Full Framework Conformance", "Complete Framework Conformance"
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("GOV-001", self.rules())
+
+    def test_failure_driven_scope_exclusion_prohibition_is_required(self) -> None:
+        path = self.root / "docs/framework/Coordinator_Node_Control_Framework.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "shall not be created or expanded solely after",
+            "may be created after",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("GOV-001", self.rules())
+
+    def test_self_declaration_boundary_is_required(self) -> None:
+        path = self.root / "docs/framework/Coordinator_Node_Control_Framework.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "Framework conformance is a Project-scoped self-declaration",
+            "Framework conformance is certification by the maintainer",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("GOV-001", self.rules())
+
+    def test_self_declaration_check_is_required(self) -> None:
+        path = self.root / "docs/validation/Framework_Conformance_Checklist.md"
+        text = path.read_text(encoding="utf-8").replace("F-00D", "F-00Z", 1)
         path.write_text(text, encoding="utf-8")
         self.assertIn("GOV-002", self.rules())
 

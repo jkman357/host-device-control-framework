@@ -1,0 +1,8 @@
+manifest_version: 1
+repository: host-device-control-framework
+policy:
+  default_terms: LICENSE
+  exception_authority: repository-maintainer
+  exception_effect: registered-material-only
+  required_file_marker: "Third-Party Material ID: <id>"
+materials: []

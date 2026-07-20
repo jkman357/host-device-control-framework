@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`  
-**Document Version:** v1.0.8  
+**Document Version:** v1.0.9  
 **Status:** Draft for Review  
-**Supersedes Document Version:** v1.0.7  
+**Supersedes Document Version:** v1.0.8  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.9 | 2026-07-20 | Draft for Review | Added normalized visible-text integrity controls for legal documents, controlled third-party-material manifest validation, Full and Scoped conformance classification checks, self-declaration boundaries, and regression tests for hidden, fenced, duplicated, and semantically reversed legal clauses. |
 | v1.0.8 | 2026-07-20 | Draft for Review | Added regression-protected checks for the GitHub Terms limited-rights carve-out, lawfully authorized file-specific notice exceptions, the no-unsolicited-contribution policy, and the Framework conformance-restoration path. |
 | v1.0.7 | 2026-07-19 | Draft for Review | Added controlled Protocol schema, semantic-lint tool, Multi-Node fixtures, regression-test, workflow, and detached-package evidence checks. |
 | v1.0.6 | 2026-07-19 | Draft for Review | Added the common checklist non-authority principle and coverage for Protocol, Node, validation, NOTICE, folder-index, routing, synchronization, and governance-regression checks. |
@@ -96,7 +97,8 @@ The automated validator shall check at least:
 - Validation Checklists contain the common non-authority statement and validation Repository Roles explicitly deny independent requirement authority.
 - `LICENSE` preserves the GitHub Terms limited-platform-rights carve-out, applicable-law exceptions, no-additional-rights boundary, no-warranty and liability terms, and lawfully authorized file-specific or third-party notice scope.
 - `CONTRIBUTING.md` states that external contributions require a separate prior written agreement and that unsolicited submissions do not create an inbound repository license or acceptance obligation.
-- `NOTICE.md` contains the required repository sections, limits file-specific notice precedence to lawfully authorized and expressly accepted exceptions, and links the contribution boundary.
+- `third-party-materials.yaml` uses the controlled root and policy schema; every accepted material entry has a unique ID, bounded scope, provenance, rights holder, exact notice identity, acceptance record, SHA-256 source identity, obligations, an existing target path, and the required visible material marker.
+- `NOTICE.md` contains the required repository sections, limits file-specific notice precedence to lawfully authorized, manifest-registered, and visibly marked exceptions, distinguishes engineering evaluation from licensed implementation, and states that Framework conformance is the claim issuer's self-declaration rather than author or maintainer certification.
 - The Framework and Framework Conformance Checklist retain the scoped conformance-claim, authorized-deviation, and correction/revalidation/evidence restoration requirements.
 - `CHANGELOG.md` records each newly introduced governed document and synchronization of Registry, Manifest, NOTICE, and Validator behavior.
 - Manifest path, version, status, Purpose, display-name, and Routing Role consistency with the authority registry.
@@ -124,6 +126,8 @@ A reviewer shall verify:
 - Security, safety, and Product decisions remain owned by their approved authorities.
 - Validation claims do not exceed retained evidence.
 - LICENSE, NOTICE, CONTRIBUTING, and README usage language are consistent with the intended publication and contribution model.
+- The normalized visible text of controlled legal documents matches the approved baseline; HTML comments and fenced examples do not satisfy legal clauses, while visible duplication, negation, contradiction, or semantic reversal fails validation.
+- Framework conformance controls require explicit Full, Scoped, or Nonconforming classification, prohibit failure-driven scope laundering, protect non-excludable controls, and preserve the self-declaration and no-certification boundary.
 - File-specific or third-party notices are authorized, scoped to identified material, and do not silently relicense unrelated repository content.
 - A restored conformance claim is supported by correction or explicit exclusion from the claim scope, repeated invalidated activities, regenerated evidence, residual-risk approval, and a final scoped record.
 

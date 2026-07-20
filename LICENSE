@@ -1,5 +1,9 @@
 Copyright © 2026 Ray Yang. All rights reserved.
 
+COPYRIGHT SCOPE
+
+Copyright claims in this repository apply only to the human-authored selection, arrangement, engineering expression, revisions, and other protectable contributions of the applicable rights holder. They exclude third-party materials and any material that is not eligible for copyright protection under applicable law. No claim is made to rights owned by third parties.
+
 NO LICENSE GRANTED
 
 Except for the limited rights granted through GitHub under GitHub's applicable Terms of Service, and except for rights or exceptions provided by applicable law, no copyright license is granted to reproduce, modify, distribute, publish, sublicense, sell, commercially exploit, or otherwise use the original materials in this repository unless permission is explicitly stated for specific material or granted separately in writing by the applicable copyright holder.
@@ -16,8 +20,12 @@ Any person or organization that evaluates, relies upon, or applies these materia
 
 To the maximum extent permitted by applicable law, the copyright holder and contributors shall not be liable for any direct, indirect, incidental, special, consequential, or other loss or damage arising from access to, reliance upon, or application of these materials.
 
+Nothing in this disclaimer excludes or limits liability that cannot lawfully be excluded or limited, including liability arising from intentional misconduct or gross negligence where applicable.
+
 FILE-SPECIFIC AND THIRD-PARTY NOTICES
 
-A file-specific copyright, license, attribution, or use notice takes precedence only for the material it clearly identifies, only to the extent that the notice is lawfully authorized by the applicable rights holder, and only when it has been expressly accepted into this repository by the maintainer as an authorized licensing or notice exception.
+A file-specific copyright, license, attribution, or use notice takes precedence only for the material it clearly identifies, only to the extent that the notice is lawfully authorized by the applicable rights holder, and only when the exception is expressly accepted by the maintainer and registered in `third-party-materials.yaml`.
 
-A third-party notice applies only to the specifically identified third-party material and does not alter the terms applicable to the remaining repository materials. An accidental, unauthorized, ambiguous, or copied notice shall not be interpreted as granting rights beyond those that the applicable rights holder had authority and intent to grant.
+Each accepted exception shall identify its controlled manifest entry through a visible `Third-Party Material ID: <id>` marker in or immediately adjacent to the affected material. A file-specific notice that is absent from the manifest, lacks the required marker, exceeds its registered scope, or is accidental, unauthorized, ambiguous, or copied shall not be interpreted as granting rights beyond those that the applicable rights holder had authority and intent to grant.
+
+A third-party notice applies only to the specifically identified and registered third-party material and does not alter the terms applicable to the remaining repository materials.

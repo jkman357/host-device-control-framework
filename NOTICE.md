@@ -2,13 +2,27 @@
 
 ## Copyright Notice
 
-Copyright © 2026 Ray Yang. All rights reserved except where the repository-level [`LICENSE`](LICENSE) or a file-specific notice states otherwise.
+Copyright © 2026 Ray Yang. All rights reserved except where the repository-level [`LICENSE`](LICENSE) and the controlled [`third-party-materials.yaml`](third-party-materials.yaml) manifest state otherwise for specifically identified material.
+
+## Copyright Scope
+
+Copyright claims apply only to human-authored selection, arrangement, engineering expression, revisions, and other protectable contributions of the applicable rights holder. They exclude third-party materials and any material that is not eligible for copyright protection under applicable law. No ownership is claimed over third-party rights, standards, trademarks, source material, or other excluded content.
 
 ## Personal Engineering Project Disclaimer
 
-This repository is maintained as a personal engineering research and methodology project. It is provided for inspection, discussion, and engineering development under the applicable repository terms.
+This repository is maintained as a personal engineering research and methodology project. It is made available for inspection, discussion, and engineering evaluation under the applicable repository terms.
+
+Reproduction, modification, implementation, incorporation, distribution, or other use requires separate authorization unless permitted by applicable law or GitHub's applicable Terms of Service.
 
 The materials are not a substitute for Product requirements, professional engineering judgment, qualified review, physical validation, security assessment, legal advice, regulatory approval, certification, or an applicable third-party standard.
+
+## Framework Conformance Claims
+
+Framework conformance is a Project-scoped self-declaration made by the person or organization issuing the claim, unless a separate written assessment or certification agreement explicitly states otherwise.
+
+A conformance claim does not imply review, certification, approval, endorsement, warranty, acceptance, or responsibility by the Framework author, repository maintainer, copyright holder, contributor, AI system, tool provider, or any third party. The claim issuer remains responsible for the accuracy, scope, evidence, approvals, exclusions, and presentation of the claim.
+
+A claim identified by the Framework as `Scoped Framework Conformance` shall not be presented, abbreviated, or promoted as full or product-wide Framework conformance.
 
 ## No Employer or Company Representation
 
@@ -32,9 +46,11 @@ Users remain responsible for obtaining lawful access to applicable official stan
 
 ## File-Specific Notice Precedence
 
-A file-specific copyright, license, attribution, or use notice takes precedence only for the material it clearly identifies, only to the extent lawfully authorized by the applicable rights holder, and only when expressly accepted into this repository by the maintainer as an authorized licensing or notice exception.
+A file-specific copyright, license, attribution, or use notice takes precedence only for the material it clearly identifies, only to the extent lawfully authorized by the applicable rights holder, and only when the exception is expressly accepted by the maintainer and registered in [`third-party-materials.yaml`](third-party-materials.yaml).
 
-A third-party notice applies only to the specifically identified third-party material and does not alter the terms applicable to the remaining repository materials. An accidental, unauthorized, ambiguous, or copied notice does not create a repository licensing exception.
+Each accepted exception shall carry the visible `Third-Party Material ID: <id>` marker required by the manifest. A notice that is not registered, lacks the required marker, exceeds the registered scope, or is accidental, unauthorized, ambiguous, or copied does not create a repository licensing exception.
+
+A third-party notice applies only to the specifically identified and registered third-party material and does not alter the terms applicable to the remaining repository materials.
 
 This `NOTICE.md` provides repository information only. It does not replace, amend, expand, or reduce the legal effect of the repository-level [`LICENSE`](LICENSE).
 
