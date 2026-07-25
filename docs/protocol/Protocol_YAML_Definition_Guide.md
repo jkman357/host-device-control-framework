@@ -3,9 +3,9 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.1.0  
+**Document Version:** v1.1.1  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.0.11  
+**Supersedes Document Version:** v1.1.0  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
@@ -17,7 +17,7 @@
 **Repository:** `host-device-control-framework`  
 **Repository Role:** Normative Protocol YAML syntax, semantics, machine-verifiable representation, validation, and Code Generation authority  
 **First Issued:** 2026-07-15  
-**Last Revised:** 2026-07-19  
+**Last Revised:** 2026-07-25  
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -202,6 +202,7 @@ The keywords in this document have the following meanings:
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.1 | 2026-07-25 | Baseline | Required an independently executable Protocol Conformance Tester for Protocols with commands, responses, state transitions, events, telemetry, or streams unless an approved N/A rationale exists; defined its authority boundary, coverage, target execution, evidence identity, and non-substitution limits. |
 | v1.1.0 | 2026-07-19 | Baseline | Added the conditional `node_model` contract and semantic-lint rules for Single-Node compatibility, independent links, shared multidrop buses, routed gateways, identity/address separation, target binding, broadcast and multi-target behavior, per-Node scope, lifecycle, resources, and Firmware Update coordination. |
 | v1.0.0 | 2026-07-15 | Not recorded | Established the general Protocol YAML Definition Guide, including data models, Messages, versioning, security, Transport, Code Generation, Lint, Test Vectors, and governance rules. |
 | v1.0.1 | 2026-07-15 | Not recorded | Corrected the inconsistency between a Framework Message ID example and the recommended allocation range; explicitly separated the Message, Capability, Service, Namespace, Error, Enum, and Bitset registries and their uniqueness scopes; and strengthened Semantic Lint, quick-reference, and Baseline decisions. |
@@ -2755,6 +2756,36 @@ Unsupported hardware revision
 Interrupted finalization
 Rollback trigger
 ```
+
+### 24.6 Independent Protocol Conformance Tester
+
+For a Protocol containing commands, responses, state transitions, events, telemetry, or streams, the Project
+shall provide an independently executable Protocol Conformance Tester unless an authorized human approves an
+`N/A` rationale in the Project analysis.
+
+The Tester shall:
+
+```text
+Derive expected behavior from the controlled Project Protocol and Golden Test Vectors
+Remain independent from the production Coordinator and Node implementations under test
+Exercise every in-scope command, response, rejection, timeout, and state transition
+Verify framing, length, byte order, CRC or integrity field, sequence, correlation, and version behavior
+Verify telemetry or stream ordering, gaps, duplicates, wrap, overflow, and bounded-duration operation
+Execute against the physical Node or a clearly identified representative target before formal integration approval
+Retain Protocol, vector, Tester, Node build, target, Transport, configuration, execution, and result identities
+Report unsupported or undefined behavior without inventing Product semantics
+```
+
+The Tester may be implemented in Python or another suitable language. The Framework does not mandate the
+implementation language.
+
+The Tester shall not become a competing Protocol authority. When the Tester and the controlled Project Protocol
+disagree, the implementation or test artifact shall be treated as suspect until an authorized Protocol change is
+approved.
+
+A passing Tester result proves only the covered Protocol behavior on the identified target and configuration. It
+shall not replace formal Coordinator/Node interoperability, Product validation, safety or security assessment,
+Hardware-in-the-Loop evidence where applicable, or responsible human approval.
 
 ---
 

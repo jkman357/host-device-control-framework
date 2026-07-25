@@ -3,9 +3,9 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`
 **Document ID:** FAAT
-**Document Version:** v1.1.2
+**Document Version:** v1.1.3
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.1
+**Supersedes Document Version:** v1.1.2
 **Document Type:** Reusable Analysis Template
 **Primary Narrative Language:** English
 **Author:** Ray Yang
@@ -31,7 +31,7 @@
 - `AI_Generated_Artifact_Validation_Guide.md`
 
 **First Issued:** 2026-07-15
-**Last Revised:** 2026-07-19
+**Last Revised:** 2026-07-25
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -91,6 +91,7 @@ Other Coordinator/Node applications
 
 | Version | Date | Status | Author | Description |
 | --- | --- | --- | --- | --- |
+| v1.1.3 | 2026-07-25 | Baseline | Ray Yang | Added a mandatory Project decision and evidence table for an independent Protocol Conformance Tester, including controlled source identity, command and negative coverage, state transitions, telemetry or stream checks, physical-Node execution, evidence location, and human ownership. |
 | v1.1.2 | 2026-07-20 | Baseline | Ray Yang | Added canonical Framework repository host, owner, name, URL, immutable source revision, and document version fields to the pre-validation conformance claim-boundary baseline. |
 | v1.1.1 | 2026-07-20 | Baseline | Ray Yang | Added a pre-validation conformance claim-boundary baseline, revision identity, included and excluded boundaries, and post-failure anti-retroactivity requirements. |
 | v1.1.0 | 2026-07-19 | Baseline | Ray Yang | Added mandatory Multi-Node topology, identity, addressing, lifecycle, operation, security, shared-resource, Firmware Update, validation, and acceptance analysis records for independent links, shared buses, and routed gateways while retaining the existing Single-Node application path. |
@@ -1854,7 +1855,32 @@ Packet Decoder
 Hardware-in-the-Loop
 ```
 
-## 15.2 Scenarios
+## 15.2 Independent Protocol Conformance Tester Decision
+
+Complete every field. Use `None` when no item exists. Use `N/A` only with an authorized rationale. AI shall not
+infer omitted Project decisions.
+
+| Item | Required Project Entry |
+|---|---|
+| Independent Protocol Tester Required | `Yes / No / N/A` |
+| N/A Rationale | `<Required when N/A; otherwise None>` |
+| Tester Implementation | `<Language, tool, repository, and canonical path>` |
+| Project Protocol Source Identity | `<Repository, commit/tag/Release, path, and hash as applicable>` |
+| Golden Test Vector Identity | `<Repository, revision, path, and generator/tool version>` |
+| Covered Commands and Responses | `<Complete list or None>` |
+| Negative and Timeout Cases | `<Complete list or None>` |
+| State-Transition Coverage | `<Complete list or None>` |
+| Telemetry and Stream Coverage | `<Gap, duplicate, order, wrap, overflow, duration, or N/A rationale>` |
+| Physical Node Execution | `Planned / Passed / Failed / Inconclusive / Blocked / Not Run` |
+| Representative Target Rationale | `<Required when physical Product target is not used; otherwise None>` |
+| Evidence Location | `<Controlled path or record identifier>` |
+| Owner | `<Authorized human role and identity>` |
+| Reviewer | `<Authorized human role and identity>` |
+
+The Tester shall consume the controlled Project Protocol and Golden Test Vectors. It shall not create or silently
+change wire semantics. A passing result does not replace formal Coordinator/Node integration or Product approval.
+
+## 15.3 Scenarios
 
 | Scenario | Expected Behavior | Evidence |
 |---|---|---|
@@ -1872,7 +1898,7 @@ Hardware-in-the-Loop
 | Security failure | Reject, audit, and recover by policy | `<Evidence>` |
 | Update interruption | Preserve committed progress and resume safely | `<Evidence>` |
 
-## 15.3 Mock Architecture
+## 15.4 Mock Architecture
 
 ```text
 Coordinator UI
@@ -1894,7 +1920,7 @@ Mock Node
 Application and Device Simulator
 ```
 
-## 15.4 Test Layers
+## 15.5 Test Layers
 
 | Layer | Purpose |
 |---|---|

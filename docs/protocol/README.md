@@ -6,7 +6,7 @@ This directory contains shared Coordinator/Node Protocol authorities for the mac
 
 ## Documents
 
-- [`Protocol_YAML_Definition_Guide.md`](Protocol_YAML_Definition_Guide.md) — **Baseline** syntax, semantics, conditional `node_model`, machine-verifiable representation, Schema Validation, Semantic Lint, and Code Generation authority.
+- [`Protocol_YAML_Definition_Guide.md`](Protocol_YAML_Definition_Guide.md) — **Baseline** syntax, semantics, conditional `node_model`, machine-verifiable representation, Schema Validation, Semantic Lint, Code Generation, Golden Vector, and independent Protocol Conformance Tester authority.
 - [`Protocol_YAML_Template.md`](Protocol_YAML_Template.md) — **Baseline** reusable Single-Node and Multi-Node Project Protocol YAML starting structure and examples.
 - [`Protocol_Compatibility_Rules.md`](Protocol_Compatibility_Rules.md) — **Draft for Review / proposed normative authority** for Protocol version consequences, Single-Node and Multi-Node compatibility, mixed-version operation, migration, deprecation, removal, and evidence.
 - [`Protocol_Registry_Governance.md`](Protocol_Registry_Governance.md) — **Draft for Review / proposed normative authority** for Protocol identifiers plus distinct Node identity, runtime address, route, allocation, uniqueness, lifecycle, retirement, non-reuse, merge control, and generated Registry artifacts.

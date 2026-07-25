@@ -15,7 +15,6 @@ import sys
 from typing import Sequence
 
 import yaml
-
 CANONICAL_REPOSITORY = "jkman357/host-device-control-framework"
 
 
@@ -59,7 +58,6 @@ def verify_signed_tag(root: Path, commit: str | None = None) -> list[str]:
         baseline = yaml.safe_load(baseline_path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, yaml.YAMLError) as exc:
         return [f"cannot load legal-baseline.yaml: {exc}"]
-
     identity = baseline.get("repository_identity") if isinstance(baseline, dict) else None
     anchor = baseline.get("external_anchor") if isinstance(baseline, dict) else None
     if not isinstance(identity, dict) or not isinstance(anchor, dict):
@@ -68,7 +66,6 @@ def verify_signed_tag(root: Path, commit: str | None = None) -> list[str]:
         return ["legal baseline canonical repository identity is invalid"]
     if anchor.get("activation_state") != "external-evidence-required":
         return ["repository content must not self-assert external-anchor activation"]
-
     errors: list[str] = []
     try:
         worktree = _run_git(root, ["rev-parse", "--is-inside-work-tree"])
@@ -76,7 +73,6 @@ def verify_signed_tag(root: Path, commit: str | None = None) -> list[str]:
         return [f"not a verifiable Git worktree: {exc}"]
     if worktree != "true":
         return ["not a verifiable Git worktree"]
-
     try:
         origin = _run_git(root, ["remote", "get-url", "origin"])
         normalized = normalize_github_repository(origin)
@@ -85,7 +81,6 @@ def verify_signed_tag(root: Path, commit: str | None = None) -> list[str]:
         normalized = None
     if normalized != CANONICAL_REPOSITORY:
         errors.append(f"origin remote is not canonical repository {CANONICAL_REPOSITORY}")
-
     try:
         target_commit = commit or _run_git(root, ["rev-parse", "HEAD"])
         target_commit = _run_git(root, ["rev-parse", f"{target_commit}^{{commit}}"])
@@ -97,7 +92,6 @@ def verify_signed_tag(root: Path, commit: str | None = None) -> list[str]:
     if not isinstance(tag, str) or not tag:
         errors.append("signed tag name is missing")
         return errors
-
     try:
         tag_object_type = _run_git(root, ["cat-file", "-t", f"refs/tags/{tag}"])
         if tag_object_type != "tag":
@@ -105,7 +99,6 @@ def verify_signed_tag(root: Path, commit: str | None = None) -> list[str]:
     except RuntimeError as exc:
         errors.append(f"signed tag {tag} is missing: {exc}")
         return errors
-
     try:
         tagged_commit = _run_git(root, ["rev-parse", f"refs/tags/{tag}^{{commit}}"])
         if tagged_commit != target_commit:
@@ -117,7 +110,6 @@ def verify_signed_tag(root: Path, commit: str | None = None) -> list[str]:
         _run_git(root, ["verify-tag", tag])
     except RuntimeError as exc:
         errors.append(f"tag signature verification failed: {exc}")
-
     try:
         tagged_baseline = _run_git(root, ["show", f"refs/tags/{tag}:legal-baseline.yaml"])
         current_baseline = baseline_path.read_text(encoding="utf-8").rstrip("\n")
@@ -134,7 +126,6 @@ def main() -> int:
     parser.add_argument("--repository", type=Path, default=Path.cwd(), help="repository root")
     parser.add_argument("--commit", help="expected commit; defaults to HEAD")
     args = parser.parse_args()
-
     errors = verify_signed_tag(args.repository.resolve(), args.commit)
     if errors:
         for error in errors:
