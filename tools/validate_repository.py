@@ -807,14 +807,20 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "shall not replace formal Coordinator/Node interoperability",
         "Protocol Conformance Tester Owner",
         "Protocol Conformance Tester impact",
-        "Protocol Conformance Tester source identity or authorized N/A approval record",
+        "Independent Protocol Conformance Tester source identity",
+        "authorized N/A approval record",
         "shall not call, import, or reuse the production Coordinator or Node command handlers",
+        "Protocol Definition Baseline",
+        "Protocol Integration Baseline",
+        "Protocol Release Baseline",
+        "Protocol Definition Baseline approval does not require executed Tester evidence",
     ]
     for marker in guide_markers:
         if marker not in guide_text:
             findings.append(Finding("PCT-001", _relative(root, guide), f"required conformance-tester authority marker is missing: {marker}"))
     template_markers = [
         "## 15.2 Independent Protocol Conformance Tester Decision",
+        "Protocol Baseline Stage",
         "Independent Protocol Tester Applicability",
         "N/A Approval Reference",
         "Tester Independence Boundary",
@@ -830,9 +836,14 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
     for marker in template_markers:
         if marker not in template_text:
             findings.append(Finding("PCT-002", _relative(root, template), f"required application-analysis field is missing: {marker}"))
-    if "Yes / No / N/A" in template_text:
-        findings.append(Finding("PCT-004", _relative(root, template), "unapproved No path remains in Protocol Tester applicability"))
-    for check_id in ("P-106", "P-107", "P-108", "P-109", "P-115", "P-116"):
+    applicability_row = re.search(
+        r"^\|\s*Independent Protocol Tester Applicability\s*\|\s*([^|]+?)\s*\|\s*$",
+        template_text,
+        re.MULTILINE,
+    )
+    if applicability_row is None or applicability_row.group(1).strip() != "`Required / N/A`":
+        findings.append(Finding("PCT-004", _relative(root, template), "Protocol Tester applicability must be exactly `Required / N/A`"))
+    for check_id in ("P-106", "P-107", "P-108", "P-109", "P-115", "P-116", "P-117", "P-118", "P-119"):
         if not re.search(rf"^\s*- \[ \] {re.escape(check_id)}\b", checklist_text, re.MULTILINE):
             findings.append(Finding("PCT-003", _relative(root, checklist), f"required Protocol tester check is missing: {check_id}"))
 

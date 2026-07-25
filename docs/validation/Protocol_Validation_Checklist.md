@@ -1,8 +1,8 @@
 # Protocol Validation Checklist
 
 **Canonical Filename:** `Protocol_Validation_Checklist.md`  
-**Document Version:** v1.1.2  
-**Supersedes Document Version:** v1.1.1  
+**Document Version:** v1.1.3  
+**Supersedes Document Version:** v1.1.2  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -31,6 +31,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.3 | 2026-07-25 | Draft for Review | Added staged Protocol baseline checks so Definition Baselines require a controlled Tester plan without fabricated execution evidence, while Integration and Release Baselines require physical-or-representative target execution and formal gate disposition. |
 | v1.1.2 | 2026-07-25 | Draft for Review | Closed Tester applicability and independence gaps by requiring a recorded N/A approval reference, prohibiting unapproved `No`, distinguishing permitted generated-data reuse from production implementation reuse, and adding explicit evidence for the formal integration gate. |
 | v1.1.1 | 2026-07-25 | Draft for Review | Added evidence checks for the independent Protocol Conformance Tester required by the Protocol YAML Definition Guide, including controlled expectations, complete in-scope behavior, physical or representative target execution, retained identities, and explicit N/A rationale. |
 | v1.1.0 | 2026-07-19 | Draft for Review | Added traceable Multi-Node YAML, identity/address, targeting, broadcast, multi-target, scope, lifecycle, resource, transport, security, Firmware Update, compatibility, and fixture evidence checks. |
@@ -191,3 +192,6 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-114 The final result is bounded as Pass, Fail, Inconclusive, Blocked, or approved limited scope.
 - [ ] P-115 Conformance-Tester evidence identifies the Project Protocol, Golden Vectors, Tester revision, Node build, target, Transport, configuration, execution time, result, and formal integration-gate disposition.
 - [ ] P-116 A Tester `N/A` disposition identifies the authorized approver, approval reference, date, scope, and rationale.
+- [ ] P-117 The claimed Protocol baseline stage is identified as Definition, Integration, or Release.
+- [ ] P-118 A Protocol Definition Baseline records Tester applicability, ownership, independence, planned location, and coverage without claiming unexecuted target evidence.
+- [ ] P-119 A Protocol Integration or Release Baseline retains the applicable physical-or-representative target Tester result and formal integration-gate disposition, or an authorized N/A approval record.

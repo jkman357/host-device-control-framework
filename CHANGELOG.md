@@ -6,6 +6,9 @@ Individual authority documents retain their own internal Version History and app
 
 ## Unreleased
 
+- Closed a Protocol lifecycle circularity by separating Definition, Integration, and Release Baselines: Tester planning is controlled at definition time, while physical or representative target execution evidence is required before formal integration and release approval.
+- Hardened Protocol Tester applicability validation to require the exact `Required / N/A` disposition and reject alternate optional paths.
+
 - Closed follow-up Protocol Conformance Tester governance gaps by removing the unauthorised `No` applicability path, requiring an N/A approval record, defining implementation-independence boundaries, adding controlled tool and execution-report artifacts, inserting a physical-or-representative Node pre-integration gate, and extending validator regression coverage.
 - Added an explicit independent Protocol Conformance Tester requirement for command, response, state, telemetry, and stream Protocols, including physical or representative Node execution and retained source/build/configuration evidence.
 - Added mandatory Project-analysis fields for Tester applicability, controlled Protocol and Golden Vector identity, coverage, target execution, evidence location, owner, and reviewer.

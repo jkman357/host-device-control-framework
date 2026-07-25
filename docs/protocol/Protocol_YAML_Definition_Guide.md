@@ -3,9 +3,9 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.1.2  
+**Document Version:** v1.1.3  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.1.1  
+**Supersedes Document Version:** v1.1.2  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
@@ -202,6 +202,7 @@ The keywords in this document have the following meanings:
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.3 | 2026-07-25 | Baseline | Separated Protocol Definition, Integration, and Release Baselines so initial wire-contract approval does not depend circularly on an already implemented physical Node; retained Tester planning at definition time and required executed Tester evidence before formal integration and release approval. |
 | v1.1.2 | 2026-07-25 | Baseline | Closed Protocol Conformance Tester governance gaps by defining implementation independence, authorized N/A approval records, Tester ownership, Protocol-change impact, controlled baseline contents, and execution-evidence identity. |
 | v1.1.1 | 2026-07-25 | Baseline | Required an independently executable Protocol Conformance Tester for Protocols with commands, responses, state transitions, events, telemetry, or streams unless an approved N/A rationale exists; defined its authority boundary, coverage, target execution, evidence identity, and non-substitution limits. |
 | v1.1.0 | 2026-07-19 | Baseline | Added the conditional `node_model` contract and semantic-lint rules for Single-Node compatibility, independent links, shared multidrop buses, routed gateways, identity/address separation, target binding, broadcast and multi-target behavior, per-Node scope, lifecycle, resources, and Firmware Update coordination. |
@@ -2786,6 +2787,11 @@ The Tester shall not become a competing Protocol authority. When the Tester and 
 disagree, the implementation or test artifact shall be treated as suspect until an authorized Protocol change is
 approved.
 
+Tester applicability, ownership, independence, intended canonical location, and planned coverage shall be recorded
+at the Protocol Definition Baseline. Executed Tester evidence is not a prerequisite to initial Protocol Definition
+Baseline approval because the Node implementation may not yet exist. The Tester shall be implemented and executed
+before formal Coordinator/Node integration approval and before a Protocol Integration or Release Baseline is approved.
+
 A passing Tester result proves only the covered Protocol behavior on the identified target and configuration. It
 shall not replace formal Coordinator/Node interoperability, Product validation, safety or security assessment,
 Hardware-in-the-Loop evidence where applicable, or responsible human approval.
@@ -2828,26 +2834,53 @@ A Protocol change shall identify:
 - Migration plan
 - Review evidence
 
-### 25.3 Baseline Contents
+### 25.3 Staged Baseline Contents
 
-A formal Protocol Baseline should include:
+A Project shall identify which Protocol baseline stage is being approved. The stages prevent a circular requirement
+in which an approved wire contract would depend on a Node implementation that itself requires that contract.
+
+A **Protocol Definition Baseline** should include:
 
 ```text
 Protocol YAML
 Schema or validator version
-Semantic Lint configuration
-Generated artifacts
+Semantic Lint configuration and result
 Human-readable Protocol documentation
-Compatibility Matrix
-Test Vectors
-Independent Protocol Conformance Tester source identity or authorized N/A approval record
-Protocol Conformance Tester execution evidence and result identity when applicable
-Generator version
-Validation report
-Review and approval evidence
+Compatibility and security decisions applicable at definition time
+Golden Test Vectors or controlled vector plan
+Protocol Conformance Tester applicability decision
+Tester Owner, Evidence Reviewer, planned canonical location, and planned coverage when required
+Authorized N/A approval record when applicable
+Review and definition-approval evidence
 ```
 
-The controlled baseline shall identify the Protocol Conformance Tester source identity or authorized N/A approval record, and shall retain the applicable Tester execution evidence and result identity.
+A **Protocol Integration Baseline** should additionally include:
+
+```text
+Protocol Definition Baseline identity
+Generated artifacts and generator version
+Coordinator and Node implementation identities in scope
+Independent Protocol Conformance Tester source identity
+Protocol Conformance Tester execution evidence and result identity
+Physical Node or approved representative-target identity and configuration
+Cross-implementation and cross-language interoperability results in scope
+Observed anomalies, limitations, and approved deviations
+Integration-gate review and approval evidence
+```
+
+A **Protocol Release Baseline** should additionally include:
+
+```text
+Protocol Integration Baseline identity
+Final compatibility, security, validation, and migration reports
+Release package, commit, tag, and integrity identities
+Final unresolved-risk, limitation, and deviation disposition
+Release review and approval evidence
+```
+
+The Protocol Definition Baseline shall not claim executed Tester or target evidence that does not yet exist. The
+Protocol Integration and Release Baselines shall identify the Independent Protocol Conformance Tester source identity
+and retain the applicable Tester execution evidence and result identity, or the authorized N/A approval record.
 
 ### 25.4 Generated Artifact Control
 
@@ -2862,21 +2895,36 @@ explicitly record every intentional removal and its rationale.
 
 A successful syntax check does not prove that a structural rewrite preserved the complete technical baseline.
 
-### 25.6 Baseline Gate
+### 25.6 Staged Baseline Gates
 
-Before Baseline approval:
+Before **Protocol Definition Baseline** approval:
 
 - Schema Validation shall pass.
 - Semantic Lint shall pass.
-- Compatibility Review shall pass.
-- Generated artifacts shall match the source.
-- Required Test Vectors shall pass.
-- The independent Protocol Conformance Tester shall pass on the physical Node or approved representative target when applicable, or an authorized N/A approval record shall exist.
-- Cross-language interoperability shall pass for languages in scope.
-- Security review shall pass for security-sensitive Messages.
-- No unresolved placeholder shall remain.
+- Compatibility and security decisions required at definition time shall be reviewed.
+- Required Golden Test Vectors shall pass, or a controlled vector-completion plan shall be approved when generation depends on later tooling.
+- Protocol Conformance Tester applicability, ownership, independence boundary, planned location, and planned coverage shall be recorded, or an authorized N/A approval record shall exist.
+- No unresolved wire-contract placeholder shall remain.
 - Document and Protocol versions shall be correct.
 - Change history shall accurately describe the change.
+
+Protocol Definition Baseline approval does not require executed Tester evidence, a completed production Node, or
+formal Coordinator/Node interoperability evidence.
+
+Before **Protocol Integration Baseline** approval:
+
+- Generated artifacts shall match the approved Protocol Definition Baseline.
+- The independent Protocol Conformance Tester shall pass on the physical Node or approved representative target when applicable, or an authorized N/A approval record shall exist.
+- Cross-implementation and cross-language interoperability shall pass for implementations and languages in scope.
+- Target, Transport, configuration, anomaly, limitation, and deviation evidence shall be retained.
+- The formal integration gate shall be approved by the assigned human authority.
+
+Before **Protocol Release Baseline** approval:
+
+- The Protocol Integration Baseline shall be identified and accepted.
+- Final compatibility, security, migration, validation, and release-package evidence shall be complete for the claimed scope.
+- Unresolved risks, limitations, failures, and deviations shall have an explicit release disposition.
+- Final release approval shall be recorded.
 
 ---
 

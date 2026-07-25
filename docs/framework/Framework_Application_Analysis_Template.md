@@ -3,9 +3,9 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`
 **Document ID:** FAAT
-**Document Version:** v1.1.4
+**Document Version:** v1.1.5
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.3
+**Supersedes Document Version:** v1.1.4
 **Document Type:** Reusable Analysis Template
 **Primary Narrative Language:** English
 **Author:** Ray Yang
@@ -91,6 +91,7 @@ Other Coordinator/Node applications
 
 | Version | Date | Status | Author | Description |
 | --- | --- | --- | --- | --- |
+| v1.1.5 | 2026-07-25 | Baseline | Ray Yang | Added staged Protocol Definition, Integration, and Release Baseline records so Tester planning is required at definition time while physical execution evidence is required only for formal integration and release approval; strengthened applicability-field semantics. |
 | v1.1.4 | 2026-07-25 | Baseline | Ray Yang | Closed Protocol Conformance Tester applicability and lifecycle gaps by removing the unauthorised `No` path, requiring an N/A approval record, documenting independence boundaries, adding required tool/evidence artifacts and repository placement, inserting a pre-integration execution gate, and extending the completion checklist. |
 | v1.1.3 | 2026-07-25 | Baseline | Ray Yang | Added a mandatory Project decision and evidence table for an independent Protocol Conformance Tester, including controlled source identity, command and negative coverage, state transitions, telemetry or stream checks, physical-Node execution, evidence location, and human ownership. |
 | v1.1.2 | 2026-07-20 | Baseline | Ray Yang | Added canonical Framework repository host, owner, name, URL, immutable source revision, and document version fields to the pre-validation conformance claim-boundary baseline. |
@@ -1864,6 +1865,7 @@ infer omitted Project decisions.
 
 | Item | Required Project Entry |
 |---|---|
+| Protocol Baseline Stage | `Definition / Integration / Release` |
 | Independent Protocol Tester Applicability | `Required / N/A` |
 | N/A Rationale | `<Required when N/A; otherwise None>` |
 | N/A Approval Reference | `<Approver, approval record, date, and scope when N/A; otherwise None>` |
@@ -1883,10 +1885,12 @@ infer omitted Project decisions.
 | Reviewer | `<Authorized human role and identity>` |
 
 The Tester shall consume the controlled Project Protocol and Golden Test Vectors. It shall not create or silently
-change wire semantics. `Required` means the Tester must be implemented and executed against the physical Node or an
-approved representative target before formal Coordinator/Node integration approval. `N/A` requires an authorized
-approval record; an unapproved `No`, blank field, or deferred decision is not a valid disposition. A passing result
-does not replace formal Coordinator/Node integration or Product approval.
+change wire semantics. `Required` means applicability, ownership, independence, planned canonical location, and
+coverage are recorded for a Protocol Definition Baseline. Physical or approved representative-target execution is
+required before the Formal Integration Gate may be marked `Passed` and before an Integration or Release Baseline is
+approved. `N/A` requires an authorized approval record; an unapproved `No`, `Optional`, blank field, or deferred
+decision is not a valid disposition. A passing result does not replace formal Coordinator/Node integration or Product
+approval.
 
 ## 15.3 Scenarios
 
@@ -2076,12 +2080,16 @@ An excluded item shall not invalidate the architecture assumption being tested.
 | 5 | Mock Node and Transport | Normal and failure scenarios reproducible |
 | 6 | Coordinator Core | Connection, commands, state reconciliation, Telemetry, and Stream operate |
 | 7 | Node Core | Event-Driven dispatch, validation, state ownership, and local protection operate |
-| 8 | Independent Protocol Conformance Tester | All in-scope Node commands, responses, states, errors, telemetry, and streams pass on the physical Node or approved representative target; authorized N/A is recorded when permitted |
+| 8 | Independent Protocol Conformance Tester | Definition-stage applicability and plan are controlled; before formal integration approval, all in-scope Node commands, responses, states, errors, telemetry, and streams pass on the physical Node or approved representative target, or authorized N/A is recorded |
 | 9 | Basic UI / External Integration | Monitoring and approved control flows operate |
 | 10 | Logging and Recording | Behavior can be reconstructed |
 | 11 | Hardware Integration | Core functions pass on target hardware |
 | 12 | Fault, Timing, Security, and Update Tests | High-risk evidence passes |
 | 13 | MVP Baseline | Documents, Code, Protocol, generated artifacts, and tests are synchronized |
+
+Phases 5 through 8 may proceed in controlled parallel when Project resources require it. This table does not require
+production Coordinator implementation to precede the Node Tester. Regardless of implementation order, the Formal
+Integration Gate shall remain `Pending` until Phase 8 passes or an authorized N/A approval record exists.
 
 ---
 
@@ -2628,7 +2636,8 @@ Acceptance Evidence:
 - [ ] Plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets are separately calculated.
 - [ ] Application and Bootloader security boundaries are defined.
 - [ ] Schema Validation, Semantic Lint, Code Generation, and Test Vector targets are defined.
-- [ ] Independent Protocol Conformance Tester applicability is recorded as `Required` or authorized `N/A`; no unapproved `No` or blank disposition remains.
+- [ ] The claimed Protocol Baseline Stage is recorded as `Definition`, `Integration`, or `Release`.
+- [ ] Independent Protocol Conformance Tester applicability is recorded exactly as `Required` or authorized `N/A`; no unapproved `No`, `Optional`, blank, or deferred disposition remains.
 - [ ] Tester Protocol source, Golden Vector identity, independence boundary, owner, reviewer, and evidence location are defined when applicable.
 
 ## Responsibility Boundary
@@ -2674,6 +2683,7 @@ Acceptance Evidence:
 - [ ] MVP test scope is defined.
 - [ ] Hardware integration, long-run, load, reset, reconnect, and recovery tests are defined.
 - [ ] Security and Firmware Update tests are defined when applicable.
+- [ ] A Definition Baseline records the Tester plan without claiming unexecuted target evidence; an Integration or Release Baseline retains the required execution evidence.
 - [ ] The independent Protocol Conformance Tester covers all in-scope command, response, rejection, timeout, state, event, telemetry, and stream behaviors when applicable.
 - [ ] The Tester was executed against the physical Node or approved representative target, and the formal integration gate is not marked Passed without retained evidence.
 - [ ] Requirement-to-design-to-test traceability is defined.

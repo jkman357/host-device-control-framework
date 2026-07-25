@@ -60,6 +60,22 @@ class RepositoryValidatorTests(unittest.TestCase):
         path.write_text(text, encoding="utf-8")
         self.assertIn("PCT-004", self.rules())
 
+    def test_protocol_tester_optional_applicability_loophole_is_rejected(self) -> None:
+        path = self.root / "docs/framework/Framework_Application_Analysis_Template.md"
+        text = path.read_text(encoding="utf-8").replace("`Required / N/A`", "`Required / Optional / N/A`", 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-004", self.rules())
+
+    def test_protocol_tester_staged_baseline_lifecycle_is_enforced(self) -> None:
+        path = self.root / "docs/protocol/Protocol_YAML_Definition_Guide.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "Protocol Definition Baseline approval does not require executed Tester evidence",
+            "All baseline approval requires completed target execution",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-001", self.rules())
+
     def test_protocol_tester_lifecycle_artifact_is_enforced(self) -> None:
         path = self.root / "docs/framework/Framework_Application_Analysis_Template.md"
         text = path.read_text(encoding="utf-8").replace(
@@ -86,10 +102,10 @@ class RepositoryValidatorTests(unittest.TestCase):
         registry = yaml.safe_load((self.root / "authority-registry.yaml").read_text(encoding="utf-8"))
         by_path = {record["path"]: record for record in registry["documents"]}
         expected = {
-            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.28",
-            "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.4",
-            "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.2",
-            "docs/validation/Protocol_Validation_Checklist.md": "v1.1.2",
+            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.29",
+            "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.5",
+            "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.3",
+            "docs/validation/Protocol_Validation_Checklist.md": "v1.1.3",
         }
         for path, version in expected.items():
             with self.subTest(path=path):
