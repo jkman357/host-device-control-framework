@@ -3,9 +3,9 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.1.1  
+**Document Version:** v1.1.2  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.1.0  
+**Supersedes Document Version:** v1.1.1  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
@@ -202,6 +202,7 @@ The keywords in this document have the following meanings:
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.2 | 2026-07-25 | Baseline | Closed Protocol Conformance Tester governance gaps by defining implementation independence, authorized N/A approval records, Tester ownership, Protocol-change impact, controlled baseline contents, and execution-evidence identity. |
 | v1.1.1 | 2026-07-25 | Baseline | Required an independently executable Protocol Conformance Tester for Protocols with commands, responses, state transitions, events, telemetry, or streams unless an approved N/A rationale exists; defined its authority boundary, coverage, target execution, evidence identity, and non-substitution limits. |
 | v1.1.0 | 2026-07-19 | Baseline | Added the conditional `node_model` contract and semantic-lint rules for Single-Node compatibility, independent links, shared multidrop buses, routed gateways, identity/address separation, target binding, broadcast and multi-target behavior, per-Node scope, lifecycle, resources, and Firmware Update coordination. |
 | v1.0.0 | 2026-07-15 | Not recorded | Established the general Protocol YAML Definition Guide, including data models, Messages, versioning, security, Transport, Code Generation, Lint, Test Vectors, and governance rules. |
@@ -2761,7 +2762,7 @@ Rollback trigger
 
 For a Protocol containing commands, responses, state transitions, events, telemetry, or streams, the Project
 shall provide an independently executable Protocol Conformance Tester unless an authorized human approves an
-`N/A` rationale in the Project analysis.
+`N/A` rationale and records the approver, approval reference, scope, and reason in the Project analysis.
 
 The Tester shall:
 
@@ -2778,6 +2779,8 @@ Report unsupported or undefined behavior without inventing Product semantics
 
 The Tester may be implemented in Python or another suitable language. The Framework does not mandate the
 implementation language.
+
+The Tester may consume controlled generated contract data and Golden Test Vectors. It shall not call, import, or reuse the production Coordinator or Node command handlers, state-transition logic, Transport/Session behavior, or codec implementation being evaluated. Shared use of generated constants or immutable vector data shall be recorded so that implementation independence remains reviewable.
 
 The Tester shall not become a competing Protocol authority. When the Tester and the controlled Project Protocol
 disagree, the implementation or test artifact shall be treated as suspect until an authorized Protocol change is
@@ -2803,8 +2806,12 @@ Application Profile Owner
 Security Reviewer
 Compatibility Reviewer
 Test Vector Owner
+Protocol Conformance Tester Owner
+Tester Evidence Reviewer
 Release Approver
 ```
+
+The Project shall record the Protocol Conformance Tester Owner and Tester Evidence Reviewer as controlled human roles.
 
 ### 25.2 Change Control
 
@@ -2816,6 +2823,7 @@ A Protocol change shall identify:
 - Security impact
 - Code Generation impact
 - Test Vector impact
+- Protocol Conformance Tester impact
 - Required version changes
 - Migration plan
 - Review evidence
@@ -2832,10 +2840,14 @@ Generated artifacts
 Human-readable Protocol documentation
 Compatibility Matrix
 Test Vectors
+Independent Protocol Conformance Tester source identity or authorized N/A approval record
+Protocol Conformance Tester execution evidence and result identity when applicable
 Generator version
 Validation report
 Review and approval evidence
 ```
+
+The controlled baseline shall identify the Protocol Conformance Tester source identity or authorized N/A approval record, and shall retain the applicable Tester execution evidence and result identity.
 
 ### 25.4 Generated Artifact Control
 
@@ -2859,6 +2871,7 @@ Before Baseline approval:
 - Compatibility Review shall pass.
 - Generated artifacts shall match the source.
 - Required Test Vectors shall pass.
+- The independent Protocol Conformance Tester shall pass on the physical Node or approved representative target when applicable, or an authorized N/A approval record shall exist.
 - Cross-language interoperability shall pass for languages in scope.
 - Security review shall pass for security-sensitive Messages.
 - No unresolved placeholder shall remain.

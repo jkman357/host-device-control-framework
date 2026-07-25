@@ -3,9 +3,9 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`
 **Document ID:** FAAT
-**Document Version:** v1.1.3
+**Document Version:** v1.1.4
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.2
+**Supersedes Document Version:** v1.1.3
 **Document Type:** Reusable Analysis Template
 **Primary Narrative Language:** English
 **Author:** Ray Yang
@@ -91,6 +91,7 @@ Other Coordinator/Node applications
 
 | Version | Date | Status | Author | Description |
 | --- | --- | --- | --- | --- |
+| v1.1.4 | 2026-07-25 | Baseline | Ray Yang | Closed Protocol Conformance Tester applicability and lifecycle gaps by removing the unauthorised `No` path, requiring an N/A approval record, documenting independence boundaries, adding required tool/evidence artifacts and repository placement, inserting a pre-integration execution gate, and extending the completion checklist. |
 | v1.1.3 | 2026-07-25 | Baseline | Ray Yang | Added a mandatory Project decision and evidence table for an independent Protocol Conformance Tester, including controlled source identity, command and negative coverage, state transitions, telemetry or stream checks, physical-Node execution, evidence location, and human ownership. |
 | v1.1.2 | 2026-07-20 | Baseline | Ray Yang | Added canonical Framework repository host, owner, name, URL, immutable source revision, and document version fields to the pre-validation conformance claim-boundary baseline. |
 | v1.1.1 | 2026-07-20 | Baseline | Ray Yang | Added a pre-validation conformance claim-boundary baseline, revision identity, included and excluded boundaries, and post-failure anti-retroactivity requirements. |
@@ -364,6 +365,7 @@ Security and Access Control model
 Firmware Update and Bootloader analysis
 UI responsibility and workflow
 Mock, Simulator, and Test Harness plan
+Independent Protocol Conformance Tester applicability and evidence plan
 Required documents and artifacts
 MVP scope and development sequence
 Framework Gap Register
@@ -1862,9 +1864,11 @@ infer omitted Project decisions.
 
 | Item | Required Project Entry |
 |---|---|
-| Independent Protocol Tester Required | `Yes / No / N/A` |
+| Independent Protocol Tester Applicability | `Required / N/A` |
 | N/A Rationale | `<Required when N/A; otherwise None>` |
-| Tester Implementation | `<Language, tool, repository, and canonical path>` |
+| N/A Approval Reference | `<Approver, approval record, date, and scope when N/A; otherwise None>` |
+| Tester Implementation | `<Language, tool, repository, and canonical path; None only when N/A>` |
+| Tester Independence Boundary | `<Production modules not reused; generated constants or vector data shared, if any>` |
 | Project Protocol Source Identity | `<Repository, commit/tag/Release, path, and hash as applicable>` |
 | Golden Test Vector Identity | `<Repository, revision, path, and generator/tool version>` |
 | Covered Commands and Responses | `<Complete list or None>` |
@@ -1873,12 +1877,16 @@ infer omitted Project decisions.
 | Telemetry and Stream Coverage | `<Gap, duplicate, order, wrap, overflow, duration, or N/A rationale>` |
 | Physical Node Execution | `Planned / Passed / Failed / Inconclusive / Blocked / Not Run` |
 | Representative Target Rationale | `<Required when physical Product target is not used; otherwise None>` |
+| Formal Integration Gate | `Passed / Failed / Pending / N/A` |
 | Evidence Location | `<Controlled path or record identifier>` |
 | Owner | `<Authorized human role and identity>` |
 | Reviewer | `<Authorized human role and identity>` |
 
 The Tester shall consume the controlled Project Protocol and Golden Test Vectors. It shall not create or silently
-change wire semantics. A passing result does not replace formal Coordinator/Node integration or Product approval.
+change wire semantics. `Required` means the Tester must be implemented and executed against the physical Node or an
+approved representative target before formal Coordinator/Node integration approval. `N/A` requires an authorized
+approval record; an unapproved `No`, blank field, or deferred decision is not a valid disposition. A passing result
+does not replace formal Coordinator/Node integration or Product approval.
 
 ## 15.3 Scenarios
 
@@ -1966,6 +1974,8 @@ Application and Device Simulator
 | Generated Java contract | Conditional | Project Protocol YAML |
 | Generated documentation | Recommended | Project Protocol YAML |
 | Golden Test Vectors | Yes | Project Protocol YAML / approved cases |
+| Independent Protocol Conformance Tester | Yes when applicable | Project Protocol and Golden Test Vectors |
+| Protocol Conformance Tester execution report | Yes before formal integration approval when applicable | Tester execution against the physical Node or approved representative target |
 | Protocol decoder metadata | Recommended | Project Protocol YAML |
 | Semantic Lint report | Yes | Project Protocol YAML |
 | Compatibility report | Yes | Old/new Protocol versions |
@@ -2001,6 +2011,7 @@ Application and Device Simulator
 │  ├─ mock_node/
 │  ├─ simulator/
 │  ├─ protocol_lint/
+│  ├─ protocol_conformance_tester/
 │  ├─ packet_decoder/
 │  └─ fault_injection/
 ├─ docs/
@@ -2012,6 +2023,8 @@ Application and Device Simulator
 │  └─ user/
 └─ README.md
 ```
+
+When applicable, the controlled repository shall provide the independent Tester under a stable canonical path such as `tools/protocol_conformance_tester/` or record the approved equivalent location.
 
 ---
 
@@ -2040,8 +2053,9 @@ The MVP shall prove the highest-risk architectural assumptions, not merely displ
 11. Basic Coordinator workflow and UI when applicable.
 12. Logging and packet capture.
 13. Minimum Protocol validation and Test Vectors.
-14. Timing, bandwidth, Buffer, and resource measurements.
-15. Security and Firmware Update subset required to avoid architectural rework.
+14. Independent Protocol Conformance Tester coverage for the in-scope physical or representative Node.
+15. Timing, bandwidth, Buffer, and resource measurements.
+16. Security and Firmware Update subset required to avoid architectural rework.
 
 ## 17.3 MVP Exclusions
 
@@ -2062,11 +2076,12 @@ An excluded item shall not invalidate the architecture assumption being tested.
 | 5 | Mock Node and Transport | Normal and failure scenarios reproducible |
 | 6 | Coordinator Core | Connection, commands, state reconciliation, Telemetry, and Stream operate |
 | 7 | Node Core | Event-Driven dispatch, validation, state ownership, and local protection operate |
-| 8 | Basic UI / External Integration | Monitoring and approved control flows operate |
-| 9 | Logging and Recording | Behavior can be reconstructed |
-| 10 | Hardware Integration | Core functions pass on target hardware |
-| 11 | Fault, Timing, Security, and Update Tests | High-risk evidence passes |
-| 12 | MVP Baseline | Documents, Code, Protocol, generated artifacts, and tests are synchronized |
+| 8 | Independent Protocol Conformance Tester | All in-scope Node commands, responses, states, errors, telemetry, and streams pass on the physical Node or approved representative target; authorized N/A is recorded when permitted |
+| 9 | Basic UI / External Integration | Monitoring and approved control flows operate |
+| 10 | Logging and Recording | Behavior can be reconstructed |
+| 11 | Hardware Integration | Core functions pass on target hardware |
+| 12 | Fault, Timing, Security, and Update Tests | High-risk evidence passes |
+| 13 | MVP Baseline | Documents, Code, Protocol, generated artifacts, and tests are synchronized |
 
 ---
 
@@ -2613,6 +2628,8 @@ Acceptance Evidence:
 - [ ] Plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets are separately calculated.
 - [ ] Application and Bootloader security boundaries are defined.
 - [ ] Schema Validation, Semantic Lint, Code Generation, and Test Vector targets are defined.
+- [ ] Independent Protocol Conformance Tester applicability is recorded as `Required` or authorized `N/A`; no unapproved `No` or blank disposition remains.
+- [ ] Tester Protocol source, Golden Vector identity, independence boundary, owner, reviewer, and evidence location are defined when applicable.
 
 ## Responsibility Boundary
 
@@ -2657,6 +2674,8 @@ Acceptance Evidence:
 - [ ] MVP test scope is defined.
 - [ ] Hardware integration, long-run, load, reset, reconnect, and recovery tests are defined.
 - [ ] Security and Firmware Update tests are defined when applicable.
+- [ ] The independent Protocol Conformance Tester covers all in-scope command, response, rejection, timeout, state, event, telemetry, and stream behaviors when applicable.
+- [ ] The Tester was executed against the physical Node or approved representative target, and the formal integration gate is not marked Passed without retained evidence.
 - [ ] Requirement-to-design-to-test traceability is defined.
 
 ## Gap, Risk, and Decision Management

@@ -6,10 +6,11 @@ Individual authority documents retain their own internal Version History and app
 
 ## Unreleased
 
+- Closed follow-up Protocol Conformance Tester governance gaps by removing the unauthorised `No` applicability path, requiring an N/A approval record, defining implementation-independence boundaries, adding controlled tool and execution-report artifacts, inserting a physical-or-representative Node pre-integration gate, and extending validator regression coverage.
 - Added an explicit independent Protocol Conformance Tester requirement for command, response, state, telemetry, and stream Protocols, including physical or representative Node execution and retained source/build/configuration evidence.
 - Added mandatory Project-analysis fields for Tester applicability, controlled Protocol and Golden Vector identity, coverage, target execution, evidence location, owner, and reviewer.
 - Extended the Protocol Validation Checklist with traceable Tester existence, coverage, controlled-expectation, target-execution, and evidence-identity checks.
-- Updated AI routing, authority registry, root document set, and directory indexes for AI Engineering Usage Guide v1.0.27, Framework Application Analysis Template v1.1.3, Protocol YAML Definition Guide v1.1.1, and Protocol Validation Checklist v1.1.1.
+- Updated AI routing, authority registry, root document set, and directory indexes for AI Engineering Usage Guide v1.0.28, Framework Application Analysis Template v1.1.4, Protocol YAML Definition Guide v1.1.2, and Protocol Validation Checklist v1.1.2.
 
 - Corrected the canonical Framework conformance example to the immutable `e516fa1d58bd99014b965f37215db85ae594704b` / Framework `v1.1.4` source pair and upgraded claim schema v2 to require canonical GitHub host, owner, repository name, and URL.
 

@@ -805,23 +805,34 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "shall not become a competing Protocol authority",
         "may be implemented in Python",
         "shall not replace formal Coordinator/Node interoperability",
+        "Protocol Conformance Tester Owner",
+        "Protocol Conformance Tester impact",
+        "Protocol Conformance Tester source identity or authorized N/A approval record",
+        "shall not call, import, or reuse the production Coordinator or Node command handlers",
     ]
     for marker in guide_markers:
         if marker not in guide_text:
             findings.append(Finding("PCT-001", _relative(root, guide), f"required conformance-tester authority marker is missing: {marker}"))
     template_markers = [
         "## 15.2 Independent Protocol Conformance Tester Decision",
-        "Independent Protocol Tester Required",
+        "Independent Protocol Tester Applicability",
+        "N/A Approval Reference",
+        "Tester Independence Boundary",
         "Protocol Source Identity",
         "Golden Test Vector Identity",
         "Physical Node Execution",
+        "Formal Integration Gate",
+        "Independent Protocol Conformance Tester | Yes when applicable",
+        "protocol_conformance_tester/",
         "| Owner |",
         "| Reviewer |",
     ]
     for marker in template_markers:
         if marker not in template_text:
             findings.append(Finding("PCT-002", _relative(root, template), f"required application-analysis field is missing: {marker}"))
-    for check_id in ("P-106", "P-107", "P-108", "P-109", "P-115"):
+    if "Yes / No / N/A" in template_text:
+        findings.append(Finding("PCT-004", _relative(root, template), "unapproved No path remains in Protocol Tester applicability"))
+    for check_id in ("P-106", "P-107", "P-108", "P-109", "P-115", "P-116"):
         if not re.search(rf"^\s*- \[ \] {re.escape(check_id)}\b", checklist_text, re.MULTILINE):
             findings.append(Finding("PCT-003", _relative(root, checklist), f"required Protocol tester check is missing: {check_id}"))
 
@@ -883,7 +894,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(
         "PASS: repository documentation, authority registry, Protocol schema, semantic "
-        "fixtures, independent Protocol tester governance, and CI controls are consistent."
+        "fixtures, independent Protocol tester applicability, lifecycle, evidence, and CI controls are consistent."
     )
     return 0
 
