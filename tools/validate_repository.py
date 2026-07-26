@@ -792,6 +792,21 @@ def check_protocol_assets(root: Path, findings: list[Finding]) -> None:
             findings.append(Finding("PROTO-008", _relative(root, fixture), "invalid fixture did not produce expected rule(s): " + ", ".join(missing_rules)))
 
 
+def _section_by_heading(text: str, heading: str, next_heading_level: int | None = None) -> str | None:
+    """Return one visible Markdown section beginning at an exact heading."""
+    matches = list(re.finditer(rf"^{re.escape(heading)}\s*$", text, re.MULTILINE))
+    if len(matches) != 1:
+        return None
+    match = matches[0]
+    if next_heading_level is None:
+        level = len(heading) - len(heading.lstrip("#"))
+    else:
+        level = next_heading_level
+    following = re.search(rf"^#{{1,{level}}}\s+", text[match.end():], re.MULTILINE)
+    end = match.end() + following.start() if following else len(text)
+    return text[match.start():end]
+
+
 def check_protocol_conformance_tester_governance(root: Path, findings: list[Finding]) -> None:
     guide = root / "docs/protocol/Protocol_YAML_Definition_Guide.md"
     template = root / "docs/framework/Framework_Application_Analysis_Template.md"
@@ -799,54 +814,138 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
     guide_text = _visible_text(_read_text(guide)) if guide.is_file() else ""
     template_text = _visible_text(_read_text(template)) if template.is_file() else ""
     checklist_text = _visible_text(_read_text(checklist)) if checklist.is_file() else ""
-    guide_markers = [
-        "### 24.6 Independent Protocol Conformance Tester",
+
+    tester_section = _section_by_heading(guide_text, "### 24.6 Independent Protocol Conformance Tester")
+    baseline_section = _section_by_heading(guide_text, "### 25.3 Staged Baseline Contents")
+    gate_section = _section_by_heading(guide_text, "### 25.6 Staged Baseline Gates")
+    if tester_section is None:
+        findings.append(Finding("PCT-001", _relative(root, guide), "the unique 24.6 Protocol Conformance Tester section is missing"))
+        tester_section = ""
+    if baseline_section is None:
+        findings.append(Finding("PCT-001", _relative(root, guide), "the unique 25.3 staged-baseline section is missing"))
+        baseline_section = ""
+    if gate_section is None:
+        findings.append(Finding("PCT-001", _relative(root, guide), "the unique 25.6 staged-baseline gate section is missing"))
+        gate_section = ""
+
+    tester_markers = [
         "independently executable Protocol Conformance Tester",
         "shall not become a competing Protocol authority",
         "may be implemented in Python",
         "shall not replace formal Coordinator/Node interoperability",
-        "Protocol Conformance Tester Owner",
-        "Protocol Conformance Tester impact",
-        "Independent Protocol Conformance Tester source identity",
         "authorized N/A approval record",
         "shall not call, import, or reuse the production Coordinator or Node command handlers",
-        "Protocol Definition Baseline",
-        "Protocol Integration Baseline",
-        "Protocol Release Baseline",
-        "Protocol Definition Baseline approval does not require executed Tester evidence",
     ]
-    for marker in guide_markers:
+    for marker in tester_markers:
+        if marker not in tester_section:
+            findings.append(Finding("PCT-001", _relative(root, guide), f"24.6 is missing required authority text: {marker}"))
+
+    baseline_markers = [
+        "exactly one Protocol baseline stage",
+        "A **Protocol Definition Baseline** shall include",
+        "A **Protocol Integration Baseline** shall additionally include",
+        "A **Protocol Release Baseline** shall additionally include",
+        "Independent Protocol Conformance Tester source identity",
+        "review trigger, expiry, or continuing-validity condition",
+        "shall not be carried into Integration or Release without recorded re-confirmation",
+    ]
+    for marker in baseline_markers:
+        if marker not in baseline_section:
+            findings.append(Finding("PCT-001", _relative(root, guide), f"25.3 is missing required staged-baseline text: {marker}"))
+
+    gate_markers = [
+        "Protocol Definition Baseline approval does not require executed Tester evidence",
+        "Before **Protocol Integration Baseline** approval",
+        "Before **Protocol Release Baseline** approval",
+        "formal integration gate shall be approved",
+    ]
+    for marker in gate_markers:
+        if marker not in gate_section:
+            findings.append(Finding("PCT-001", _relative(root, guide), f"25.6 is missing required staged-gate text: {marker}"))
+
+    guide_global_markers = [
+        "Protocol Conformance Tester Owner",
+        "Protocol Conformance Tester impact",
+    ]
+    for marker in guide_global_markers:
         if marker not in guide_text:
-            findings.append(Finding("PCT-001", _relative(root, guide), f"required conformance-tester authority marker is missing: {marker}"))
+            findings.append(Finding("PCT-001", _relative(root, guide), f"required conformance-tester governance marker is missing: {marker}"))
+
+    template_section = _section_by_heading(template_text, "## 15.2 Independent Protocol Conformance Tester Decision")
+    if template_section is None:
+        findings.append(Finding("PCT-002", _relative(root, template), "the unique 15.2 Protocol Conformance Tester decision section is missing"))
+        template_section = ""
+
     template_markers = [
-        "## 15.2 Independent Protocol Conformance Tester Decision",
-        "Protocol Baseline Stage",
-        "Independent Protocol Tester Applicability",
         "N/A Approval Reference",
         "Tester Independence Boundary",
-        "Protocol Source Identity",
+        "Project Protocol Source Identity",
         "Golden Test Vector Identity",
         "Physical Node Execution",
         "Formal Integration Gate",
+        "Exactly one baseline stage shall be selected",
+        "review trigger, expiry, or continuing-validity condition",
+    ]
+    for marker in template_markers:
+        if marker not in template_section:
+            findings.append(Finding("PCT-002", _relative(root, template), f"15.2 is missing required application-analysis text: {marker}"))
+
+    applicability_pattern = r"^\|\s*Independent Protocol Tester Applicability\s*\|\s*([^|]+?)\s*\|\s*$"
+    applicability_rows = re.findall(applicability_pattern, template_text, re.MULTILINE)
+    section_applicability_rows = re.findall(applicability_pattern, template_section, re.MULTILINE)
+    if len(applicability_rows) != 1 or section_applicability_rows != ["`Required / N/A`"]:
+        findings.append(Finding(
+            "PCT-004", _relative(root, template),
+            "15.2 must contain the repository's only Protocol Tester applicability row and its value must be exactly `Required / N/A`",
+        ))
+
+    stage_pattern = r"^\|\s*Protocol Baseline Stage\s*\|\s*([^|]+?)\s*\|\s*$"
+    stage_rows = re.findall(stage_pattern, template_text, re.MULTILINE)
+    section_stage_rows = re.findall(stage_pattern, template_section, re.MULTILINE)
+    expected_stage = "`<Exactly one: Definition, Integration, or Release>`"
+    if len(stage_rows) != 1 or section_stage_rows != [expected_stage]:
+        findings.append(Finding(
+            "PCT-005", _relative(root, template),
+            f"15.2 must contain the repository's only Protocol Baseline Stage row and its value must be exactly {expected_stage}",
+        ))
+
+    for marker in (
         "Independent Protocol Conformance Tester | Yes when applicable",
         "protocol_conformance_tester/",
         "| Owner |",
         "| Reviewer |",
-    ]
-    for marker in template_markers:
+    ):
         if marker not in template_text:
-            findings.append(Finding("PCT-002", _relative(root, template), f"required application-analysis field is missing: {marker}"))
-    applicability_row = re.search(
-        r"^\|\s*Independent Protocol Tester Applicability\s*\|\s*([^|]+?)\s*\|\s*$",
-        template_text,
-        re.MULTILINE,
-    )
-    if applicability_row is None or applicability_row.group(1).strip() != "`Required / N/A`":
-        findings.append(Finding("PCT-004", _relative(root, template), "Protocol Tester applicability must be exactly `Required / N/A`"))
-    for check_id in ("P-106", "P-107", "P-108", "P-109", "P-115", "P-116", "P-117", "P-118", "P-119"):
-        if not re.search(rf"^\s*- \[ \] {re.escape(check_id)}\b", checklist_text, re.MULTILINE):
-            findings.append(Finding("PCT-003", _relative(root, checklist), f"required Protocol tester check is missing: {check_id}"))
+            findings.append(Finding("PCT-002", _relative(root, template), f"required application-analysis artifact marker is missing: {marker}"))
 
+    interoperability_section = _section_by_heading(checklist_text, "# 12. Coordinator/Node Interoperability")
+    evidence_section = _section_by_heading(checklist_text, "# 13. Evidence and Approval")
+    if interoperability_section is None:
+        findings.append(Finding("PCT-003", _relative(root, checklist), "the unique interoperability checklist section is missing"))
+        interoperability_section = ""
+    if evidence_section is None:
+        findings.append(Finding("PCT-003", _relative(root, checklist), "the unique evidence checklist section is missing"))
+        evidence_section = ""
+
+    checklist_requirements = {
+        "P-106": (interoperability_section, ("**Definition:**", "**Integration/Release:**")),
+        "P-107": (interoperability_section, ("**Definition:**", "**Integration/Release:**")),
+        "P-108": (interoperability_section, ("**Definition:**", "**Integration/Release:**")),
+        "P-109": (interoperability_section, ("**Integration/Release only:**", "N/A — Definition stage")),
+        "P-115": (evidence_section, ("**Integration/Release only:**", "N/A — Definition stage")),
+        "P-116": (evidence_section, ("review trigger, expiry, or continuing-validity condition", "re-confirmed")),
+        "P-117": (evidence_section, ("Exactly one", "no combined, unspecified, or deferred stage")),
+        "P-118": (evidence_section, ("Definition Baseline", "without claiming unexecuted target evidence")),
+        "P-119": (evidence_section, ("Integration or Release Baseline", "formal integration-gate disposition")),
+    }
+    for check_id, (section, markers) in checklist_requirements.items():
+        matches = re.findall(rf"^\s*- \[ \] {re.escape(check_id)}\b.*$", section, re.MULTILINE)
+        if len(matches) != 1:
+            findings.append(Finding("PCT-003", _relative(root, checklist), f"required Protocol tester check must occur exactly once in its controlled section: {check_id}"))
+            continue
+        for marker in markers:
+            if marker not in matches[0]:
+                findings.append(Finding("PCT-006", _relative(root, checklist), f"{check_id} is missing stage-scoped evidence text: {marker}"))
 
 def _unreleased_section(text: str) -> str | None:
     match = re.search(r"^##\s+Unreleased\s*$", text, re.MULTILINE)

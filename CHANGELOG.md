@@ -5,6 +5,8 @@ All notable repository-level changes are documented in this file.
 Individual authority documents retain their own internal Version History and approval status.
 
 ## Unreleased
+- Closed staged Protocol Tester checklist contradictions by separating Definition planning from Integration/Release implementation and execution evidence, requiring exactly one claimed baseline stage, and requiring N/A re-confirmation when scope or stage changes.
+- Hardened repository validation against decoy or duplicate Protocol Tester table rows by scoping checks to the controlled section and requiring one exact applicability row and one exact baseline-stage row.
 
 - Closed a Protocol lifecycle circularity by separating Definition, Integration, and Release Baselines: Tester planning is controlled at definition time, while physical or representative target execution evidence is required before formal integration and release approval.
 - Hardened Protocol Tester applicability validation to require the exact `Required / N/A` disposition and reject alternate optional paths.

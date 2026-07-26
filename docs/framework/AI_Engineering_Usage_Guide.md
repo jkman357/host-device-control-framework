@@ -3,7 +3,7 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`
 **Document ID:** AIEUG
-**Document Version:** v1.0.29
+**Document Version:** v1.0.30
 **Status:** Draft for Review
 **Document Type:** AI Usage and Authority Routing Guide
 **Primary Narrative Language:** English
@@ -11,7 +11,7 @@
 **Maintainer:** Ray Yang
 **Repository:** `host-device-control-framework`
 **Repository Role:** Proposed normative AI task-routing and repository-governance authority
-**Supersedes Document Version:** v1.0.28
+**Supersedes Document Version:** v1.0.29
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -100,6 +100,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.0.30 | 2026-07-25 | Draft for Review | Routed exact-one Protocol baseline-stage selection and stage-scoped Tester evidence through Protocol YAML Definition Guide v1.1.4, Framework Application Analysis Template v1.1.6, and Protocol Validation Checklist v1.1.4; required N/A re-evaluation and prevented Definition-stage checks from demanding unexecuted evidence. |
 | v1.0.29 | 2026-07-25 | Draft for Review | Routed staged Protocol Definition, Integration, and Release Baselines through Protocol YAML Definition Guide v1.1.3, Framework Application Analysis Template v1.1.5, and Protocol Validation Checklist v1.1.3; prohibited circular definition-baseline gates and fabricated pre-execution evidence. |
 | v1.0.28 | 2026-07-25 | Draft for Review | Closed Protocol Conformance Tester routing gaps by using Protocol YAML Definition Guide v1.1.2, Framework Application Analysis Template v1.1.4, and Protocol Validation Checklist v1.1.2; required an authorized N/A record, implementation independence, a physical-or-representative Node execution gate, and retained evidence before formal integration approval. |
 | v1.0.27 | 2026-07-25 | Draft for Review | Routed the independent Protocol Conformance Tester requirement through Protocol YAML Definition Guide v1.1.1, Framework Application Analysis Template v1.1.3, and Protocol Validation Checklist v1.1.1; retained Project Protocol authority, executable-evidence boundaries, and human approval. |
@@ -141,10 +142,10 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.29` | Draft for Review | AI authority routing and operating controls |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.30` | Draft for Review | AI authority routing and operating controls |
 | Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.5` | Baseline | Generalized Single-Node and Multi-Node architecture and governance |
-| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.1.5` | Baseline | Application, topology, resource, and acceptance analysis method |
-| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.1.3` | Baseline | Protocol YAML representation and Multi-Node semantic-validation rules |
+| Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.1.6` | Baseline | Application, topology, resource, and acceptance analysis method |
+| Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.1.4` | Baseline | Protocol YAML representation and Multi-Node semantic-validation rules |
 | Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.1.0` | Baseline | Reusable Single-Node and Multi-Node Protocol starting structure |
 | Protocol Compatibility Rules | `docs/protocol/Protocol_Compatibility_Rules.md` | `v1.1.0` | Draft for Review | Protocol compatibility, Multi-Node migration, and mixed-version rules |
 | Protocol Registry Governance | `docs/protocol/Protocol_Registry_Governance.md` | `v1.1.0` | Draft for Review | Protocol identifiers and Node identity/address/route governance |
@@ -160,7 +161,7 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
 | Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.11` | Draft for Review | Repository structural, canonical claim-source, legal-baseline, external-anchor, release-freeze, third-party byte/evidence, and evidence checks |
 | Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.1.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
-| Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.1.3` | Draft for Review | Protocol and Multi-Node validation evidence-capture checklist |
+| Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.1.4` | Draft for Review | Protocol and Multi-Node validation evidence-capture checklist |
 | Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.1.5` | Draft for Review | Framework and Multi-Node conformance, claim lifecycle, deviation, and restoration evidence-capture checklist |
 | Coding Rules Review Checklist | `docs/validation/Coding_Rules_Review_Checklist.md` | `v1.0.0` | Draft for Review | Language Coding Rules review and evidence-capture checklist |
 | AI-Generated Artifact Validation Guide | `docs/validation/AI_Generated_Artifact_Validation_Guide.md` | `v1.1.0` | Draft for Review | AI-generated artifact validation and human-approval controls |

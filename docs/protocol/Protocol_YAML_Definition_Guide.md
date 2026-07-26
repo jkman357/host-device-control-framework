@@ -3,9 +3,9 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.1.3  
+**Document Version:** v1.1.4  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.1.2  
+**Supersedes Document Version:** v1.1.3  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
@@ -202,6 +202,7 @@ The keywords in this document have the following meanings:
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.4 | 2026-07-25 | Baseline | Made staged-baseline contents mandatory, required exactly one claimed Protocol baseline stage, required N/A re-evaluation when scope or stage changes, and aligned stage-specific Tester planning, implementation, execution, and evidence obligations. |
 | v1.1.3 | 2026-07-25 | Baseline | Separated Protocol Definition, Integration, and Release Baselines so initial wire-contract approval does not depend circularly on an already implemented physical Node; retained Tester planning at definition time and required executed Tester evidence before formal integration and release approval. |
 | v1.1.2 | 2026-07-25 | Baseline | Closed Protocol Conformance Tester governance gaps by defining implementation independence, authorized N/A approval records, Tester ownership, Protocol-change impact, controlled baseline contents, and execution-evidence identity. |
 | v1.1.1 | 2026-07-25 | Baseline | Required an independently executable Protocol Conformance Tester for Protocols with commands, responses, state transitions, events, telemetry, or streams unless an approved N/A rationale exists; defined its authority boundary, coverage, target execution, evidence identity, and non-substitution limits. |
@@ -2763,7 +2764,7 @@ Rollback trigger
 
 For a Protocol containing commands, responses, state transitions, events, telemetry, or streams, the Project
 shall provide an independently executable Protocol Conformance Tester unless an authorized human approves an
-`N/A` rationale and records the approver, approval reference, scope, and reason in the Project analysis.
+`N/A` rationale and records the approver, approval reference, scope, reason, and review condition in the Project analysis. This controlled record is the authorized N/A approval record.
 
 The Tester shall:
 
@@ -2836,10 +2837,10 @@ A Protocol change shall identify:
 
 ### 25.3 Staged Baseline Contents
 
-A Project shall identify which Protocol baseline stage is being approved. The stages prevent a circular requirement
+A Project shall identify exactly one Protocol baseline stage for each approval record: `Definition`, `Integration`, or `Release`. A record shall not claim multiple stages or use an unspecified, combined, or deferred stage. The stages prevent a circular requirement
 in which an approved wire contract would depend on a Node implementation that itself requires that contract.
 
-A **Protocol Definition Baseline** should include:
+A **Protocol Definition Baseline** shall include the following applicable controlled items:
 
 ```text
 Protocol YAML
@@ -2854,7 +2855,7 @@ Authorized N/A approval record when applicable
 Review and definition-approval evidence
 ```
 
-A **Protocol Integration Baseline** should additionally include:
+A **Protocol Integration Baseline** shall additionally include the following applicable controlled items:
 
 ```text
 Protocol Definition Baseline identity
@@ -2868,7 +2869,7 @@ Observed anomalies, limitations, and approved deviations
 Integration-gate review and approval evidence
 ```
 
-A **Protocol Release Baseline** should additionally include:
+A **Protocol Release Baseline** shall additionally include the following applicable controlled items:
 
 ```text
 Protocol Integration Baseline identity
@@ -2881,6 +2882,8 @@ Release review and approval evidence
 The Protocol Definition Baseline shall not claim executed Tester or target evidence that does not yet exist. The
 Protocol Integration and Release Baselines shall identify the Independent Protocol Conformance Tester source identity
 and retain the applicable Tester execution evidence and result identity, or the authorized N/A approval record.
+
+An authorized Tester `N/A` decision shall be re-evaluated whenever Protocol scope, message categories, implementation targets, Transport behavior, or claimed baseline stage changes. The approval record shall identify its review trigger, expiry, or continuing-validity condition; a prior Definition-stage `N/A` shall not be carried into Integration or Release without recorded re-confirmation.
 
 ### 25.4 Generated Artifact Control
 

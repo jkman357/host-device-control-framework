@@ -3,9 +3,9 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`
 **Document ID:** FAAT
-**Document Version:** v1.1.5
+**Document Version:** v1.1.6
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.4
+**Supersedes Document Version:** v1.1.5
 **Document Type:** Reusable Analysis Template
 **Primary Narrative Language:** English
 **Author:** Ray Yang
@@ -91,6 +91,7 @@ Other Coordinator/Node applications
 
 | Version | Date | Status | Author | Description |
 | --- | --- | --- | --- | --- |
+| v1.1.6 | 2026-07-25 | Baseline | Ray Yang | Required exactly one Protocol baseline stage per approval record, added N/A review conditions, made Tester fields and completion checks stage-specific, and prevented Definition-stage reviews from being failed by Integration/Release execution criteria. |
 | v1.1.5 | 2026-07-25 | Baseline | Ray Yang | Added staged Protocol Definition, Integration, and Release Baseline records so Tester planning is required at definition time while physical execution evidence is required only for formal integration and release approval; strengthened applicability-field semantics. |
 | v1.1.4 | 2026-07-25 | Baseline | Ray Yang | Closed Protocol Conformance Tester applicability and lifecycle gaps by removing the unauthorised `No` path, requiring an N/A approval record, documenting independence boundaries, adding required tool/evidence artifacts and repository placement, inserting a pre-integration execution gate, and extending the completion checklist. |
 | v1.1.3 | 2026-07-25 | Baseline | Ray Yang | Added a mandatory Project decision and evidence table for an independent Protocol Conformance Tester, including controlled source identity, command and negative coverage, state transitions, telemetry or stream checks, physical-Node execution, evidence location, and human ownership. |
@@ -1865,10 +1866,10 @@ infer omitted Project decisions.
 
 | Item | Required Project Entry |
 |---|---|
-| Protocol Baseline Stage | `Definition / Integration / Release` |
+| Protocol Baseline Stage | `<Exactly one: Definition, Integration, or Release>` |
 | Independent Protocol Tester Applicability | `Required / N/A` |
 | N/A Rationale | `<Required when N/A; otherwise None>` |
-| N/A Approval Reference | `<Approver, approval record, date, and scope when N/A; otherwise None>` |
+| N/A Approval Reference | `<Approver, approval record, date, scope, and review/expiry condition when N/A; otherwise None>` |
 | Tester Implementation | `<Language, tool, repository, and canonical path; None only when N/A>` |
 | Tester Independence Boundary | `<Production modules not reused; generated constants or vector data shared, if any>` |
 | Project Protocol Source Identity | `<Repository, commit/tag/Release, path, and hash as applicable>` |
@@ -1886,9 +1887,9 @@ infer omitted Project decisions.
 
 The Tester shall consume the controlled Project Protocol and Golden Test Vectors. It shall not create or silently
 change wire semantics. `Required` means applicability, ownership, independence, planned canonical location, and
-coverage are recorded for a Protocol Definition Baseline. Physical or approved representative-target execution is
+coverage are recorded for a Protocol Definition Baseline. Exactly one baseline stage shall be selected for each approval record. Physical or approved representative-target execution is
 required before the Formal Integration Gate may be marked `Passed` and before an Integration or Release Baseline is
-approved. `N/A` requires an authorized approval record; an unapproved `No`, `Optional`, blank field, or deferred
+approved. `N/A` requires an authorized approval record with a review trigger, expiry, or continuing-validity condition; it shall be re-evaluated when Protocol scope or baseline stage changes. An unapproved `No`, `Optional`, blank field, combined stage, or deferred
 decision is not a valid disposition. A passing result does not replace formal Coordinator/Node integration or Product
 approval.
 
@@ -2636,7 +2637,7 @@ Acceptance Evidence:
 - [ ] Plaintext Message, security overhead, secured Record, reassembly, and Fragment budgets are separately calculated.
 - [ ] Application and Bootloader security boundaries are defined.
 - [ ] Schema Validation, Semantic Lint, Code Generation, and Test Vector targets are defined.
-- [ ] The claimed Protocol Baseline Stage is recorded as `Definition`, `Integration`, or `Release`.
+- [ ] Exactly one claimed Protocol Baseline Stage is recorded as `Definition`, `Integration`, or `Release`; no combined, unspecified, or deferred stage remains.
 - [ ] Independent Protocol Conformance Tester applicability is recorded exactly as `Required` or authorized `N/A`; no unapproved `No`, `Optional`, blank, or deferred disposition remains.
 - [ ] Tester Protocol source, Golden Vector identity, independence boundary, owner, reviewer, and evidence location are defined when applicable.
 
@@ -2684,8 +2685,8 @@ Acceptance Evidence:
 - [ ] Hardware integration, long-run, load, reset, reconnect, and recovery tests are defined.
 - [ ] Security and Firmware Update tests are defined when applicable.
 - [ ] A Definition Baseline records the Tester plan without claiming unexecuted target evidence; an Integration or Release Baseline retains the required execution evidence.
-- [ ] The independent Protocol Conformance Tester covers all in-scope command, response, rejection, timeout, state, event, telemetry, and stream behaviors when applicable.
-- [ ] The Tester was executed against the physical Node or approved representative target, and the formal integration gate is not marked Passed without retained evidence.
+- [ ] At Definition, planned Tester coverage includes all in-scope command, response, rejection, timeout, state, event, telemetry, and stream behaviors; at Integration or Release, the implemented Tester demonstrates that coverage when applicable.
+- [ ] For an Integration or Release Baseline, the Tester was executed against the physical Node or approved representative target, and the formal integration gate is not marked Passed without retained evidence; this execution item is not required for a Definition Baseline.
 - [ ] Requirement-to-design-to-test traceability is defined.
 
 ## Gap, Risk, and Decision Management

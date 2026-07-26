@@ -52,7 +52,7 @@ class RepositoryValidatorTests(unittest.TestCase):
             1,
         )
         path.write_text(text, encoding="utf-8")
-        self.assertIn("PCT-002", self.rules())
+        self.assertIn("PCT-004", self.rules())
 
     def test_protocol_tester_no_applicability_loophole_is_rejected(self) -> None:
         path = self.root / "docs/framework/Framework_Application_Analysis_Template.md"
@@ -98,14 +98,65 @@ class RepositoryValidatorTests(unittest.TestCase):
         path.write_text(text, encoding="utf-8")
         self.assertIn("PCT-003", self.rules())
 
+
+    def test_protocol_tester_decoy_applicability_row_is_rejected(self) -> None:
+        path = self.root / "docs/framework/Framework_Application_Analysis_Template.md"
+        text = path.read_text(encoding="utf-8")
+        heading = "## 15.2 Independent Protocol Conformance Tester Decision"
+        text = text.replace(
+            heading,
+            "| Independent Protocol Tester Applicability | `Required / N/A` |\n\n" + heading,
+            1,
+        )
+        first = text.find("| Independent Protocol Tester Applicability | `Required / N/A` |")
+        second = text.find("| Independent Protocol Tester Applicability | `Required / N/A` |", first + 1)
+        self.assertGreater(second, first)
+        text = text[:second] + text[second:].replace(
+            "| Independent Protocol Tester Applicability | `Required / N/A` |",
+            "| Independent Protocol Tester Applicability | `Required / Optional / N/A` |",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-004", self.rules())
+
+    def test_protocol_baseline_stage_row_is_enforced(self) -> None:
+        path = self.root / "docs/framework/Framework_Application_Analysis_Template.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "`<Exactly one: Definition, Integration, or Release>`",
+            "`Definition / Integration / Release`",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-005", self.rules())
+
+    def test_definition_stage_does_not_require_executed_tester_evidence(self) -> None:
+        path = self.root / "docs/validation/Protocol_Validation_Checklist.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "**Integration/Release only:** the Tester was executed",
+            "The Tester was executed",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-006", self.rules())
+
+    def test_protocol_baseline_contents_are_mandatory(self) -> None:
+        path = self.root / "docs/protocol/Protocol_YAML_Definition_Guide.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "A **Protocol Definition Baseline** shall include",
+            "A **Protocol Definition Baseline** should include",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-001", self.rules())
+
     def test_registry_versions_match_updated_documents(self) -> None:
         registry = yaml.safe_load((self.root / "authority-registry.yaml").read_text(encoding="utf-8"))
         by_path = {record["path"]: record for record in registry["documents"]}
         expected = {
-            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.29",
-            "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.5",
-            "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.3",
-            "docs/validation/Protocol_Validation_Checklist.md": "v1.1.3",
+            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.30",
+            "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.6",
+            "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.4",
+            "docs/validation/Protocol_Validation_Checklist.md": "v1.1.4",
         }
         for path, version in expected.items():
             with self.subTest(path=path):

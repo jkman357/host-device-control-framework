@@ -1,8 +1,8 @@
 # Protocol Validation Checklist
 
 **Canonical Filename:** `Protocol_Validation_Checklist.md`  
-**Document Version:** v1.1.3  
-**Supersedes Document Version:** v1.1.2  
+**Document Version:** v1.1.4  
+**Supersedes Document Version:** v1.1.3  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -31,6 +31,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.4 | 2026-07-25 | Draft for Review | Made Protocol Tester checks explicitly stage-scoped so Definition Baselines require planning and independence records without execution, while Integration and Release Baselines require an implemented Tester, target execution, retained evidence, and gate disposition; required exactly one stage and N/A re-confirmation. |
 | v1.1.3 | 2026-07-25 | Draft for Review | Added staged Protocol baseline checks so Definition Baselines require a controlled Tester plan without fabricated execution evidence, while Integration and Release Baselines require physical-or-representative target execution and formal gate disposition. |
 | v1.1.2 | 2026-07-25 | Draft for Review | Closed Tester applicability and independence gaps by requiring a recorded N/A approval reference, prohibiting unapproved `No`, distinguishing permitted generated-data reuse from production implementation reuse, and adding explicit evidence for the formal integration gate. |
 | v1.1.1 | 2026-07-25 | Draft for Review | Added evidence checks for the independent Protocol Conformance Tester required by the Protocol YAML Definition Guide, including controlled expectations, complete in-scope behavior, physical or representative target execution, retained identities, and explicit N/A rationale. |
@@ -178,10 +179,10 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-103 Security Handshake and protected records passed across independent implementations where applicable.
 - [ ] P-104 Mixed-version and unsupported-version behavior passed for each claimed direction.
 - [ ] P-105 Target or representative-system evidence exists for timing, hardware, and physical behavior that mocks cannot prove.
-- [ ] P-106 An independently executable Protocol Conformance Tester exists as required by the Protocol YAML Definition Guide, or an authorized `N/A` rationale and approval reference are recorded; an unapproved `No` or blank disposition is not accepted.
-- [ ] P-107 The Tester covers every applicable in-scope command, response, rejection, timeout, state transition, event, telemetry, and stream behavior.
-- [ ] P-108 Tester expectations derive from the controlled Project Protocol and Golden Test Vectors; the Tester does not reuse production command handlers, state logic, Transport/Session behavior, or codec implementation under test, and any shared generated constants or immutable vectors are identified.
-- [ ] P-109 The Tester was executed against the physical Node or a clearly identified representative target, representative-target equivalence is justified, and raw evidence was retained.
+- [ ] P-106 **Definition:** Tester applicability, owner, reviewer, independence boundary, canonical location, and implementation plan are recorded. **Integration/Release:** an independently executable Protocol Conformance Tester exists. At any stage, an authorized `N/A` record may satisfy this item; an unapproved `No`, `Optional`, blank, combined, or deferred disposition is not accepted.
+- [ ] P-107 **Definition:** planned coverage includes every applicable in-scope command, response, rejection, timeout, state transition, event, telemetry, and stream behavior. **Integration/Release:** the implemented Tester demonstrates that coverage.
+- [ ] P-108 **Definition:** the intended expectation source and independence boundary are recorded. **Integration/Release:** Tester expectations demonstrably derive from the controlled Project Protocol and Golden Test Vectors; the Tester does not reuse production command handlers, state logic, Transport/Session behavior, or codec implementation under test, and any shared generated constants or immutable vectors are identified.
+- [ ] P-109 **Integration/Release only:** the Tester was executed against the physical Node or a clearly identified representative target, representative-target equivalence is justified, and raw evidence was retained. Mark this item `N/A — Definition stage` for a Definition Baseline; do not fabricate execution evidence.
 
 # 13. Evidence and Approval
 
@@ -190,8 +191,8 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-112 No generated or AI-authored statement is represented as executed evidence without raw output.
 - [ ] P-113 Human reviewers approved the compatibility, Registry, security, and Product-semantic decisions within their authority.
 - [ ] P-114 The final result is bounded as Pass, Fail, Inconclusive, Blocked, or approved limited scope.
-- [ ] P-115 Conformance-Tester evidence identifies the Project Protocol, Golden Vectors, Tester revision, Node build, target, Transport, configuration, execution time, result, and formal integration-gate disposition.
-- [ ] P-116 A Tester `N/A` disposition identifies the authorized approver, approval reference, date, scope, and rationale.
-- [ ] P-117 The claimed Protocol baseline stage is identified as Definition, Integration, or Release.
+- [ ] P-115 **Integration/Release only:** Conformance-Tester evidence identifies the Project Protocol, Golden Vectors, Tester revision, Node build, target, Transport, configuration, execution time, result, and formal integration-gate disposition. Mark this item `N/A — Definition stage` for a Definition Baseline.
+- [ ] P-116 A Tester `N/A` disposition identifies the authorized approver, approval reference, date, scope, rationale, and review trigger, expiry, or continuing-validity condition; it is re-confirmed when scope or baseline stage changes.
+- [ ] P-117 Exactly one claimed Protocol baseline stage is identified as `Definition`, `Integration`, or `Release`; no combined, unspecified, or deferred stage is accepted.
 - [ ] P-118 A Protocol Definition Baseline records Tester applicability, ownership, independence, planned location, and coverage without claiming unexecuted target evidence.
 - [ ] P-119 A Protocol Integration or Release Baseline retains the applicable physical-or-representative target Tester result and formal integration-gate disposition, or an authorized N/A approval record.
