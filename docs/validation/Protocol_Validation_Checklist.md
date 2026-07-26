@@ -1,8 +1,8 @@
 # Protocol Validation Checklist
 
 **Canonical Filename:** `Protocol_Validation_Checklist.md`  
-**Document Version:** v1.1.5  
-**Supersedes Document Version:** v1.1.4  
+**Document Version:** v1.1.6  
+**Supersedes Document Version:** v1.1.5  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -31,6 +31,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.6 | 2026-07-26 | Draft for Review | Added cross-field disposition consistency checks for stage, applicability, execution, and gate state, and required self-validation evidence proving that the independent Tester accepts controlled positive cases and rejects controlled malformed or incorrect cases. |
 | v1.1.5 | 2026-07-26 | Draft for Review | Bound Tester and interoperability evidence to exact tested candidate identities, rejected stale Integration evidence after relevant Release-candidate changes, and bounded representative-target claims to demonstrated equivalence with residual actual-target verification or explicit release limitation. |
 | v1.1.4 | 2026-07-25 | Draft for Review | Made Protocol Tester checks explicitly stage-scoped so Definition Baselines require planning and independence records without execution, while Integration and Release Baselines require an implemented Tester, target execution, retained evidence, and gate disposition; required exactly one stage and N/A re-confirmation. |
 | v1.1.3 | 2026-07-25 | Draft for Review | Added staged Protocol baseline checks so Definition Baselines require a controlled Tester plan without fabricated execution evidence, while Integration and Release Baselines require physical-or-representative target execution and formal gate disposition. |
@@ -200,3 +201,5 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-120 Each Integration or Release Tester and interoperability result identifies the exact Protocol, Golden Vectors, Tester, Coordinator build when in scope, Node build, target, Transport, and configuration that were tested.
 - [ ] P-121 Before Release approval, Integration evidence is reconciled against the exact Release candidate; every relevant identity change has recorded impact analysis, affected re-execution, and replacement evidence, and stale evidence is not inherited.
 - [ ] P-122 Representative-target evidence is claimed only for behavior preserved by the documented equivalence; residual startup, FPU, interrupt, peripheral, DMA, memory-layout, compiler/toolchain, timing, and physical-Transport behavior is verified on the actual Product target or explicitly bounded and approved as a release limitation.
+- [ ] P-123 Baseline stage, Tester applicability, Tester self-validation, physical-execution state, and formal-gate disposition form a permitted combination; a Required Tester with a non-Passed Integration/Release execution or an `N/A` gate does not support approval.
+- [ ] P-124 Before a Tester PASS result is relied upon, controlled self-validation proves that the Tester accepts intended positive cases and detects applicable known-negative length, integrity/CRC, Message ID, state/sequence, timeout, and parser-recovery cases; the self-validation source, revision, environment, raw result, anomalies, and evidence identity are retained.

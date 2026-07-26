@@ -3,9 +3,9 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.1.5  
+**Document Version:** v1.1.6  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.1.4  
+**Supersedes Document Version:** v1.1.5  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
@@ -202,6 +202,7 @@ The keywords in this document have the following meanings:
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.6 | 2026-07-26 | Baseline | Required stage/applicability/execution/gate dispositions to be internally consistent and required independent Tester self-validation with positive and known-negative controls before a Tester PASS claim may support Integration or Release approval. |
 | v1.1.5 | 2026-07-26 | Baseline | Bound Tester and interoperability evidence to the exact tested candidate identities, required Integration-to-Release evidence reconciliation and affected re-execution after identity changes, and bounded representative-target claims to demonstrated equivalence with residual actual-target verification or explicit release limitation. |
 | v1.1.4 | 2026-07-25 | Baseline | Made staged-baseline contents mandatory, required exactly one claimed Protocol baseline stage, required N/A re-evaluation when scope or stage changes, and aligned stage-specific Tester planning, implementation, execution, and evidence obligations. |
 | v1.1.3 | 2026-07-25 | Baseline | Separated Protocol Definition, Integration, and Release Baselines so initial wire-contract approval does not depend circularly on an already implemented physical Node; retained Tester planning at definition time and required executed Tester evidence before formal integration and release approval. |
@@ -2780,12 +2781,15 @@ Retain exact Protocol, vector, Tester, Coordinator build when in scope, Node bui
 Bind each result to the exact tested candidate; do not inherit it after a relevant identity changes without documented impact analysis and affected re-execution
 Bound representative-target claims to the demonstrated equivalence and identify residual behavior that still requires the actual Product target or an explicit release limitation
 Report unsupported or undefined behavior without inventing Product semantics
+Self-validate the Tester against controlled positive and known-negative cases before relying on a Tester PASS result
 ```
 
 The Tester may be implemented in Python or another suitable language. The Framework does not mandate the
 implementation language. Bind each result to the exact tested candidate. Bound representative-target claims to the demonstrated equivalence.
 
 The Tester may consume controlled generated contract data and Golden Test Vectors. It shall not call, import, or reuse the production Coordinator or Node command handlers, state-transition logic, Transport/Session behavior, or codec implementation being evaluated. Shared use of generated constants or immutable vector data shall be recorded so that implementation independence remains reviewable.
+
+Before a Tester PASS result is accepted for an Integration or Release Baseline, the Project shall retain a Tester self-validation identity and result. The self-validation shall use controlled positive cases and known-negative controls, including applicable malformed length, integrity/CRC failure, unexpected Message ID, invalid state or sequence, timeout, and parser recovery or resynchronization cases. It shall demonstrate that the Tester both accepts the intended valid result and detects the intended invalid result. A self-test that only proves the script starts, imports, or replays its own generated expectations is insufficient. The self-validation source, revision, execution environment, raw result, anomalies, and evidence location shall be traceable.
 
 The Tester shall not become a competing Protocol authority. When the Tester and the controlled Project Protocol
 disagree, the implementation or test artifact shall be treated as suspect until an authorized Protocol change is
@@ -2870,6 +2874,7 @@ Protocol Definition Baseline identity
 Generated artifacts and generator version
 Coordinator and Node implementation identities in scope
 Independent Protocol Conformance Tester source identity
+Tester self-validation source, environment, execution result, and evidence identity
 Protocol Conformance Tester execution evidence and result identity
 Physical Node or approved representative-target identity and configuration
 Exact tested-candidate identity set: Protocol, vectors, Tester, Coordinator build when in scope, Node build, target, Transport, and configuration
@@ -2900,6 +2905,29 @@ changes unless the change impact is recorded, affected checks are re-executed, a
 The Protocol Integration Baseline shall retain the Exact tested-candidate identity set. The Protocol Release Baseline shall retain an Integration-to-Release evidence reconciliation and shall not inherit Integration evidence after a relevant candidate identity change without documented impact analysis, affected re-execution, and replacement evidence.
 
 An authorized Tester `N/A` decision shall be re-evaluated whenever Protocol scope, message categories, implementation targets, Transport behavior, or claimed baseline stage changes. The approval record shall identify its review trigger, expiry, or continuing-validity condition; a prior Definition-stage `N/A` shall not be carried into Integration or Release without recorded re-confirmation.
+
+The stage, applicability, physical-execution state, and formal-gate disposition shall form one internally consistent record:
+
+```text
+Definition + Required
+  -> Physical execution is Planned or Not Run
+  -> Formal Integration Gate is N/A — Definition stage
+
+Definition + authorized N/A
+  -> Tester implementation and execution are N/A
+  -> Formal Integration Gate is N/A — Definition stage
+
+Integration or Release + Required
+  -> Tester self-validation is Passed
+  -> Physical or approved representative-target execution is Passed
+  -> Formal Integration Gate is Passed for the approved scope
+
+Integration or Release + authorized N/A
+  -> The N/A approval is current and re-confirmed for that stage
+  -> Tester execution and Formal Integration Gate are N/A only within the approved N/A scope
+```
+
+A `Failed`, `Inconclusive`, `Blocked`, `Not Run`, `Pending`, stale `N/A`, or contradictory combination shall not support Integration or Release approval. A record shall not use `N/A` for the gate while claiming the Tester is `Required` and the Integration or Release Baseline is approved.
 
 ### 25.4 Generated Artifact Control
 
@@ -2933,6 +2961,7 @@ formal Coordinator/Node interoperability evidence.
 Before **Protocol Integration Baseline** approval:
 
 - Generated artifacts shall match the approved Protocol Definition Baseline.
+- The independent Protocol Conformance Tester self-validation shall pass with controlled positive and known-negative cases before its result is relied upon.
 - The independent Protocol Conformance Tester shall pass on the physical Node or approved representative target when applicable, or an authorized N/A approval record shall exist.
 - Cross-implementation and cross-language interoperability shall pass for implementations and languages in scope.
 - Target, Transport, configuration, anomaly, limitation, and deviation evidence shall be retained.

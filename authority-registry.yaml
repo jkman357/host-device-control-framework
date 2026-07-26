@@ -8,11 +8,11 @@ policy:
 documents:
 - display_name: AI Engineering Usage Guide
   path: docs/framework/AI_Engineering_Usage_Guide.md
-  version: v1.0.31
+  version: v1.0.32
   status: Draft for Review
   repository_role: Proposed normative AI task-routing and repository-governance authority
   readme_purpose: AI entry point, authority routing, Multi-Node-aware task workflows,
-    evidence states, exact tested-candidate evidence routing, and human approval boundary
+    evidence states, exact tested-candidate evidence routing, Tester self-validation, and human approval boundary
   routing_role: AI authority routing and operating controls
   applies_when: Any AI-assisted engineering task uses this repository or a detached
     authority-set package.
@@ -44,14 +44,14 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Framework Application Analysis Template
   path: docs/framework/Framework_Application_Analysis_Template.md
-  version: v1.1.7
+  version: v1.1.8
   status: Baseline
   repository_role: Normative framework-application analysis method
   readme_purpose: Method for applying the Framework to a Product, including topology,
     identity, resources, Reuse Classification, canonical source identity, Protocol inputs,
     independent Protocol Conformance Tester applicability, staged gates, exact tested
     identities, evidence reconciliation, representative-target residual boundaries,
-    risks, Gaps, MVP, and acceptance evidence
+    cross-field disposition consistency, Tester self-validation, risks, Gaps, MVP, and acceptance evidence
   routing_role: Application, topology, resource, and acceptance analysis method
   applies_when: The Framework is applied to a new Product, application, platform,
     or Product revision.
@@ -68,15 +68,15 @@ documents:
   - docs/framework/Coordinator_Node_Control_Framework.md
 - display_name: Protocol YAML Definition Guide
   path: docs/protocol/Protocol_YAML_Definition_Guide.md
-  version: v1.1.5
+  version: v1.1.6
   status: Baseline
   repository_role: Normative Protocol YAML syntax, semantics, machine-verifiable representation,
     validation, and Code Generation authority
   readme_purpose: Protocol YAML syntax, Multi-Node node_model semantics, machine-verifiable
     governance representation, Schema Validation, Semantic Lint, Code Generation,
     Golden Vectors, and independent Protocol Conformance Tester applicability, exact
-    tested-candidate evidence binding, release reconciliation, and representative-target
-    claim boundaries
+    tested-candidate evidence binding, release reconciliation, representative-target
+    claim boundaries, disposition consistency, and Tester self-validation
   routing_role: Protocol YAML representation and Multi-Node semantic-validation rules
   applies_when: A Project Protocol YAML is designed, reviewed, linted, versioned,
     or used for Code Generation.
@@ -420,14 +420,14 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Protocol Validation Checklist
   path: docs/validation/Protocol_Validation_Checklist.md
-  version: v1.1.5
+  version: v1.1.6
   status: Draft for Review
   repository_role: Proposed operational Protocol conformance checklist; not an independent
     Protocol or Product requirement authority
   readme_purpose: Traceable Protocol YAML, node_model, topology, identity, security,
     compatibility, independent Protocol Conformance Tester applicability, staged gates,
     exact tested identities, evidence freshness, representative-target residual boundaries,
-    and interoperability evidence view
+    cross-field consistency, Tester self-validation, and interoperability evidence view
   routing_role: Protocol and Multi-Node validation evidence-capture checklist
   applies_when: A Project Protocol definition or implementation is reviewed or validated
     against its governing authorities.

@@ -837,6 +837,8 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "shall not call, import, or reuse the production Coordinator or Node command handlers",
         "Bind each result to the exact tested candidate",
         "Bound representative-target claims to the demonstrated equivalence",
+        "The self-validation shall use controlled positive cases and known-negative controls",
+        "A self-test that only proves the script starts, imports, or replays its own generated expectations is insufficient",
     ]
     for marker in tester_markers:
         if marker not in tester_section:
@@ -853,6 +855,8 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "Exact tested-candidate identity set",
         "Integration-to-Release evidence reconciliation",
         "shall not inherit Integration evidence",
+        "stage, applicability, physical-execution state, and formal-gate disposition",
+        "shall not use `N/A` for the gate while claiming the Tester is `Required`",
     ]
     for marker in baseline_markers:
         if marker not in baseline_section:
@@ -862,6 +866,7 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "Protocol Definition Baseline approval does not require executed Tester evidence",
         "Before **Protocol Integration Baseline** approval",
         "Before **Protocol Release Baseline** approval",
+        "Tester self-validation shall pass",
         "formal integration gate shall be approved",
         "exact tested-candidate identity set",
         "Representative-target use shall record the equivalence boundary",
@@ -896,6 +901,9 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "Tested Candidate Identity",
         "Integration-to-Release Evidence Reconciliation",
         "Representative Target Residual Boundary",
+        "Tester Self-Validation Identity",
+        "cross-field disposition matrix",
+        "`N/A` for the Formal Integration Gate is not a substitute for a missing PASS",
     ]
     for marker in template_markers:
         if marker not in template_section:
@@ -922,6 +930,7 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
 
     for marker in (
         "Independent Protocol Conformance Tester | Yes when applicable",
+        "Protocol Conformance Tester self-validation report",
         "protocol_conformance_tester/",
         "| Owner |",
         "| Reviewer |",
@@ -951,6 +960,8 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "P-120": (evidence_section, ("exact Protocol", "Golden Vectors", "Node build", "Transport")),
         "P-121": (evidence_section, ("exact Release candidate", "affected re-execution", "stale evidence is not inherited")),
         "P-122": (evidence_section, ("documented equivalence", "actual Product target", "release limitation")),
+        "P-123": (evidence_section, ("permitted combination", "Required Tester", "does not support approval")),
+        "P-124": (evidence_section, ("controlled self-validation", "known-negative", "raw result", "evidence identity")),
     }
     for check_id, (section, markers) in checklist_requirements.items():
         matches = re.findall(rf"^\s*- \[ \] {re.escape(check_id)}\b.*$", section, re.MULTILINE)
@@ -982,6 +993,24 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
     combined = tester_section + baseline_section + gate_section + template_section + evidence_section
     if any(marker not in combined for marker in representative_markers):
         findings.append(Finding("PCT-008", _relative(root, guide), "representative-target evidence boundaries or residual actual-target disposition are incomplete"))
+
+    disposition_markers = (
+        "stage, applicability, physical-execution state, and formal-gate disposition",
+        "A `Failed`, `Inconclusive`, `Blocked`, `Not Run`, `Pending`, stale `N/A`, or contradictory combination shall not support Integration or Release approval",
+        "`N/A` for the Formal Integration Gate is not a substitute for a missing PASS",
+    )
+    if any(marker not in baseline_section + template_section for marker in disposition_markers):
+        findings.append(Finding("PCT-009", _relative(root, template), "stage, applicability, execution, and gate dispositions are not fail-closed and internally consistent"))
+
+    self_validation_markers = (
+        "Tester Self-Validation Identity",
+        "controlled positive cases and known-negative controls",
+        "A self-test that only proves the script starts, imports, or replays its own generated expectations is insufficient",
+        "Protocol Conformance Tester self-validation report",
+    )
+    self_validation_combined = tester_section + baseline_section + gate_section + template_section + evidence_section + template_text
+    if any(marker not in self_validation_combined for marker in self_validation_markers):
+        findings.append(Finding("PCT-010", _relative(root, guide), "Tester self-validation authority, evidence identity, or known-negative controls are incomplete"))
 
 def _unreleased_section(text: str) -> str | None:
     match = re.search(r"^##\s+Unreleased\s*$", text, re.MULTILINE)

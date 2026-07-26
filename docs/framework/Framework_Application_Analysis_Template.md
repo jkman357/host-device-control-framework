@@ -3,9 +3,9 @@
 
 **Document Name:** `Framework_Application_Analysis_Template.md`
 **Document ID:** FAAT
-**Document Version:** v1.1.7
+**Document Version:** v1.1.8
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.6
+**Supersedes Document Version:** v1.1.7
 **Document Type:** Reusable Analysis Template
 **Primary Narrative Language:** English
 **Author:** Ray Yang
@@ -91,6 +91,7 @@ Other Coordinator/Node applications
 
 | Version | Date | Status | Author | Description |
 | --- | --- | --- | --- | --- |
+| v1.1.8 | 2026-07-26 | Baseline | Ray Yang | Added an explicit stage/applicability/execution/gate consistency matrix, prohibited contradictory approval records, and required self-validation evidence showing that the independent Tester detects known-good and known-bad Protocol cases before its PASS result is relied upon. |
 | v1.1.7 | 2026-07-26 | Baseline | Ray Yang | Bound Protocol Tester evidence to exact tested candidate identities, required Integration-to-Release evidence reconciliation and affected re-execution, and bounded representative-target claims with residual actual-target verification or approved release limitations. |
 | v1.1.6 | 2026-07-25 | Baseline | Ray Yang | Required exactly one Protocol baseline stage per approval record, added N/A review conditions, made Tester fields and completion checks stage-specific, and prevented Definition-stage reviews from being failed by Integration/Release execution criteria. |
 | v1.1.5 | 2026-07-25 | Baseline | Ray Yang | Added staged Protocol Definition, Integration, and Release Baseline records so Tester planning is required at definition time while physical execution evidence is required only for formal integration and release approval; strengthened applicability-field semantics. |
@@ -1873,6 +1874,7 @@ infer omitted Project decisions.
 | N/A Approval Reference | `<Approver, approval record, date, scope, and review/expiry condition when N/A; otherwise None>` |
 | Tester Implementation | `<Language, tool, repository, and canonical path; None only when N/A>` |
 | Tester Independence Boundary | `<Production modules not reused; generated constants or vector data shared, if any>` |
+| Tester Self-Validation Identity | `<Self-test suite/revision, positive and known-negative controls, environment, result, anomalies, and evidence>` |
 | Project Protocol Source Identity | `<Repository, commit/tag/Release, path, and hash as applicable>` |
 | Golden Test Vector Identity | `<Repository, revision, path, and generator/tool version>` |
 | Tested Candidate Identity | `<Exact Protocol, vectors, Tester, Coordinator build when in scope, Node build, target, Transport, and configuration identities>` |
@@ -1881,7 +1883,7 @@ infer omitted Project decisions.
 | Negative and Timeout Cases | `<Complete list or None>` |
 | State-Transition Coverage | `<Complete list or None>` |
 | Telemetry and Stream Coverage | `<Gap, duplicate, order, wrap, overflow, duration, or N/A rationale>` |
-| Physical Node Execution | `Planned / Passed / Failed / Inconclusive / Blocked / Not Run` |
+| Physical Node Execution | `Planned / Passed / Failed / Inconclusive / Blocked / Not Run / N/A` |
 | Representative Target Rationale | `<Required when physical Product target is not used; otherwise None>` |
 | Representative Target Residual Boundary | `<Demonstrated equivalence, unproven target-specific behavior, actual-target verification, or approved bounded release limitation>` |
 | Formal Integration Gate | `Passed / Failed / Pending / N/A` |
@@ -1899,7 +1901,19 @@ candidate identities. Before Release approval, Integration evidence shall be rec
 changed identities require impact analysis, affected re-execution, and replacement evidence. Representative-target
 results shall be limited to demonstrated equivalence, with residual Product-target behavior verified on the actual
 target or retained as an explicit, approved, bounded release limitation. A passing result does not replace formal
-Coordinator/Node integration or Product approval.
+Coordinator/Node integration or Product approval. Before relying on a Tester PASS result, retain self-validation evidence showing that the Tester accepts controlled valid cases and rejects controlled malformed or incorrect cases.
+
+Use the following cross-field disposition matrix; combinations outside it are contradictory and shall not be approved:
+
+| Baseline Stage | Applicability | Tester Self-Validation | Physical Node Execution | Formal Integration Gate | Approval Effect |
+|---|---|---|---|---|---|
+| Definition | Required | Planned / Not Run | Planned / Not Run | `N/A — Definition stage` | Definition approval may proceed when the plan and ownership are complete |
+| Definition | Authorized N/A | N/A | N/A / Not Run | `N/A — Definition stage` | Definition approval may proceed only within the approved N/A scope |
+| Integration / Release | Required | Passed | Passed | Passed | Approval may proceed for the exact tested scope |
+| Integration / Release | Authorized N/A | N/A | N/A | N/A | Approval may proceed only within the current, re-confirmed N/A scope |
+| Integration / Release | Required | Failed / Inconclusive / Blocked / Not Run | Any non-Passed state | Failed / Pending / N/A | Approval shall not proceed |
+
+`N/A` for the Formal Integration Gate is not a substitute for a missing PASS when the Tester is `Required`.
 
 ## 15.3 Scenarios
 
@@ -1988,6 +2002,7 @@ Application and Device Simulator
 | Generated documentation | Recommended | Project Protocol YAML |
 | Golden Test Vectors | Yes | Project Protocol YAML / approved cases |
 | Independent Protocol Conformance Tester | Yes when applicable | Project Protocol and Golden Test Vectors |
+| Protocol Conformance Tester self-validation report | Yes before relying on a Tester PASS when applicable | Controlled positive and known-negative Tester checks, environment, raw result, and anomalies |
 | Protocol Conformance Tester execution report | Yes before formal integration approval when applicable | Tester execution against the physical Node or approved representative target |
 | Protocol evidence reconciliation record | Yes before Release approval when applicable | Integration evidence compared with exact Release candidate identities, impacts, re-execution, and replacement evidence |
 | Protocol decoder metadata | Recommended | Project Protocol YAML |
@@ -2691,6 +2706,7 @@ Acceptance Evidence:
 - [ ] Mock Node, Mock Coordinator, and Device Simulator needs are decided.
 - [ ] Fault injection is defined.
 - [ ] MVP test scope is defined.
+- [ ] Protocol Tester self-validation accepts controlled positive cases and detects controlled known-negative cases before a Tester PASS result is relied upon.
 - [ ] Protocol Tester and interoperability evidence is bound to exact tested candidate identities.
 - [ ] Integration evidence is reconciled against the Release candidate and affected checks are re-executed after relevant identity changes.
 - [ ] Representative-target claims are bounded to demonstrated equivalence; residual Product-target behavior is verified or explicitly limited and approved.
@@ -2698,6 +2714,7 @@ Acceptance Evidence:
 - [ ] Security and Firmware Update tests are defined when applicable.
 - [ ] A Definition Baseline records the Tester plan without claiming unexecuted target evidence; an Integration or Release Baseline retains the required execution evidence.
 - [ ] At Definition, planned Tester coverage includes all in-scope command, response, rejection, timeout, state, event, telemetry, and stream behaviors; at Integration or Release, the implemented Tester demonstrates that coverage when applicable.
+- [ ] Stage, Tester applicability, self-validation, physical execution, and formal gate values match the controlled disposition matrix; contradictory values do not support approval.
 - [ ] For an Integration or Release Baseline, the Tester was executed against the physical Node or approved representative target, and the formal integration gate is not marked Passed without retained evidence; this execution item is not required for a Definition Baseline.
 - [ ] Requirement-to-design-to-test traceability is defined.
 

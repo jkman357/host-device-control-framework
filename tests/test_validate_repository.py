@@ -185,14 +185,50 @@ class RepositoryValidatorTests(unittest.TestCase):
         path.write_text(text, encoding="utf-8")
         self.assertIn("PCT-003", self.rules())
 
+    def test_protocol_tester_disposition_matrix_is_enforced(self) -> None:
+        path = self.root / "docs/framework/Framework_Application_Analysis_Template.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "`N/A` for the Formal Integration Gate is not a substitute for a missing PASS",
+            "N/A may be used whenever execution is unavailable",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-009", self.rules())
+
+    def test_protocol_tester_self_validation_identity_is_enforced(self) -> None:
+        path = self.root / "docs/framework/Framework_Application_Analysis_Template.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "| Tester Self-Validation Identity |",
+            "| Tester Startup Check |",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertTrue({"PCT-002", "PCT-010"} & self.rules())
+
+    def test_protocol_tester_known_negative_controls_are_enforced(self) -> None:
+        path = self.root / "docs/protocol/Protocol_YAML_Definition_Guide.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "The self-validation shall use controlled positive cases and known-negative controls",
+            "The self-validation may use a basic startup check",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-010", self.rules())
+
+    def test_protocol_tester_new_checklist_ids_are_enforced(self) -> None:
+        path = self.root / "docs/validation/Protocol_Validation_Checklist.md"
+        text = path.read_text(encoding="utf-8").replace("P-124", "P-194", 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-003", self.rules())
+
     def test_registry_versions_match_updated_documents(self) -> None:
         registry = yaml.safe_load((self.root / "authority-registry.yaml").read_text(encoding="utf-8"))
         by_path = {record["path"]: record for record in registry["documents"]}
         expected = {
-            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.31",
-            "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.7",
-            "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.5",
-            "docs/validation/Protocol_Validation_Checklist.md": "v1.1.5",
+            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.32",
+            "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.8",
+            "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.6",
+            "docs/validation/Protocol_Validation_Checklist.md": "v1.1.6",
         }
         for path, version in expected.items():
             with self.subTest(path=path):

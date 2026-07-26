@@ -5,6 +5,9 @@ All notable repository-level changes are documented in this file.
 Individual authority documents retain their own internal Version History and approval status.
 
 ## Unreleased
+- Rejected contradictory Protocol Tester approval records by defining stage/applicability/self-validation/physical-execution/formal-gate disposition consistency.
+- Required controlled Tester self-validation with positive and known-negative cases before a Tester PASS result may support Integration or Release approval.
+- Extended repository validation and mutation regression coverage for cross-field gate bypasses and unverified Tester PASS claims.
 - Bound Protocol Tester and interoperability evidence to exact tested candidate identities; added Integration-to-Release evidence reconciliation, affected re-execution, and replacement-evidence requirements.
 - Bounded representative-target claims to demonstrated equivalence and required residual actual-target verification or explicit, approved release limitations.
 - Extended repository validation and mutation regression coverage for stale evidence and over-claimed representative-target evidence.
