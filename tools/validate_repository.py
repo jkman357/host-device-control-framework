@@ -121,6 +121,17 @@ AI_ROUTING_HISTORY_EXPECTATIONS = {
     },
 }
 
+RELEASE_STATE_REQUIRED_MARKERS = (
+    "The repository is being prepared as the `v1.0.0` release candidate.",
+    "Repository text alone does not establish a release freeze",
+    "An immutable freeze exists only when the final commit is identified",
+)
+RELEASE_STATE_PROHIBITED_PATTERNS = (
+    r"\brepository content is frozen as\b",
+    r"\brepository is frozen as\b",
+)
+
+
 
 @dataclass(frozen=True)
 class Finding:
@@ -1226,6 +1237,37 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
     if any(marker not in self_validation_combined for marker in self_validation_markers):
         findings.append(Finding("PCT-010", _relative(root, guide), "Tester self-validation authority, evidence identity, or known-negative controls are incomplete"))
 
+def _expected_changelog_snapshot(registry: dict[str, Any]) -> list[str]:
+    rows = ["| Document | Version | Status |", "|---|---:|---|"]
+    for document in registry["documents"]:
+        rows.append(
+            f"| {document['display_name']} | {document['version']} | {document['status']} |"
+        )
+    return rows
+
+
+def check_release_state_claims(root: Path, findings: list[Finding]) -> None:
+    path = root / "README.md"
+    if not path.is_file():
+        return
+    text = _visible_text(_read_text(path))
+    for marker in RELEASE_STATE_REQUIRED_MARKERS:
+        if marker not in text:
+            findings.append(Finding(
+                "STATUS-001",
+                "README.md",
+                f"release-state boundary is missing or altered: {marker}",
+            ))
+    for pattern in RELEASE_STATE_PROHIBITED_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            findings.append(Finding(
+                "STATUS-001",
+                "README.md",
+                "mutable repository text shall not self-assert that the release is already frozen",
+            ))
+            break
+
+
 def _unreleased_section(text: str) -> str | None:
     match = re.search(r"^##\s+Unreleased\s*$", text, re.MULTILINE)
     if not match:
@@ -1235,12 +1277,20 @@ def _unreleased_section(text: str) -> str | None:
     return text[match.start():end]
 
 
-def check_changelog(root: Path, findings: list[Finding]) -> None:
+def check_changelog(root: Path, registry: dict[str, Any] | None, findings: list[Finding]) -> None:
     path = root / "CHANGELOG.md"
     section = _unreleased_section(_visible_text(_read_text(path))) if path.is_file() else None
     if section is None:
         findings.append(Finding("CHANGE-001", "CHANGELOG.md", "an unambiguous ## Unreleased section is required"))
         return
+    if registry and isinstance(registry.get("documents"), list):
+        snapshot = _extract_table(section, "| Document | Version | Status |")
+        if snapshot != _expected_changelog_snapshot(registry):
+            findings.append(Finding(
+                "CHANGE-002",
+                "CHANGELOG.md",
+                "Current Authority Revision Snapshot does not exactly match authority-registry.yaml",
+            ))
     for term in (
         "Multi-Node", "node_model", "validate_protocol.py", "protocol.schema.yaml",
         "third-party-materials.yaml", "legal-baseline.yaml",
@@ -1259,6 +1309,7 @@ def validate(root: Path | str) -> list[Finding]:
     registry = load_registry(root, findings)
     check_governed_documents(root, registry, findings)
     check_registry_views(root, registry, findings)
+    check_release_state_claims(root, findings)
     check_markdown_structure(root, findings)
     check_links(root, findings)
     check_filename_policy(root, findings)
@@ -1267,7 +1318,7 @@ def validate(root: Path | str) -> list[Finding]:
     check_workflow(root, findings)
     check_protocol_assets(root, findings)
     check_protocol_conformance_tester_governance(root, findings)
-    check_changelog(root, findings)
+    check_changelog(root, registry, findings)
     return findings
 
 

@@ -5,6 +5,40 @@ All notable repository-level changes are documented in this file.
 Individual authority documents retain their own internal Version History and approval status.
 
 ## Unreleased
+
+### Current Authority Revision Snapshot
+
+| Document | Version | Status |
+|---|---:|---|
+| AI Engineering Usage Guide | v1.0.36 | Draft for Review |
+| Coordinator/Node Control Framework | v1.1.6 | Baseline |
+| Framework Application Analysis Template | v1.1.9 | Baseline |
+| Protocol YAML Definition Guide | v1.1.7 | Baseline |
+| Protocol YAML Template | v1.1.1 | Baseline |
+| Protocol Compatibility Rules | v1.1.0 | Draft for Review |
+| Protocol Registry Governance | v1.1.0 | Draft for Review |
+| Protocol Security Profile | v1.1.0 | Draft for Review |
+| Coordinator Software Engineering Rules | v1.1.0 | Draft for Review |
+| Coordinator Architecture Patterns | v1.1.0 | Draft for Review |
+| Coordinator Concurrency Guide | v1.1.0 | Draft for Review |
+| Coordinator Logging Guide | v1.1.1 | Draft for Review |
+| Coordinator Testing Guide | v1.1.1 | Draft for Review |
+| Coordinator UI Engineering Guide | v1.1.1 | Draft for Review |
+| Node Software Engineering Rules | v1.1.0 | Draft for Review |
+| Embedded C Coding Rules | v1.0.18 | Final Baseline |
+| C# Coding Rules | v1.0.4 | Draft for Review |
+| Repository Validation Checklist | v1.0.15 | Draft for Review |
+| Validation Evidence Guide | v1.1.0 | Draft for Review |
+| Protocol Validation Checklist | v1.1.6 | Draft for Review |
+| Framework Conformance Checklist | v1.1.5 | Draft for Review |
+| Coding Rules Review Checklist | v1.0.0 | Draft for Review |
+| AI-Generated Artifact Validation Guide | v1.1.0 | Draft for Review |
+
+### Current Review Changes
+
+- Added an exact Current Authority Revision Snapshot so `CHANGELOG.md` cannot silently omit the active governed-document versions while legacy keywords remain elsewhere in Unreleased.
+- Replaced the mutable-content self-assertion that the repository was already frozen with fail-closed release-candidate wording; repository text alone is not freeze evidence.
+- Added repository validation and mutation tests for stale Changelog snapshots and self-asserted release-freeze wording.
 - Enforced strict descending semantic-version order for governed Version History and Change History tables; ascending order is now rejected.
 - Normalized Embedded C Coding Rules v1.0.18 Change History to descending order without changing coding-rule semantics.
 - Hardened controlled AI routing-history validation to reject missing, duplicated, additional, or additive-decoy authority-version references.

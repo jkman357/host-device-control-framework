@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.0.14
+**Document Version:** v1.0.15
 **Status:** Draft for Review
-**Supersedes Document Version:** v1.0.13
+**Supersedes Document Version:** v1.0.14
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.15 | 2026-07-26 | Draft for Review | Required the Unreleased authority-revision snapshot to exactly match the authority registry and made repository release-state wording fail-closed so mutable content cannot self-assert a freeze. |
 | v1.0.14 | 2026-07-26 | Draft for Review | Enforced strict descending Version History order and exact, exclusive historical authority-version routing references; added regression coverage for ascending histories and additive decoy versions. |
 | v1.0.13 | 2026-07-26 | Draft for Review | Added executable validation for the controlled AI routing-history sequence so historical version-to-version routing records cannot silently reference a later or incorrect authority revision. |
 | v1.0.12 | 2026-07-26 | Draft for Review | Required executable validation of unique and monotonic history versions, highest current version, current-row uniqueness, ISO dates, and correct immediate Supersedes linkage; added regression coverage for self-supersession and duplicate history rows. |
@@ -106,7 +107,7 @@ The automated validator shall check at least:
 - `third-party-materials.yaml` uses the controlled root and policy schema; every accepted material entry has a unique ID, bounded scope, provenance, rights holder, exact notice identity, acceptance record, SHA-256 source identity, obligations, an existing target path, and the required visible material marker.
 - `NOTICE.md` contains the required repository sections, limits file-specific notice precedence to lawfully authorized, manifest-registered, and visibly marked exceptions, distinguishes engineering evaluation from licensed implementation, and states that Framework conformance is the claim issuer's self-declaration rather than author or maintainer certification.
 - The Framework and Framework Conformance Checklist retain the scoped conformance-claim, authorized-deviation, and correction/revalidation/evidence restoration requirements.
-- `CHANGELOG.md` records each newly introduced governed document and synchronization of Registry, Manifest, NOTICE, and Validator behavior.
+- `CHANGELOG.md` records each newly introduced governed document and synchronization of Registry, Manifest, NOTICE, and Validator behavior; its Current Authority Revision Snapshot exactly matches `authority-registry.yaml`.
 - Manifest path, version, status, Purpose, display-name, and Routing Role consistency with the authority registry.
 - Draft documents use `Proposed` Repository Role wording; Baseline and Final Baseline documents use non-proposed normative wording.
 - Required canonical authority paths exist.
@@ -136,7 +137,7 @@ A reviewer shall verify:
 - Framework conformance controls require explicit Full, Scoped, or Nonconforming classification, included-boundary satisfaction, pre-validation scope baselines, claim lifecycle and invalidation control, residual-deviation restrictions, and the self-declaration and signatory-bounded assessment boundary.
 - `legal-baseline.yaml` provides local legal-text change detection only, records `external-evidence-required`, and never self-asserts activation; authenticity and authorization require the external signed-tag or protected-merge control defined by `.github/REPOSITORY_PROTECTION.md`.
 - `tools/verify_external_anchor.py` verifies signed-tag mode against the canonical origin, annotated tag type, valid signature, exact target commit, and matching tagged legal-baseline bytes; GitHub ruleset or protected-merge evidence remains external.
-- A repository content freeze is recognized only through an immutable signed release tag or controlled GitHub Release that identifies the exact final commit; a ZIP or mutable branch is not freeze evidence.
+- Repository text does not self-assert a release freeze. A repository content freeze is recognized only through an immutable signed release tag or controlled GitHub Release that identifies the exact final commit; a ZIP or mutable branch is not freeze evidence.
 - `.github/CODEOWNERS` covers legal, conformance, third-party, validator, baseline, and governance-control files.
 - Third-party entries are entire-file only and bind actual repository bytes, retained source-evidence bytes, notice text, controlled approver identity, approval reference, and obligation evidence.
 - `schema/framework-conformance-claim.schema.yaml` v2 and its canonical example validate claim identity, classification, lifecycle, boundary baseline, globally unique repository host/owner/name/URL, immutable commit/document-version pairing, evidence, supersession, and re-evaluation triggers.
