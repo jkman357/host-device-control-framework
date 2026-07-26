@@ -3,14 +3,14 @@
 > UI Architecture, State Presentation, Responsiveness, and Control Feedback
 
 **Canonical Filename:** `Coordinator_UI_Engineering_Guide.md`  
-**Document Version:** v1.1.0  
+**Document Version:** v1.1.1  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, UI engineers, reviewers, test engineers, code generators, and AI-assisted engineering systems  
 **Repository Role:** Proposed topic-specific normative engineering authority for Coordinator UI implementation, subordinate to Coordinator Software Engineering Rules  
-**Supersedes Document Version:** v1.0.1
+**Supersedes Document Version:** v1.1.0
 
 ---
 
@@ -39,9 +39,10 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.1 | 2026-07-26 | Draft for Review | Normalized Version History to strict descending semantic-version order to match repository validation governance; no Coordinator UI requirements changed. |
 | v1.1.0 | 2026-07-19 | Draft for Review | Expanded Multi-Node UI rules for selected versus operation-bound Nodes, aggregate and per-Node views, identity conflict, offline/reconnecting state, multi-target confirmation, per-Node progress, partial results, and alarm attribution. |
-| v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining UI architecture, state ownership, command feedback, connection and stale state, multi-Node binding, data visualization, responsiveness, alarms and events, validation, errors, units, accessibility, localization, persistence, engineering controls, testing, and anti-patterns. |
 | v1.0.1 | 2026-07-19 | Draft for Review | Hardened archive and package import against symbolic links, hard links, Windows reparse points, special filesystem entries, destination-link traversal, canonical-path escape, unintended overwrite, and time-of-check/time-of-use replacement. |
+| v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining UI architecture, state ownership, command feedback, connection and stale state, multi-Node binding, data visualization, responsiveness, alarms and events, validation, errors, units, accessibility, localization, persistence, engineering controls, testing, and anti-patterns. |
 
 ---
 

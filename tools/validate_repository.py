@@ -340,6 +340,65 @@ def load_registry(root: Path, findings: list[Finding]) -> dict[str, Any] | None:
     return registry
 
 
+def _semver_tuple(value: str) -> tuple[int, int, int] | None:
+    match = re.fullmatch(r"v(\d+)\.(\d+)\.(\d+)", value)
+    if not match:
+        return None
+    return tuple(int(part) for part in match.groups())
+
+
+def _table_cells(line: str) -> list[str]:
+    if not line.startswith("|") or not line.endswith("|"):
+        return []
+    return [cell.strip() for cell in line[1:-1].split("|")]
+
+
+def _history_table(text: str) -> tuple[list[str], list[tuple[int, list[str]]]] | None:
+    visible_lines = _visible_text(text).splitlines()
+    history_headings = [
+        (level, title, number)
+        for level, title, number in _headings(text)
+        if re.search(r"(?:Version History|Change History)\s*$", title, re.IGNORECASE)
+    ]
+    if len(history_headings) != 1:
+        return None
+    heading_level, _, heading_number = history_headings[0]
+    header_index: int | None = None
+    for index in range(heading_number, len(visible_lines)):
+        heading = re.match(r"^(#{1,6})\s+", visible_lines[index])
+        if heading and len(heading.group(1)) <= heading_level:
+            break
+        cells = _table_cells(visible_lines[index])
+        if "Version" in cells and "Date" in cells and "Status" in cells and (
+            "Summary" in cells or "Description" in cells
+        ):
+            if header_index is not None:
+                return None
+            header_index = index
+    if header_index is None or header_index + 2 >= len(visible_lines):
+        return None
+    headers = _table_cells(visible_lines[header_index])
+    separator = visible_lines[header_index + 1]
+    if not re.fullmatch(r"\|(?:\s*:?-+:?\s*\|)+", separator):
+        return None
+    rows: list[tuple[int, list[str]]] = []
+    index = header_index + 2
+    while index < len(visible_lines) and visible_lines[index].startswith("|"):
+        rows.append((index + 1, _table_cells(visible_lines[index])))
+        index += 1
+    return headers, rows
+
+
+def _valid_iso_date(value: str) -> bool:
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        return False
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
 def check_governed_documents(root: Path, registry: dict[str, Any] | None, findings: list[Finding]) -> None:
     if not registry or not isinstance(registry.get("documents"), list):
         return
@@ -362,10 +421,11 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
             continue
         text = _read_text(path)
         for field in CONTROLLED_METADATA:
+            if field == "Supersedes Document Version":
+                continue
             values = _metadata_values(text, field)
-            expected_count = 0 if field == "Supersedes Document Version" and document.get("version") == "v1.0.0" else 1
-            if len(values) != expected_count:
-                findings.append(Finding("DOC-008", relative, f"{field} must appear exactly {expected_count} time(s) in the visible opening metadata region; found {len(values)}"))
+            if len(values) != 1:
+                findings.append(Finding("DOC-008", relative, f"{field} must appear exactly once in the visible opening metadata region; found {len(values)}"))
         version = _metadata(text, "Document Version")
         status = _metadata(text, "Status")
         role = _metadata(text, "Repository Role")
@@ -375,13 +435,110 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
             findings.append(Finding("DOC-004", relative, f"Status {status!r} does not equal registry {document.get('status')!r}"))
         if role != document.get("repository_role"):
             findings.append(Finding("DOC-005", relative, "Repository Role does not equal registry repository_role"))
-        history_pattern = re.compile(
-            rf"^\|\s*{re.escape(str(document.get('version')))}\s*\|.*\|\s*{re.escape(str(document.get('status')))}\s*\|",
-            re.MULTILINE,
-        )
-        if not history_pattern.search(_visible_text(text)):
-            findings.append(Finding("DOC-007", relative, "Version History lacks a row matching current version and status"))
 
+        parsed = _history_table(text)
+        if parsed is None:
+            findings.append(Finding("DOC-006", relative, "exactly one parseable Version History or Change History table is required"))
+            continue
+        headers, raw_rows = parsed
+        if not raw_rows:
+            findings.append(Finding("DOC-006", relative, "Version History table has no data rows"))
+            continue
+        expected_columns = len(headers)
+        required = {"Version", "Date", "Status"}
+        if not required.issubset(headers) or not ({"Summary", "Description"} & set(headers)):
+            findings.append(Finding("DOC-006", relative, "Version History columns must include Version, Date, Status, and Summary or Description"))
+            continue
+        version_index = headers.index("Version")
+        date_index = headers.index("Date")
+        status_index = headers.index("Status")
+        summary_index = headers.index("Summary") if "Summary" in headers else headers.index("Description")
+
+        rows: list[dict[str, Any]] = []
+        malformed = False
+        for line_number, cells in raw_rows:
+            if len(cells) != expected_columns:
+                findings.append(Finding("DOC-006", f"{relative}:{line_number}", "Version History row has the wrong column count"))
+                malformed = True
+                continue
+            version_value = cells[version_index]
+            semver = _semver_tuple(version_value)
+            if semver is None:
+                findings.append(Finding("DOC-009", f"{relative}:{line_number}", f"invalid history version {version_value!r}"))
+                malformed = True
+                continue
+            if not cells[summary_index]:
+                findings.append(Finding("DOC-006", f"{relative}:{line_number}", "Version History summary or description must not be empty"))
+            rows.append({
+                "line": line_number,
+                "version": version_value,
+                "semver": semver,
+                "date": cells[date_index],
+                "status": cells[status_index],
+            })
+        if malformed or not rows:
+            continue
+
+        versions = [row["version"] for row in rows]
+        semvers = [row["semver"] for row in rows]
+        duplicate_versions = sorted({value for value in versions if versions.count(value) > 1})
+        if duplicate_versions:
+            findings.append(Finding("DOC-009", relative, "Version History versions must be unique; duplicates: " + ", ".join(duplicate_versions)))
+        ascending = all(left < right for left, right in zip(semvers, semvers[1:]))
+        descending = all(left > right for left, right in zip(semvers, semvers[1:]))
+        if len(semvers) > 1 and not (ascending or descending):
+            findings.append(Finding("DOC-009", relative, "Version History versions must be strictly monotonic"))
+
+        current_semver = _semver_tuple(version or "")
+        current_rows = [row for row in rows if row["version"] == version]
+        if len(current_rows) != 1:
+            findings.append(Finding("DOC-007", relative, f"current version {version!r} must appear exactly once in Version History; found {len(current_rows)}"))
+        if current_semver is not None and current_semver != max(semvers):
+            findings.append(Finding("DOC-009", relative, f"metadata version {version!r} must be the highest Version History version"))
+        if len(current_rows) == 1:
+            current_row = current_rows[0]
+            if current_row["status"] != status:
+                findings.append(Finding("DOC-010", f"{relative}:{current_row['line']}", "current Version History status does not match document Status"))
+            if not _valid_iso_date(current_row["date"]):
+                findings.append(Finding("DOC-010", f"{relative}:{current_row['line']}", "current Version History date must be a real ISO YYYY-MM-DD date"))
+
+        recorded_by_version: list[tuple[tuple[int, int, int], date]] = []
+        for row in rows:
+            date_value = row["date"]
+            status_value = row["status"]
+            if date_value != "Not recorded":
+                if not _valid_iso_date(date_value):
+                    findings.append(Finding("DOC-010", f"{relative}:{row['line']}", f"invalid Version History date {date_value!r}"))
+                else:
+                    recorded_by_version.append((row["semver"], date.fromisoformat(date_value)))
+            if status_value != "Not recorded" and status_value not in VALID_STATUSES:
+                findings.append(Finding("DOC-010", f"{relative}:{row['line']}", f"invalid Version History status {status_value!r}"))
+        recorded_by_version.sort(key=lambda item: item[0])
+        for (_, earlier), (_, later) in zip(recorded_by_version, recorded_by_version[1:]):
+            if later < earlier:
+                findings.append(Finding("DOC-010", relative, "recorded Version History dates must not move backward as versions increase"))
+                break
+
+        supersedes_values = _metadata_values(text, "Supersedes Document Version")
+        if len(rows) == 1:
+            if supersedes_values:
+                findings.append(Finding("DOC-011", relative, "an initial one-row Version History must not declare Supersedes Document Version"))
+        else:
+            if len(supersedes_values) != 1:
+                findings.append(Finding("DOC-011", relative, f"Supersedes Document Version must appear exactly once; found {len(supersedes_values)}"))
+            elif current_semver is not None:
+                lower_rows = [row for row in rows if row["semver"] < current_semver]
+                expected_supersedes = max(lower_rows, key=lambda row: row["semver"])["version"] if lower_rows else None
+                actual_supersedes = supersedes_values[0]
+                actual_semver = _semver_tuple(actual_supersedes)
+                if actual_semver is None:
+                    findings.append(Finding("DOC-011", relative, "Supersedes Document Version must match vMAJOR.MINOR.PATCH"))
+                elif actual_supersedes not in versions:
+                    findings.append(Finding("DOC-011", relative, "Supersedes Document Version must exist in Version History"))
+                elif actual_semver >= current_semver:
+                    findings.append(Finding("DOC-011", relative, "Supersedes Document Version must be lower than the current version"))
+                elif actual_supersedes != expected_supersedes:
+                    findings.append(Finding("DOC-011", relative, f"Supersedes Document Version must identify immediate prior listed version {expected_supersedes}"))
 
 def _expected_root_table(registry: dict[str, Any]) -> list[str]:
     rows = ["| Document | Version | Status | Purpose |", "|---|---:|---|---|"]
@@ -1068,8 +1225,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"FAIL: {len(findings)} repository validation finding(s).")
         return 1
     print(
-        "PASS: repository documentation, authority registry, Protocol schema, semantic "
-        "fixtures, independent Protocol tester applicability, lifecycle, evidence, and CI controls are consistent."
+        "PASS: repository documentation, authority registry, Version History chains, Protocol schema, "
+        "semantic fixtures, independent Protocol tester applicability, lifecycle, evidence, and CI controls are consistent."
     )
     return 0
 

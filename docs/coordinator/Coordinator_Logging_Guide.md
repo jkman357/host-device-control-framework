@@ -3,14 +3,14 @@
 > Structured, Bounded, and Reviewable Logging for Coordinator Software
 
 **Canonical Filename:** `Coordinator_Logging_Guide.md`  
-**Document Version:** v1.1.0  
+**Document Version:** v1.1.1  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, test engineers, support-tool developers, code generators, and AI-assisted engineering systems  
 **Repository Role:** Proposed topic-specific normative engineering authority for Coordinator logging implementation, subordinate to Coordinator Software Engineering Rules  
-**Supersedes Document Version:** v1.0.1
+**Supersedes Document Version:** v1.1.0
 
 ---
 
@@ -39,9 +39,10 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.1 | 2026-07-26 | Draft for Review | Normalized Version History to strict descending semantic-version order to match repository validation governance; no Coordinator logging requirements changed. |
 | v1.1.0 | 2026-07-19 | Draft for Review | Added Node-attributable identity, address/route, transport, connection generation, Protocol/Secure Session, target, sequence, lifecycle, multi-target, address-conflict, and aggregate-event logging requirements and tests. |
-| v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining log purpose, event structure, levels, identifiers, correlation, Protocol logging, sensitive-data handling, injection resistance, asynchronous and bounded delivery, retention, export, integrity, time, startup context, fault evidence, testing, and anti-patterns. |
 | v1.0.1 | 2026-07-19 | Draft for Review | Distinguished accidental-corruption detection from adversarial tamper detection and authenticity; required independently anchored signing, authentication, trusted timestamp, or controlled append-only evidence when the threat model requires stronger assurance than a hash manifest. |
+| v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining log purpose, event structure, levels, identifiers, correlation, Protocol logging, sensitive-data handling, injection resistance, asynchronous and bounded delivery, retention, export, integrity, time, startup context, fault evidence, testing, and anti-patterns. |
 
 ---
 

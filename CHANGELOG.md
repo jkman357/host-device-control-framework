@@ -5,6 +5,10 @@ All notable repository-level changes are documented in this file.
 Individual authority documents retain their own internal Version History and approval status.
 
 ## Unreleased
+- Corrected the AI Engineering Usage Guide self-supersession and duplicated v1.0.32 history row; restored the missing v1.0.31 identity.
+- Normalized non-monotonic authority Version History tables to strict descending semantic-version order without changing their normative engineering content.
+- Enforced table-scoped Version History uniqueness, monotonicity, current-version/date/status consistency, and immediate Supersedes linkage in repository validation.
+- Added mutation regression coverage for duplicated history versions, self-supersession, stale Supersedes links, and non-monotonic history ordering.
 - Rejected contradictory Protocol Tester approval records by defining stage/applicability/self-validation/physical-execution/formal-gate disposition consistency.
 - Required controlled Tester self-validation with positive and known-negative cases before a Tester PASS result may support Integration or Release approval.
 - Extended repository validation and mutation regression coverage for cross-field gate bypasses and unverified Tester PASS claims.

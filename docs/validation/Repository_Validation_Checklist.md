@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.0.11
+**Document Version:** v1.0.12
 **Status:** Draft for Review
-**Supersedes Document Version:** v1.0.10
+**Supersedes Document Version:** v1.0.11
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.12 | 2026-07-26 | Draft for Review | Required executable validation of unique and monotonic history versions, highest current version, current-row uniqueness, ISO dates, and correct immediate Supersedes linkage; added regression coverage for self-supersession and duplicate history rows. |
 | v1.0.11 | 2026-07-20 | Draft for Review | Added claim-schema v2 canonical repository identity, canonical example commit/version pairing, explicit external-anchor activation state, signed-tag verification tooling, and immutable release-freeze checks. |
 | v1.0.10 | 2026-07-20 | Draft for Review | Bound third-party entries to actual repository and source-evidence bytes; externalized legal digest baselines; required CODEOWNERS and external anchor governance; and added conformance-claim schema validation. |
 | v1.0.9 | 2026-07-20 | Draft for Review | Added normalized visible-text integrity controls for legal documents, controlled third-party-material manifest validation, Full and Scoped conformance classification checks, self-declaration boundaries, and regression tests for hidden, fenced, duplicated, and semantically reversed legal clauses. |

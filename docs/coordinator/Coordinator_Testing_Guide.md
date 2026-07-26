@@ -3,14 +3,14 @@
 > Verification Strategy for Coordinator Applications, Protocol Integration, and UI Behavior
 
 **Canonical Filename:** `Coordinator_Testing_Guide.md`  
-**Document Version:** v1.1.0  
+**Document Version:** v1.1.1  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, verification engineers, test-tool developers, code generators, and AI-assisted engineering systems  
 **Repository Role:** Proposed topic-specific normative engineering authority for Coordinator engineering tests, subordinate to Coordinator Software Engineering Rules  
-**Supersedes Document Version:** v1.0.1
+**Supersedes Document Version:** v1.1.0
 
 ---
 
@@ -39,9 +39,10 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.1 | 2026-07-26 | Draft for Review | Normalized Version History to strict descending semantic-version order to match repository validation governance; no Coordinator testing requirements changed. |
 | v1.1.0 | 2026-07-19 | Draft for Review | Added a complete Multi-Node verification matrix covering isolation, conflicts, stale generations, shared-bus fairness, cross-Node correlation and Session boundaries, broadcast, multi-target partial results, UI binding, mixed versions, and Firmware Update targeting. |
-| v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining test layers, traceability, deterministic dependencies, Protocol and Transport coverage, concurrency and reconnect testing, fuzzing, UI testing, performance, fault injection, simulators, CI, flakiness control, evidence integrity, and release review. |
 | v1.0.1 | 2026-07-19 | Draft for Review | Clarified that artifact hashes and immutable identities detect change only when their provenance is trusted, and required independently anchored signing, authentication, trusted timestamp, or append-only evidence where authenticity or adversarial tamper resistance is required. |
+| v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining test layers, traceability, deterministic dependencies, Protocol and Transport coverage, concurrency and reconnect testing, fuzzing, UI testing, performance, fault injection, simulators, CI, flakiness control, evidence integrity, and release review. |
 
 ---
 
