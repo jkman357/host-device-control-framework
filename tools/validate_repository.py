@@ -89,36 +89,36 @@ CANONICAL_CLAIM_EXAMPLE_SOURCE = {
     "document_version": "v1.1.4",
 }
 AI_ROUTING_HISTORY_EXPECTATIONS = {
-    "v1.0.27": (
-        "Protocol YAML Definition Guide v1.1.1",
-        "Framework Application Analysis Template v1.1.3",
-        "Protocol Validation Checklist v1.1.1",
-    ),
-    "v1.0.28": (
-        "Protocol YAML Definition Guide v1.1.2",
-        "Framework Application Analysis Template v1.1.4",
-        "Protocol Validation Checklist v1.1.2",
-    ),
-    "v1.0.29": (
-        "Protocol YAML Definition Guide v1.1.3",
-        "Framework Application Analysis Template v1.1.5",
-        "Protocol Validation Checklist v1.1.3",
-    ),
-    "v1.0.30": (
-        "Protocol YAML Definition Guide v1.1.4",
-        "Framework Application Analysis Template v1.1.6",
-        "Protocol Validation Checklist v1.1.4",
-    ),
-    "v1.0.31": (
-        "Protocol YAML Definition Guide v1.1.5",
-        "Framework Application Analysis Template v1.1.7",
-        "Protocol Validation Checklist v1.1.5",
-    ),
-    "v1.0.32": (
-        "Protocol YAML Definition Guide v1.1.6",
-        "Framework Application Analysis Template v1.1.8",
-        "Protocol Validation Checklist v1.1.6",
-    ),
+    "v1.0.27": {
+        "Protocol YAML Definition Guide": "v1.1.1",
+        "Framework Application Analysis Template": "v1.1.3",
+        "Protocol Validation Checklist": "v1.1.1",
+    },
+    "v1.0.28": {
+        "Protocol YAML Definition Guide": "v1.1.2",
+        "Framework Application Analysis Template": "v1.1.4",
+        "Protocol Validation Checklist": "v1.1.2",
+    },
+    "v1.0.29": {
+        "Protocol YAML Definition Guide": "v1.1.3",
+        "Framework Application Analysis Template": "v1.1.5",
+        "Protocol Validation Checklist": "v1.1.3",
+    },
+    "v1.0.30": {
+        "Protocol YAML Definition Guide": "v1.1.4",
+        "Framework Application Analysis Template": "v1.1.6",
+        "Protocol Validation Checklist": "v1.1.4",
+    },
+    "v1.0.31": {
+        "Protocol YAML Definition Guide": "v1.1.5",
+        "Framework Application Analysis Template": "v1.1.7",
+        "Protocol Validation Checklist": "v1.1.5",
+    },
+    "v1.0.32": {
+        "Protocol YAML Definition Guide": "v1.1.6",
+        "Framework Application Analysis Template": "v1.1.8",
+        "Protocol Validation Checklist": "v1.1.6",
+    },
 }
 
 
@@ -517,10 +517,9 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
         duplicate_versions = sorted({value for value in versions if versions.count(value) > 1})
         if duplicate_versions:
             findings.append(Finding("DOC-009", relative, "Version History versions must be unique; duplicates: " + ", ".join(duplicate_versions)))
-        ascending = all(left < right for left, right in zip(semvers, semvers[1:]))
         descending = all(left > right for left, right in zip(semvers, semvers[1:]))
-        if len(semvers) > 1 and not (ascending or descending):
-            findings.append(Finding("DOC-009", relative, "Version History versions must be strictly monotonic"))
+        if len(semvers) > 1 and not descending:
+            findings.append(Finding("DOC-009", relative, "Version History versions must be in strict descending semantic-version order"))
 
         current_semver = _semver_tuple(version or "")
         current_rows = [row for row in rows if row["version"] == version]
@@ -554,7 +553,7 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
 
         if relative == "docs/framework/AI_Engineering_Usage_Guide.md":
             rows_by_version = {row["version"]: row for row in rows}
-            for history_version, expected_tokens in AI_ROUTING_HISTORY_EXPECTATIONS.items():
+            for history_version, expected_routes in AI_ROUTING_HISTORY_EXPECTATIONS.items():
                 row = rows_by_version.get(history_version)
                 if row is None:
                     findings.append(Finding(
@@ -563,14 +562,19 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
                         f"controlled AI routing-history row {history_version} is missing",
                     ))
                     continue
-                missing_tokens = [token for token in expected_tokens if token not in row["summary"]]
-                if missing_tokens:
-                    findings.append(Finding(
-                        "DOC-012",
-                        f"{relative}:{row['line']}",
-                        f"controlled AI routing-history row {history_version} has incorrect authority versions; missing: "
-                        + ", ".join(missing_tokens),
-                    ))
+                for authority_name, expected_version in expected_routes.items():
+                    matches = re.findall(
+                        rf"{re.escape(authority_name)}\s+(v\d+\.\d+\.\d+)",
+                        row["summary"],
+                    )
+                    if matches != [expected_version]:
+                        actual = ", ".join(matches) if matches else "missing"
+                        findings.append(Finding(
+                            "DOC-012",
+                            f"{relative}:{row['line']}",
+                            f"controlled AI routing-history row {history_version} must reference "
+                            f"exactly {authority_name} {expected_version}; found: {actual}",
+                        ))
 
         supersedes_values = _metadata_values(text, "Supersedes Document Version")
         if len(rows) == 1:

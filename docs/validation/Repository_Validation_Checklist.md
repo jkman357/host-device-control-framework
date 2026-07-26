@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.0.13
+**Document Version:** v1.0.14
 **Status:** Draft for Review
-**Supersedes Document Version:** v1.0.12
+**Supersedes Document Version:** v1.0.13
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.14 | 2026-07-26 | Draft for Review | Enforced strict descending Version History order and exact, exclusive historical authority-version routing references; added regression coverage for ascending histories and additive decoy versions. |
 | v1.0.13 | 2026-07-26 | Draft for Review | Added executable validation for the controlled AI routing-history sequence so historical version-to-version routing records cannot silently reference a later or incorrect authority revision. |
 | v1.0.12 | 2026-07-26 | Draft for Review | Required executable validation of unique and monotonic history versions, highest current version, current-row uniqueness, ISO dates, and correct immediate Supersedes linkage; added regression coverage for self-supersession and duplicate history rows. |
 | v1.0.11 | 2026-07-20 | Draft for Review | Added claim-schema v2 canonical repository identity, canonical example commit/version pairing, explicit external-anchor activation state, signed-tag verification tooling, and immutable release-freeze checks. |
@@ -84,12 +85,12 @@ The automated validator shall check at least:
 - Each metadata key appears exactly once in the opening metadata region before the first level-2 heading in the document and line 80.
 - Only the six approved directory-index `README.md` files are exempt from authority metadata, and each declares `Repository Role: Non-normative directory index`.
 - Governed Markdown filenames use the lowercase `.md` extension; `.MD` and `.markdown` variants are rejected.
-- Document versions use `vMAJOR.MINOR.PATCH`, Version History versions are unique and monotonic, and the metadata version is the highest listed version.
+- Document versions use `vMAJOR.MINOR.PATCH`, Version History versions are unique and in strict descending semantic-version order, and the metadata version is the highest listed version.
 - Version History has `Version`, `Date`, `Status`, and `Summary` or `Description` columns; every row has the header cell count and a non-empty summary.
 - Every current-version row has a real ISO date and current Status. Legacy historical values may use `Not recorded`; every recorded historical date is a real ISO date and recorded dates follow version order.
 - Current version presence exactly once in the Version History or Change History table located under the corresponding unique heading.
 - A document with multiple Version History entries declares `Supersedes Document Version`; an initial version does not. The declared version uses `vMAJOR.MINOR.PATCH`, exists in Version History, is lower than the current version, and identifies the immediate prior listed version.
-- Controlled cross-document routing records in the AI Engineering Usage Guide match the approved historical authority-version sequence; a later current version shall not be retroactively substituted into an earlier routing record.
+- Controlled cross-document routing records in the AI Engineering Usage Guide contain exactly one expected reference for each governed authority in the approved historical sequence; missing, duplicated, additional, later, or otherwise incorrect authority versions are rejected.
 - Version History status and date consistency when those columns are present.
 - Exact set equality between versioned authority documents and the root Current Document Set.
 - Exact set equality between versioned authority documents and the AI Active Document Manifest.

@@ -5,6 +5,10 @@ All notable repository-level changes are documented in this file.
 Individual authority documents retain their own internal Version History and approval status.
 
 ## Unreleased
+- Enforced strict descending semantic-version order for governed Version History and Change History tables; ascending order is now rejected.
+- Normalized Embedded C Coding Rules v1.0.18 Change History to descending order without changing coding-rule semantics.
+- Hardened controlled AI routing-history validation to reject missing, duplicated, additional, or additive-decoy authority-version references.
+- Added mutation regression coverage for ascending history tables and additive historical-routing decoys.
 - Corrected the AI Engineering Usage Guide v1.0.31 historical routing reference from Framework Application Analysis Template v1.1.8 to the actual v1.1.7 revision.
 - Added executable validation and regression coverage for the controlled AI routing-history sequence.
 - Corrected the AI Engineering Usage Guide self-supersession and duplicated v1.0.32 history row; restored the missing v1.0.31 identity.

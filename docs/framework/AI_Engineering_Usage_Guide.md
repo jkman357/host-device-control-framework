@@ -3,7 +3,7 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`
 **Document ID:** AIEUG
-**Document Version:** v1.0.34
+**Document Version:** v1.0.35
 **Status:** Draft for Review
 **Document Type:** AI Usage and Authority Routing Guide
 **Primary Narrative Language:** English
@@ -11,7 +11,7 @@
 **Maintainer:** Ray Yang
 **Repository:** `host-device-control-framework`
 **Repository Role:** Proposed normative AI task-routing and repository-governance authority
-**Supersedes Document Version:** v1.0.33
+**Supersedes Document Version:** v1.0.34
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -100,6 +100,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.0.35 | 2026-07-26 | Draft for Review | Routed strict descending Version History enforcement, normalized Embedded C Coding Rules v1.0.18 history ordering, and enforced exact, exclusive historical authority-version references through Repository Validation Checklist v1.0.14; no Product, Framework, Protocol, or Embedded C implementation requirement was changed. |
 | v1.0.34 | 2026-07-26 | Draft for Review | Corrected the v1.0.31 historical routing reference to Framework Application Analysis Template v1.1.7 and synchronized controlled historical-routing validation through Repository Validation Checklist v1.0.13; no Product or Protocol authority was added. |
 | v1.0.33 | 2026-07-26 | Draft for Review | Corrected the duplicated v1.0.32 history entry to v1.0.31; synchronized routing for normalized authority histories and Repository Validation Checklist v1.0.12; no Product or Protocol authority was added. |
 | v1.0.32 | 2026-07-26 | Draft for Review | Routed stage/applicability/execution/gate consistency and independent Tester self-validation through Protocol YAML Definition Guide v1.1.6, Framework Application Analysis Template v1.1.8, and Protocol Validation Checklist v1.1.6; rejected contradictory approval records and unverified Tester PASS claims. |
@@ -146,7 +147,7 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.34` | Draft for Review | AI authority routing and operating controls |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.35` | Draft for Review | AI authority routing and operating controls |
 | Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.6` | Baseline | Generalized Single-Node and Multi-Node architecture and governance |
 | Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.1.9` | Baseline | Application, topology, resource, and acceptance analysis method |
 | Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.1.7` | Baseline | Protocol YAML representation and Multi-Node semantic-validation rules |
@@ -161,9 +162,9 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 | Coordinator Testing Guide | `docs/coordinator/Coordinator_Testing_Guide.md` | `v1.1.1` | Draft for Review | Detailed Coordinator Multi-Node engineering-test and evidence rules |
 | Coordinator UI Engineering Guide | `docs/coordinator/Coordinator_UI_Engineering_Guide.md` | `v1.1.1` | Draft for Review | Detailed Multi-Node Coordinator UI and operation-binding rules |
 | Node Software Engineering Rules | `docs/node/Node_Software_Engineering_Rules.md` | `v1.1.0` | Draft for Review | Cross-language Node identity, targeting, lifecycle, and engineering rules |
-| Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.17` | Final Baseline | Product-owned Embedded C implementation rules |
+| Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.18` | Final Baseline | Product-owned Embedded C implementation rules |
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.13` | Draft for Review | Repository structural, canonical claim-source, legal-baseline, external-anchor, release-freeze, third-party byte/evidence, and evidence checks |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.14` | Draft for Review | Repository structural, canonical claim-source, legal-baseline, external-anchor, release-freeze, third-party byte/evidence, and evidence checks |
 | Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.1.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
 | Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.1.6` | Draft for Review | Protocol and Multi-Node validation evidence-capture checklist |
 | Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.1.5` | Draft for Review | Framework and Multi-Node conformance, claim lifecycle, deviation, and restoration evidence-capture checklist |
