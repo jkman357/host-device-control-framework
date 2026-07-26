@@ -1,8 +1,8 @@
 # Protocol Validation Checklist
 
 **Canonical Filename:** `Protocol_Validation_Checklist.md`  
-**Document Version:** v1.1.4  
-**Supersedes Document Version:** v1.1.3  
+**Document Version:** v1.1.5  
+**Supersedes Document Version:** v1.1.4  
 **Status:** Draft for Review  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
@@ -31,6 +31,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.5 | 2026-07-26 | Draft for Review | Bound Tester and interoperability evidence to exact tested candidate identities, rejected stale Integration evidence after relevant Release-candidate changes, and bounded representative-target claims to demonstrated equivalence with residual actual-target verification or explicit release limitation. |
 | v1.1.4 | 2026-07-25 | Draft for Review | Made Protocol Tester checks explicitly stage-scoped so Definition Baselines require planning and independence records without execution, while Integration and Release Baselines require an implemented Tester, target execution, retained evidence, and gate disposition; required exactly one stage and N/A re-confirmation. |
 | v1.1.3 | 2026-07-25 | Draft for Review | Added staged Protocol baseline checks so Definition Baselines require a controlled Tester plan without fabricated execution evidence, while Integration and Release Baselines require physical-or-representative target execution and formal gate disposition. |
 | v1.1.2 | 2026-07-25 | Draft for Review | Closed Tester applicability and independence gaps by requiring a recorded N/A approval reference, prohibiting unapproved `No`, distinguishing permitted generated-data reuse from production implementation reuse, and adding explicit evidence for the formal integration gate. |
@@ -196,3 +197,6 @@ A blank row is not a Pass. `N/A` does not remove a governing requirement unless 
 - [ ] P-117 Exactly one claimed Protocol baseline stage is identified as `Definition`, `Integration`, or `Release`; no combined, unspecified, or deferred stage is accepted.
 - [ ] P-118 A Protocol Definition Baseline records Tester applicability, ownership, independence, planned location, and coverage without claiming unexecuted target evidence.
 - [ ] P-119 A Protocol Integration or Release Baseline retains the applicable physical-or-representative target Tester result and formal integration-gate disposition, or an authorized N/A approval record.
+- [ ] P-120 Each Integration or Release Tester and interoperability result identifies the exact Protocol, Golden Vectors, Tester, Coordinator build when in scope, Node build, target, Transport, and configuration that were tested.
+- [ ] P-121 Before Release approval, Integration evidence is reconciled against the exact Release candidate; every relevant identity change has recorded impact analysis, affected re-execution, and replacement evidence, and stale evidence is not inherited.
+- [ ] P-122 Representative-target evidence is claimed only for behavior preserved by the documented equivalence; residual startup, FPU, interrupt, peripheral, DMA, memory-layout, compiler/toolchain, timing, and physical-Transport behavior is verified on the actual Product target or explicitly bounded and approved as a release limitation.

@@ -835,6 +835,8 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "shall not replace formal Coordinator/Node interoperability",
         "authorized N/A approval record",
         "shall not call, import, or reuse the production Coordinator or Node command handlers",
+        "Bind each result to the exact tested candidate",
+        "Bound representative-target claims to the demonstrated equivalence",
     ]
     for marker in tester_markers:
         if marker not in tester_section:
@@ -848,6 +850,9 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "Independent Protocol Conformance Tester source identity",
         "review trigger, expiry, or continuing-validity condition",
         "shall not be carried into Integration or Release without recorded re-confirmation",
+        "Exact tested-candidate identity set",
+        "Integration-to-Release evidence reconciliation",
+        "shall not inherit Integration evidence",
     ]
     for marker in baseline_markers:
         if marker not in baseline_section:
@@ -858,6 +863,9 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "Before **Protocol Integration Baseline** approval",
         "Before **Protocol Release Baseline** approval",
         "formal integration gate shall be approved",
+        "exact tested-candidate identity set",
+        "Representative-target use shall record the equivalence boundary",
+        "Integration evidence shall be reconciled against the exact Release candidate identities",
     ]
     for marker in gate_markers:
         if marker not in gate_section:
@@ -885,6 +893,9 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "Formal Integration Gate",
         "Exactly one baseline stage shall be selected",
         "review trigger, expiry, or continuing-validity condition",
+        "Tested Candidate Identity",
+        "Integration-to-Release Evidence Reconciliation",
+        "Representative Target Residual Boundary",
     ]
     for marker in template_markers:
         if marker not in template_section:
@@ -937,6 +948,9 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         "P-117": (evidence_section, ("Exactly one", "no combined, unspecified, or deferred stage")),
         "P-118": (evidence_section, ("Definition Baseline", "without claiming unexecuted target evidence")),
         "P-119": (evidence_section, ("Integration or Release Baseline", "formal integration-gate disposition")),
+        "P-120": (evidence_section, ("exact Protocol", "Golden Vectors", "Node build", "Transport")),
+        "P-121": (evidence_section, ("exact Release candidate", "affected re-execution", "stale evidence is not inherited")),
+        "P-122": (evidence_section, ("documented equivalence", "actual Product target", "release limitation")),
     }
     for check_id, (section, markers) in checklist_requirements.items():
         matches = re.findall(rf"^\s*- \[ \] {re.escape(check_id)}\b.*$", section, re.MULTILINE)
@@ -946,6 +960,28 @@ def check_protocol_conformance_tester_governance(root: Path, findings: list[Find
         for marker in markers:
             if marker not in matches[0]:
                 findings.append(Finding("PCT-006", _relative(root, checklist), f"{check_id} is missing stage-scoped evidence text: {marker}"))
+
+    freshness_markers = (
+        "exact tested-candidate identity set",
+        "Integration-to-Release evidence reconciliation",
+        "shall not inherit Integration evidence",
+    )
+    if any(marker not in baseline_section + gate_section for marker in freshness_markers):
+        findings.append(Finding("PCT-007", _relative(root, guide), "exact candidate identity binding or Release evidence reconciliation is incomplete"))
+    if any(marker not in template_section for marker in (
+        "Tested Candidate Identity", "Integration-to-Release Evidence Reconciliation"
+    )):
+        findings.append(Finding("PCT-007", _relative(root, template), "the Tester decision does not retain exact candidate identity and Release reconciliation"))
+
+    representative_markers = (
+        "Representative Target Residual Boundary",
+        "demonstrated equivalence",
+        "actual Product target",
+        "release limitation",
+    )
+    combined = tester_section + baseline_section + gate_section + template_section + evidence_section
+    if any(marker not in combined for marker in representative_markers):
+        findings.append(Finding("PCT-008", _relative(root, guide), "representative-target evidence boundaries or residual actual-target disposition are incomplete"))
 
 def _unreleased_section(text: str) -> str | None:
     match = re.search(r"^##\s+Unreleased\s*$", text, re.MULTILINE)

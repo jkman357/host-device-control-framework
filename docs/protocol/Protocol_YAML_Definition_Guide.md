@@ -3,9 +3,9 @@
 
 **Document Name:** `Protocol_YAML_Definition_Guide.md`  
 **Document ID:** PYDG  
-**Document Version:** v1.1.4  
+**Document Version:** v1.1.5  
 **Status:** Baseline  
-**Supersedes Document Version:** v1.1.3  
+**Supersedes Document Version:** v1.1.4  
 **Document Type:** Reusable Definition Guide  
 **Related Framework:** `Coordinator_Node_Control_Framework.md`  
 **Related Template:** `Protocol_YAML_Template.md`  
@@ -17,7 +17,7 @@
 **Repository:** `host-device-control-framework`  
 **Repository Role:** Normative Protocol YAML syntax, semantics, machine-verifiable representation, validation, and Code Generation authority  
 **First Issued:** 2026-07-15  
-**Last Revised:** 2026-07-25  
+**Last Revised:** 2026-07-26  
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -202,6 +202,7 @@ The keywords in this document have the following meanings:
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.5 | 2026-07-26 | Baseline | Bound Tester and interoperability evidence to the exact tested candidate identities, required Integration-to-Release evidence reconciliation and affected re-execution after identity changes, and bounded representative-target claims to demonstrated equivalence with residual actual-target verification or explicit release limitation. |
 | v1.1.4 | 2026-07-25 | Baseline | Made staged-baseline contents mandatory, required exactly one claimed Protocol baseline stage, required N/A re-evaluation when scope or stage changes, and aligned stage-specific Tester planning, implementation, execution, and evidence obligations. |
 | v1.1.3 | 2026-07-25 | Baseline | Separated Protocol Definition, Integration, and Release Baselines so initial wire-contract approval does not depend circularly on an already implemented physical Node; retained Tester planning at definition time and required executed Tester evidence before formal integration and release approval. |
 | v1.1.2 | 2026-07-25 | Baseline | Closed Protocol Conformance Tester governance gaps by defining implementation independence, authorized N/A approval records, Tester ownership, Protocol-change impact, controlled baseline contents, and execution-evidence identity. |
@@ -2775,12 +2776,14 @@ Exercise every in-scope command, response, rejection, timeout, and state transit
 Verify framing, length, byte order, CRC or integrity field, sequence, correlation, and version behavior
 Verify telemetry or stream ordering, gaps, duplicates, wrap, overflow, and bounded-duration operation
 Execute against the physical Node or a clearly identified representative target before formal integration approval
-Retain Protocol, vector, Tester, Node build, target, Transport, configuration, execution, and result identities
+Retain exact Protocol, vector, Tester, Coordinator build when in scope, Node build, target, Transport, configuration, execution, and result identities
+Bind each result to the exact tested candidate; do not inherit it after a relevant identity changes without documented impact analysis and affected re-execution
+Bound representative-target claims to the demonstrated equivalence and identify residual behavior that still requires the actual Product target or an explicit release limitation
 Report unsupported or undefined behavior without inventing Product semantics
 ```
 
 The Tester may be implemented in Python or another suitable language. The Framework does not mandate the
-implementation language.
+implementation language. Bind each result to the exact tested candidate. Bound representative-target claims to the demonstrated equivalence.
 
 The Tester may consume controlled generated contract data and Golden Test Vectors. It shall not call, import, or reuse the production Coordinator or Node command handlers, state-transition logic, Transport/Session behavior, or codec implementation being evaluated. Shared use of generated constants or immutable vector data shall be recorded so that implementation independence remains reviewable.
 
@@ -2793,9 +2796,14 @@ at the Protocol Definition Baseline. Executed Tester evidence is not a prerequis
 Baseline approval because the Node implementation may not yet exist. The Tester shall be implemented and executed
 before formal Coordinator/Node integration approval and before a Protocol Integration or Release Baseline is approved.
 
-A passing Tester result proves only the covered Protocol behavior on the identified target and configuration. It
-shall not replace formal Coordinator/Node interoperability, Product validation, safety or security assessment,
-Hardware-in-the-Loop evidence where applicable, or responsible human approval.
+A passing Tester result proves only the covered Protocol behavior of the exact tested candidate on the identified
+target and configuration. A representative target proves only the behavior preserved by the documented equivalence;
+it does not prove target-specific startup, FPU, interrupt, peripheral, DMA, memory-layout, compiler/toolchain, timing,
+or physical-Transport behavior unless that equivalence is demonstrated. Residual behavior shall be verified on the
+actual Product target before Release approval or retained as an explicit, bounded release limitation approved by the
+assigned human authority. Tester evidence shall not replace formal Coordinator/Node interoperability, Product
+validation, safety or security assessment, Hardware-in-the-Loop evidence where applicable, or responsible human
+approval.
 
 ---
 
@@ -2864,6 +2872,8 @@ Coordinator and Node implementation identities in scope
 Independent Protocol Conformance Tester source identity
 Protocol Conformance Tester execution evidence and result identity
 Physical Node or approved representative-target identity and configuration
+Exact tested-candidate identity set: Protocol, vectors, Tester, Coordinator build when in scope, Node build, target, Transport, and configuration
+Representative-target equivalence boundary, residual unproven target-specific behavior, and required actual-target verification or approved limitation
 Cross-implementation and cross-language interoperability results in scope
 Observed anomalies, limitations, and approved deviations
 Integration-gate review and approval evidence
@@ -2873,6 +2883,7 @@ A **Protocol Release Baseline** shall additionally include the following applica
 
 ```text
 Protocol Integration Baseline identity
+Integration-to-Release evidence reconciliation identifying every changed candidate identity, its impact, affected re-execution, and replacement evidence
 Final compatibility, security, validation, and migration reports
 Release package, commit, tag, and integrity identities
 Final unresolved-risk, limitation, and deviation disposition
@@ -2881,7 +2892,12 @@ Release review and approval evidence
 
 The Protocol Definition Baseline shall not claim executed Tester or target evidence that does not yet exist. The
 Protocol Integration and Release Baselines shall identify the Independent Protocol Conformance Tester source identity
-and retain the applicable Tester execution evidence and result identity, or the authorized N/A approval record.
+and retain the applicable Tester execution evidence and result identity, or the authorized N/A approval record. Each
+result shall be bound to the exact tested-candidate identity set. A Release Baseline shall not inherit Integration
+evidence after a relevant Protocol, vector, Tester, Coordinator, Node, target, Transport, or configuration identity
+changes unless the change impact is recorded, affected checks are re-executed, and replacement evidence is retained.
+
+The Protocol Integration Baseline shall retain the Exact tested-candidate identity set. The Protocol Release Baseline shall retain an Integration-to-Release evidence reconciliation and shall not inherit Integration evidence after a relevant candidate identity change without documented impact analysis, affected re-execution, and replacement evidence.
 
 An authorized Tester `N/A` decision shall be re-evaluated whenever Protocol scope, message categories, implementation targets, Transport behavior, or claimed baseline stage changes. The approval record shall identify its review trigger, expiry, or continuing-validity condition; a prior Definition-stage `N/A` shall not be carried into Integration or Release without recorded re-confirmation.
 
@@ -2920,11 +2936,15 @@ Before **Protocol Integration Baseline** approval:
 - The independent Protocol Conformance Tester shall pass on the physical Node or approved representative target when applicable, or an authorized N/A approval record shall exist.
 - Cross-implementation and cross-language interoperability shall pass for implementations and languages in scope.
 - Target, Transport, configuration, anomaly, limitation, and deviation evidence shall be retained.
+- The exact tested-candidate identity set shall be retained with every Tester and interoperability result.
+- Representative-target use shall record the equivalence boundary, residual unproven target-specific behavior, and required actual-target verification or approved bounded limitation.
 - The formal integration gate shall be approved by the assigned human authority.
 
 Before **Protocol Release Baseline** approval:
 
 - The Protocol Integration Baseline shall be identified and accepted.
+- Integration evidence shall be reconciled against the exact Release candidate identities; every relevant change shall have recorded impact analysis, affected re-execution, and replacement evidence.
+- Representative-target residual behavior shall be verified on the actual Product target or explicitly bounded and approved as a release limitation.
 - Final compatibility, security, migration, validation, and release-package evidence shall be complete for the claimed scope.
 - Unresolved risks, limitations, failures, and deviations shall have an explicit release disposition.
 - Final release approval shall be recorded.

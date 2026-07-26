@@ -149,14 +149,50 @@ class RepositoryValidatorTests(unittest.TestCase):
         path.write_text(text, encoding="utf-8")
         self.assertIn("PCT-001", self.rules())
 
+    def test_release_evidence_reconciliation_is_enforced(self) -> None:
+        path = self.root / "docs/protocol/Protocol_YAML_Definition_Guide.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "shall retain an Integration-to-Release evidence reconciliation",
+            "shall retain a Release evidence note",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-001", self.rules())
+
+    def test_exact_tested_candidate_identity_is_enforced(self) -> None:
+        path = self.root / "docs/framework/Framework_Application_Analysis_Template.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "| Tested Candidate Identity |",
+            "| Approximate Candidate Identity |",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-002", self.rules())
+
+    def test_representative_target_residual_boundary_is_enforced(self) -> None:
+        path = self.root / "docs/framework/Framework_Application_Analysis_Template.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "| Representative Target Residual Boundary |",
+            "| Representative Target Note |",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-002", self.rules())
+
+    def test_new_evidence_checklist_ids_are_enforced(self) -> None:
+        path = self.root / "docs/validation/Protocol_Validation_Checklist.md"
+        text = path.read_text(encoding="utf-8").replace("P-121", "P-191", 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("PCT-003", self.rules())
+
     def test_registry_versions_match_updated_documents(self) -> None:
         registry = yaml.safe_load((self.root / "authority-registry.yaml").read_text(encoding="utf-8"))
         by_path = {record["path"]: record for record in registry["documents"]}
         expected = {
-            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.30",
-            "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.6",
-            "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.4",
-            "docs/validation/Protocol_Validation_Checklist.md": "v1.1.4",
+            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.31",
+            "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.7",
+            "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.5",
+            "docs/validation/Protocol_Validation_Checklist.md": "v1.1.5",
         }
         for path, version in expected.items():
             with self.subTest(path=path):

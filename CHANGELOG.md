@@ -5,6 +5,9 @@ All notable repository-level changes are documented in this file.
 Individual authority documents retain their own internal Version History and approval status.
 
 ## Unreleased
+- Bound Protocol Tester and interoperability evidence to exact tested candidate identities; added Integration-to-Release evidence reconciliation, affected re-execution, and replacement-evidence requirements.
+- Bounded representative-target claims to demonstrated equivalence and required residual actual-target verification or explicit, approved release limitations.
+- Extended repository validation and mutation regression coverage for stale evidence and over-claimed representative-target evidence.
 - Closed staged Protocol Tester checklist contradictions by separating Definition planning from Integration/Release implementation and execution evidence, requiring exactly one claimed baseline stage, and requiring N/A re-confirmation when scope or stage changes.
 - Hardened repository validation against decoy or duplicate Protocol Tester table rows by scoping checks to the controlled section and requiring one exact applicability row and one exact baseline-stage row.
 

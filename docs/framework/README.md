@@ -8,7 +8,7 @@ This directory contains cross-platform, cross-language authority documents for t
 
 - [`AI_Engineering_Usage_Guide.md`](AI_Engineering_Usage_Guide.md) — AI task routing, evidence states, operating controls, and human approval boundaries.
 - [`Coordinator_Node_Control_Framework.md`](Coordinator_Node_Control_Framework.md) — master Single-Node and Multi-Node architecture, targeting, isolation, lifecycle, and engineering governance authority.
-- [`Framework_Application_Analysis_Template.md`](Framework_Application_Analysis_Template.md) — method for applying the Framework to a specific Product or application, including topology, identity, resource, independent Protocol Conformance Tester applicability, exact-one staged baseline gates, stage-scoped evidence, and acceptance decisions.
+- [`Framework_Application_Analysis_Template.md`](Framework_Application_Analysis_Template.md) — method for applying the Framework to a specific Product or application, including topology, identity, resource, independent Protocol Conformance Tester applicability, staged baseline gates, exact tested identities, evidence reconciliation, and representative-target residual boundaries, and acceptance decisions.
 
 ## Authority Boundary
 
