@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.0.12
+**Document Version:** v1.0.13
 **Status:** Draft for Review
-**Supersedes Document Version:** v1.0.11
+**Supersedes Document Version:** v1.0.12
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.13 | 2026-07-26 | Draft for Review | Added executable validation for the controlled AI routing-history sequence so historical version-to-version routing records cannot silently reference a later or incorrect authority revision. |
 | v1.0.12 | 2026-07-26 | Draft for Review | Required executable validation of unique and monotonic history versions, highest current version, current-row uniqueness, ISO dates, and correct immediate Supersedes linkage; added regression coverage for self-supersession and duplicate history rows. |
 | v1.0.11 | 2026-07-20 | Draft for Review | Added claim-schema v2 canonical repository identity, canonical example commit/version pairing, explicit external-anchor activation state, signed-tag verification tooling, and immutable release-freeze checks. |
 | v1.0.10 | 2026-07-20 | Draft for Review | Bound third-party entries to actual repository and source-evidence bytes; externalized legal digest baselines; required CODEOWNERS and external anchor governance; and added conformance-claim schema validation. |
@@ -88,6 +89,7 @@ The automated validator shall check at least:
 - Every current-version row has a real ISO date and current Status. Legacy historical values may use `Not recorded`; every recorded historical date is a real ISO date and recorded dates follow version order.
 - Current version presence exactly once in the Version History or Change History table located under the corresponding unique heading.
 - A document with multiple Version History entries declares `Supersedes Document Version`; an initial version does not. The declared version uses `vMAJOR.MINOR.PATCH`, exists in Version History, is lower than the current version, and identifies the immediate prior listed version.
+- Controlled cross-document routing records in the AI Engineering Usage Guide match the approved historical authority-version sequence; a later current version shall not be retroactively substituted into an earlier routing record.
 - Version History status and date consistency when those columns are present.
 - Exact set equality between versioned authority documents and the root Current Document Set.
 - Exact set equality between versioned authority documents and the AI Active Document Manifest.

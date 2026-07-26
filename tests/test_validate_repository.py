@@ -225,7 +225,7 @@ class RepositoryValidatorTests(unittest.TestCase):
         registry = yaml.safe_load((self.root / "authority-registry.yaml").read_text(encoding="utf-8"))
         by_path = {record["path"]: record for record in registry["documents"]}
         expected = {
-            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.33",
+            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.34",
             "docs/framework/Coordinator_Node_Control_Framework.md": "v1.1.6",
             "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.9",
             "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.7",
@@ -233,7 +233,7 @@ class RepositoryValidatorTests(unittest.TestCase):
             "docs/coordinator/Coordinator_Logging_Guide.md": "v1.1.1",
             "docs/coordinator/Coordinator_Testing_Guide.md": "v1.1.1",
             "docs/coordinator/Coordinator_UI_Engineering_Guide.md": "v1.1.1",
-            "docs/validation/Repository_Validation_Checklist.md": "v1.0.12",
+            "docs/validation/Repository_Validation_Checklist.md": "v1.0.13",
             "docs/validation/Protocol_Validation_Checklist.md": "v1.1.6",
         }
         for path, version in expected.items():
@@ -264,8 +264,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_self_supersession_is_rejected(self) -> None:
         path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
         text = path.read_text(encoding="utf-8").replace(
-            "**Supersedes Document Version:** v1.0.32",
             "**Supersedes Document Version:** v1.0.33",
+            "**Supersedes Document Version:** v1.0.34",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -274,8 +274,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_stale_supersedes_version_is_rejected(self) -> None:
         path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
         text = path.read_text(encoding="utf-8").replace(
-            "**Supersedes Document Version:** v1.0.32",
-            "**Supersedes Document Version:** v1.0.30",
+            "**Supersedes Document Version:** v1.0.33",
+            "**Supersedes Document Version:** v1.0.31",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -301,6 +301,21 @@ class RepositoryValidatorTests(unittest.TestCase):
         )
         path.write_text(text, encoding="utf-8")
         self.assertIn("DOC-010", self.rules())
+
+    def test_ai_routing_history_sequence_is_enforced(self) -> None:
+        path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
+        text = path.read_text(encoding="utf-8")
+        original = next(line for line in text.splitlines() if line.startswith("| v1.0.31 |"))
+        mutated = original.replace(
+            "Framework Application Analysis Template v1.1.7",
+            "Framework Application Analysis Template v1.1.8",
+            1,
+        )
+        self.assertNotEqual(original, mutated)
+        text = text.replace(original, mutated, 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("DOC-012", self.rules())
+
 
 
 if __name__ == "__main__":

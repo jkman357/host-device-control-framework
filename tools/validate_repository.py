@@ -88,6 +88,38 @@ CANONICAL_CLAIM_EXAMPLE_SOURCE = {
     "commit_sha": "e516fa1d58bd99014b965f37215db85ae594704b",
     "document_version": "v1.1.4",
 }
+AI_ROUTING_HISTORY_EXPECTATIONS = {
+    "v1.0.27": (
+        "Protocol YAML Definition Guide v1.1.1",
+        "Framework Application Analysis Template v1.1.3",
+        "Protocol Validation Checklist v1.1.1",
+    ),
+    "v1.0.28": (
+        "Protocol YAML Definition Guide v1.1.2",
+        "Framework Application Analysis Template v1.1.4",
+        "Protocol Validation Checklist v1.1.2",
+    ),
+    "v1.0.29": (
+        "Protocol YAML Definition Guide v1.1.3",
+        "Framework Application Analysis Template v1.1.5",
+        "Protocol Validation Checklist v1.1.3",
+    ),
+    "v1.0.30": (
+        "Protocol YAML Definition Guide v1.1.4",
+        "Framework Application Analysis Template v1.1.6",
+        "Protocol Validation Checklist v1.1.4",
+    ),
+    "v1.0.31": (
+        "Protocol YAML Definition Guide v1.1.5",
+        "Framework Application Analysis Template v1.1.7",
+        "Protocol Validation Checklist v1.1.5",
+    ),
+    "v1.0.32": (
+        "Protocol YAML Definition Guide v1.1.6",
+        "Framework Application Analysis Template v1.1.8",
+        "Protocol Validation Checklist v1.1.6",
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -475,6 +507,7 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
                 "semver": semver,
                 "date": cells[date_index],
                 "status": cells[status_index],
+                "summary": cells[summary_index],
             })
         if malformed or not rows:
             continue
@@ -518,6 +551,26 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
             if later < earlier:
                 findings.append(Finding("DOC-010", relative, "recorded Version History dates must not move backward as versions increase"))
                 break
+
+        if relative == "docs/framework/AI_Engineering_Usage_Guide.md":
+            rows_by_version = {row["version"]: row for row in rows}
+            for history_version, expected_tokens in AI_ROUTING_HISTORY_EXPECTATIONS.items():
+                row = rows_by_version.get(history_version)
+                if row is None:
+                    findings.append(Finding(
+                        "DOC-012",
+                        relative,
+                        f"controlled AI routing-history row {history_version} is missing",
+                    ))
+                    continue
+                missing_tokens = [token for token in expected_tokens if token not in row["summary"]]
+                if missing_tokens:
+                    findings.append(Finding(
+                        "DOC-012",
+                        f"{relative}:{row['line']}",
+                        f"controlled AI routing-history row {history_version} has incorrect authority versions; missing: "
+                        + ", ".join(missing_tokens),
+                    ))
 
         supersedes_values = _metadata_values(text, "Supersedes Document Version")
         if len(rows) == 1:

@@ -5,6 +5,8 @@ All notable repository-level changes are documented in this file.
 Individual authority documents retain their own internal Version History and approval status.
 
 ## Unreleased
+- Corrected the AI Engineering Usage Guide v1.0.31 historical routing reference from Framework Application Analysis Template v1.1.8 to the actual v1.1.7 revision.
+- Added executable validation and regression coverage for the controlled AI routing-history sequence.
 - Corrected the AI Engineering Usage Guide self-supersession and duplicated v1.0.32 history row; restored the missing v1.0.31 identity.
 - Normalized non-monotonic authority Version History tables to strict descending semantic-version order without changing their normative engineering content.
 - Enforced table-scoped Version History uniqueness, monotonicity, current-version/date/status consistency, and immediate Supersedes linkage in repository validation.
