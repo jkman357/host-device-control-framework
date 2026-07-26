@@ -225,7 +225,7 @@ class RepositoryValidatorTests(unittest.TestCase):
         registry = yaml.safe_load((self.root / "authority-registry.yaml").read_text(encoding="utf-8"))
         by_path = {record["path"]: record for record in registry["documents"]}
         expected = {
-            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.37",
+            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.38",
             "docs/framework/Coordinator_Node_Control_Framework.md": "v1.1.6",
             "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.9",
             "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.7",
@@ -234,7 +234,7 @@ class RepositoryValidatorTests(unittest.TestCase):
             "docs/coordinator/Coordinator_Testing_Guide.md": "v1.1.1",
             "docs/coordinator/Coordinator_UI_Engineering_Guide.md": "v1.1.1",
             "docs/coding-rules/Embedded_C_Coding_Rules.md": "v1.0.18",
-            "docs/validation/Repository_Validation_Checklist.md": "v1.0.16",
+            "docs/validation/Repository_Validation_Checklist.md": "v1.0.17",
             "docs/validation/Protocol_Validation_Checklist.md": "v1.1.6",
         }
         for path, version in expected.items():
@@ -265,8 +265,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_self_supersession_is_rejected(self) -> None:
         path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
         text = path.read_text(encoding="utf-8").replace(
-            "**Supersedes Document Version:** v1.0.36",
             "**Supersedes Document Version:** v1.0.37",
+            "**Supersedes Document Version:** v1.0.38",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -275,7 +275,7 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_stale_supersedes_version_is_rejected(self) -> None:
         path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
         text = path.read_text(encoding="utf-8").replace(
-            "**Supersedes Document Version:** v1.0.36",
+            "**Supersedes Document Version:** v1.0.37",
             "**Supersedes Document Version:** v1.0.31",
             1,
         )
@@ -296,8 +296,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_current_history_date_and_status_are_enforced(self) -> None:
         path = self.root / "docs/validation/Repository_Validation_Checklist.md"
         text = path.read_text(encoding="utf-8").replace(
-            "| v1.0.16 | 2026-07-26 | Draft for Review |",
-            "| v1.0.16 | 2026-02-30 | Baseline |",
+            "| v1.0.17 | 2026-07-26 | Draft for Review |",
+            "| v1.0.17 | 2026-02-30 | Baseline |",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -349,8 +349,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_changelog_current_authority_snapshot_is_enforced(self) -> None:
         path = self.root / "CHANGELOG.md"
         text = path.read_text(encoding="utf-8").replace(
+            "| AI Engineering Usage Guide | v1.0.38 | Draft for Review |",
             "| AI Engineering Usage Guide | v1.0.37 | Draft for Review |",
-            "| AI Engineering Usage Guide | v1.0.36 | Draft for Review |",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -374,6 +374,16 @@ class RepositoryValidatorTests(unittest.TestCase):
         source.unlink()
         source.symlink_to(external)
         self.assertIn("REP-007", self.rules())
+
+    def test_codeowners_covers_all_governed_authority_and_validator_content(self) -> None:
+        path = self.root / ".github/CODEOWNERS"
+        text = path.read_text(encoding="utf-8").replace(
+            "/docs/ @jkman357",
+            "/docs/framework/Coordinator_Node_Control_Framework.md @jkman357",
+            1,
+        )
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("GOV-003", self.rules())
 
     def test_unsafe_registry_document_path_is_rejected_before_access(self) -> None:
         path = self.root / "authority-registry.yaml"

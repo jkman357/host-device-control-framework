@@ -42,7 +42,8 @@ REQUIRED_FILES = {
     "examples/framework-conformance-claim.yaml", "tools/validate_repository.py",
     "tools/validate_protocol.py", "tools/verify_external_anchor.py",
     "tests/test_validate_repository.py", "tests/test_validate_protocol.py",
-    "tests/test_security_regressions.py", "tests/fixtures/protocol_expectations.yaml",
+    "tests/test_security_regressions.py", "tests/test_verify_external_anchor.py",
+    "tests/fixtures/protocol_expectations.yaml",
 }
 REQUIRED_NOTICE_HEADINGS = {
     "Copyright Notice", "Copyright Scope", "Personal Engineering Project Disclaimer",
@@ -68,13 +69,9 @@ LEGAL_PROTECTED_DOCUMENTS = {"LICENSE", "NOTICE.md", "CONTRIBUTING.md"}
 REQUIRED_CODEOWNER_PATHS = {
     "/LICENSE", "/NOTICE.md", "/CONTRIBUTING.md", "/legal-baseline.yaml",
     "/third-party-materials.yaml", "/.github/CODEOWNERS", "/.github/REPOSITORY_PROTECTION.md",
-    "/tools/validate_repository.py", "/tools/verify_external_anchor.py",
-    "/tests/test_validate_repository.py", "/docs/framework/Coordinator_Node_Control_Framework.md",
-    "/docs/framework/Framework_Application_Analysis_Template.md",
-    "/docs/validation/Framework_Conformance_Checklist.md",
-    "/docs/validation/Repository_Validation_Checklist.md",
-    "/schema/framework-conformance-claim.schema.yaml",
-    "/examples/framework-conformance-claim.yaml",
+    "/README.md", "/CHANGELOG.md", "/authority-registry.yaml", "/requirements-validation.txt",
+    "/.github/workflows/", "/docs/", "/schema/", "/tools/", "/tests/", "/examples/",
+    "/third-party-evidence/",
 }
 REQUIRED_PROTECTION_MARKERS = {
     "repository-local hashes and tests provide change detection only",
@@ -84,6 +81,10 @@ REQUIRED_PROTECTION_MARKERS = {
     "external-evidence-required", "never self-asserts that the anchor is active",
     "repository release freeze", "a zip, branch name, working tree, or mutable `main` state is not freeze evidence",
     "updating a digest in the same commit is not, by itself, approval",
+    "all governed authority documents under `docs/`",
+    "all validator, verifier, regression-test, and fixture content under `tools/` and `tests/`",
+    "the verifier is commit-scoped", "protected legal-document digests that match the target commit",
+    "does not attest to uncommitted working-tree content",
 }
 CANONICAL_CLAIM_EXAMPLE_SOURCE = {
     "commit_sha": "e516fa1d58bd99014b965f37215db85ae594704b",

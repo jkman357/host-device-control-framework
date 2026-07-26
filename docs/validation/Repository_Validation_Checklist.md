@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.0.16
+**Document Version:** v1.0.17
 **Status:** Draft for Review
-**Supersedes Document Version:** v1.0.15
+**Supersedes Document Version:** v1.0.16
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.17 | 2026-07-26 | Draft for Review | Extended CODEOWNERS coverage to all governed authorities, schemas, workflows, validators, tests, fixtures, and governance manifests; made signed-tag verification commit-scoped and required protected legal-document digests to match the target commit; added external-anchor verifier regression tests. |
 | v1.0.16 | 2026-07-26 | Draft for Review | Rejected symbolic links and special filesystem entries before repository reads, constrained authority-registry document and prerequisite paths to canonical repository-relative docs/*.md paths, and required Current Status and Unreleased release-state wording to remain mutually consistent. |
 | v1.0.15 | 2026-07-26 | Draft for Review | Required the Unreleased authority-revision snapshot to exactly match the authority registry and made repository release-state wording fail-closed so mutable content cannot self-assert a freeze. |
 | v1.0.14 | 2026-07-26 | Draft for Review | Enforced strict descending Version History order and exact, exclusive historical authority-version routing references; added regression coverage for ascending histories and additive decoy versions. |
@@ -140,11 +141,12 @@ A reviewer shall verify:
 - The normalized visible text of controlled legal documents matches the approved baseline; HTML comments and fenced examples do not satisfy legal clauses, while visible duplication, negation, contradiction, or semantic reversal fails validation.
 - Framework conformance controls require explicit Full, Scoped, or Nonconforming classification, included-boundary satisfaction, pre-validation scope baselines, claim lifecycle and invalidation control, residual-deviation restrictions, and the self-declaration and signatory-bounded assessment boundary.
 - `legal-baseline.yaml` provides local legal-text change detection only, records `external-evidence-required`, and never self-asserts activation; authenticity and authorization require the external signed-tag or protected-merge control defined by `.github/REPOSITORY_PROTECTION.md`.
-- `tools/verify_external_anchor.py` verifies signed-tag mode against the canonical origin, annotated tag type, valid signature, exact target commit, and matching tagged legal-baseline bytes; GitHub ruleset or protected-merge evidence remains external.
+- `tools/verify_external_anchor.py` performs commit-scoped signed-tag verification against the canonical origin, annotated tag type, valid signature, exact target commit, matching target/tag legal-baseline bytes, and target-commit protected legal-document digests; it does not attest to uncommitted working-tree content, GitHub rulesets, protected-merge evidence, or external signer authorization.
 - Repository text does not self-assert a release freeze. A repository content freeze is recognized only through an immutable signed release tag or controlled GitHub Release that identifies the exact final commit; a ZIP or mutable branch is not freeze evidence.
 - Repository validation never follows repository-controlled symbolic links or authority-registry paths outside the canonical `docs/` boundary; a structural failure is reported before controlled content is consumed.
 - README Current Status and the active Changelog record are reviewed together so a superseded freeze declaration cannot remain as an unqualified current claim.
-- `.github/CODEOWNERS` covers legal, conformance, third-party, validator, baseline, and governance-control files.
+- External-anchor verifier regression tests cover a valid target commit, malformed target baseline data, and target-commit protected-document digest mismatch.
+- `.github/CODEOWNERS` covers all governed authority documents, repository manifests, legal and third-party controls, schemas, examples, workflows, dependency inputs, validators, verifiers, tests, and fixtures.
 - Third-party entries are entire-file only and bind actual repository bytes, retained source-evidence bytes, notice text, controlled approver identity, approval reference, and obligation evidence.
 - `schema/framework-conformance-claim.schema.yaml` v2 and its canonical example validate claim identity, classification, lifecycle, boundary baseline, globally unique repository host/owner/name/URL, immutable commit/document-version pairing, evidence, supersession, and re-evaluation triggers.
 - File-specific or third-party notices are authorized, scoped to identified material, and do not silently relicense unrelated repository content.

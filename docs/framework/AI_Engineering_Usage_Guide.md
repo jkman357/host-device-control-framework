@@ -3,7 +3,7 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`
 **Document ID:** AIEUG
-**Document Version:** v1.0.37
+**Document Version:** v1.0.38
 **Status:** Draft for Review
 **Document Type:** AI Usage and Authority Routing Guide
 **Primary Narrative Language:** English
@@ -11,7 +11,7 @@
 **Maintainer:** Ray Yang
 **Repository:** `host-device-control-framework`
 **Repository Role:** Proposed normative AI task-routing and repository-governance authority
-**Supersedes Document Version:** v1.0.36
+**Supersedes Document Version:** v1.0.37
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -100,6 +100,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.0.38 | 2026-07-26 | Draft for Review | Routed complete CODEOWNERS trust-boundary coverage and commit-scoped legal-anchor verification through Repository Validation Checklist v1.0.17; no Product, Framework, Protocol, or implementation requirement was changed. |
 | v1.0.37 | 2026-07-26 | Draft for Review | Routed fail-closed repository path safety, canonical authority-registry path boundaries, and active release-state consistency through Repository Validation Checklist v1.0.16; no Product, Framework, Protocol, or implementation requirement was changed. |
 | v1.0.36 | 2026-07-26 | Draft for Review | Routed current Unreleased authority-revision snapshot validation and fail-closed release-state wording through Repository Validation Checklist v1.0.15; no Product, Framework, Protocol, or implementation requirement was changed. |
 | v1.0.35 | 2026-07-26 | Draft for Review | Routed strict descending Version History enforcement, normalized Embedded C Coding Rules v1.0.18 history ordering, and enforced exact, exclusive historical authority-version references through Repository Validation Checklist v1.0.14; no Product, Framework, Protocol, or Embedded C implementation requirement was changed. |
@@ -149,7 +150,7 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.37` | Draft for Review | AI authority routing and operating controls |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.38` | Draft for Review | AI authority routing and operating controls |
 | Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.6` | Baseline | Generalized Single-Node and Multi-Node architecture and governance |
 | Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.1.9` | Baseline | Application, topology, resource, and acceptance analysis method |
 | Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.1.7` | Baseline | Protocol YAML representation and Multi-Node semantic-validation rules |
@@ -166,7 +167,7 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 | Node Software Engineering Rules | `docs/node/Node_Software_Engineering_Rules.md` | `v1.1.0` | Draft for Review | Cross-language Node identity, targeting, lifecycle, and engineering rules |
 | Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.18` | Final Baseline | Product-owned Embedded C implementation rules |
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.16` | Draft for Review | Repository path safety, authority synchronization, canonical claim-source, legal-baseline, external-anchor, release-state, third-party byte/evidence, and evidence checks |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.17` | Draft for Review | Repository path safety, complete CODEOWNERS coverage, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, release-state, third-party byte/evidence, and evidence checks |
 | Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.1.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
 | Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.1.6` | Draft for Review | Protocol and Multi-Node validation evidence-capture checklist |
 | Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.1.5` | Draft for Review | Framework and Multi-Node conformance, claim lifecycle, deviation, and restoration evidence-capture checklist |

@@ -17,15 +17,13 @@ For a sole-maintainer repository, signed-tag mode is the minimum practical exter
 
 The following shall be covered by `.github/CODEOWNERS` and by the selected external control:
 
-- `LICENSE`
-- `NOTICE.md`
-- `CONTRIBUTING.md`
-- `legal-baseline.yaml`
-- `third-party-materials.yaml`
-- `.github/CODEOWNERS`
-- this protection document
-- the repository validator and its regression tests
-- Framework conformance governance and claim schema files
+- `LICENSE`, `NOTICE.md`, and `CONTRIBUTING.md`
+- `README.md`, `CHANGELOG.md`, `authority-registry.yaml`, and `requirements-validation.txt`
+- `legal-baseline.yaml`, `third-party-materials.yaml`, and `third-party-evidence/`
+- `.github/CODEOWNERS`, this protection document, and `.github/workflows/`
+- all governed authority documents under `docs/`
+- all controlled schemas and examples under `schema/` and `examples/`
+- all validator, verifier, regression-test, and fixture content under `tools/` and `tests/`
 
 ## Baseline-change record
 
@@ -39,7 +37,7 @@ For signed-tag mode, run the controlled verifier after creating the signed annot
 python tools/verify_external_anchor.py --commit "$(git rev-parse HEAD)"
 ```
 
-The verifier requires the canonical `origin` repository identity, an annotated tag, a valid tag signature, an exact tag-to-commit match, and identical `legal-baseline.yaml` bytes at the tagged commit. It does not verify GitHub rulesets or protected-merge evidence.
+The verifier is commit-scoped. It requires the canonical `origin` repository identity, an annotated tag, a valid tag signature, an exact tag-to-commit match, identical target/tag `legal-baseline.yaml` bytes, and protected legal-document digests that match the target commit. It does not attest to uncommitted working-tree content and does not verify GitHub rulesets, protected-merge evidence, or external signer-authorization policy.
 
 ## Repository release freeze
 

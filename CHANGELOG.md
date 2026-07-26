@@ -10,7 +10,7 @@ Individual authority documents retain their own internal Version History and app
 
 | Document | Version | Status |
 |---|---:|---|
-| AI Engineering Usage Guide | v1.0.37 | Draft for Review |
+| AI Engineering Usage Guide | v1.0.38 | Draft for Review |
 | Coordinator/Node Control Framework | v1.1.6 | Baseline |
 | Framework Application Analysis Template | v1.1.9 | Baseline |
 | Protocol YAML Definition Guide | v1.1.7 | Baseline |
@@ -27,7 +27,7 @@ Individual authority documents retain their own internal Version History and app
 | Node Software Engineering Rules | v1.1.0 | Draft for Review |
 | Embedded C Coding Rules | v1.0.18 | Final Baseline |
 | C# Coding Rules | v1.0.4 | Draft for Review |
-| Repository Validation Checklist | v1.0.16 | Draft for Review |
+| Repository Validation Checklist | v1.0.17 | Draft for Review |
 | Validation Evidence Guide | v1.1.0 | Draft for Review |
 | Protocol Validation Checklist | v1.1.6 | Draft for Review |
 | Framework Conformance Checklist | v1.1.5 | Draft for Review |
@@ -124,6 +124,9 @@ Individual authority documents retain their own internal Version History and app
 
 ### Changed
 
+- Expanded `.github/CODEOWNERS` from selected files to the complete governed authority, schema, workflow, dependency, validator, verifier, test, fixture, and governance-manifest boundary.
+- Made `tools/verify_external_anchor.py` commit-scoped: it now reads the controlled baseline and protected legal documents from the target commit, verifies their normalized digests before accepting the signed tag, and explicitly excludes uncommitted working-tree content from the result.
+- Added fail-closed external-anchor verifier regression tests for valid target content, malformed baseline identity, and protected-document digest mismatch.
 - Updated AI Engineering Usage Guide to v1.0.26, Coordinator/Node Control Framework and Framework Conformance Checklist to v1.1.5, Framework Application Analysis Template to v1.1.2, and Repository Validation Checklist to v1.0.11; synchronized canonical claim-source identity, external-anchor state, release-freeze guidance, registry, README, AI manifest, validator, and regression tests.
 
 - Updated AI Engineering Usage Guide to v1.0.25, Coordinator/Node Control Framework and Framework Conformance Checklist to v1.1.4, Framework Application Analysis Template to v1.1.1, and Repository Validation Checklist to v1.0.10; synchronized the registry, README, AI manifest, legal controls, third-party manifest, claim schema, validator, and regression tests.

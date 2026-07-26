@@ -8,7 +8,7 @@ policy:
 documents:
 - display_name: AI Engineering Usage Guide
   path: docs/framework/AI_Engineering_Usage_Guide.md
-  version: v1.0.37
+  version: v1.0.38
   status: Draft for Review
   repository_role: Proposed normative AI task-routing and repository-governance authority
   readme_purpose: AI entry point, authority routing, Multi-Node-aware task workflows,
@@ -379,17 +379,18 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Repository Validation Checklist
   path: docs/validation/Repository_Validation_Checklist.md
-  version: v1.0.16
+  version: v1.0.17
   status: Draft for Review
   repository_role: Proposed operational validation method; not a Product or architecture
     authority
-  readme_purpose: Repository structural and non-link path safety, canonical registry paths,
-    authority synchronization, canonical claim-source, legal-baseline, external-anchor,
-    scoped release-state consistency, third-party byte/evidence, executable Protocol
-    schema/fixture, current Unreleased authority-revision snapshot, evidence-state,
-    and detached-package checks
-  routing_role: Repository path safety, authority synchronization, canonical claim-source,
-    legal-baseline, external-anchor, release-state, third-party byte/evidence, and evidence checks
+  readme_purpose: Repository structural and non-link path safety, complete CODEOWNERS coverage,
+    canonical registry paths, authority synchronization, canonical claim-source, commit-scoped
+    legal-baseline external-anchor verification, scoped release-state consistency, third-party
+    byte/evidence, executable Protocol schema/fixture, current Unreleased authority-revision
+    snapshot, evidence-state, and detached-package checks
+  routing_role: Repository path safety, complete CODEOWNERS coverage, authority synchronization,
+    canonical claim-source, commit-scoped legal-baseline external-anchor verification,
+    release-state, third-party byte/evidence, and evidence checks
   applies_when: Repository content, authority manifests, detached packages, or validation
     tooling are changed or reviewed.
   authority_topics:
@@ -402,6 +403,8 @@ documents:
   - Repository release-state claim integrity
   - Repository path and filesystem-entry safety
   - Canonical authority-registry path boundaries
+  - Complete CODEOWNERS trust-boundary coverage
+  - Commit-scoped external-anchor target-content verification
   prerequisite_documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Validation Evidence Guide

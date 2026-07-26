@@ -7,6 +7,17 @@
 /third-party-materials.yaml @jkman357
 /.github/CODEOWNERS @jkman357
 /.github/REPOSITORY_PROTECTION.md @jkman357
+/README.md @jkman357
+/CHANGELOG.md @jkman357
+/authority-registry.yaml @jkman357
+/requirements-validation.txt @jkman357
+/.github/workflows/ @jkman357
+/docs/ @jkman357
+/schema/ @jkman357
+/tools/ @jkman357
+/tests/ @jkman357
+/examples/ @jkman357
+/third-party-evidence/ @jkman357
 /tools/validate_repository.py @jkman357
 /tools/verify_external_anchor.py @jkman357
 /tests/test_validate_repository.py @jkman357

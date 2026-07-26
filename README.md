@@ -37,7 +37,7 @@ AI may accelerate engineering work, but it cannot own Product authority, fabrica
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.37 | Draft for Review | AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, exact tested-candidate evidence routing, Tester self-validation, and human approval boundary |
+| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.38 | Draft for Review | AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, exact tested-candidate evidence routing, Tester self-validation, and human approval boundary |
 | [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.1.6 | Baseline | Generalized Single-Node and Multi-Node architecture, role and target boundaries, timing, safety, security, Firmware Update, Runtime, canonical source identity, conformance lifecycle, and governance |
 | [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.1.9 | Baseline | Method for applying the Framework to a Product, including topology, identity, resources, Reuse Classification, canonical source identity, Protocol inputs, independent Protocol Conformance Tester applicability, staged gates, exact tested identities, evidence reconciliation, representative-target residual boundaries, cross-field disposition consistency, Tester self-validation, risks, Gaps, MVP, and acceptance evidence |
 | [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.1.7 | Baseline | Protocol YAML syntax, Multi-Node node_model semantics, machine-verifiable governance representation, Schema Validation, Semantic Lint, Code Generation, Golden Vectors, and independent Protocol Conformance Tester applicability, exact tested-candidate evidence binding, release reconciliation, representative-target claim boundaries, disposition consistency, and Tester self-validation |
@@ -54,7 +54,7 @@ AI may accelerate engineering work, but it cannot own Product authority, fabrica
 | [`Node_Software_Engineering_Rules.md`](docs/node/Node_Software_Engineering_Rules.md) | v1.1.0 | Draft for Review | Node identity, addressing, target validation, broadcast response, Session isolation, lifecycle, resources, safety, telemetry, diagnostics, Bootloader handoff, and target tests |
 | [`Embedded_C_Coding_Rules.md`](docs/coding-rules/Embedded_C_Coding_Rules.md) | v1.0.18 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 | [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.4 | Draft for Review | Product-owned C# language and .NET implementation rules |
-| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.16 | Draft for Review | Repository structural and non-link path safety, canonical registry paths, authority synchronization, canonical claim-source, legal-baseline, external-anchor, scoped release-state consistency, third-party byte/evidence, executable Protocol schema/fixture, current Unreleased authority-revision snapshot, evidence-state, and detached-package checks |
+| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.17 | Draft for Review | Repository structural and non-link path safety, complete CODEOWNERS coverage, canonical registry paths, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, scoped release-state consistency, third-party byte/evidence, executable Protocol schema/fixture, current Unreleased authority-revision snapshot, evidence-state, and detached-package checks |
 | [`Validation_Evidence_Guide.md`](docs/validation/Validation_Evidence_Guide.md) | v1.1.0 | Draft for Review | Evidence identity, traceability, reproducibility, execution state, Multi-Node topology and isolation records, ownership, anomaly, retention, integrity, and AI limitations |
 | [`Protocol_Validation_Checklist.md`](docs/validation/Protocol_Validation_Checklist.md) | v1.1.6 | Draft for Review | Traceable Protocol YAML, node_model, topology, identity, security, compatibility, independent Protocol Conformance Tester applicability, staged gates, exact tested identities, evidence freshness, representative-target residual boundaries, cross-field consistency, Tester self-validation, and interoperability evidence view |
 | [`Framework_Conformance_Checklist.md`](docs/validation/Framework_Conformance_Checklist.md) | v1.1.5 | Draft for Review | Traceable Framework role, authority, canonical source identity, Multi-Node isolation, immutable targeting, lifecycle, claim-boundary baseline, claim lifecycle, safety, security, deviation, restoration, and evidence view |
@@ -230,7 +230,8 @@ host-device-control-framework/
     │   └── protocol_expectations.yaml
     ├── test_validate_repository.py
     ├── test_validate_protocol.py
-    └── test_security_regressions.py
+    ├── test_security_regressions.py
+    └── test_verify_external_anchor.py
 ```
 
 Directory `README.md` files are non-normative indexes. All other maintained Markdown under `docs/` is governed through `authority-registry.yaml`.
@@ -248,7 +249,7 @@ python -m unittest discover -s tests -v
 python tools/verify_external_anchor.py --commit "$(git rev-parse HEAD)"
 ```
 
-The repository validator checks structure, non-link regular-file boundaries, canonical registry paths, registry equality, metadata/version/status, directory indexes, the AI manifest, stable filenames, links, headings, fences, tables, controlled LICENSE/NOTICE/contribution boundaries, the externalized legal digest baseline, CODEOWNERS coverage, third-party material byte and evidence binding, Framework claim-classification and lifecycle controls, scoped release-state consistency, the conformance-claim schema and example, routing, workflow controls, the Protocol schema, valid/invalid semantic fixtures, and regression-protected governance failures. `validate_protocol.py` may also be run directly against Project Protocol YAML files.
+The repository validator checks structure, non-link regular-file boundaries, canonical registry paths, registry equality, metadata/version/status, directory indexes, the AI manifest, stable filenames, links, headings, fences, tables, controlled LICENSE/NOTICE/contribution boundaries, the externalized legal digest baseline, complete CODEOWNERS trust-boundary coverage, commit-scoped target legal-document anchor verification, third-party material byte and evidence binding, Framework claim-classification and lifecycle controls, scoped release-state consistency, the conformance-claim schema and example, routing, workflow controls, the Protocol schema, valid/invalid semantic fixtures, and regression-protected governance failures. `validate_protocol.py` may also be run directly against Project Protocol YAML files.
 
 A passing result does not prove semantic correctness, Product suitability, safety, security adequacy, regulatory compliance, physical behavior, or human approval.
 
