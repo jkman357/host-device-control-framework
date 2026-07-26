@@ -10,7 +10,7 @@ Individual authority documents retain their own internal Version History and app
 
 | Document | Version | Status |
 |---|---:|---|
-| AI Engineering Usage Guide | v1.0.36 | Draft for Review |
+| AI Engineering Usage Guide | v1.0.37 | Draft for Review |
 | Coordinator/Node Control Framework | v1.1.6 | Baseline |
 | Framework Application Analysis Template | v1.1.9 | Baseline |
 | Protocol YAML Definition Guide | v1.1.7 | Baseline |
@@ -27,7 +27,7 @@ Individual authority documents retain their own internal Version History and app
 | Node Software Engineering Rules | v1.1.0 | Draft for Review |
 | Embedded C Coding Rules | v1.0.18 | Final Baseline |
 | C# Coding Rules | v1.0.4 | Draft for Review |
-| Repository Validation Checklist | v1.0.15 | Draft for Review |
+| Repository Validation Checklist | v1.0.16 | Draft for Review |
 | Validation Evidence Guide | v1.1.0 | Draft for Review |
 | Protocol Validation Checklist | v1.1.6 | Draft for Review |
 | Framework Conformance Checklist | v1.1.5 | Draft for Review |
@@ -36,6 +36,9 @@ Individual authority documents retain their own internal Version History and app
 
 ### Current Review Changes
 
+- Rejected repository-controlled symbolic links and special filesystem entries before content reads, and constrained authority-registry document and prerequisite paths to canonical repository-relative `docs/*.md` paths.
+- Scoped release-state validation to the unique README Current Status section and the active Changelog Unreleased section so superseded mutable-content freeze wording cannot remain as a current unqualified claim.
+- Added regression coverage for external symlink substitution, unsafe registry paths, Current Status decoys, and contradictory Unreleased freeze assertions.
 - Added an exact Current Authority Revision Snapshot so `CHANGELOG.md` cannot silently omit the active governed-document versions while legacy keywords remain elsewhere in Unreleased.
 - Replaced the mutable-content self-assertion that the repository was already frozen with fail-closed release-candidate wording; repository text alone is not freeze evidence.
 - Added repository validation and mutation tests for stale Changelog snapshots and self-asserted release-freeze wording.
@@ -71,7 +74,7 @@ Individual authority documents retain their own internal Version History and app
 
 - Made external legal-baseline activation explicitly fail-closed through `external-evidence-required`, added signed-tag verification tooling, and prohibited repository content or detached ZIPs from self-asserting anchor activation.
 
-- Declared the repository content frozen as the `v1.0.0` release candidate; immutable freeze identity is established only by the final signed tag or controlled GitHub Release.
+- Added the first `v1.0.0` release-candidate status wording; its earlier mutable-content freeze declaration is superseded by the current fail-closed release-state boundary.
 
 - Required Scoped claims to satisfy every applicable requirement within each included boundary; restricted residual deviations; froze the claim boundary before validation; and added claim lifecycle, invalidation, supersession, withdrawal, and signatory-bounded assessment rules.
 - Added `schema/framework-conformance-claim.schema.yaml` and a canonical machine-validatable Framework conformance claim example.

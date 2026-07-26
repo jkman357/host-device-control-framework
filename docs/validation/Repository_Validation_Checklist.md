@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.0.15
+**Document Version:** v1.0.16
 **Status:** Draft for Review
-**Supersedes Document Version:** v1.0.14
+**Supersedes Document Version:** v1.0.15
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.16 | 2026-07-26 | Draft for Review | Rejected symbolic links and special filesystem entries before repository reads, constrained authority-registry document and prerequisite paths to canonical repository-relative docs/*.md paths, and required Current Status and Unreleased release-state wording to remain mutually consistent. |
 | v1.0.15 | 2026-07-26 | Draft for Review | Required the Unreleased authority-revision snapshot to exactly match the authority registry and made repository release-state wording fail-closed so mutable content cannot self-assert a freeze. |
 | v1.0.14 | 2026-07-26 | Draft for Review | Enforced strict descending Version History order and exact, exclusive historical authority-version routing references; added regression coverage for ascending histories and additive decoy versions. |
 | v1.0.13 | 2026-07-26 | Draft for Review | Added executable validation for the controlled AI routing-history sequence so historical version-to-version routing records cannot silently reference a later or incorrect authority revision. |
@@ -76,6 +77,8 @@ python -m unittest discover -s tests -v
 The automated validator shall check at least:
 
 - UTF-8 readability and final newline.
+- Repository entries are regular files or directories only; symbolic links and special filesystem entries are rejected before controlled content is read.
+- Authority-registry document and prerequisite paths are canonical repository-relative POSIX Markdown paths under `docs/`; absolute paths, parent traversal, dot segments, and backslash aliases are rejected before downstream file access.
 - Fenced Code blocks using marker-aware matching: closing markers shall use the same character and at least the opening-marker length.
 - Existing local targets for balanced-parenthesis inline Markdown links, images, reference-style links, and HTML `a`/`img` elements.
 - Existing Markdown heading anchors for local links that contain fragments, including ATX and Setext headings.
@@ -108,6 +111,7 @@ The automated validator shall check at least:
 - `NOTICE.md` contains the required repository sections, limits file-specific notice precedence to lawfully authorized, manifest-registered, and visibly marked exceptions, distinguishes engineering evaluation from licensed implementation, and states that Framework conformance is the claim issuer's self-declaration rather than author or maintainer certification.
 - The Framework and Framework Conformance Checklist retain the scoped conformance-claim, authorized-deviation, and correction/revalidation/evidence restoration requirements.
 - `CHANGELOG.md` records each newly introduced governed document and synchronization of Registry, Manifest, NOTICE, and Validator behavior; its Current Authority Revision Snapshot exactly matches `authority-registry.yaml`.
+- The unique README `Current Status` section contains the controlled release-candidate boundary, while the active `CHANGELOG.md` Unreleased section contains no unqualified mutable-content freeze assertion.
 - Manifest path, version, status, Purpose, display-name, and Routing Role consistency with the authority registry.
 - Draft documents use `Proposed` Repository Role wording; Baseline and Final Baseline documents use non-proposed normative wording.
 - Required canonical authority paths exist.
@@ -138,6 +142,8 @@ A reviewer shall verify:
 - `legal-baseline.yaml` provides local legal-text change detection only, records `external-evidence-required`, and never self-asserts activation; authenticity and authorization require the external signed-tag or protected-merge control defined by `.github/REPOSITORY_PROTECTION.md`.
 - `tools/verify_external_anchor.py` verifies signed-tag mode against the canonical origin, annotated tag type, valid signature, exact target commit, and matching tagged legal-baseline bytes; GitHub ruleset or protected-merge evidence remains external.
 - Repository text does not self-assert a release freeze. A repository content freeze is recognized only through an immutable signed release tag or controlled GitHub Release that identifies the exact final commit; a ZIP or mutable branch is not freeze evidence.
+- Repository validation never follows repository-controlled symbolic links or authority-registry paths outside the canonical `docs/` boundary; a structural failure is reported before controlled content is consumed.
+- README Current Status and the active Changelog record are reviewed together so a superseded freeze declaration cannot remain as an unqualified current claim.
 - `.github/CODEOWNERS` covers legal, conformance, third-party, validator, baseline, and governance-control files.
 - Third-party entries are entire-file only and bind actual repository bytes, retained source-evidence bytes, notice text, controlled approver identity, approval reference, and obligation evidence.
 - `schema/framework-conformance-claim.schema.yaml` v2 and its canonical example validate claim identity, classification, lifecycle, boundary baseline, globally unique repository host/owner/name/URL, immutable commit/document-version pairing, evidence, supersession, and re-evaluation triggers.

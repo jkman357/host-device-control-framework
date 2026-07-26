@@ -7,8 +7,9 @@ import argparse
 from dataclasses import dataclass
 from datetime import date
 import hashlib
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
+import stat
 from typing import Any, Iterable
 from urllib.parse import unquote
 
@@ -129,6 +130,7 @@ RELEASE_STATE_REQUIRED_MARKERS = (
 RELEASE_STATE_PROHIBITED_PATTERNS = (
     r"\brepository content is frozen as\b",
     r"\brepository is frozen as\b",
+    r"\bdeclared the repository content frozen as\b",
 )
 
 
@@ -143,12 +145,28 @@ class Finding:
         return f"{self.rule}: {self.path}: {self.message}"
 
 
+def _is_regular_file_without_link(path: Path) -> bool:
+    try:
+        mode = path.lstat().st_mode
+    except OSError:
+        return False
+    return stat.S_ISREG(mode) and not stat.S_ISLNK(mode)
+
+
 def _read_text(path: Path) -> str:
+    # Do not follow repository-controlled links or special files. Path-safety
+    # validation reports them separately; returning an empty value keeps the
+    # remaining checks fail-closed without reading outside the repository.
+    if not _is_regular_file_without_link(path):
+        return ""
     return path.read_text(encoding="utf-8")
 
 
 def _all_files(root: Path) -> list[Path]:
-    return sorted(path for path in root.rglob("*") if path.is_file() and ".git" not in path.parts)
+    return sorted(
+        path for path in root.rglob("*")
+        if _is_regular_file_without_link(path) and ".git" not in path.parts
+    )
 
 
 def _markdown_files(root: Path) -> list[Path]:
@@ -270,10 +288,26 @@ def _load_unique_yaml(text: str) -> Any:
     return yaml.load(text, Loader=UniqueKeyLoader)
 
 
+def check_repository_path_safety(root: Path, findings: list[Finding]) -> None:
+    for path in sorted(root.rglob("*")):
+        if ".git" in path.parts:
+            continue
+        relative = _relative(root, path)
+        try:
+            mode = path.lstat().st_mode
+        except OSError as exc:
+            findings.append(Finding("REP-007", relative, f"cannot inspect repository entry without following it: {exc}"))
+            continue
+        if stat.S_ISLNK(mode):
+            findings.append(Finding("REP-007", relative, "symbolic links are prohibited in the controlled repository tree"))
+        elif not (stat.S_ISREG(mode) or stat.S_ISDIR(mode)):
+            findings.append(Finding("REP-007", relative, "special filesystem entries are prohibited in the controlled repository tree"))
+
+
 def check_required_files(root: Path, findings: list[Finding]) -> None:
     for relative in sorted(REQUIRED_FILES):
-        if not (root / relative).is_file():
-            findings.append(Finding("REP-001", relative, "required repository file is missing"))
+        if not _is_regular_file_without_link(root / relative):
+            findings.append(Finding("REP-001", relative, "required repository file is missing or is not a regular non-link file"))
 
 
 def check_text_files(root: Path, findings: list[Finding]) -> None:
@@ -296,6 +330,15 @@ def check_text_files(root: Path, findings: list[Finding]) -> None:
             continue
         if text and not text.endswith("\n"):
             findings.append(Finding("REP-006", relative, "text file must end with a newline"))
+
+
+def _safe_registry_document_path(value: Any) -> bool:
+    if not isinstance(value, str) or not value or "\\" in value:
+        return False
+    candidate = PurePosixPath(value)
+    if candidate.is_absolute() or any(part in {"", ".", ".."} for part in candidate.parts):
+        return False
+    return candidate.parts[0] == "docs" and candidate.suffix == ".md" and candidate.as_posix() == value
 
 
 def load_registry(root: Path, findings: list[Finding]) -> dict[str, Any] | None:
@@ -333,6 +376,12 @@ def load_registry(root: Path, findings: list[Finding]) -> dict[str, Any] | None:
         if not isinstance(path_value, str):
             findings.append(Finding("REG-009", where, "path must be a string"))
             continue
+        if not _safe_registry_document_path(path_value):
+            findings.append(Finding(
+                "REG-018", where,
+                "path must be a canonical repository-relative POSIX Markdown path under docs/ with no absolute, dot, parent, or backslash segments",
+            ))
+            continue
         if path_value in seen_paths:
             findings.append(Finding("REG-010", path_value, "duplicate governed path"))
         seen_paths.add(path_value)
@@ -361,10 +410,15 @@ def load_registry(root: Path, findings: list[Finding]) -> dict[str, Any] | None:
         prereqs = document.get("prerequisite_documents", [])
         if not isinstance(prereqs, list):
             continue
-        graph[path_value] = [str(item) for item in prereqs]
+        safe_prereqs: list[str] = []
         for prereq in prereqs:
+            if not _safe_registry_document_path(prereq):
+                findings.append(Finding("REG-018", path_value, f"unsafe or non-canonical prerequisite path: {prereq!r}"))
+                continue
+            safe_prereqs.append(prereq)
             if prereq not in all_paths:
                 findings.append(Finding("REG-016", path_value, f"unknown prerequisite: {prereq}"))
+        graph[path_value] = safe_prereqs
     visiting: set[str] = set()
     visited: set[str] = set()
     def visit(node: str, stack: list[str]) -> None:
@@ -447,7 +501,7 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
         return
     registry_by_path = {
         document["path"]: document for document in registry["documents"]
-        if isinstance(document, dict) and isinstance(document.get("path"), str)
+        if isinstance(document, dict) and _safe_registry_document_path(document.get("path"))
     }
     governed_actual = {
         _relative(root, path) for path in _markdown_files(root)
@@ -655,8 +709,10 @@ def check_registry_views(root: Path, registry: dict[str, Any] | None, findings: 
     if manifest != _expected_manifest(registry):
         findings.append(Finding("VIEW-002", _relative(root, ai_path), "Active Document Manifest does not exactly match authority-registry.yaml"))
     for document in registry["documents"]:
-        path = Path(document["path"])
-        index = root / path.parent / "README.md"
+        if not isinstance(document, dict) or not _safe_registry_document_path(document.get("path")):
+            continue
+        path = PurePosixPath(document["path"])
+        index = root / Path(*path.parts[:-1]) / "README.md"
         if not index.is_file() or f"]({path.name})" not in _visible_text(_read_text(index)):
             findings.append(Finding("VIEW-003", document["path"], f"directory index does not link {path.name}"))
 
@@ -1247,25 +1303,41 @@ def _expected_changelog_snapshot(registry: dict[str, Any]) -> list[str]:
 
 
 def check_release_state_claims(root: Path, findings: list[Finding]) -> None:
-    path = root / "README.md"
-    if not path.is_file():
+    readme_path = root / "README.md"
+    if not _is_regular_file_without_link(readme_path):
         return
-    text = _visible_text(_read_text(path))
+    readme_text = _visible_text(_read_text(readme_path))
+    status_section = _section_by_heading(readme_text, "## Current Status")
+    if status_section is None:
+        findings.append(Finding("STATUS-001", "README.md", "a unique ## Current Status section is required"))
+        status_section = ""
     for marker in RELEASE_STATE_REQUIRED_MARKERS:
-        if marker not in text:
+        if marker not in status_section:
             findings.append(Finding(
                 "STATUS-001",
                 "README.md",
-                f"release-state boundary is missing or altered: {marker}",
+                f"Current Status release-state boundary is missing or altered: {marker}",
             ))
     for pattern in RELEASE_STATE_PROHIBITED_PATTERNS:
-        if re.search(pattern, text, re.IGNORECASE):
+        if re.search(pattern, status_section, re.IGNORECASE):
             findings.append(Finding(
                 "STATUS-001",
                 "README.md",
                 "mutable repository text shall not self-assert that the release is already frozen",
             ))
             break
+
+    changelog_path = root / "CHANGELOG.md"
+    if _is_regular_file_without_link(changelog_path):
+        unreleased = _unreleased_section(_visible_text(_read_text(changelog_path))) or ""
+        for pattern in RELEASE_STATE_PROHIBITED_PATTERNS:
+            if re.search(pattern, unreleased, re.IGNORECASE):
+                findings.append(Finding(
+                    "STATUS-002",
+                    "CHANGELOG.md",
+                    "Unreleased changes contain an active or unqualified mutable-content freeze assertion",
+                ))
+                break
 
 
 def _unreleased_section(text: str) -> str | None:
@@ -1304,6 +1376,7 @@ def check_changelog(root: Path, registry: dict[str, Any] | None, findings: list[
 def validate(root: Path | str) -> list[Finding]:
     root = Path(root).resolve()
     findings: list[Finding] = []
+    check_repository_path_safety(root, findings)
     check_required_files(root, findings)
     check_text_files(root, findings)
     registry = load_registry(root, findings)
