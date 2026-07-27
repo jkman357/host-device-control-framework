@@ -7,6 +7,7 @@
 /third-party-materials.yaml @jkman357
 /.github/CODEOWNERS @jkman357
 /.github/REPOSITORY_PROTECTION.md @jkman357
+/.gitattributes @jkman357
 /README.md @jkman357
 /CHANGELOG.md @jkman357
 /authority-registry.yaml @jkman357

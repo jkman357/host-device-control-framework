@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.1.0
+**Document Version:** v1.1.1
 **Status:** Baseline
-**Supersedes Document Version:** v1.0.17
+**Supersedes Document Version:** v1.1.0
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.1 | 2026-07-27 | Baseline | Added repository-controlled `.gitattributes`, canonical LF checkout enforcement, required binary declarations, complete CODEOWNERS coverage, and regression tests for missing or weakened line-ending policy; promoted after explicit human freeze approval. |
 | v1.1.0 | 2026-07-27 | Baseline | Added release-candidate document-version support, retained multi-digit semantic-version components, required RC status to remain Draft for Review, and defined explicit human freeze approval as the boundary for removing the RC suffix; promoted from v1.1.0-rc.1 after explicit human freeze approval. |
 | v1.0.17 | 2026-07-26 | Draft for Review | Extended CODEOWNERS coverage to all governed authorities, schemas, workflows, validators, tests, fixtures, and governance manifests; made signed-tag verification commit-scoped and required protected legal-document digests to match the target commit; added external-anchor verifier regression tests. |
 | v1.0.16 | 2026-07-26 | Draft for Review | Rejected symbolic links and special filesystem entries before repository reads, constrained authority-registry document and prerequisite paths to canonical repository-relative docs/*.md paths, and required Current Status and Unreleased release-state wording to remain mutually consistent. |
@@ -78,7 +79,8 @@ python -m unittest discover -s tests -v
 
 The automated validator shall check at least:
 
-- UTF-8 readability and final newline.
+- UTF-8 readability, canonical LF line endings, and final newline.
+- A root `.gitattributes` file with the exact `* text=auto eol=lf` checkout policy and required binary declarations for common archive, document, image, executable, and Firmware artifact types.
 - Repository entries are regular files or directories only; symbolic links and special filesystem entries are rejected before controlled content is read.
 - Authority-registry document and prerequisite paths are canonical repository-relative POSIX Markdown paths under `docs/`; absolute paths, parent traversal, dot segments, and backslash aliases are rejected before downstream file access.
 - Fenced Code blocks using marker-aware matching: closing markers shall use the same character and at least the opening-marker length.
@@ -148,7 +150,7 @@ A reviewer shall verify:
 - Repository validation never follows repository-controlled symbolic links or authority-registry paths outside the canonical `docs/` boundary; a structural failure is reported before controlled content is consumed.
 - README Current Status and the active Changelog record are reviewed together so a superseded freeze declaration cannot remain as an unqualified current claim.
 - External-anchor verifier regression tests cover a valid target commit, malformed target baseline data, and target-commit protected-document digest mismatch.
-- `.github/CODEOWNERS` covers all governed authority documents, repository manifests, legal and third-party controls, schemas, examples, workflows, dependency inputs, validators, verifiers, tests, and fixtures.
+- `.github/CODEOWNERS` covers `.gitattributes`, all governed authority documents, repository manifests, legal and third-party controls, schemas, examples, workflows, dependency inputs, validators, verifiers, tests, and fixtures.
 - Third-party entries are entire-file only and bind actual repository bytes, retained source-evidence bytes, notice text, controlled approver identity, approval reference, and obligation evidence.
 - `schema/framework-conformance-claim.schema.yaml` v2 and its canonical example validate claim identity, classification, lifecycle, boundary baseline, globally unique repository host/owner/name/URL, immutable commit/document-version pairing, evidence, supersession, and re-evaluation triggers.
 - File-specific or third-party notices are authorized, scoped to identified material, and do not silently relicense unrelated repository content.

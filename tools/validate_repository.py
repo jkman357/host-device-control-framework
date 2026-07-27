@@ -34,7 +34,7 @@ INDEX_READMES = {
     "docs/node/README.md", "docs/coding-rules/README.md", "docs/validation/README.md",
 }
 REQUIRED_FILES = {
-    "README.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE", "NOTICE.md",
+    ".gitattributes", "README.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE", "NOTICE.md",
     "third-party-materials.yaml", "legal-baseline.yaml", "third-party-evidence/README.md",
     ".github/CODEOWNERS", ".github/REPOSITORY_PROTECTION.md", "authority-registry.yaml",
     "requirements-validation.txt", ".github/workflows/document-validation.yml",
@@ -69,6 +69,7 @@ LEGAL_PROTECTED_DOCUMENTS = {"LICENSE", "NOTICE.md", "CONTRIBUTING.md"}
 REQUIRED_CODEOWNER_PATHS = {
     "/LICENSE", "/NOTICE.md", "/CONTRIBUTING.md", "/legal-baseline.yaml",
     "/third-party-materials.yaml", "/.github/CODEOWNERS", "/.github/REPOSITORY_PROTECTION.md",
+    "/.gitattributes",
     "/README.md", "/CHANGELOG.md", "/authority-registry.yaml", "/requirements-validation.txt",
     "/.github/workflows/", "/docs/", "/schema/", "/tools/", "/tests/", "/examples/",
     "/third-party-evidence/",
@@ -124,9 +125,9 @@ AI_ROUTING_HISTORY_EXPECTATIONS = {
 }
 
 RELEASE_STATE_REQUIRED_MARKERS = (
-    "The repository is being prepared as the `v1.0.0` release candidate.",
-    "Repository text alone does not establish a release freeze",
-    "An immutable freeze exists only when the final commit is identified",
+    "The repository content has received explicit human freeze approval for the `v1.1.1` Baseline.",
+    "Repository text and detached ZIP packages do not independently establish immutable Git release identity.",
+    "Immutable release identity exists only after the final commit is identified by the `v1.1.1` tag or controlled GitHub Release.",
 )
 RELEASE_STATE_PROHIBITED_PATTERNS = (
     r"\brepository content is frozen as\b",
@@ -313,8 +314,9 @@ def check_required_files(root: Path, findings: list[Finding]) -> None:
 
 def check_text_files(root: Path, findings: list[Finding]) -> None:
     suffixes = {".md", ".yaml", ".yml", ".py", ".txt"}
+    text_filenames = {"LICENSE", ".gitattributes"}
     for path in _all_files(root):
-        if path.suffix.casefold() not in suffixes and path.name != "LICENSE":
+        if path.suffix.casefold() not in suffixes and path.name not in text_filenames:
             continue
         relative = _relative(root, path)
         data = path.read_bytes()
@@ -331,6 +333,36 @@ def check_text_files(root: Path, findings: list[Finding]) -> None:
             continue
         if text and not text.endswith("\n"):
             findings.append(Finding("REP-006", relative, "text file must end with a newline"))
+
+
+def check_gitattributes(root: Path, findings: list[Finding]) -> None:
+    path = root / ".gitattributes"
+    if not _is_regular_file_without_link(path):
+        return
+    lines = {
+        line.strip()
+        for line in _read_text(path).splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    }
+    required_lines = {
+        "* text=auto eol=lf",
+        "*.png binary",
+        "*.jpg binary",
+        "*.jpeg binary",
+        "*.gif binary",
+        "*.zip binary",
+        "*.pdf binary",
+        "*.bin binary",
+        "*.hex binary",
+        "*.elf binary",
+    }
+    missing = sorted(required_lines - lines)
+    if missing:
+        findings.append(Finding(
+            "REP-008",
+            ".gitattributes",
+            "canonical LF checkout policy or required binary declarations are missing: " + ", ".join(missing),
+        ))
 
 
 def _safe_registry_document_path(value: Any) -> bool:
@@ -1387,6 +1419,7 @@ def validate(root: Path | str) -> list[Finding]:
     check_repository_path_safety(root, findings)
     check_required_files(root, findings)
     check_text_files(root, findings)
+    check_gitattributes(root, findings)
     registry = load_registry(root, findings)
     check_governed_documents(root, registry, findings)
     check_registry_views(root, registry, findings)
@@ -1414,7 +1447,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"FAIL: {len(findings)} repository validation finding(s).")
         return 1
     print(
-        "PASS: repository documentation, authority registry, Version History chains, Protocol schema, "
+        "PASS: repository documentation, LF checkout policy, authority registry, Version History chains, Protocol schema, "
         "semantic fixtures, independent Protocol tester applicability, lifecycle, evidence, and CI controls are consistent."
     )
     return 0
