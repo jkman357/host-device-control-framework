@@ -388,8 +388,8 @@ def load_registry(root: Path, findings: list[Finding]) -> dict[str, Any] | None:
         seen_paths.add(path_value)
         if document.get("status") not in VALID_STATUSES:
             findings.append(Finding("REG-011", path_value, f"status must be one of {sorted(VALID_STATUSES)}"))
-        if not re.fullmatch(r"v\d+\.\d+\.\d+", str(document.get("version", ""))):
-            findings.append(Finding("REG-012", path_value, "version must match vMAJOR.MINOR.PATCH"))
+        if _semver_tuple(str(document.get("version", ""))) is None:
+            findings.append(Finding("REG-012", path_value, "version must match vMAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH-rc.N"))
         topics = document.get("authority_topics")
         if not isinstance(topics, list) or not topics:
             findings.append(Finding("REG-013", path_value, "authority_topics must be a non-empty list"))
@@ -438,11 +438,16 @@ def load_registry(root: Path, findings: list[Finding]) -> dict[str, Any] | None:
     return registry
 
 
-def _semver_tuple(value: str) -> tuple[int, int, int] | None:
-    match = re.fullmatch(r"v(\d+)\.(\d+)\.(\d+)", value)
+def _semver_tuple(value: str) -> tuple[int, int, int, int, int] | None:
+    match = re.fullmatch(r"v(\d+)\.(\d+)\.(\d+)(?:-rc\.(\d+))?", value)
     if not match:
         return None
-    return tuple(int(part) for part in match.groups())
+    major, minor, patch, rc_number = match.groups()
+    if rc_number is None:
+        return int(major), int(minor), int(patch), 1, 0
+    if int(rc_number) < 1:
+        return None
+    return int(major), int(minor), int(patch), 0, int(rc_number)
 
 
 def _table_cells(line: str) -> list[str]:
@@ -599,8 +604,10 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
                 findings.append(Finding("DOC-010", f"{relative}:{current_row['line']}", "current Version History status does not match document Status"))
             if not _valid_iso_date(current_row["date"]):
                 findings.append(Finding("DOC-010", f"{relative}:{current_row['line']}", "current Version History date must be a real ISO YYYY-MM-DD date"))
+            if "-rc." in current_row["version"] and status != "Draft for Review":
+                findings.append(Finding("DOC-013", f"{relative}:{current_row['line']}", "release-candidate versions must remain Draft for Review"))
 
-        recorded_by_version: list[tuple[tuple[int, int, int], date]] = []
+        recorded_by_version: list[tuple[tuple[int, int, int, int, int], date]] = []
         for row in rows:
             date_value = row["date"]
             status_value = row["status"]
@@ -655,7 +662,7 @@ def check_governed_documents(root: Path, registry: dict[str, Any] | None, findin
                 actual_supersedes = supersedes_values[0]
                 actual_semver = _semver_tuple(actual_supersedes)
                 if actual_semver is None:
-                    findings.append(Finding("DOC-011", relative, "Supersedes Document Version must match vMAJOR.MINOR.PATCH"))
+                    findings.append(Finding("DOC-011", relative, "Supersedes Document Version must match vMAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH-rc.N"))
                 elif actual_supersedes not in versions:
                     findings.append(Finding("DOC-011", relative, "Supersedes Document Version must exist in Version History"))
                 elif actual_semver >= current_semver:

@@ -20,7 +20,7 @@ Objective Evidence and Human Acceptance
     builds, executes, measures, reviews, and approves the bounded result
 ```
 
-AI may accelerate engineering work, but it cannot own Product authority, fabricate evidence, self-approve, or replace target validation and responsible human judgment.
+AI may accelerate engineering work, but it cannot own Product authority, fabricate evidence, self-approve, or replace target validation and responsible human judgment. Engineering continuity shall reside in controlled repository artifacts and portable handoff records rather than in one AI provider, model, account, or conversation.
 
 ## Documentation Domains
 
@@ -37,7 +37,7 @@ AI may accelerate engineering work, but it cannot own Product authority, fabrica
 
 | Document | Version | Status | Purpose |
 |---|---:|---|---|
-| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.0.38 | Draft for Review | AI entry point, authority routing, Multi-Node-aware task workflows, evidence states, exact tested-candidate evidence routing, Tester self-validation, and human approval boundary |
+| [`AI_Engineering_Usage_Guide.md`](docs/framework/AI_Engineering_Usage_Guide.md) | v1.1.0 | Baseline | AI entry point, authority routing, provider-independent work continuity, Multi-Node-aware task workflows, evidence states, exact tested-candidate evidence routing, Tester self-validation, and human approval boundary |
 | [`Coordinator_Node_Control_Framework.md`](docs/framework/Coordinator_Node_Control_Framework.md) | v1.1.6 | Baseline | Generalized Single-Node and Multi-Node architecture, role and target boundaries, timing, safety, security, Firmware Update, Runtime, canonical source identity, conformance lifecycle, and governance |
 | [`Framework_Application_Analysis_Template.md`](docs/framework/Framework_Application_Analysis_Template.md) | v1.1.9 | Baseline | Method for applying the Framework to a Product, including topology, identity, resources, Reuse Classification, canonical source identity, Protocol inputs, independent Protocol Conformance Tester applicability, staged gates, exact tested identities, evidence reconciliation, representative-target residual boundaries, cross-field disposition consistency, Tester self-validation, risks, Gaps, MVP, and acceptance evidence |
 | [`Protocol_YAML_Definition_Guide.md`](docs/protocol/Protocol_YAML_Definition_Guide.md) | v1.1.7 | Baseline | Protocol YAML syntax, Multi-Node node_model semantics, machine-verifiable governance representation, Schema Validation, Semantic Lint, Code Generation, Golden Vectors, and independent Protocol Conformance Tester applicability, exact tested-candidate evidence binding, release reconciliation, representative-target claim boundaries, disposition consistency, and Tester self-validation |
@@ -54,7 +54,7 @@ AI may accelerate engineering work, but it cannot own Product authority, fabrica
 | [`Node_Software_Engineering_Rules.md`](docs/node/Node_Software_Engineering_Rules.md) | v1.1.0 | Draft for Review | Node identity, addressing, target validation, broadcast response, Session isolation, lifecycle, resources, safety, telemetry, diagnostics, Bootloader handoff, and target tests |
 | [`Embedded_C_Coding_Rules.md`](docs/coding-rules/Embedded_C_Coding_Rules.md) | v1.0.18 | Final Baseline | Product-owned Embedded C implementation, memory, arithmetic, State Machine, ISR, callback, RTOS, Protocol, and review rules |
 | [`CSharp_Coding_Rules.md`](docs/coding-rules/CSharp_Coding_Rules.md) | v1.0.4 | Draft for Review | Product-owned C# language and .NET implementation rules |
-| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.0.17 | Draft for Review | Repository structural and non-link path safety, complete CODEOWNERS coverage, canonical registry paths, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, scoped release-state consistency, third-party byte/evidence, executable Protocol schema/fixture, current Unreleased authority-revision snapshot, evidence-state, and detached-package checks |
+| [`Repository_Validation_Checklist.md`](docs/validation/Repository_Validation_Checklist.md) | v1.1.0 | Baseline | Repository structural and non-link path safety, complete CODEOWNERS coverage, canonical registry paths, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, scoped release-state consistency, third-party byte/evidence, executable Protocol schema/fixture, current Unreleased authority-revision snapshot, evidence-state, and detached-package checks |
 | [`Validation_Evidence_Guide.md`](docs/validation/Validation_Evidence_Guide.md) | v1.1.0 | Draft for Review | Evidence identity, traceability, reproducibility, execution state, Multi-Node topology and isolation records, ownership, anomaly, retention, integrity, and AI limitations |
 | [`Protocol_Validation_Checklist.md`](docs/validation/Protocol_Validation_Checklist.md) | v1.1.6 | Draft for Review | Traceable Protocol YAML, node_model, topology, identity, security, compatibility, independent Protocol Conformance Tester applicability, staged gates, exact tested identities, evidence freshness, representative-target residual boundaries, cross-field consistency, Tester self-validation, and interoperability evidence view |
 | [`Framework_Conformance_Checklist.md`](docs/validation/Framework_Conformance_Checklist.md) | v1.1.5 | Draft for Review | Traceable Framework role, authority, canonical source identity, Multi-Node isolation, immutable targeting, lifecycle, claim-boundary baseline, claim lifecycle, safety, security, deviation, restoration, and evidence view |
@@ -62,6 +62,8 @@ AI may accelerate engineering work, but it cannot own Product authority, fabrica
 | [`AI_Generated_Artifact_Validation_Guide.md`](docs/validation/AI_Generated_Artifact_Validation_Guide.md) | v1.1.0 | Draft for Review | Authority, prompt, stale-source, invented-topology, identity/address confusion, code/document/test, execution evidence, target verification, security, approval, and records |
 
 The machine-readable [`authority-registry.yaml`](authority-registry.yaml) is the controlled source for document identity, version, status, Repository Role, applicability, authority topics, prerequisites, README purpose, and AI manifest routing-role fields. The validator requires the registry, this table, directory indexes, and the AI Active Document Manifest to agree.
+
+During iterative review, candidate documents use `vMAJOR.MINOR.PATCH-rc.N`. The target formal version remains fixed while only `N` advances. Removing the RC suffix and issuing the formal version requires explicit human freeze approval.
 
 ## AI Task Routing
 

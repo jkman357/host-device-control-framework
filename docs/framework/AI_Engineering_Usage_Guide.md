@@ -3,15 +3,15 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`
 **Document ID:** AIEUG
-**Document Version:** v1.0.38
-**Status:** Draft for Review
+**Document Version:** v1.1.0
+**Status:** Baseline
 **Document Type:** AI Usage and Authority Routing Guide
 **Primary Narrative Language:** English
 **Author:** Ray Yang
 **Maintainer:** Ray Yang
 **Repository:** `host-device-control-framework`
-**Repository Role:** Proposed normative AI task-routing and repository-governance authority
-**Supersedes Document Version:** v1.0.37
+**Repository Role:** Normative AI task-routing and repository-governance authority
+**Supersedes Document Version:** v1.0.38
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -28,7 +28,7 @@
 - `Repository_Validation_Checklist.md`
 
 **First Issued:** 2026-07-18
-**Last Revised:** 2026-07-26
+**Last Revised:** 2026-07-27
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -100,6 +100,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.0 | 2026-07-27 | Baseline | Added provider-independent AI work continuity, interruption recovery, controlled handoff-package content, restart boundaries, cross-AI validation requirements, and the controlled release-candidate workflow; promoted from v1.1.0-rc.1 after explicit human freeze approval. |
 | v1.0.38 | 2026-07-26 | Draft for Review | Routed complete CODEOWNERS trust-boundary coverage and commit-scoped legal-anchor verification through Repository Validation Checklist v1.0.17; no Product, Framework, Protocol, or implementation requirement was changed. |
 | v1.0.37 | 2026-07-26 | Draft for Review | Routed fail-closed repository path safety, canonical authority-registry path boundaries, and active release-state consistency through Repository Validation Checklist v1.0.16; no Product, Framework, Protocol, or implementation requirement was changed. |
 | v1.0.36 | 2026-07-26 | Draft for Review | Routed current Unreleased authority-revision snapshot validation and fail-closed release-state wording through Repository Validation Checklist v1.0.15; no Product, Framework, Protocol, or implementation requirement was changed. |
@@ -142,15 +143,14 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 ## 0.2 Active Document Manifest
 
-This Draft is the proposed version-routing entry point for AI use of this repository. Until a human promotes it to
-Baseline, its routing is provisional and shall not override direct human instructions or the approved topic authority
-of the documents listed below.
+This Baseline is the active version-routing entry point for AI use of this repository. Its routing remains subordinate
+to direct human instructions and to the approved topic authority of the documents listed below.
 
 The machine-readable `authority-registry.yaml` is the identity and routing-metadata source for this manifest. The human-readable table shall not redefine or silently diverge from the registry.
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.0.38` | Draft for Review | AI authority routing and operating controls |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.1.0` | Baseline | AI authority routing, operating controls, and provider-independent work continuity |
 | Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.6` | Baseline | Generalized Single-Node and Multi-Node architecture and governance |
 | Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.1.9` | Baseline | Application, topology, resource, and acceptance analysis method |
 | Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.1.7` | Baseline | Protocol YAML representation and Multi-Node semantic-validation rules |
@@ -167,7 +167,7 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 | Node Software Engineering Rules | `docs/node/Node_Software_Engineering_Rules.md` | `v1.1.0` | Draft for Review | Cross-language Node identity, targeting, lifecycle, and engineering rules |
 | Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.18` | Final Baseline | Product-owned Embedded C implementation rules |
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.0.17` | Draft for Review | Repository path safety, complete CODEOWNERS coverage, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, release-state, third-party byte/evidence, and evidence checks |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.1.0` | Baseline | Repository path safety, complete CODEOWNERS coverage, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, release-state, third-party byte/evidence, and evidence checks |
 | Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.1.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
 | Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.1.6` | Draft for Review | Protocol and Multi-Node validation evidence-capture checklist |
 | Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.1.5` | Draft for Review | Framework and Multi-Node conformance, claim lifecycle, deviation, and restoration evidence-capture checklist |
@@ -219,6 +219,13 @@ docs/validation/AI_Generated_Artifact_Validation_Guide.md
 The canonical repository path identifies the maintained authority document. The `Document Version` metadata identifies
 the content revision. Git history, tags, Releases, and release-package names preserve immutable snapshots.
 
+During an active review cycle, the intended next formal version shall remain fixed and only the release-candidate
+suffix shall advance, for example `v1.1.0-rc.1`, `v1.1.0-rc.2`, and `v1.1.0-rc.3`. Each RC identifies a reviewable
+candidate, not an approved release. Git commits remain the detailed edit history. An AI shall not remove the RC suffix,
+promote the candidate, or advance the formal version until an authorized human explicitly declares the candidate
+frozen. The frozen release uses the same core version without the RC suffix, for example `v1.1.0`. Multi-digit MINOR
+and PATCH components remain valid; they shall not be mechanically carried merely because a component has two digits.
+
 An AI shall not infer the current authority version from a maintained filename and shall not create a second
 maintained copy merely to represent a PATCH or MINOR revision. Historical snapshots belong in Git history, tags,
 Releases, release packages, or controlled archives rather than parallel maintained Markdown filenames.
@@ -267,6 +274,37 @@ An AI using this repository shall follow these principles:
 16. Produce evidence-oriented outputs that can be reviewed, tested, reproduced, and traced.
 
 ---
+
+## 1.1 Provider-Independent AI Work Continuity
+
+Engineering work shall not depend on the continued availability, memory, proprietary conversation state, or behavior
+of one AI provider, model, account, session, or tool. An AI is a replaceable engineering participant, not the
+repository authority or the sole holder of Project context.
+
+The recoverable engineering state shall remain in controlled, portable artifacts such as:
+
+```text
+Repository or complete Project package
+Applicable authority identities and versions
+Current task, scope, and requested outcome
+Product decisions, assumptions, unknowns, and unresolved conflicts
+Modified files and change summary
+Executed validation commands and actual results
+Known failures, limitations, and next actions
+Required human decisions and approvals
+```
+
+Chat transcripts may provide supplementary context, but they shall not be the only location of an approved
+requirement, design decision, known defect, validation result, or unfinished-work state. Provider-specific memory,
+proprietary prompt state, and hidden reasoning shall not be required to resume the work.
+
+When an AI service becomes unavailable, unreliable, exhausted, or unsuitable, the Project may continue with another
+AI or with human-only engineering. The successor shall re-establish authority and source identity from the supplied
+artifacts, review the recorded current state, distinguish inherited facts from prior-AI conclusions, and rerun
+applicable validation before relying on or extending the prior output.
+
+AI continuity does not mean that a successor blindly accepts the prior AI's work. Handoff preserves recoverability;
+independent review and executable evidence preserve trust.
 
 # 2. Authority Routing and Trust Boundary
 
@@ -746,6 +784,7 @@ Available build, validation, analysis, and test tools
 Expected output format and intended status
 Acceptance evidence
 Confidentiality and secret-handling constraints
+Prior work-state or handoff package when continuing interrupted AI-assisted work
 ```
 
 When a material input is missing:
@@ -836,6 +875,7 @@ Default status rules:
 
 ```text
 New or materially rewritten AI artifact -> Draft for Review
+Review-cycle candidate -> vMAJOR.MINOR.PATCH-rc.N and Draft for Review
 Human-approved stable artifact -> Baseline
 Human-approved locked release authority -> Final Baseline
 Generated artifact -> Generated / Derived, with source identity
@@ -844,6 +884,28 @@ Test output -> Executed result only when the test actually ran
 
 AI may recommend a version and status. AI shall not self-approve `Baseline`, `Final Baseline`, a Deviation, residual
 risk, or release.
+
+## 5.8 Continuation and Handoff Record
+
+When work may continue in another session, tool, model, provider, or by another engineer, preserve a concise
+continuation record containing, as applicable:
+
+```text
+Controlled source or package identity
+Task objective and completed scope
+Files added, changed, deleted, or intentionally left unchanged
+Material decisions and their authority
+Assumptions, unknowns, conflicts, and open risks
+Commands and tools actually executed
+Actual validation results and unexecuted checks
+Known defects or incomplete work
+Next bounded actions
+Human decisions or approvals still required
+```
+
+The continuation record shall be understandable without access to proprietary chat memory. It shall not claim that
+work is complete merely because an AI response ended, and it shall not convert prior-AI assertions into facts or
+validation evidence.
 
 ---
 
@@ -878,6 +940,9 @@ An AI using this repository shall not:
 25. Report an artifact as final while material assumptions, conflicts, or missing evidence remain unresolved.
 26. Claim real-system correctness without target testing and measurement evidence.
 27. Disclose secrets or sensitive information merely because they appear in an input artifact.
+28. Make an AI provider, model, account, conversation, proprietary memory, or hidden prompt state the sole holder of required engineering context.
+29. Treat a prior AI conclusion as authority or evidence without re-establishing its source, scope, and applicable validation.
+30. Resume interrupted work from an unidentified, incomplete, or stale package while claiming continuity with the controlled Project state.
 
 ---
 
@@ -1073,12 +1138,38 @@ Preserve or explicitly remove each prior normative rule
     |
 Update examples, checklists, decisions, references, and version history
     |
+Keep the target formal version fixed and advance only the RC suffix during review
+    |
 Validate structure, semantics, versions, and cross-document references
     |
 Record executed checks and remaining limitations
     |
 Submit Draft for Review or Candidate Baseline for human approval
 ```
+
+## 10.4 AI Interruption, Provider Switch, or Work Resumption
+
+```text
+Obtain the controlled repository or complete Project package
+    |
+Verify package identity, integrity, and applicable authority versions when evidence is available
+    |
+Read the continuation record, changed artifacts, known failures, and requested next action
+    |
+Separate source-backed facts from prior-AI assumptions, proposals, and unverified conclusions
+    |
+Re-establish the current working-tree or package state before editing
+    |
+Rerun applicable repository, build, analysis, and test checks rather than inheriting PASS claims
+    |
+Continue only within the recorded scope or explicitly disclose a changed scope
+    |
+Produce an updated continuation record and complete portable artifact set
+```
+
+A provider switch shall not require conversion to a provider-specific repository format. When a complete ZIP package
+is the agreed exchange artifact, the returned ZIP shall contain the complete updated Project tree rather than only
+disconnected generated fragments, unless the human explicitly requests a patch or partial artifact.
 
 ---
 
@@ -1133,8 +1224,10 @@ The real system behaves as required
 Before declaring an AI task complete:
 
 - [ ] Active authority documents and exact versions are identified.
-- [ ] Repository branch, tag, commit, or source identity is recorded when available.
+- [ ] Repository branch, tag, commit, package identity, or source identity is recorded when available.
 - [ ] Full-file versus excerpted access is disclosed.
+- [ ] Interrupted or transferred work includes a portable continuation record that does not depend on proprietary AI memory.
+- [ ] Prior-AI conclusions and PASS claims were independently checked before reuse.
 - [ ] Product-specific requirements and constraints are identified.
 - [ ] Facts, assumptions, unknowns, and potentially stale inputs are separated.
 - [ ] Responsibility and authority boundaries are preserved.
@@ -1157,9 +1250,9 @@ Before declaring an AI task complete:
 
 ---
 
-# 13. Draft Decision Summary
+# 13. Baseline Decision Summary
 
-This Draft for Review proposes the following decisions:
+This Baseline establishes the following decisions:
 
 1. The repository is primarily an AI-consumable engineering authority set.
 2. Human engineers are not expected to memorize and manually apply every rule before implementation.
@@ -1198,8 +1291,8 @@ subordinate to the owning authority and shall not be used to create a competing 
 32. Human responsibility centers on Product intent, approval, measurement, validation, deviation, and residual-risk acceptance.
 33. Manual Code entry is not the primary human value in this operating model.
 34. The AI operating model is authority routing, constrained generation, automated review, explicit evidence states, and human approval.
-35. This Guide remains Draft for Review until human approval, authority-set integration, and canonical-path verification are complete.
-36. Routing from this Draft is provisional and cannot override direct human instructions or approved topic authorities.
+35. This Guide was promoted to Baseline after explicit human approval, authority-set integration, canonical-path verification, and repository validation.
+36. Routing from this Baseline cannot override direct human instructions or approved topic authorities.
 37. Cross-implementation interoperability applies to every implementation; cross-language interoperability applies only to language pairs in scope.
 38. Repeated non-owning requirements are derived conformance summaries and do not override the authority source.
 39. Maintained repository documents use stable canonical repository paths, while immutable detached release, audit, and external-delivery artifacts use versioned or Baseline-identified distributed filenames.

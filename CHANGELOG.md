@@ -10,7 +10,7 @@ Individual authority documents retain their own internal Version History and app
 
 | Document | Version | Status |
 |---|---:|---|
-| AI Engineering Usage Guide | v1.0.38 | Draft for Review |
+| AI Engineering Usage Guide | v1.1.0 | Baseline |
 | Coordinator/Node Control Framework | v1.1.6 | Baseline |
 | Framework Application Analysis Template | v1.1.9 | Baseline |
 | Protocol YAML Definition Guide | v1.1.7 | Baseline |
@@ -27,7 +27,7 @@ Individual authority documents retain their own internal Version History and app
 | Node Software Engineering Rules | v1.1.0 | Draft for Review |
 | Embedded C Coding Rules | v1.0.18 | Final Baseline |
 | C# Coding Rules | v1.0.4 | Draft for Review |
-| Repository Validation Checklist | v1.0.17 | Draft for Review |
+| Repository Validation Checklist | v1.1.0 | Baseline |
 | Validation Evidence Guide | v1.1.0 | Draft for Review |
 | Protocol Validation Checklist | v1.1.6 | Draft for Review |
 | Framework Conformance Checklist | v1.1.5 | Draft for Review |
@@ -36,6 +36,12 @@ Individual authority documents retain their own internal Version History and app
 
 ### Current Review Changes
 
+- Promoted AI Engineering Usage Guide and Repository Validation Checklist from `v1.1.0-rc.1` to the formal `v1.1.0` Baseline after explicit human freeze approval.
+- Adopted release-candidate versioning for iterative review: the intended formal version remains fixed, only the `-rc.N` suffix advances, and the formal version is issued only after explicit human freeze approval.
+- Retained normal semantic-version components, including multi-digit MINOR and PATCH values; removed the proposed mechanical single-digit carry-forward rule.
+- Added provider-independent AI work continuity and controlled handoff rules without creating a provider-specific guide or a new authority document.
+- Defined a portable continuation record for repository/package identity, completed scope, changes, decisions, assumptions, executed checks, actual results, known defects, next actions, and pending human approvals.
+- Added an interruption/provider-switch workflow that re-establishes authority, separates prior-AI conclusions from facts, reruns applicable validation, and returns a complete updated Project ZIP when ZIP is the agreed exchange artifact.
 - Rejected repository-controlled symbolic links and special filesystem entries before content reads, and constrained authority-registry document and prerequisite paths to canonical repository-relative `docs/*.md` paths.
 - Scoped release-state validation to the unique README Current Status section and the active Changelog Unreleased section so superseded mutable-content freeze wording cannot remain as a current unqualified claim.
 - Added regression coverage for external symlink substitution, unsafe registry paths, Current Status decoys, and contradictory Unreleased freeze assertions.

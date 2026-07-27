@@ -1,13 +1,13 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.0.17
-**Status:** Draft for Review
-**Supersedes Document Version:** v1.0.16
+**Document Version:** v1.1.0
+**Status:** Baseline
+**Supersedes Document Version:** v1.0.17
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
-**Repository Role:** Proposed operational validation method; not a Product or architecture authority
+**Repository Role:** Operational validation method; not a Product or architecture authority
 
 Copyright © 2026 Ray Yang. All rights reserved unless a repository-level license states otherwise.
 
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.0 | 2026-07-27 | Baseline | Added release-candidate document-version support, retained multi-digit semantic-version components, required RC status to remain Draft for Review, and defined explicit human freeze approval as the boundary for removing the RC suffix; promoted from v1.1.0-rc.1 after explicit human freeze approval. |
 | v1.0.17 | 2026-07-26 | Draft for Review | Extended CODEOWNERS coverage to all governed authorities, schemas, workflows, validators, tests, fixtures, and governance manifests; made signed-tag verification commit-scoped and required protected legal-document digests to match the target commit; added external-anchor verifier regression tests. |
 | v1.0.16 | 2026-07-26 | Draft for Review | Rejected symbolic links and special filesystem entries before repository reads, constrained authority-registry document and prerequisite paths to canonical repository-relative docs/*.md paths, and required Current Status and Unreleased release-state wording to remain mutually consistent. |
 | v1.0.15 | 2026-07-26 | Draft for Review | Required the Unreleased authority-revision snapshot to exactly match the authority registry and made repository release-state wording fail-closed so mutable content cannot self-assert a freeze. |
@@ -90,13 +91,14 @@ The automated validator shall check at least:
 - Each metadata key appears exactly once in the opening metadata region before the first level-2 heading in the document and line 80.
 - Only the six approved directory-index `README.md` files are exempt from authority metadata, and each declares `Repository Role: Non-normative directory index`.
 - Governed Markdown filenames use the lowercase `.md` extension; `.MD` and `.markdown` variants are rejected.
-- Document versions use `vMAJOR.MINOR.PATCH`, Version History versions are unique and in strict descending semantic-version order, and the metadata version is the highest listed version.
+- Document versions use `vMAJOR.MINOR.PATCH` or `vMAJOR.MINOR.PATCH-rc.N`; Version History versions are unique and in strict descending semantic-version order, and the metadata version is the highest listed version. Multi-digit MINOR and PATCH components are valid.
 - Version History has `Version`, `Date`, `Status`, and `Summary` or `Description` columns; every row has the header cell count and a non-empty summary.
 - Every current-version row has a real ISO date and current Status. Legacy historical values may use `Not recorded`; every recorded historical date is a real ISO date and recorded dates follow version order.
 - Current version presence exactly once in the Version History or Change History table located under the corresponding unique heading.
-- A document with multiple Version History entries declares `Supersedes Document Version`; an initial version does not. The declared version uses `vMAJOR.MINOR.PATCH`, exists in Version History, is lower than the current version, and identifies the immediate prior listed version.
+- A document with multiple Version History entries declares `Supersedes Document Version`; an initial version does not. The declared version uses `vMAJOR.MINOR.PATCH` or `vMAJOR.MINOR.PATCH-rc.N`, exists in Version History, is lower than the current version, and identifies the immediate prior listed version.
 - Controlled cross-document routing records in the AI Engineering Usage Guide contain exactly one expected reference for each governed authority in the approved historical sequence; missing, duplicated, additional, later, or otherwise incorrect authority versions are rejected.
 - Version History status and date consistency when those columns are present.
+- A release-candidate version uses the exact suffix `-rc.N`, remains `Draft for Review`, advances only the RC number within one review cycle, and is not converted to the formal version until explicit authorized-human freeze approval.
 - Exact set equality between versioned authority documents and the root Current Document Set.
 - Exact set equality between versioned authority documents and the AI Active Document Manifest.
 - `authority-registry.yaml` exactly covers governed documents and matches their path, version, Status, and Repository Role metadata.

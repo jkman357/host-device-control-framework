@@ -8,12 +8,13 @@ policy:
 documents:
 - display_name: AI Engineering Usage Guide
   path: docs/framework/AI_Engineering_Usage_Guide.md
-  version: v1.0.38
-  status: Draft for Review
-  repository_role: Proposed normative AI task-routing and repository-governance authority
-  readme_purpose: AI entry point, authority routing, Multi-Node-aware task workflows,
-    evidence states, exact tested-candidate evidence routing, Tester self-validation, and human approval boundary
-  routing_role: AI authority routing and operating controls
+  version: v1.1.0
+  status: Baseline
+  repository_role: Normative AI task-routing and repository-governance authority
+  readme_purpose: AI entry point, authority routing, provider-independent work continuity,
+    Multi-Node-aware task workflows, evidence states, exact tested-candidate evidence routing,
+    Tester self-validation, and human approval boundary
+  routing_role: AI authority routing, operating controls, and provider-independent work continuity
   applies_when: Any AI-assisted engineering task uses this repository or a detached
     authority-set package.
   authority_topics:
@@ -21,6 +22,7 @@ documents:
   - evidence-state reporting
   - prohibited AI behavior
   - human approval boundary
+  - provider-independent AI work continuity and controlled handoff
   prerequisite_documents: []
 - display_name: Coordinator/Node Control Framework
   path: docs/framework/Coordinator_Node_Control_Framework.md
@@ -379,10 +381,9 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Repository Validation Checklist
   path: docs/validation/Repository_Validation_Checklist.md
-  version: v1.0.17
-  status: Draft for Review
-  repository_role: Proposed operational validation method; not a Product or architecture
-    authority
+  version: v1.1.0
+  status: Baseline
+  repository_role: Operational validation method; not a Product or architecture authority
   readme_purpose: Repository structural and non-link path safety, complete CODEOWNERS coverage,
     canonical registry paths, authority synchronization, canonical claim-source, commit-scoped
     legal-baseline external-anchor verification, scoped release-state consistency, third-party

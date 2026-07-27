@@ -13,7 +13,7 @@ TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-from validate_repository import CHECKLIST_PRINCIPLE, validate
+from validate_repository import CHECKLIST_PRINCIPLE, _semver_tuple, validate
 
 
 class RepositoryValidatorTests(unittest.TestCase):
@@ -225,7 +225,7 @@ class RepositoryValidatorTests(unittest.TestCase):
         registry = yaml.safe_load((self.root / "authority-registry.yaml").read_text(encoding="utf-8"))
         by_path = {record["path"]: record for record in registry["documents"]}
         expected = {
-            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.0.38",
+            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.1.0",
             "docs/framework/Coordinator_Node_Control_Framework.md": "v1.1.6",
             "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.9",
             "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.7",
@@ -234,7 +234,7 @@ class RepositoryValidatorTests(unittest.TestCase):
             "docs/coordinator/Coordinator_Testing_Guide.md": "v1.1.1",
             "docs/coordinator/Coordinator_UI_Engineering_Guide.md": "v1.1.1",
             "docs/coding-rules/Embedded_C_Coding_Rules.md": "v1.0.18",
-            "docs/validation/Repository_Validation_Checklist.md": "v1.0.17",
+            "docs/validation/Repository_Validation_Checklist.md": "v1.1.0",
             "docs/validation/Protocol_Validation_Checklist.md": "v1.1.6",
         }
         for path, version in expected.items():
@@ -265,8 +265,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_self_supersession_is_rejected(self) -> None:
         path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
         text = path.read_text(encoding="utf-8").replace(
-            "**Supersedes Document Version:** v1.0.37",
             "**Supersedes Document Version:** v1.0.38",
+            "**Supersedes Document Version:** v1.1.0",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -275,7 +275,7 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_stale_supersedes_version_is_rejected(self) -> None:
         path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
         text = path.read_text(encoding="utf-8").replace(
-            "**Supersedes Document Version:** v1.0.37",
+            "**Supersedes Document Version:** v1.0.38",
             "**Supersedes Document Version:** v1.0.31",
             1,
         )
@@ -296,8 +296,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_current_history_date_and_status_are_enforced(self) -> None:
         path = self.root / "docs/validation/Repository_Validation_Checklist.md"
         text = path.read_text(encoding="utf-8").replace(
-            "| v1.0.17 | 2026-07-26 | Draft for Review |",
-            "| v1.0.17 | 2026-02-30 | Baseline |",
+            "| v1.1.0 | 2026-07-27 | Baseline |",
+            "| v1.1.0 | 2026-02-30 | Draft for Review |",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -346,10 +346,32 @@ class RepositoryValidatorTests(unittest.TestCase):
 
 
 
+    def test_formal_baseline_version_is_accepted(self) -> None:
+        self.assertEqual([], validate(self.root))
+
+    def test_release_candidate_version_is_accepted(self) -> None:
+        self.assertIsNotNone(_semver_tuple("v1.1.0-rc.1"))
+        self.assertLess(_semver_tuple("v1.1.0-rc.1"), _semver_tuple("v1.1.0"))
+
+    def test_release_candidate_requires_positive_number(self) -> None:
+        self.assertIsNone(_semver_tuple("v1.1.0-rc.0"))
+
+    def test_release_candidate_must_remain_draft(self) -> None:
+        path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
+        text = path.read_text(encoding="utf-8")
+        text = text.replace("**Document Version:** v1.1.0", "**Document Version:** v1.1.0-rc.1", 1)
+        text = text.replace("| v1.1.0 | 2026-07-27 | Baseline |", "| v1.1.0-rc.1 | 2026-07-27 | Baseline |", 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("DOC-013", self.rules())
+
+    def test_multi_digit_semantic_version_is_allowed(self) -> None:
+        self.assertIsNotNone(_semver_tuple("v1.12.34"))
+        self.assertIsNotNone(_semver_tuple("v1.12.34-rc.7"))
+
     def test_changelog_current_authority_snapshot_is_enforced(self) -> None:
         path = self.root / "CHANGELOG.md"
         text = path.read_text(encoding="utf-8").replace(
-            "| AI Engineering Usage Guide | v1.0.38 | Draft for Review |",
+            "| AI Engineering Usage Guide | v1.1.0 | Baseline |",
             "| AI Engineering Usage Guide | v1.0.37 | Draft for Review |",
             1,
         )
