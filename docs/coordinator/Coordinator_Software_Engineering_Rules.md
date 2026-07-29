@@ -1,14 +1,14 @@
 # Coordinator Software Engineering Rules
 
 **Canonical Filename:** `Coordinator_Software_Engineering_Rules.md`  
-**Document Version:** v1.1.0  
-**Status:** Draft for Review  
-**Supersedes Document Version:** v1.0.5  
+**Document Version:** v1.1.1  
+**Status:** Baseline  
+**Supersedes Document Version:** v1.1.0  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, test engineers, code generators, and AI-assisted engineering systems  
-**Repository Role:** Proposed normative engineering authority for Coordinator-owned software  
+**Repository Role:** Normative engineering authority for Coordinator-owned software  
 **Related Documents:**
 - `../framework/Coordinator_Node_Control_Framework.md`
 - `Coordinator_Architecture_Patterns.md`
@@ -32,6 +32,7 @@ This document is independently authored. External standards and guidance are ref
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.1 | 2026-07-29 | Baseline | Defined the replaceable Presentation boundary: concrete UI frameworks remain in Presentation integration, Application and Domain policy remain UI-framework-independent, UI capabilities cross stable boundaries through narrow project-owned ports, and UI migration preserves core behavior without promising zero-cost presentation reuse; promoted from v1.1.1-rc.1 after explicit human freeze approval. |
 | v1.1.0 | 2026-07-19 | Draft for Review | Added Coordinator-wide Multi-Node targeting, context isolation, registry/lifecycle, shared-resource, broadcast, multi-target, aggregate-state, Session, and Firmware Update realization requirements while preserving Single-Node implementations. |
 | v1.0.5 | 2026-07-19 | Draft for Review | Added explicit routing and authority boundaries for the five topic-specific Coordinator Guides; clarified that this document owns cross-topic minimum constraints while an explicitly adopted Guide owns detailed realization within its topic; retained Draft for Review status pending human approval. |
 | v1.0.4 | 2026-07-19 | Draft for Review | Added explicit Supersedes metadata required by repository governance; no normative Coordinator engineering requirements changed. |
@@ -278,6 +279,8 @@ Runtime events and data may flow in both directions through declared interfaces,
 
 The Domain layer shall not depend on Protocol wire types, Transport implementations, UI frameworks, or Infrastructure implementations.
 
+Concrete UI-framework assemblies, controls, dispatchers, windows, dialogs, binding types, and visual resources shall be confined to the Presentation layer, Presentation-specific adapters, or the Composition Root. Application, Domain, Protocol Services, and Transport abstractions shall remain usable and testable without starting a UI runtime.
+
 Supporting cross-cutting services may include:
 
 ```text
@@ -319,6 +322,10 @@ The Presentation layer shall not own:
 
 UI event handlers shall remain thin and shall delegate work to an Application service, command, or use-case object.
 
+The selected UI framework shall be treated as a Presentation adapter rather than as the owner of the application. Views, bindings, navigation, concrete commands, visual state, and some presentation objects may require replacement when the UI technology changes. Application workflows, Domain rules, Protocol behavior, Transport contracts, persistence contracts, and their non-UI tests shall not require redesign solely because the Presentation technology changes.
+
+View models, presenters, and equivalent presentation objects may contain framework-specific presentation behavior where justified, but they shall not become the exclusive home of application orchestration, device behavior, Protocol rules, or Product business decisions.
+
 ## 12. Application Layer
 
 The Application layer owns use-case orchestration, including:
@@ -335,6 +342,8 @@ The Application layer owns use-case orchestration, including:
 - Mapping domain results to presentation-ready outcomes.
 
 The Application layer shall coordinate components but shall not contain wire-format parsing or direct operating-system API calls unless the project explicitly assigns those responsibilities.
+
+When an Application use case genuinely requires a user-interaction capability such as file selection, notification, navigation, clipboard access, or UI-thread dispatch, it shall depend on a narrow project-owned port defined by the consuming stable layer. The concrete WPF, WinUI, Avalonia, Qt, web, mobile, or other UI implementation shall remain outside that layer. Such ports shall describe required behavior rather than mirror a framework API.
 
 ## 13. Domain Layer
 
@@ -1232,6 +1241,10 @@ Dependency updates shall be reviewed for:
 ## 63. Framework Isolation
 
 UI, logging, serialization, database, and transport frameworks should be isolated behind project-owned boundaries where framework replacement or long-term maintenance risk is significant.
+
+For Coordinator applications with a UI, concrete UI-framework references shall not leak into Application, Domain, Protocol, or Transport contracts. Framework-specific services shall be supplied at the Composition Root through project-owned interfaces when a stable layer genuinely needs the capability.
+
+The isolation goal is to preserve stable behavior and tests, not to require every View, ViewModel, presenter, or visual control to be portable across frameworks. Abstractions that add no current test, ownership, or credible migration value should not be introduced solely to claim theoretical portability.
 
 Domain rules shall not be expressed only through framework-specific attributes or callbacks when doing so prevents independent testing or reuse.
 

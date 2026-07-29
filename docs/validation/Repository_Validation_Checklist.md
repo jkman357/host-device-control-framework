@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.1.1
+**Document Version:** v1.1.2
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.0
+**Supersedes Document Version:** v1.1.1
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,7 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.2 | 2026-07-29 | Baseline | Synchronized formal authority promotion, repository baseline v1.1.2 release-state markers, active authority snapshots, and regression expectations after explicit human freeze approval; no Product or architecture requirement changed. |
 | v1.1.1 | 2026-07-27 | Baseline | Added repository-controlled `.gitattributes`, canonical LF checkout enforcement, required binary declarations, complete CODEOWNERS coverage, and regression tests for missing or weakened line-ending policy; promoted after explicit human freeze approval. |
 | v1.1.0 | 2026-07-27 | Baseline | Added release-candidate document-version support, retained multi-digit semantic-version components, required RC status to remain Draft for Review, and defined explicit human freeze approval as the boundary for removing the RC suffix; promoted from v1.1.0-rc.1 after explicit human freeze approval. |
 | v1.0.17 | 2026-07-26 | Draft for Review | Extended CODEOWNERS coverage to all governed authorities, schemas, workflows, validators, tests, fixtures, and governance manifests; made signed-tag verification commit-scoped and required protected legal-document digests to match the target commit; added external-anchor verifier regression tests. |

@@ -8,7 +8,7 @@ policy:
 documents:
 - display_name: AI Engineering Usage Guide
   path: docs/framework/AI_Engineering_Usage_Guide.md
-  version: v1.1.1
+  version: v1.1.2
   status: Baseline
   repository_role: Normative AI task-routing and repository-governance authority
   readme_purpose: AI entry point, authority routing, provider-independent work continuity,
@@ -184,18 +184,17 @@ documents:
   - docs/protocol/Protocol_Registry_Governance.md
 - display_name: Coordinator Software Engineering Rules
   path: docs/coordinator/Coordinator_Software_Engineering_Rules.md
-  version: v1.1.0
-  status: Draft for Review
-  repository_role: Proposed normative engineering authority for Coordinator-owned
-    software
-  readme_purpose: Cross-language Coordinator architecture, per-Node ownership and
-    isolation, lifecycle, concurrency, diagnostics, configuration, security, testing,
-    and release rules
+  version: v1.1.1
+  status: Baseline
+  repository_role: Normative engineering authority for Coordinator-owned software
+  readme_purpose: Cross-language Coordinator architecture, replaceable Presentation
+    boundaries, per-Node ownership and isolation, lifecycle, concurrency, diagnostics,
+    configuration, security, testing, and release rules
   routing_role: Cross-language Coordinator architecture and engineering rules
-  applies_when: Software performs or directly supports a Coordinator role and the
-    Draft is explicitly adopted or approved for Project use.
+  applies_when: Software performs or directly supports a Coordinator role.
   authority_topics:
   - Coordinator software architecture
+  - replaceable Presentation and UI-framework dependency boundaries
   - lifecycle and concurrency
   - diagnostics and configuration
   - Coordinator testing and release evidence
@@ -205,21 +204,21 @@ documents:
   - docs/framework/Coordinator_Node_Control_Framework.md
 - display_name: Coordinator Architecture Patterns
   path: docs/coordinator/Coordinator_Architecture_Patterns.md
-  version: v1.1.0
-  status: Draft for Review
-  repository_role: Proposed topic-specific normative engineering authority for Coordinator
-    architecture patterns, subordinate to Coordinator Software Engineering Rules
-  readme_purpose: Coordinator layering, Node Registry and Context, immutable target
-    binding, per-Node state and resources, shared-bus scheduling, aggregate state,
-    and multi-target patterns
+  version: v1.1.1
+  status: Baseline
+  repository_role: Topic-specific normative engineering authority for Coordinator architecture
+    patterns, subordinate to Coordinator Software Engineering Rules
+  readme_purpose: Coordinator layering, replaceable Presentation adapters, Node Registry
+    and Context, immutable target binding, per-Node state and resources, shared-bus
+    scheduling, aggregate state, and multi-target patterns
   routing_role: Detailed Coordinator Multi-Node architecture and structural-realization
     rules
   applies_when: Coordinator structure, layering, dependency direction, state ownership,
     command or receive pipelines, lifecycle realization, or multi-Node isolation is
-    designed or reviewed and this Draft is explicitly adopted or approved for Project
-    use.
+    designed or reviewed.
   authority_topics:
   - Coordinator layering and dependency direction
+  - replaceable Presentation adapter and UI migration boundaries
   - Coordinator state ownership
   - Coordinator command and receive pipelines
   - Coordinator lifecycle and multi-Node isolation
@@ -300,19 +299,20 @@ documents:
   - docs/coordinator/Coordinator_Software_Engineering_Rules.md
 - display_name: Coordinator UI Engineering Guide
   path: docs/coordinator/Coordinator_UI_Engineering_Guide.md
-  version: v1.1.1
-  status: Draft for Review
-  repository_role: Proposed topic-specific normative engineering authority for Coordinator
-    UI implementation, subordinate to Coordinator Software Engineering Rules
-  readme_purpose: Node selection and immutable operation binding, aggregate and per-Node
-    views, partial results, stale state, responsiveness, visualization, and input
-    safety
-  routing_role: Detailed Multi-Node Coordinator UI and operation-binding rules
+  version: v1.1.2
+  status: Baseline
+  repository_role: Topic-specific normative engineering authority for Coordinator UI
+    implementation, subordinate to Coordinator Software Engineering Rules
+  readme_purpose: Replaceable UI-framework boundaries, Node selection and immutable
+    operation binding, aggregate and per-Node views, partial results, stale state,
+    responsiveness, visualization, and input safety
+  routing_role: Detailed replaceable Presentation, Multi-Node UI, and operation-binding rules
   applies_when: A Coordinator UI presents Node state, issues commands, handles external
     content, visualizes data, or implements operational, service, production, or laboratory
-    workflows and this Draft is explicitly adopted or approved for Project use.
+    workflows.
   authority_topics:
   - Coordinator presentation-state realization
+  - UI-framework isolation and replacement boundaries
   - Coordinator command feedback and stale-data display
   - Coordinator high-rate visualization and responsiveness
   - Coordinator UI input and external-content safety
@@ -364,24 +364,23 @@ documents:
   - docs/framework/Coordinator_Node_Control_Framework.md
 - display_name: C# Coding Rules
   path: docs/coding-rules/CSharp_Coding_Rules.md
-  version: v1.0.4
-  status: Draft for Review
-  repository_role: Proposed normative language and implementation authority for Product-owned
-    C# code
-  readme_purpose: Product-owned C# language and .NET implementation rules
-  routing_role: Product-owned C# language and .NET implementation rules
-  applies_when: Product-owned C# code is generated, modified, reviewed, or validated
-    and the Draft is explicitly adopted or approved for Project use.
+  version: v1.0.5
+  status: Baseline
+  repository_role: Normative language and implementation authority for Product-owned C# code
+  readme_purpose: Product-owned C# language, .NET implementation, and UI-framework dependency-boundary rules
+  routing_role: Product-owned C# language, .NET implementation, and UI-framework boundary rules
+  applies_when: Product-owned C# code is generated, modified, reviewed, or validated.
   authority_topics:
   - C# language rules
   - .NET resource and concurrency behavior
+  - C# UI-framework dependency and presentation-integration boundaries
   - untrusted input and deserialization safety
   - C# review evidence
   prerequisite_documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Repository Validation Checklist
   path: docs/validation/Repository_Validation_Checklist.md
-  version: v1.1.1
+  version: v1.1.2
   status: Baseline
   repository_role: Operational validation method; not a Product or architecture authority
   readme_purpose: Repository structural and non-link path safety, canonical LF checkout policy,

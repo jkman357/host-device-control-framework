@@ -125,9 +125,9 @@ AI_ROUTING_HISTORY_EXPECTATIONS = {
 }
 
 RELEASE_STATE_REQUIRED_MARKERS = (
-    "The repository content has received explicit human freeze approval for the `v1.1.1` Baseline.",
+    "The repository content has received explicit human freeze approval for the `v1.1.2` Baseline.",
     "Repository text and detached ZIP packages do not independently establish immutable Git release identity.",
-    "Immutable release identity exists only after the final commit is identified by the `v1.1.1` tag or controlled GitHub Release.",
+    "Immutable release identity exists only after the final commit is identified by the `v1.1.2` tag or controlled GitHub Release.",
 )
 RELEASE_STATE_PROHIBITED_PATTERNS = (
     r"\brepository content is frozen as\b",

@@ -3,14 +3,14 @@
 > UI Architecture, State Presentation, Responsiveness, and Control Feedback
 
 **Canonical Filename:** `Coordinator_UI_Engineering_Guide.md`  
-**Document Version:** v1.1.1  
-**Status:** Draft for Review  
+**Document Version:** v1.1.2  
+**Status:** Baseline  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, UI engineers, reviewers, test engineers, code generators, and AI-assisted engineering systems  
-**Repository Role:** Proposed topic-specific normative engineering authority for Coordinator UI implementation, subordinate to Coordinator Software Engineering Rules  
-**Supersedes Document Version:** v1.1.0
+**Repository Role:** Topic-specific normative engineering authority for Coordinator UI implementation, subordinate to Coordinator Software Engineering Rules  
+**Supersedes Document Version:** v1.1.1
 
 ---
 
@@ -39,6 +39,7 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.2 | 2026-07-29 | Baseline | Defined UI-framework isolation and replacement boundaries, including permissible presentation-specific code, prohibited framework leakage into stable layers, project-owned UI service ports, migration expectations, anti-patterns, and review checks; promoted from v1.1.2-rc.1 after explicit human freeze approval. |
 | v1.1.1 | 2026-07-26 | Draft for Review | Normalized Version History to strict descending semantic-version order to match repository validation governance; no Coordinator UI requirements changed. |
 | v1.1.0 | 2026-07-19 | Draft for Review | Expanded Multi-Node UI rules for selected versus operation-bound Nodes, aggregate and per-Node views, identity conflict, offline/reconnecting state, multi-target confirmation, per-Node progress, partial results, and alarm attribution. |
 | v1.0.1 | 2026-07-19 | Draft for Review | Hardened archive and package import against symbolic links, hard links, Windows reparse points, special filesystem entries, destination-link traversal, canonical-path escape, unintended overwrite, and time-of-check/time-of-use replacement. |
@@ -62,9 +63,9 @@ The Guide focuses on implementation boundaries, state truthfulness, responsivene
 
 ## 0.2 Authority Boundary
 
-This document is a `Draft for Review`. Its requirements are proposed and do not apply to a Project until a human authority explicitly adopts or approves this document for that Project.
+This document is a `Baseline`. Its requirements are the approved reusable Coordinator UI implementation authority within the stated scope. A Project may define more specific Product UI requirements or an approved documented deviation without silently weakening the governing cross-topic rules.
 
-`Coordinator_Software_Engineering_Rules.md` remains the cross-topic Coordinator software authority. This Guide owns only the detailed Coordinator UI implementation and presentation-state realization rules within its stated scope after adoption. It shall not weaken or silently override the cross-topic rules. Repeated Framework, Protocol, safety, security-boundary, or Product rules are `Derived conformance summary` unless a section explicitly identifies a Coordinator-specific realization owned here.
+`Coordinator_Software_Engineering_Rules.md` remains the cross-topic Coordinator software authority. This Guide owns only the detailed Coordinator UI implementation and presentation-state realization rules within its stated scope. It shall not weaken or silently override the cross-topic rules. Repeated Framework, Protocol, safety, security-boundary, or Product rules are `Derived conformance summary` unless a section explicitly identifies a Coordinator-specific realization owned here.
 
 This Guide does not define:
 
@@ -90,6 +91,7 @@ Approved Product requirements, the Coordinator SDD, the Project Protocol, applic
 10. Errors should be actionable and correlated with diagnostic evidence.
 11. UI behavior should be testable without physical hardware where practical.
 12. Product-specific usability decisions require human review and appropriate evidence.
+13. The UI framework shall be treated as a Presentation adapter; stable application and domain behavior shall not depend on a concrete UI runtime.
 
 ---
 
@@ -121,6 +123,14 @@ The UI layer shall not:
 - decide Product safety behavior not defined by an authority.
 
 View models, presenters, controllers, or equivalent presentation objects should expose UI-ready state and commands without depending on concrete controls.
+
+Concrete WPF, WinUI, Avalonia, Qt, browser, mobile, or other UI-framework references shall remain within Presentation integration, platform adapters, or the Composition Root. Application, Domain, Protocol, Transport, and persistence contracts shall not expose framework windows, controls, dispatchers, dialogs, brushes, visibility values, visual resources, or equivalent presentation types.
+
+Presentation objects may use framework-specific binding, command, navigation, lifecycle, or rendering mechanisms where that provides a simpler and more maintainable implementation. Portability of every ViewModel, presenter, or controller is not mandatory. Application workflows, Product rules, Protocol behavior, device-state ownership, and retry or timeout policy shall not be moved into presentation objects merely to simplify binding.
+
+When a stable layer genuinely needs a user-interaction capability, it should depend on a narrow project-owned port such as user notification, file selection, navigation request, clipboard access, or UI dispatch. The concrete UI implementation shall be supplied at the Composition Root and shall translate framework behavior into project-owned outcomes.
+
+Replacing the UI framework may require rewriting Views, layout markup, bindings, navigation, dialogs, chart controls, accessibility integration, UI-thread dispatch, and framework-specific presentation logic. The architecture goal is to preserve verified Application, Domain, Protocol, Transport, data-processing, persistence, and non-UI test behavior; it is not a claim that UI migration is automatic or cost-free.
 
 ---
 
@@ -592,6 +602,10 @@ Reject or explicitly justify:
 18. Trusting imported content based only on filename, extension, or user selection.
 19. Rendering NaN, infinity, overflow, invalid timestamps, or uncontrolled text as normal Product values.
 20. Shipping engineering-only controls without explicit authorization and production-use governance.
+21. Application, Domain, Protocol, or Transport code referencing a concrete UI-framework assembly or visual type.
+22. Product, device, Protocol, retry, timeout, or state-transition logic placed in code-behind or presentation objects.
+23. Application-facing interfaces that mirror a UI framework API instead of describing the required project behavior.
+24. Excessive abstraction introduced only to claim theoretical View or ViewModel portability without testability, ownership, or credible migration value.
 
 ---
 
@@ -599,6 +613,10 @@ Reject or explicitly justify:
 
 - [ ] Approved Product UI/UX, usability, alarm, risk, and platform authorities are identified.
 - [ ] UI, application, Protocol, and Transport responsibilities are separated.
+- [ ] Concrete UI-framework references are confined to Presentation integration, platform adapters, or the Composition Root.
+- [ ] Application and Domain behavior can execute and be tested without starting a UI runtime.
+- [ ] UI-service ports expose project behavior rather than concrete windows, controls, dispatchers, dialogs, or visual types.
+- [ ] UI migration expectations identify presentation code to replace and stable behavior intended for reuse.
 - [ ] Presentation state distinguishes observed, requested, pending, confirmed, rejected, stale, unknown, and disconnected states.
 - [ ] Command success is not inferred from Transport write completion.
 - [ ] Controls are gated by connection, synchronization, capability, and operation state, while authorization is independently enforced by the Application layer and Node.

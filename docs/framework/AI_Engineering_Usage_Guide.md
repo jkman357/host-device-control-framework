@@ -3,7 +3,7 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`
 **Document ID:** AIEUG
-**Document Version:** v1.1.1
+**Document Version:** v1.1.2
 **Status:** Baseline
 **Document Type:** AI Usage and Authority Routing Guide
 **Primary Narrative Language:** English
@@ -11,7 +11,7 @@
 **Maintainer:** Ray Yang
 **Repository:** `host-device-control-framework`
 **Repository Role:** Normative AI task-routing and repository-governance authority
-**Supersedes Document Version:** v1.1.0
+**Supersedes Document Version:** v1.1.1
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -28,7 +28,7 @@
 - `Repository_Validation_Checklist.md`
 
 **First Issued:** 2026-07-18
-**Last Revised:** 2026-07-27
+**Last Revised:** 2026-07-29
 Copyright © 2026 Ray Yang. All rights reserved.
 
 This document is maintained as part of a personal engineering project. It is not an official
@@ -100,6 +100,7 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.2 | 2026-07-29 | Baseline | Promoted Coordinator Software Engineering Rules v1.1.1, Coordinator Architecture Patterns v1.1.1, Coordinator UI Engineering Guide v1.1.2, and C# Coding Rules v1.0.5 to formal Baseline status after explicit human freeze approval; synchronized active routing and Repository Validation Checklist v1.1.2 for repository baseline v1.1.2. |
 | v1.1.1 | 2026-07-27 | Baseline | Updated active routing for Repository Validation Checklist v1.1.1 after adding canonical LF checkout and `.gitattributes` governance; no Product, Framework, Protocol, role, or implementation requirement changed. |
 | v1.1.0 | 2026-07-27 | Baseline | Added provider-independent AI work continuity, interruption recovery, controlled handoff-package content, restart boundaries, cross-AI validation requirements, and the controlled release-candidate workflow; promoted from v1.1.0-rc.1 after explicit human freeze approval. |
 | v1.0.38 | 2026-07-26 | Draft for Review | Routed complete CODEOWNERS trust-boundary coverage and commit-scoped legal-anchor verification through Repository Validation Checklist v1.0.17; no Product, Framework, Protocol, or implementation requirement was changed. |
@@ -151,7 +152,7 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.1.1` | Baseline | AI authority routing, operating controls, and provider-independent work continuity |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.1.2` | Baseline | AI authority routing, operating controls, and provider-independent work continuity |
 | Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.6` | Baseline | Generalized Single-Node and Multi-Node architecture and governance |
 | Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.1.9` | Baseline | Application, topology, resource, and acceptance analysis method |
 | Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.1.7` | Baseline | Protocol YAML representation and Multi-Node semantic-validation rules |
@@ -159,16 +160,16 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 | Protocol Compatibility Rules | `docs/protocol/Protocol_Compatibility_Rules.md` | `v1.1.0` | Draft for Review | Protocol compatibility, Multi-Node migration, and mixed-version rules |
 | Protocol Registry Governance | `docs/protocol/Protocol_Registry_Governance.md` | `v1.1.0` | Draft for Review | Protocol identifiers and Node identity/address/route governance |
 | Protocol Security Profile | `docs/protocol/Protocol_Security_Profile.md` | `v1.1.0` | Draft for Review | Protocol security-profile and per-Node Session-isolation rules |
-| Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.1.0` | Draft for Review | Cross-language Coordinator architecture and engineering rules |
-| Coordinator Architecture Patterns | `docs/coordinator/Coordinator_Architecture_Patterns.md` | `v1.1.0` | Draft for Review | Detailed Coordinator Multi-Node architecture and structural-realization rules |
+| Coordinator Software Engineering Rules | `docs/coordinator/Coordinator_Software_Engineering_Rules.md` | `v1.1.1` | Baseline | Cross-language Coordinator architecture and engineering rules |
+| Coordinator Architecture Patterns | `docs/coordinator/Coordinator_Architecture_Patterns.md` | `v1.1.1` | Baseline | Detailed Coordinator Multi-Node architecture and structural-realization rules |
 | Coordinator Concurrency Guide | `docs/coordinator/Coordinator_Concurrency_Guide.md` | `v1.1.0` | Draft for Review | Detailed per-Node concurrency, fairness, backpressure, and shutdown rules |
 | Coordinator Logging Guide | `docs/coordinator/Coordinator_Logging_Guide.md` | `v1.1.1` | Draft for Review | Detailed per-Node logging, redaction, delivery, retention, and export rules |
 | Coordinator Testing Guide | `docs/coordinator/Coordinator_Testing_Guide.md` | `v1.1.1` | Draft for Review | Detailed Coordinator Multi-Node engineering-test and evidence rules |
-| Coordinator UI Engineering Guide | `docs/coordinator/Coordinator_UI_Engineering_Guide.md` | `v1.1.1` | Draft for Review | Detailed Multi-Node Coordinator UI and operation-binding rules |
+| Coordinator UI Engineering Guide | `docs/coordinator/Coordinator_UI_Engineering_Guide.md` | `v1.1.2` | Baseline | Detailed replaceable Presentation, Multi-Node UI, and operation-binding rules |
 | Node Software Engineering Rules | `docs/node/Node_Software_Engineering_Rules.md` | `v1.1.0` | Draft for Review | Cross-language Node identity, targeting, lifecycle, and engineering rules |
 | Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.18` | Final Baseline | Product-owned Embedded C implementation rules |
-| C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.4` | Draft for Review | Product-owned C# language and .NET implementation rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.1.1` | Baseline | Repository path safety, canonical LF checkout policy, complete CODEOWNERS coverage, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, release-state, third-party byte/evidence, and evidence checks |
+| C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.5` | Baseline | Product-owned C# language, .NET implementation, and UI-framework boundary rules |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.1.2` | Baseline | Repository path safety, canonical LF checkout policy, complete CODEOWNERS coverage, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, release-state, third-party byte/evidence, and evidence checks |
 | Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.1.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
 | Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.1.6` | Draft for Review | Protocol and Multi-Node validation evidence-capture checklist |
 | Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.1.5` | Draft for Review | Framework and Multi-Node conformance, claim lifecycle, deviation, and restoration evidence-capture checklist |
@@ -1313,8 +1314,8 @@ subordinate to the owning authority and shall not be used to create a competing 
 53. AI shall not infer security strength from numeric Profile-ID ordering.
 54. AI shall reject Firmware Update resume that is authorized only by Transaction ID, offset, or possession of stale Session state.
 55. AI shall reject a Transport Profile whose minimum MTU leaves no positive Fragment payload.
-56. When explicitly approved or adopted for Project use, Coordinator Software Engineering Rules govern cross-language Coordinator-owned software architecture and engineering behavior.
-57. When explicitly approved or adopted for Project use, C# Coding Rules govern Product-owned C# language and .NET implementation.
+56. Coordinator Software Engineering Rules govern cross-language Coordinator-owned software architecture and engineering behavior when the Coordinator role applies.
+57. C# Coding Rules govern Product-owned C# language and .NET implementation when C# code is generated, modified, reviewed, or validated.
 58. Coordinator C# tasks apply both the Coordinator role authority and the C# language authority; neither substitutes for the other.
 59. Authority ownership is resolved by topic before precedence; a higher-ranked document does not acquire authority over an unrelated topic.
 60. Repository validation combines automated structural checks with human semantic review; a passing script is not approval.

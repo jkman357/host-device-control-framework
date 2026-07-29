@@ -10,7 +10,7 @@ Individual authority documents retain their own internal Version History and app
 
 | Document | Version | Status |
 |---|---:|---|
-| AI Engineering Usage Guide | v1.1.1 | Baseline |
+| AI Engineering Usage Guide | v1.1.2 | Baseline |
 | Coordinator/Node Control Framework | v1.1.6 | Baseline |
 | Framework Application Analysis Template | v1.1.9 | Baseline |
 | Protocol YAML Definition Guide | v1.1.7 | Baseline |
@@ -18,16 +18,16 @@ Individual authority documents retain their own internal Version History and app
 | Protocol Compatibility Rules | v1.1.0 | Draft for Review |
 | Protocol Registry Governance | v1.1.0 | Draft for Review |
 | Protocol Security Profile | v1.1.0 | Draft for Review |
-| Coordinator Software Engineering Rules | v1.1.0 | Draft for Review |
-| Coordinator Architecture Patterns | v1.1.0 | Draft for Review |
+| Coordinator Software Engineering Rules | v1.1.1 | Baseline |
+| Coordinator Architecture Patterns | v1.1.1 | Baseline |
 | Coordinator Concurrency Guide | v1.1.0 | Draft for Review |
 | Coordinator Logging Guide | v1.1.1 | Draft for Review |
 | Coordinator Testing Guide | v1.1.1 | Draft for Review |
-| Coordinator UI Engineering Guide | v1.1.1 | Draft for Review |
+| Coordinator UI Engineering Guide | v1.1.2 | Baseline |
 | Node Software Engineering Rules | v1.1.0 | Draft for Review |
 | Embedded C Coding Rules | v1.0.18 | Final Baseline |
-| C# Coding Rules | v1.0.4 | Draft for Review |
-| Repository Validation Checklist | v1.1.1 | Baseline |
+| C# Coding Rules | v1.0.5 | Baseline |
+| Repository Validation Checklist | v1.1.2 | Baseline |
 | Validation Evidence Guide | v1.1.0 | Draft for Review |
 | Protocol Validation Checklist | v1.1.6 | Draft for Review |
 | Framework Conformance Checklist | v1.1.5 | Draft for Review |
@@ -36,6 +36,8 @@ Individual authority documents retain their own internal Version History and app
 
 ### Current Review Changes
 
+- Promoted Coordinator Software Engineering Rules v1.1.1, Coordinator Architecture Patterns v1.1.1, Coordinator UI Engineering Guide v1.1.2, and C# Coding Rules v1.0.5 to formal Baseline status after explicit human freeze approval; finalized replaceable Presentation and UI-framework isolation rules, reusable core boundaries, pragmatic framework-specific presentation code, project-owned UI service ports, migration scope, anti-patterns, and review checks.
+- Updated AI Engineering Usage Guide and Repository Validation Checklist to v1.1.2 Baseline, synchronized authority routing and regression expectations, and recorded explicit human freeze approval for repository baseline v1.1.2; immutable Git identity remains pending the final tag or controlled GitHub Release.
 - Added `.gitattributes` to enforce canonical LF text checkouts across Windows, Linux, and macOS and to protect common binary artifacts from line-ending normalization.
 - Extended repository validation, CODEOWNERS coverage, and regression tests to reject missing or weakened `.gitattributes` policy.
 - Updated AI Engineering Usage Guide and Repository Validation Checklist to `v1.1.1` Baseline and recorded explicit human freeze approval for repository baseline `v1.1.1`; immutable Git identity remains pending the final tag or controlled GitHub Release.

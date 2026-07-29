@@ -3,14 +3,14 @@
 > Reusable Structural Patterns for Coordinator-Side Applications
 
 **Canonical Filename:** `Coordinator_Architecture_Patterns.md`  
-**Document Version:** v1.1.0  
-**Supersedes Document Version:** v1.0.0  
-**Status:** Draft for Review  
+**Document Version:** v1.1.1  
+**Supersedes Document Version:** v1.1.0  
+**Status:** Baseline  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-19  
 **Language:** English  
 **Intended Audience:** Human engineers, software architects, reviewers, test engineers, code generators, and AI-assisted engineering systems  
-**Repository Role:** Proposed topic-specific normative engineering authority for Coordinator architecture patterns, subordinate to Coordinator Software Engineering Rules
+**Repository Role:** Topic-specific normative engineering authority for Coordinator architecture patterns, subordinate to Coordinator Software Engineering Rules
 
 ---
 
@@ -39,6 +39,7 @@ This document is maintained as part of a personal engineering project. It is not
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.1 | 2026-07-29 | Baseline | Added the Replaceable Presentation Adapter pattern, explicit UI-framework dependency boundaries, migration scope, project structure guidance, anti-patterns, and review criteria while preserving pragmatic framework-specific presentation code; promoted from v1.1.1-rc.1 after explicit human freeze approval. |
 | v1.1.0 | 2026-07-19 | Draft for Review | Expanded the Multi-Node isolation pattern into Node Registry, Node Context, immutable target/route binding, per-Node request/state/resource, shared-bus scheduling, aggregate-state, replacement, and multi-target operation patterns. |
 | v1.0.0 | 2026-07-19 | Draft for Review | Initial Draft defining Coordinator layers, dependency direction, state ownership, command and receive pipelines, lifecycle handling, multi-Node isolation, security-session ownership, extension boundaries, configuration, error propagation, pattern selection, anti-patterns, and review criteria. |
 
@@ -72,9 +73,9 @@ The keywords in this Guide are used as follows:
 
 ## 0.2 Authority Boundary
 
-This document is a `Draft for Review`. Its requirements are proposed and do not apply to a Project until a human authority explicitly adopts or approves this document for that Project.
+This document is a `Baseline`. Its requirements are the approved reusable architecture-pattern authority within the stated scope. A Project may define more specific requirements or an approved documented deviation without silently weakening the governing cross-topic rules.
 
-`Coordinator_Software_Engineering_Rules.md` remains the cross-topic Coordinator software authority. This Guide owns only the detailed Coordinator architecture-pattern and structural-realization rules within its stated scope after adoption. It shall not weaken or silently override the cross-topic rules. Repeated Framework, Protocol, safety, security-boundary, or Product rules are `Derived conformance summary` unless a section explicitly identifies a Coordinator-specific realization owned here.
+`Coordinator_Software_Engineering_Rules.md` remains the cross-topic Coordinator software authority. This Guide owns only the detailed Coordinator architecture-pattern and structural-realization rules within its stated scope. It shall not weaken or silently override the cross-topic rules. Repeated Framework, Protocol, safety, security-boundary, or Product rules are `Derived conformance summary` unless a section explicitly identifies a Coordinator-specific realization owned here.
 
 This Guide does not define:
 
@@ -103,6 +104,7 @@ A Coordinator architecture shall preserve the following principles:
 10. Infrastructure concerns such as Transport, file storage, clock access, logging, and operating-system integration should be replaceable behind interfaces.
 11. The architecture should allow unit and component testing without the physical Node for logic that does not require real hardware evidence.
 12. The Coordinator shall not assume that its local model is authoritative after a reconnect until state reconciliation completes.
+13. The selected UI framework shall be a replaceable Presentation adapter; Application and Domain behavior shall remain independently executable and testable.
 
 ---
 
@@ -120,7 +122,7 @@ Responsibilities:
 - marshal UI updates onto the UI thread;
 - avoid direct Protocol, Transport, file, and device-control logic.
 
-The Presentation Layer should depend on application-facing view models or presentation interfaces, not on a concrete Transport.
+The Presentation Layer should depend on application-facing view models or presentation interfaces, not on a concrete Transport. Concrete controls, binding primitives, navigation mechanisms, dispatcher access, visual resources, and framework-specific presentation objects may remain inside this layer. Their presence shall not require Application, Domain, Protocol, or Transport layers to reference the UI framework.
 
 ## 2.2 Application or Use-Case Layer
 
@@ -474,6 +476,55 @@ Interfaces should describe needed behavior, not mirror every method of a third-p
 
 Adapters shall translate third-party exceptions, callbacks, and status codes into application-owned result types without leaking unnecessary library-specific concepts upward.
 
+## 8.1 Replaceable Presentation Adapter Pattern
+
+A Coordinator UI should be structured so the selected UI technology is an outer adapter around stable application behavior.
+
+```text
+WPF / WinUI / Avalonia / Web / Other Presentation
+                    ↓
+           Application Use Cases
+                    ↓
+             Domain and Policy
+                    ↑
+     Protocol, Transport, and Infrastructure Adapters
+```
+
+The diagram describes source dependency policy, not runtime event direction.
+
+A practical project structure may be:
+
+```text
+Product.Presentation.Wpf/
+Product.Application/
+Product.Domain/
+Product.Protocol/
+Product.Transport/
+Product.Infrastructure/
+```
+
+When the UI framework changes, the Project should expect to replace or adapt:
+
+- Views and layout markup;
+- binding and command integration;
+- navigation, dialogs, clipboard, and window lifecycle;
+- charting, virtualization, accessibility, and visual resources;
+- UI-thread dispatch and platform-specific interaction;
+- framework-specific portions of ViewModels, presenters, or controllers.
+
+The Project should preserve, subject to verified compatibility:
+
+- Application use cases and workflow policy;
+- Domain rules, state transitions, and validation;
+- Protocol encoding, decoding, correlation, timeout, and compatibility behavior;
+- Transport contracts and non-UI adapters;
+- persistence, logging, and data-processing contracts;
+- unit and component tests that do not require a UI runtime.
+
+Presentation services needed by a stable layer should be represented by narrow ports such as user notification, file selection, navigation request, or UI dispatch. The interface shall be owned by the consuming layer and shall describe required behavior rather than expose `Window`, `Control`, `Dispatcher`, dialog, brush, or other framework types.
+
+This pattern reduces migration blast radius; it does not make UI replacement free. A Project shall not add excessive abstractions merely to make every View or ViewModel theoretically portable when there is no current testability, ownership, or credible migration benefit.
+
 ---
 
 # 9. Feature and Module Boundaries
@@ -560,6 +611,7 @@ Exceptions may be used for unexpected failures according to the language standar
 | Reconnect may deliver stale callbacks | Connection-generation token and cancellation scope |
 | Several independent features share one link | Communication orchestration with explicit dispatch and ownership |
 | Long operation such as update or export | Explicit operation state machine with progress, cancellation, and recovery |
+| UI technology may change while core behavior must remain stable | Replaceable Presentation adapter with UI-framework-free Application and Domain contracts |
 
 ---
 
@@ -579,6 +631,10 @@ The following patterns shall be rejected or explicitly justified:
 10. A generic utility or manager class accumulating unrelated responsibilities.
 11. Hidden retries that can repeat a non-idempotent operation.
 12. Startup order depending on uncontrolled static initialization side effects.
+13. Application or Domain projects referencing WPF, WinUI, Avalonia, Qt, browser, mobile, or other concrete UI-framework types.
+14. Business, Protocol, retry, or device-state logic placed in code-behind or a ViewModel solely because the UI triggered it.
+15. Application services accepting `Window`, `Control`, dispatcher, brush, visibility, dialog, or equivalent visual-framework types.
+16. Abstraction layers that only rename framework APIs and provide no ownership, testability, or credible replacement boundary.
 
 ---
 
@@ -589,6 +645,9 @@ Before approving a Coordinator architecture, verify:
 - [ ] Applicable Product, Protocol, security, UI, and platform authorities are identified.
 - [ ] Layer responsibilities and dependency direction are documented.
 - [ ] UI code does not own Protocol or Transport behavior.
+- [ ] The UI framework is confined to Presentation integration and the Composition Root; Application and Domain behavior can execute and be tested without a UI runtime.
+- [ ] UI-service ports describe project behavior without exposing concrete controls, windows, dispatchers, dialogs, or visual types.
+- [ ] Expected UI migration scope distinguishes reusable core behavior from presentation code that will be rewritten or adapted.
 - [ ] Mutable state, including Coordinator-side Secure Session state, has clear ownership and update paths.
 - [ ] Observed, requested, pending, stale, and presented state are distinguishable.
 - [ ] Command completion, rejection, timeout, cancellation, and uncertain outcome are defined.

@@ -1,14 +1,14 @@
 # C# Coding Rules
 
 **Canonical Filename:** `CSharp_Coding_Rules.md`  
-**Document Version:** v1.0.4  
-**Status:** Draft for Review  
-**Supersedes Document Version:** v1.0.3  
+**Document Version:** v1.0.5  
+**Status:** Baseline  
+**Supersedes Document Version:** v1.0.4  
 **Document Owner:** Ray Yang  
 **Initial Release Date:** 2026-07-18  
 **Language:** English  
 **Intended Audience:** Human engineers, reviewers, test engineers, code generators, and AI-assisted engineering systems  
-**Repository Role:** Proposed normative language and implementation authority for Product-owned C# code  
+**Repository Role:** Normative language and implementation authority for Product-owned C# code  
 
 ---
 
@@ -24,6 +24,7 @@ This document is independently authored. Microsoft and other external guidance i
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.0.5 | 2026-07-29 | Baseline | Added enforceable C# UI-framework dependency boundaries, prohibited concrete WPF or other visual types in stable layers, defined narrow project-owned UI service ports, clarified pragmatic ViewModel portability, and expanded structure and review checks; promoted from v1.0.5-rc.1 after explicit human freeze approval. |
 | v1.0.4 | 2026-07-19 | Draft for Review | Added explicit Supersedes metadata required by repository governance; no normative C# implementation requirements changed. |
 | v1.0.3 | 2026-07-18 | Draft for Review | Resolved authority ownership by topic before precedence; added explicit untrusted JSON, XML, and polymorphic deserialization controls, resource bounds, inert DTO mapping, and negative tests; and retained conditional Coordinator applicability and Draft status. |
 | v1.0.2 | 2026-07-18 | Draft for Review | Made Coordinator software engineering authority conditional in the AI required-context rules, scoped the recommended Coordinator project structure to Coordinator-role implementations, clarified the document as proposed normative authority while still under review, and normalized document-version formatting. |
@@ -51,7 +52,7 @@ It is intended to make C# implementation:
 
 This document controls C# language and .NET implementation practices. It does not independently own product architecture.
 
-When C# code implements or directly supports a Coordinator role, and the Draft is explicitly adopted or later approved for Project use, the applicable architecture and lifecycle authority is:
+When C# code implements or directly supports a Coordinator role, the applicable architecture and lifecycle authority is:
 
 ```text
 Coordinator_Software_Engineering_Rules.md
@@ -1342,13 +1343,23 @@ A long-running UI operation shall define:
 
 Busy state shall be cleared in a guaranteed completion path.
 
-## 109. Data Binding and View State
+## 109. Data Binding, View State, and UI Framework Boundary
 
 View state shall be separated from authoritative device state.
 
 Data binding shall not create hidden write paths into domain state.
 
 Transformation between domain and presentation models should be explicit.
+
+Concrete UI-framework assemblies, namespaces, and types shall be confined to Presentation projects, Presentation-specific adapters, or the Composition Root unless a Project-approved architecture explicitly records a justified exception. Application, Domain, Protocol, and Transport projects shall not reference WPF, WinUI, Avalonia, WinForms, MAUI, browser UI, or another concrete UI framework merely to support rendering or interaction.
+
+Non-Presentation code shall not accept or return framework windows, controls, dispatchers, dialogs, brushes, colors, visibility values, dependency objects, routed events, visual resources, or equivalent UI-specific types. Examples of prohibited leakage include direct use of `MessageBox`, `Application.Current.Dispatcher`, `Window`, `Control`, `Brush`, and `Visibility` outside Presentation integration.
+
+When an Application use case genuinely requires user interaction, it shall depend on a narrow project-owned interface such as `IUserNotificationService`, `IFileSelectionService`, `INavigationRequest`, or `IUiDispatcher`. The interface shall be owned by the consuming stable layer, describe required behavior, support deterministic testing, and avoid mirroring the complete API of a UI framework.
+
+ViewModels, presenters, controllers, and commands are Presentation objects. They may use framework-specific binding or lifecycle mechanisms when justified. They shall not own Product business rules, Protocol encoding or decoding, device-state transitions, retry policy, timeout policy, persistence rules, or long-lived application workflow solely because the UI invokes them.
+
+Application and Domain tests shall be executable without creating a UI application object, window, dispatcher loop, or other concrete UI runtime. A UI-framework replacement may legitimately rewrite Views, XAML or equivalent markup, bindings, navigation, dialogs, charts, and framework-specific presentation code; the coding boundary protects stable behavior rather than promising automatic UI portability.
 
 ## 110. High-Rate Display
 
@@ -2134,6 +2145,9 @@ C# code conforms only when:
 - [ ] Tasks are awaited or supervised.
 - [ ] Cancellation and timeout are propagated.
 - [ ] UI thread is not blocked.
+- [ ] Application and Domain projects do not reference concrete UI-framework assemblies or visual types.
+- [ ] UI service interfaces describe project behavior and are implemented in Presentation integration or the Composition Root.
+- [ ] ViewModels and code-behind do not own Product, Protocol, device-state, retry, timeout, or persistence policy.
 - [ ] Locks use private objects and have narrow scope.
 - [ ] Timers and background loops have owners.
 
@@ -2176,7 +2190,7 @@ A non-Coordinator C# project shall use its Project-approved architecture and res
 coordinator/
 ├── Product.Application/
 ├── Product.Domain/
-├── Product.Presentation/
+├── Product.Presentation.Wpf/        # or another selected UI adapter
 ├── Product.Protocol/
 │   ├── Generated/
 │   └── Integration/
@@ -2190,7 +2204,7 @@ coordinator/
 └── Product.Tests.Integration/
 ```
 
-For a Coordinator implementation, the exact structure may differ and responsibility boundaries are governed by `Coordinator_Software_Engineering_Rules.md` when that document is approved or explicitly adopted for Project use. For non-Coordinator C# code, responsibility boundaries are governed by the applicable Project-approved architecture and software engineering authority.
+For a Coordinator implementation, the exact structure may differ and responsibility boundaries are governed by `Coordinator_Software_Engineering_Rules.md`. For non-Coordinator C# code, responsibility boundaries are governed by the applicable Project-approved architecture and software engineering authority.
 
 # Appendix B — Example Thin UI Handler
 

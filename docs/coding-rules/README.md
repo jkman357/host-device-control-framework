@@ -7,7 +7,7 @@ This directory contains approved and proposed programming-language-specific impl
 ## Documents
 
 - [`Embedded_C_Coding_Rules.md`](Embedded_C_Coding_Rules.md) — **Final Baseline** Product-owned Embedded C implementation requirements.
-- [`CSharp_Coding_Rules.md`](CSharp_Coding_Rules.md) — **Draft for Review / proposed normative authority** for Product-owned C# language and .NET implementation requirements.
+- [`CSharp_Coding_Rules.md`](CSharp_Coding_Rules.md) — **Baseline normative authority** for Product-owned C# language, .NET implementation, and concrete UI-framework dependency-boundary requirements.
 
 ## Authority Boundary
 

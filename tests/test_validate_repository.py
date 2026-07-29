@@ -225,16 +225,19 @@ class RepositoryValidatorTests(unittest.TestCase):
         registry = yaml.safe_load((self.root / "authority-registry.yaml").read_text(encoding="utf-8"))
         by_path = {record["path"]: record for record in registry["documents"]}
         expected = {
-            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.1.1",
+            "docs/framework/AI_Engineering_Usage_Guide.md": "v1.1.2",
             "docs/framework/Coordinator_Node_Control_Framework.md": "v1.1.6",
             "docs/framework/Framework_Application_Analysis_Template.md": "v1.1.9",
             "docs/protocol/Protocol_YAML_Definition_Guide.md": "v1.1.7",
             "docs/protocol/Protocol_YAML_Template.md": "v1.1.1",
+            "docs/coordinator/Coordinator_Software_Engineering_Rules.md": "v1.1.1",
+            "docs/coordinator/Coordinator_Architecture_Patterns.md": "v1.1.1",
             "docs/coordinator/Coordinator_Logging_Guide.md": "v1.1.1",
             "docs/coordinator/Coordinator_Testing_Guide.md": "v1.1.1",
-            "docs/coordinator/Coordinator_UI_Engineering_Guide.md": "v1.1.1",
+            "docs/coordinator/Coordinator_UI_Engineering_Guide.md": "v1.1.2",
             "docs/coding-rules/Embedded_C_Coding_Rules.md": "v1.0.18",
-            "docs/validation/Repository_Validation_Checklist.md": "v1.1.1",
+            "docs/coding-rules/CSharp_Coding_Rules.md": "v1.0.5",
+            "docs/validation/Repository_Validation_Checklist.md": "v1.1.2",
             "docs/validation/Protocol_Validation_Checklist.md": "v1.1.6",
         }
         for path, version in expected.items():
@@ -265,8 +268,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_self_supersession_is_rejected(self) -> None:
         path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
         text = path.read_text(encoding="utf-8").replace(
-            "**Supersedes Document Version:** v1.1.0",
             "**Supersedes Document Version:** v1.1.1",
+            "**Supersedes Document Version:** v1.1.2",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -275,7 +278,7 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_stale_supersedes_version_is_rejected(self) -> None:
         path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
         text = path.read_text(encoding="utf-8").replace(
-            "**Supersedes Document Version:** v1.1.0",
+            "**Supersedes Document Version:** v1.1.1",
             "**Supersedes Document Version:** v1.0.31",
             1,
         )
@@ -296,8 +299,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_current_history_date_and_status_are_enforced(self) -> None:
         path = self.root / "docs/validation/Repository_Validation_Checklist.md"
         text = path.read_text(encoding="utf-8").replace(
-            "| v1.1.1 | 2026-07-27 | Baseline |",
-            "| v1.1.1 | 2026-02-30 | Draft for Review |",
+            "| v1.1.2 | 2026-07-29 | Baseline |",
+            "| v1.1.2 | 2026-02-30 | Draft for Review |",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -359,8 +362,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_release_candidate_must_remain_draft(self) -> None:
         path = self.root / "docs/framework/AI_Engineering_Usage_Guide.md"
         text = path.read_text(encoding="utf-8")
-        text = text.replace("**Document Version:** v1.1.1", "**Document Version:** v1.1.1-rc.1", 1)
-        text = text.replace("| v1.1.1 | 2026-07-27 | Baseline |", "| v1.1.1-rc.1 | 2026-07-27 | Baseline |", 1)
+        text = text.replace("**Document Version:** v1.1.2", "**Document Version:** v1.1.2-rc.1", 1)
+        text = text.replace("| v1.1.2 | 2026-07-29 | Baseline |", "| v1.1.2-rc.1 | 2026-07-29 | Baseline |", 1)
         path.write_text(text, encoding="utf-8")
         self.assertIn("DOC-013", self.rules())
 
@@ -371,7 +374,7 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_changelog_current_authority_snapshot_is_enforced(self) -> None:
         path = self.root / "CHANGELOG.md"
         text = path.read_text(encoding="utf-8").replace(
-            "| AI Engineering Usage Guide | v1.1.1 | Baseline |",
+            "| AI Engineering Usage Guide | v1.1.2 | Baseline |",
             "| AI Engineering Usage Guide | v1.0.37 | Draft for Review |",
             1,
         )
@@ -381,8 +384,8 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_mutable_repository_cannot_self_assert_release_freeze(self) -> None:
         path = self.root / "README.md"
         text = path.read_text(encoding="utf-8").replace(
-            "The repository content has received explicit human freeze approval for the `v1.1.1` Baseline.",
-            "The repository content is frozen as the `v1.1.1` Baseline.",
+            "The repository content has received explicit human freeze approval for the `v1.1.2` Baseline.",
+            "The repository content is frozen as the `v1.1.2` Baseline.",
             1,
         )
         path.write_text(text, encoding="utf-8")
@@ -436,7 +439,7 @@ class RepositoryValidatorTests(unittest.TestCase):
     def test_current_status_decoy_outside_controlled_section_is_rejected(self) -> None:
         path = self.root / "README.md"
         text = path.read_text(encoding="utf-8")
-        marker = "The repository content has received explicit human freeze approval for the `v1.1.1` Baseline."
+        marker = "The repository content has received explicit human freeze approval for the `v1.1.2` Baseline."
         text = text.replace(marker, "Release candidate state pending.", 1)
         text += "\n## Historical Note\n\n" + marker + "\n"
         path.write_text(text, encoding="utf-8")
