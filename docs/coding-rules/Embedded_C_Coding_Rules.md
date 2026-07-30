@@ -1453,7 +1453,25 @@ A Host-side tool `main()` may return a process exit status, but shall use an exp
 #include <stdlib.h>
 
 /*
- * Converts the host-test result into a process exit status.
+ * Function:
+ *     host_test_to_exit_status
+ *
+ * Purpose:
+ *     Converts a host-test result into the process exit status required by
+ *     the invoking operating system or automation environment.
+ *
+ * Input Parameters:
+ *     test_result:
+ *         Final host-test result to map.
+ *
+ * Output Parameters:
+ *     None.
+ *
+ * Return Value:
+ *     EXIT_SUCCESS:
+ *         The host test passed.
+ *     EXIT_FAILURE:
+ *         The host test did not pass.
  */
 static int host_test_to_exit_status(host_test_result_t test_result)
 {
@@ -1473,6 +1491,26 @@ static int host_test_to_exit_status(host_test_result_t test_result)
 ```
 
 ```c
+/*
+ * Function:
+ *     main
+ *
+ * Purpose:
+ *     Executes the host test and returns its explicitly mapped process exit
+ *     status to the invoking environment.
+ *
+ * Input Parameters:
+ *     None.
+ *
+ * Output Parameters:
+ *     None.
+ *
+ * Return Value:
+ *     EXIT_SUCCESS:
+ *         The host test passed.
+ *     EXIT_FAILURE:
+ *         The host test did not pass.
+ */
 int main(void)
 {
     host_test_result_t test_result;
@@ -1845,7 +1883,30 @@ conversion:
 
 ```c
 /*
- * Multiplies two signed 16-bit values with range protection.
+ * Function:
+ *     math_multiply_int16
+ *
+ * Purpose:
+ *     Multiplies two signed 16-bit values using a wider intermediate and
+ *     rejects a result that cannot be represented by int16_t.
+ *
+ * Input Parameters:
+ *     multiplicand:
+ *         First signed 16-bit factor.
+ *     multiplier:
+ *         Second signed 16-bit factor.
+ *
+ * Output Parameters:
+ *     result_value:
+ *         Receives the product when the function returns APP_RESULT_OK.
+ *
+ * Return Value:
+ *     APP_RESULT_OK:
+ *         The product was representable and written to result_value.
+ *     APP_RESULT_INVALID_ARGUMENT:
+ *         result_value was NULL.
+ *     APP_RESULT_OUT_OF_RANGE:
+ *         The product was outside the int16_t range.
  */
 static app_result_t math_multiply_int16(
     int16_t multiplicand,

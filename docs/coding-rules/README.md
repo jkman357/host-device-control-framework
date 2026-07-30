@@ -15,6 +15,4 @@ Language-specific rules implement, but do not replace, applicable Product requir
 
 Use [`../validation/Coding_Rules_Review_Checklist.md`](../validation/Coding_Rules_Review_Checklist.md) as a common review and evidence-capture entry point; the applicable language document remains the detailed rule authority.
 
-Use [`../validation/Coding_Rules_Review_Checklist.md`](../validation/Coding_Rules_Review_Checklist.md) as a common review and evidence-capture entry point; the applicable language document remains the detailed rule authority.
-
 Future language authorities may be added here using stable canonical filenames, such as `Cpp_Coding_Rules.md` or `Java_Coding_Rules.md`.

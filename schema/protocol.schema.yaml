@@ -21,12 +21,43 @@ properties:
     pattern: '^\d+\.\d+$'
   document:
     type: object
+    properties:
+      name:
+        type: string
+        minLength: 1
+      version:
+        type: string
+        minLength: 1
+      status:
+        type: string
+        minLength: 1
   protocol:
     type: object
+    properties:
+      name:
+        type: string
+        minLength: 1
+      family:
+        type: string
+        minLength: 1
+      version:
+        type: string
+        minLength: 1
   wire_format:
     type: object
+    properties:
+      byte_order:
+        type: string
+        enum: [little_endian, big_endian]
+      implicit_padding:
+        type: string
+        enum: [prohibited, explicit]
   id_allocation:
     type: object
+    properties:
+      message_id_width_bits:
+        type: integer
+        minimum: 1
   namespaces:
     type: array
   services:
@@ -39,8 +70,15 @@ properties:
     type: array
   compatibility:
     type: object
+    properties:
+      minimum_compatible_version:
+        type: string
+        minLength: 1
   code_generation:
     type: object
+    properties:
+      enabled:
+        type: boolean
   security_profile:
     type: object
   node_model:
@@ -165,4 +203,21 @@ properties:
             type: integer
         additionalProperties: false
     additionalProperties: false
+allOf:
+  - if:
+      required: [node_model]
+    then:
+      properties:
+        document:
+          required: [name, version, status]
+        protocol:
+          required: [name, family, version]
+        wire_format:
+          required: [byte_order, implicit_padding]
+        id_allocation:
+          required: [message_id_width_bits]
+        compatibility:
+          required: [minimum_compatible_version]
+        code_generation:
+          required: [enabled]
 additionalProperties: true

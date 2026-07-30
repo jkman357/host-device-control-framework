@@ -14,12 +14,17 @@ invalid:
     - PY-MN-021
   invalid_group_session_without_profile.yaml:
     - PY-MN-030
+  invalid_explicit_empty_core_profile.yaml:
+    - PY-SCHEMA-001
   invalid_maximum_nodes_zero.yaml:
     - PY-MN-004
+    - PY-MN-006
+    - PY-MN-007
   invalid_multi_target_partial_failure.yaml:
     - PY-MN-024
   invalid_shared_bus_without_addressing.yaml:
     - PY-MN-016
+    - PY-MN-017
   invalid_legacy_empty_profile.yaml:
     - PY-LEGACY-001
     - PY-LEGACY-002

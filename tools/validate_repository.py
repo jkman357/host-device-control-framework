@@ -314,7 +314,7 @@ def check_required_files(root: Path, findings: list[Finding]) -> None:
 
 def check_text_files(root: Path, findings: list[Finding]) -> None:
     suffixes = {".md", ".yaml", ".yml", ".py", ".txt"}
-    text_filenames = {"LICENSE", ".gitattributes"}
+    text_filenames = {"LICENSE", ".gitattributes", "CODEOWNERS"}
     for path in _all_files(root):
         if path.suffix.casefold() not in suffixes and path.name not in text_filenames:
             continue
@@ -346,15 +346,11 @@ def check_gitattributes(root: Path, findings: list[Finding]) -> None:
     }
     required_lines = {
         "* text=auto eol=lf",
-        "*.png binary",
-        "*.jpg binary",
-        "*.jpeg binary",
-        "*.gif binary",
-        "*.zip binary",
-        "*.pdf binary",
-        "*.bin binary",
-        "*.hex binary",
-        "*.elf binary",
+        "*.png binary", "*.jpg binary", "*.jpeg binary", "*.gif binary",
+        "*.bmp binary", "*.ico binary", "*.zip binary", "*.7z binary",
+        "*.tar binary", "*.gz binary", "*.pdf binary", "*.bin binary",
+        "*.hex binary", "*.elf binary", "*.exe binary", "*.dll binary",
+        "*.so binary", "*.a binary", "*.lib binary",
     }
     missing = sorted(required_lines - lines)
     if missing:
@@ -923,6 +919,31 @@ def check_legal_baseline_and_protection(root: Path, findings: list[Finding]) -> 
             findings.append(Finding("GOV-003", ".github/REPOSITORY_PROTECTION.md", f"required external-governance marker is missing or altered: {marker}"))
 
 
+def _safe_repository_relative_path(value: Any, *, required_prefix: str | None = None) -> bool:
+    if not isinstance(value, str) or not value or "\\" in value:
+        return False
+    candidate = PurePosixPath(value)
+    if candidate.is_absolute() or any(part in {"", ".", ".."} for part in candidate.parts):
+        return False
+    if candidate.as_posix() != value:
+        return False
+    if required_prefix is not None and candidate.parts[0] != required_prefix:
+        return False
+    return True
+
+
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _valid_sha256(value: Any) -> bool:
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+
+
+def _third_party_finding(findings: list[Finding], material_id: str, message: str) -> None:
+    findings.append(Finding("TPM-002", "third-party-materials.yaml", f"{material_id}: {message}"))
+
+
 def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
     path = root / "third-party-materials.yaml"
     try:
@@ -933,6 +954,8 @@ def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
     if not isinstance(document, dict):
         findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest root must be a mapping"))
         return
+    if set(document) != {"manifest_version", "repository", "policy", "approval_authorities", "materials"}:
+        findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest root keys are not controlled"))
     if document.get("manifest_version") != 2 or document.get("repository") != "host-device-control-framework":
         findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest identity is invalid"))
     policy = document.get("policy")
@@ -944,10 +967,163 @@ def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
     }
     if policy != expected_policy:
         findings.append(Finding("TPM-001", "third-party-materials.yaml", "manifest policy must exactly match the controlled fail-closed policy"))
-    if not isinstance(document.get("approval_authorities"), dict) or not document["approval_authorities"]:
+
+    authorities = document.get("approval_authorities")
+    if not isinstance(authorities, dict) or not authorities:
         findings.append(Finding("TPM-001", "third-party-materials.yaml", "approval_authorities must be a non-empty mapping"))
-    if not isinstance(document.get("materials"), list):
+        authorities = {}
+    else:
+        for authority_id, authority in authorities.items():
+            if not isinstance(authority_id, str) or re.fullmatch(r"[a-z0-9][a-z0-9._-]{0,63}", authority_id) is None:
+                findings.append(Finding("TPM-001", "third-party-materials.yaml", "approval authority ID is invalid"))
+                continue
+            if not isinstance(authority, dict) or set(authority) != {"display_name", "role"}:
+                findings.append(Finding("TPM-001", "third-party-materials.yaml", f"approval authority {authority_id} has invalid fields"))
+                continue
+            if any(not isinstance(authority.get(key), str) or not authority[key].strip() for key in ("display_name", "role")):
+                findings.append(Finding("TPM-001", "third-party-materials.yaml", f"approval authority {authority_id} has blank identity fields"))
+
+    materials = document.get("materials")
+    if not isinstance(materials, list):
         findings.append(Finding("TPM-001", "third-party-materials.yaml", "materials must be an array"))
+        return
+
+    required_keys = {
+        "id", "target_path", "scope", "provenance", "rights_holder", "notice",
+        "acceptance", "repository_file_sha256", "source_evidence", "obligations",
+        "obligation_evidence",
+    }
+    seen_ids: set[str] = set()
+    seen_targets: set[str] = set()
+    for index, material in enumerate(materials):
+        material_id = f"materials[{index}]"
+        if not isinstance(material, dict):
+            _third_party_finding(findings, material_id, "entry must be a mapping")
+            continue
+        raw_id = material.get("id")
+        if isinstance(raw_id, str):
+            material_id = raw_id
+        if set(material) != required_keys:
+            _third_party_finding(findings, material_id, "entry keys must exactly match the controlled schema")
+        if not isinstance(raw_id, str) or re.fullmatch(r"[a-z0-9][a-z0-9._-]{0,63}", raw_id) is None:
+            _third_party_finding(findings, material_id, "material ID is invalid")
+        elif raw_id in seen_ids:
+            _third_party_finding(findings, material_id, "material ID is duplicated")
+        else:
+            seen_ids.add(raw_id)
+        if material.get("scope") != "entire_file":
+            _third_party_finding(findings, material_id, "scope must be entire_file")
+
+        target_value = material.get("target_path")
+        target_path: Path | None = None
+        if not _safe_repository_relative_path(target_value):
+            _third_party_finding(findings, material_id, "target_path is not a safe repository-relative path")
+        else:
+            if target_value in seen_targets:
+                _third_party_finding(findings, material_id, "target_path is registered more than once")
+            seen_targets.add(target_value)
+            target_path = root / target_value
+            if not _is_regular_file_without_link(target_path):
+                _third_party_finding(findings, material_id, "target_path does not identify an existing regular non-link file")
+                target_path = None
+
+        expected_target_hash = material.get("repository_file_sha256")
+        if not _valid_sha256(expected_target_hash):
+            _third_party_finding(findings, material_id, "repository_file_sha256 is invalid")
+        elif target_path is not None and _sha256_file(target_path) != expected_target_hash:
+            _third_party_finding(findings, material_id, "repository_file_sha256 does not match the actual target bytes")
+
+        provenance = material.get("provenance")
+        if not isinstance(provenance, dict) or set(provenance) != {"source_name", "source_reference", "source_version"}:
+            _third_party_finding(findings, material_id, "provenance fields are invalid")
+        elif any(not isinstance(provenance.get(key), str) or not provenance[key].strip() for key in provenance):
+            _third_party_finding(findings, material_id, "provenance fields must be non-empty strings")
+        if not isinstance(material.get("rights_holder"), str) or not material["rights_holder"].strip():
+            _third_party_finding(findings, material_id, "rights_holder must be a non-empty string")
+
+        notice = material.get("notice")
+        notice_text: str | None = None
+        if not isinstance(notice, dict) or set(notice) != {"text", "sha256"}:
+            _third_party_finding(findings, material_id, "notice fields are invalid")
+        else:
+            notice_text = notice.get("text")
+            notice_hash = notice.get("sha256")
+            if not isinstance(notice_text, str) or not notice_text.strip():
+                _third_party_finding(findings, material_id, "notice text must be non-empty")
+                notice_text = None
+            if not _valid_sha256(notice_hash):
+                _third_party_finding(findings, material_id, "notice sha256 is invalid")
+            elif notice_text is not None and hashlib.sha256(notice_text.encode("utf-8")).hexdigest() != notice_hash:
+                _third_party_finding(findings, material_id, "notice sha256 does not match the exact notice text")
+
+        acceptance = material.get("acceptance")
+        if not isinstance(acceptance, dict) or set(acceptance) != {"approver", "approval_reference", "approval_date"}:
+            _third_party_finding(findings, material_id, "acceptance fields are invalid")
+        else:
+            approver = acceptance.get("approver")
+            if approver not in authorities:
+                _third_party_finding(findings, material_id, "acceptance approver is not a controlled approval authority")
+            if not isinstance(acceptance.get("approval_reference"), str) or not acceptance["approval_reference"].strip():
+                _third_party_finding(findings, material_id, "approval_reference must be non-empty")
+            approval_date = acceptance.get("approval_date")
+            try:
+                date.fromisoformat(approval_date if isinstance(approval_date, str) else "")
+            except ValueError:
+                _third_party_finding(findings, material_id, "approval_date must be an ISO date")
+
+        source_evidence = material.get("source_evidence")
+        if not isinstance(source_evidence, dict) or set(source_evidence) != {"path", "sha256"}:
+            _third_party_finding(findings, material_id, "source_evidence fields are invalid")
+        else:
+            evidence_path_value = source_evidence.get("path")
+            evidence_hash = source_evidence.get("sha256")
+            if not _safe_repository_relative_path(evidence_path_value, required_prefix="third-party-evidence"):
+                _third_party_finding(findings, material_id, "source_evidence path is outside third-party-evidence")
+            else:
+                evidence_path = root / evidence_path_value
+                if not _is_regular_file_without_link(evidence_path):
+                    _third_party_finding(findings, material_id, "source_evidence path is missing or not a regular non-link file")
+                elif not _valid_sha256(evidence_hash) or _sha256_file(evidence_path) != evidence_hash:
+                    _third_party_finding(findings, material_id, "source_evidence sha256 does not match the retained bytes")
+
+        obligations = material.get("obligations")
+        if not isinstance(obligations, list) or not obligations or any(not isinstance(item, str) or not item.strip() for item in obligations):
+            _third_party_finding(findings, material_id, "obligations must be a non-empty array of non-empty strings")
+
+        obligation_evidence = material.get("obligation_evidence")
+        if not isinstance(obligation_evidence, list) or not obligation_evidence:
+            _third_party_finding(findings, material_id, "obligation_evidence must be a non-empty array")
+        else:
+            seen_evidence_paths: set[str] = set()
+            for item in obligation_evidence:
+                if not isinstance(item, dict) or set(item) != {"path", "sha256"}:
+                    _third_party_finding(findings, material_id, "obligation_evidence item fields are invalid")
+                    continue
+                item_path_value = item.get("path")
+                item_hash = item.get("sha256")
+                if not _safe_repository_relative_path(item_path_value, required_prefix="third-party-evidence"):
+                    _third_party_finding(findings, material_id, "obligation_evidence path is outside third-party-evidence")
+                    continue
+                if item_path_value in seen_evidence_paths:
+                    _third_party_finding(findings, material_id, "obligation_evidence path is duplicated")
+                seen_evidence_paths.add(item_path_value)
+                item_path = root / item_path_value
+                if not _is_regular_file_without_link(item_path):
+                    _third_party_finding(findings, material_id, "obligation_evidence file is missing or not a regular non-link file")
+                elif not _valid_sha256(item_hash) or _sha256_file(item_path) != item_hash:
+                    _third_party_finding(findings, material_id, "obligation_evidence sha256 does not match the retained bytes")
+
+        if target_path is not None:
+            try:
+                target_text = target_path.read_text(encoding="utf-8")
+            except UnicodeError:
+                _third_party_finding(findings, material_id, "target file must be UTF-8 so the required marker and notice are visible")
+            else:
+                marker = f"Third-Party Material ID: {raw_id}"
+                if marker not in _visible_text(target_text):
+                    _third_party_finding(findings, material_id, "required visible material marker is missing")
+                if notice_text is not None and notice_text not in _visible_text(target_text):
+                    _third_party_finding(findings, material_id, "exact notice text is not visibly present in the target file")
 
 
 def check_conformance_claim_assets(root: Path, findings: list[Finding]) -> None:
@@ -1108,9 +1284,19 @@ def check_protocol_assets(root: Path, findings: list[Finding]) -> None:
             findings.append(Finding("PROTO-006", _relative(root, fixture), "invalid fixture unexpectedly passed"))
             continue
         actual_rules = {issue.rule for issue in issues}
-        missing_rules = sorted(set(expected_rules or []) - actual_rules)
-        if missing_rules:
-            findings.append(Finding("PROTO-008", _relative(root, fixture), "invalid fixture did not produce expected rule(s): " + ", ".join(missing_rules)))
+        expected_rule_set = set(expected_rules or [])
+        if actual_rules != expected_rule_set:
+            missing_rules = sorted(expected_rule_set - actual_rules)
+            unexpected_rules = sorted(actual_rules - expected_rule_set)
+            detail: list[str] = []
+            if missing_rules:
+                detail.append("missing: " + ", ".join(missing_rules))
+            if unexpected_rules:
+                detail.append("unexpected: " + ", ".join(unexpected_rules))
+            findings.append(Finding(
+                "PROTO-008", _relative(root, fixture),
+                "invalid fixture rule set differs from the manifest (" + "; ".join(detail) + ")",
+            ))
 
 
 def _section_by_heading(text: str, heading: str, next_heading_level: int | None = None) -> str | None:

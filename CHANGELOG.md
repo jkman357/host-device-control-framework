@@ -36,6 +36,7 @@ Individual authority documents retain their own internal Version History and app
 
 ### Current Review Changes
 
+- Corrected repository validation gaps without changing the frozen authority versions: explicit `node_model` profiles now require the complete common Protocol core; invalid-fixture rule sets are exact; third-party entries bind target, source, notice, approval, and obligation evidence bytes; all declared binary patterns and CODEOWNERS text integrity are checked; and Embedded C examples, a duplicate directory-index paragraph, and Framework revision metadata were repaired.
 - Promoted Coordinator Software Engineering Rules v1.1.1, Coordinator Architecture Patterns v1.1.1, Coordinator UI Engineering Guide v1.1.2, and C# Coding Rules v1.0.5 to formal Baseline status after explicit human freeze approval; finalized replaceable Presentation and UI-framework isolation rules, reusable core boundaries, pragmatic framework-specific presentation code, project-owned UI service ports, migration scope, anti-patterns, and review checks.
 - Updated AI Engineering Usage Guide and Repository Validation Checklist to v1.1.2 Baseline, synchronized authority routing and regression expectations, and recorded explicit human freeze approval for repository baseline v1.1.2; immutable Git identity remains pending the final tag or controlled GitHub Release.
 - Added `.gitattributes` to enforce canonical LF text checkouts across Windows, Linux, and macOS and to protect common binary artifacts from line-ending normalization.

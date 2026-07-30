@@ -204,6 +204,15 @@ class ProtocolSecurityRegressionTests(unittest.TestCase):
         self.assertIn("PY-LEGACY-001", rules)
         self.assertIn("PY-LEGACY-002", rules)
 
+    def test_explicit_profile_with_empty_core_is_rejected(self) -> None:
+        document = deepcopy(self.valid_explicit)
+        document["document"] = {}
+        rules = {
+            issue.rule
+            for issue in validate_protocol.validate_document(document, self.schema)
+        }
+        self.assertEqual({"PY-SCHEMA-001"}, rules)
+
     def test_boolean_string_is_rejected(self) -> None:
         document = deepcopy(self.valid_explicit)
         document["node_model"]["addressing"]["broadcast"]["supported"] = "yes"
@@ -267,7 +276,7 @@ class ProtocolSecurityRegressionTests(unittest.TestCase):
                     for issue in validate_protocol.validate_document(document, self.schema)
                 }
                 self.assertTrue(actual_rules, filename)
-                self.assertTrue(set(expected_rules).issubset(actual_rules), (filename, expected_rules, actual_rules))
+                self.assertEqual(set(expected_rules), actual_rules, (filename, expected_rules, actual_rules))
 
     def test_empty_directory_cli_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

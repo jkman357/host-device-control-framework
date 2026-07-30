@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import hashlib
 import shutil
 import sys
 import tempfile
@@ -27,6 +28,65 @@ class RepositoryValidatorTests(unittest.TestCase):
 
     def rules(self) -> set[str]:
         return {finding.rule for finding in validate(self.root)}
+
+    def install_valid_third_party_material(self) -> None:
+        notice_text = "Copyright Example Vendor. Licensed for this controlled test."
+        target = self.root / "third_party_sample.txt"
+        target.write_text(
+            "Third-Party Material ID: example-vendor-sample\n" + notice_text + "\nSample bytes.\n",
+            encoding="utf-8",
+        )
+        source = self.root / "third-party-evidence/example-vendor-source.txt"
+        source.write_text("Retained source bytes.\n", encoding="utf-8")
+        obligations = self.root / "third-party-evidence/example-vendor-obligations.txt"
+        obligations.write_text("Attribution retained.\n", encoding="utf-8")
+        manifest = {
+            "manifest_version": 2,
+            "repository": "host-device-control-framework",
+            "policy": {
+                "default_terms": "LICENSE",
+                "exception_authority": "controlled-approval-authority",
+                "exception_effect": "registered-entire-file-only",
+                "required_file_marker": "Third-Party Material ID: <id>",
+                "source_evidence_root": "third-party-evidence",
+            },
+            "approval_authorities": {
+                "ray-yang": {"display_name": "Ray Yang", "role": "repository-maintainer"}
+            },
+            "materials": [{
+                "id": "example-vendor-sample",
+                "target_path": "third_party_sample.txt",
+                "scope": "entire_file",
+                "provenance": {
+                    "source_name": "Example Vendor Sample",
+                    "source_reference": "controlled-test-fixture",
+                    "source_version": "1.0",
+                },
+                "rights_holder": "Example Vendor",
+                "notice": {
+                    "text": notice_text,
+                    "sha256": hashlib.sha256(notice_text.encode("utf-8")).hexdigest(),
+                },
+                "acceptance": {
+                    "approver": "ray-yang",
+                    "approval_reference": "TEST-APPROVAL-001",
+                    "approval_date": "2026-07-30",
+                },
+                "repository_file_sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+                "source_evidence": {
+                    "path": "third-party-evidence/example-vendor-source.txt",
+                    "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+                },
+                "obligations": ["Retain attribution notice"],
+                "obligation_evidence": [{
+                    "path": "third-party-evidence/example-vendor-obligations.txt",
+                    "sha256": hashlib.sha256(obligations.read_bytes()).hexdigest(),
+                }],
+            }],
+        }
+        (self.root / "third-party-materials.yaml").write_text(
+            yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8"
+        )
 
     def test_repository_baseline_passes(self) -> None:
         self.assertEqual([], validate(self.root))
@@ -408,6 +468,12 @@ class RepositoryValidatorTests(unittest.TestCase):
         path.write_text(text, encoding="utf-8")
         self.assertIn("REP-008", self.rules())
 
+    def test_missing_extended_gitattributes_binary_declaration_is_rejected(self) -> None:
+        path = self.root / ".gitattributes"
+        text = path.read_text(encoding="utf-8").replace("*.dll binary\n", "", 1)
+        path.write_text(text, encoding="utf-8")
+        self.assertIn("REP-008", self.rules())
+
     def test_repository_symlink_is_rejected_without_following(self) -> None:
         external = Path(self.temporary.name) / "external-readme.md"
         source = self.root / "README.md"
@@ -425,6 +491,48 @@ class RepositoryValidatorTests(unittest.TestCase):
         )
         path.write_text(text, encoding="utf-8")
         self.assertIn("GOV-003", self.rules())
+
+    def test_codeowners_text_integrity_is_enforced(self) -> None:
+        path = self.root / ".github/CODEOWNERS"
+        path.write_bytes(path.read_bytes().replace(b"\n", b"\r\n", 1))
+        self.assertIn("REP-004", self.rules())
+
+    def test_valid_third_party_material_binding_passes(self) -> None:
+        self.install_valid_third_party_material()
+        self.assertEqual([], validate(self.root))
+
+    def test_third_party_target_byte_mutation_is_rejected(self) -> None:
+        self.install_valid_third_party_material()
+        path = self.root / "third_party_sample.txt"
+        path.write_text(path.read_text(encoding="utf-8") + "mutated\n", encoding="utf-8")
+        self.assertIn("TPM-002", self.rules())
+
+    def test_third_party_source_evidence_mutation_is_rejected(self) -> None:
+        self.install_valid_third_party_material()
+        path = self.root / "third-party-evidence/example-vendor-source.txt"
+        path.write_text("changed source bytes\n", encoding="utf-8")
+        self.assertIn("TPM-002", self.rules())
+
+    def test_third_party_visible_marker_removal_is_rejected(self) -> None:
+        self.install_valid_third_party_material()
+        target = self.root / "third_party_sample.txt"
+        text = target.read_text(encoding="utf-8").replace(
+            "Third-Party Material ID: example-vendor-sample\n", "", 1
+        )
+        target.write_text(text, encoding="utf-8")
+        manifest_path = self.root / "third-party-materials.yaml"
+        manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        manifest["materials"][0]["repository_file_sha256"] = hashlib.sha256(target.read_bytes()).hexdigest()
+        manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+        self.assertIn("TPM-002", self.rules())
+
+    def test_third_party_uncontrolled_approver_is_rejected(self) -> None:
+        self.install_valid_third_party_material()
+        manifest_path = self.root / "third-party-materials.yaml"
+        manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        manifest["materials"][0]["acceptance"]["approver"] = "unknown-approver"
+        manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+        self.assertIn("TPM-002", self.rules())
 
     def test_unsafe_registry_document_path_is_rejected_before_access(self) -> None:
         path = self.root / "authority-registry.yaml"

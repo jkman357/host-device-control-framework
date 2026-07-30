@@ -31,7 +31,7 @@ class ProtocolValidatorTests(unittest.TestCase):
                 self.assertTrue(issues)
                 actual = {issue.rule for issue in issues}
                 expected = set(manifest["invalid"][path.name])
-                self.assertTrue(expected.issubset(actual), (path.name, expected, actual))
+                self.assertEqual(expected, actual, (path.name, expected, actual))
 
     def test_schema_validation_rejects_wrong_root_field_types(self) -> None:
         document = {
@@ -69,6 +69,11 @@ class ProtocolValidatorTests(unittest.TestCase):
     def test_legacy_single_node_omission_remains_valid(self) -> None:
         path = ROOT / "tests/fixtures/protocol/valid_legacy_single_node.yaml"
         self.assertEqual([], validate_path(path))
+
+    def test_explicit_node_model_cannot_bypass_core_profile(self) -> None:
+        path = ROOT / "tests/fixtures/protocol/invalid_explicit_empty_core_profile.yaml"
+        rules = {issue.rule for issue in validate_path(path)}
+        self.assertEqual({"PY-SCHEMA-001"}, rules)
 
     def test_bounded_parallel_requires_limit(self) -> None:
         path = ROOT / "tests/fixtures/protocol/invalid_bounded_parallel_update.yaml"

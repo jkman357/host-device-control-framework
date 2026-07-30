@@ -180,18 +180,89 @@ def _require_mapping(
     return value
 
 
-def _legacy_issue(
-    issues: list[ValidationIssue], path: str, message: str, *, expected: str, actual: Any
+def _core_issue(
+    issues: list[ValidationIssue], rule: str, path: str, message: str, *,
+    expected: str, actual: Any, correction: str
 ) -> None:
     issues.append(
         ValidationIssue(
-            "PY-LEGACY-002", path, message, expected=expected,
-            actual=_safe_actual(actual),
-            correction=(
-                "Use the complete legacy Single-Node profile or define an explicit node_model."
-            ),
+            rule, path, message, expected=expected,
+            actual=_safe_actual(actual), correction=correction,
         )
     )
+
+
+def _validate_core_profile(
+    document: dict[str, Any], *, rule: str, correction: str
+) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    mappings: dict[str, dict[str, Any]] = {}
+    for section, required_fields in LEGACY_REQUIRED_FIELDS.items():
+        value = document.get(section)
+        if not isinstance(value, dict):
+            _core_issue(
+                issues, rule, f"$.{section}", "core section must be a mapping",
+                expected="mapping", actual=type(value).__name__, correction=correction,
+            )
+            continue
+        mappings[section] = value
+        for field in required_fields:
+            if field not in value:
+                _core_issue(
+                    issues, rule, f"$.{section}.{field}", "required core field is missing",
+                    expected="present", actual="missing", correction=correction,
+                )
+    for section in ("namespaces", "services", "enums", "errors", "messages"):
+        if not isinstance(document.get(section), list):
+            _core_issue(
+                issues, rule, f"$.{section}", "core collection must be a list",
+                expected="list", actual=type(document.get(section)).__name__, correction=correction,
+            )
+    for section in ("document", "protocol"):
+        for field in LEGACY_REQUIRED_FIELDS[section]:
+            value = mappings.get(section, {}).get(field)
+            if not isinstance(value, str) or not value.strip():
+                _core_issue(
+                    issues, rule, f"$.{section}.{field}",
+                    "core identity field must be a non-empty string",
+                    expected="non-empty string", actual=value, correction=correction,
+                )
+    wire_format = mappings.get("wire_format", {})
+    if wire_format.get("byte_order") not in LEGACY_BYTE_ORDERS:
+        _core_issue(
+            issues, rule, "$.wire_format.byte_order", "byte_order is not controlled",
+            expected=str(sorted(LEGACY_BYTE_ORDERS)), actual=wire_format.get("byte_order"),
+            correction=correction,
+        )
+    if wire_format.get("implicit_padding") not in LEGACY_PADDING_POLICIES:
+        _core_issue(
+            issues, rule, "$.wire_format.implicit_padding",
+            "implicit_padding policy is not controlled",
+            expected=str(sorted(LEGACY_PADDING_POLICIES)),
+            actual=wire_format.get("implicit_padding"), correction=correction,
+        )
+    width = mappings.get("id_allocation", {}).get("message_id_width_bits")
+    if not isinstance(width, int) or isinstance(width, bool) or width < 1:
+        _core_issue(
+            issues, rule, "$.id_allocation.message_id_width_bits",
+            "message ID width must be a positive integer",
+            expected=">= 1", actual=width, correction=correction,
+        )
+    minimum_version = mappings.get("compatibility", {}).get("minimum_compatible_version")
+    if not isinstance(minimum_version, str) or not minimum_version.strip():
+        _core_issue(
+            issues, rule, "$.compatibility.minimum_compatible_version",
+            "compatibility version must be a non-empty string",
+            expected="non-empty string", actual=minimum_version, correction=correction,
+        )
+    enabled = mappings.get("code_generation", {}).get("enabled")
+    if not isinstance(enabled, bool):
+        _core_issue(
+            issues, rule, "$.code_generation.enabled",
+            "code generation enable field must be boolean",
+            expected="boolean", actual=enabled, correction=correction,
+        )
+    return issues
 
 
 def _validate_legacy_profile(document: dict[str, Any]) -> list[ValidationIssue]:
@@ -208,71 +279,15 @@ def _validate_legacy_profile(document: dict[str, Any]) -> list[ValidationIssue]:
                 ),
             )
         )
-    mappings: dict[str, dict[str, Any]] = {}
-    for section, required_fields in LEGACY_REQUIRED_FIELDS.items():
-        value = document.get(section)
-        if not isinstance(value, dict):
-            _legacy_issue(
-                issues, f"$.{section}", "legacy section must be a mapping",
-                expected="mapping", actual=type(value).__name__,
-            )
-            continue
-        mappings[section] = value
-        for field in required_fields:
-            if field not in value:
-                _legacy_issue(
-                    issues, f"$.{section}.{field}", "required legacy field is missing",
-                    expected="present", actual="missing",
-                )
-    for section in ("namespaces", "services", "enums", "errors", "messages"):
-        if not isinstance(document.get(section), list):
-            _legacy_issue(
-                issues, f"$.{section}", "legacy collection must be a list",
-                expected="list", actual=type(document.get(section)).__name__,
-            )
-    for section in ("document", "protocol"):
-        for field in LEGACY_REQUIRED_FIELDS[section]:
-            value = mappings.get(section, {}).get(field)
-            if not isinstance(value, str) or not value.strip():
-                _legacy_issue(
-                    issues, f"$.{section}.{field}",
-                    "legacy identity field must be a non-empty string",
-                    expected="non-empty string", actual=value,
-                )
-    wire_format = mappings.get("wire_format", {})
-    if wire_format.get("byte_order") not in LEGACY_BYTE_ORDERS:
-        _legacy_issue(
-            issues, "$.wire_format.byte_order", "legacy byte_order is not controlled",
-            expected=str(sorted(LEGACY_BYTE_ORDERS)), actual=wire_format.get("byte_order"),
+    issues.extend(
+        _validate_core_profile(
+            document,
+            rule="PY-LEGACY-002",
+            correction=(
+                "Use the complete legacy Single-Node profile or define an explicit node_model."
+            ),
         )
-    if wire_format.get("implicit_padding") not in LEGACY_PADDING_POLICIES:
-        _legacy_issue(
-            issues, "$.wire_format.implicit_padding",
-            "legacy implicit_padding policy is not controlled",
-            expected=str(sorted(LEGACY_PADDING_POLICIES)),
-            actual=wire_format.get("implicit_padding"),
-        )
-    width = mappings.get("id_allocation", {}).get("message_id_width_bits")
-    if not isinstance(width, int) or isinstance(width, bool) or width < 1:
-        _legacy_issue(
-            issues, "$.id_allocation.message_id_width_bits",
-            "legacy message ID width must be a positive integer",
-            expected=">= 1", actual=width,
-        )
-    minimum_version = mappings.get("compatibility", {}).get("minimum_compatible_version")
-    if not isinstance(minimum_version, str) or not minimum_version.strip():
-        _legacy_issue(
-            issues, "$.compatibility.minimum_compatible_version",
-            "legacy compatibility version must be a non-empty string",
-            expected="non-empty string", actual=minimum_version,
-        )
-    enabled = mappings.get("code_generation", {}).get("enabled")
-    if not isinstance(enabled, bool):
-        _legacy_issue(
-            issues, "$.code_generation.enabled",
-            "legacy code generation enable field must be boolean",
-            expected="boolean", actual=enabled,
-        )
+    )
     return issues
 
 
@@ -299,6 +314,17 @@ def validate_document(
     node_model = document.get("node_model")
     if node_model is None:
         return _validate_legacy_profile(document)
+    issues.extend(
+        _validate_core_profile(
+            document,
+            rule="PY-CORE-001",
+            correction=(
+                "Define the complete common Protocol profile before applying node_model semantics."
+            ),
+        )
+    )
+    if issues:
+        return issues
     if not isinstance(node_model, dict):
         return [ValidationIssue(
             "PY-MN-001", "$.node_model", "node_model must be a mapping",
