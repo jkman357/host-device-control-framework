@@ -125,9 +125,9 @@ AI_ROUTING_HISTORY_EXPECTATIONS = {
 }
 
 RELEASE_STATE_REQUIRED_MARKERS = (
-    "The repository content has received explicit human freeze approval for the `v1.1.2` Baseline.",
+    "The repository content has received explicit human freeze approval for the `v1.1.3` Baseline.",
     "Repository text and detached ZIP packages do not independently establish immutable Git release identity.",
-    "Immutable release identity exists only after the final commit is identified by the `v1.1.2` tag or controlled GitHub Release.",
+    "Immutable release identity exists only after the final commit is identified by the `v1.1.3` tag or controlled GitHub Release.",
 )
 RELEASE_STATE_PROHIBITED_PATTERNS = (
     r"\brepository content is frozen as\b",
@@ -919,17 +919,45 @@ def check_legal_baseline_and_protection(root: Path, findings: list[Finding]) -> 
             findings.append(Finding("GOV-003", ".github/REPOSITORY_PROTECTION.md", f"required external-governance marker is missing or altered: {marker}"))
 
 
+WINDOWS_RESERVED_PATH_NAMES = {
+    "CON", "PRN", "AUX", "NUL",
+    *(f"COM{number}" for number in range(1, 10)),
+    *(f"LPT{number}" for number in range(1, 10)),
+}
+
+
 def _safe_repository_relative_path(value: Any, *, required_prefix: str | None = None) -> bool:
-    if not isinstance(value, str) or not value or "\\" in value:
+    if not isinstance(value, str) or not value or "\\" in value or ":" in value:
         return False
     candidate = PurePosixPath(value)
     if candidate.is_absolute() or any(part in {"", ".", ".."} for part in candidate.parts):
         return False
     if candidate.as_posix() != value:
         return False
+    for part in candidate.parts:
+        if part.casefold() == ".git" or part.endswith((" ", ".")):
+            return False
+        device_name = part.split(".", 1)[0].upper()
+        if device_name in WINDOWS_RESERVED_PATH_NAMES:
+            return False
     if required_prefix is not None and candidate.parts[0] != required_prefix:
         return False
     return True
+
+
+def _repository_relative_path(
+    root: Path, value: Any, *, required_prefix: str | None = None
+) -> Path | None:
+    if not _safe_repository_relative_path(value, required_prefix=required_prefix):
+        return None
+    candidate = root.joinpath(*PurePosixPath(value).parts)
+    try:
+        resolved_root = root.resolve(strict=True)
+        resolved_candidate = candidate.resolve(strict=False)
+        resolved_candidate.relative_to(resolved_root)
+    except (OSError, RuntimeError, ValueError):
+        return None
+    return candidate
 
 
 def _sha256_file(path: Path) -> str:
@@ -1015,14 +1043,13 @@ def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
             _third_party_finding(findings, material_id, "scope must be entire_file")
 
         target_value = material.get("target_path")
-        target_path: Path | None = None
-        if not _safe_repository_relative_path(target_value):
+        target_path = _repository_relative_path(root, target_value)
+        if target_path is None:
             _third_party_finding(findings, material_id, "target_path is not a safe repository-relative path")
         else:
             if target_value in seen_targets:
                 _third_party_finding(findings, material_id, "target_path is registered more than once")
             seen_targets.add(target_value)
-            target_path = root / target_value
             if not _is_regular_file_without_link(target_path):
                 _third_party_finding(findings, material_id, "target_path does not identify an existing regular non-link file")
                 target_path = None
@@ -1077,10 +1104,12 @@ def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
         else:
             evidence_path_value = source_evidence.get("path")
             evidence_hash = source_evidence.get("sha256")
-            if not _safe_repository_relative_path(evidence_path_value, required_prefix="third-party-evidence"):
+            evidence_path = _repository_relative_path(
+                root, evidence_path_value, required_prefix="third-party-evidence"
+            )
+            if evidence_path is None:
                 _third_party_finding(findings, material_id, "source_evidence path is outside third-party-evidence")
             else:
-                evidence_path = root / evidence_path_value
                 if not _is_regular_file_without_link(evidence_path):
                     _third_party_finding(findings, material_id, "source_evidence path is missing or not a regular non-link file")
                 elif not _valid_sha256(evidence_hash) or _sha256_file(evidence_path) != evidence_hash:
@@ -1101,13 +1130,15 @@ def check_third_party_materials(root: Path, findings: list[Finding]) -> None:
                     continue
                 item_path_value = item.get("path")
                 item_hash = item.get("sha256")
-                if not _safe_repository_relative_path(item_path_value, required_prefix="third-party-evidence"):
+                item_path = _repository_relative_path(
+                    root, item_path_value, required_prefix="third-party-evidence"
+                )
+                if item_path is None:
                     _third_party_finding(findings, material_id, "obligation_evidence path is outside third-party-evidence")
                     continue
                 if item_path_value in seen_evidence_paths:
                     _third_party_finding(findings, material_id, "obligation_evidence path is duplicated")
                 seen_evidence_paths.add(item_path_value)
-                item_path = root / item_path_value
                 if not _is_regular_file_without_link(item_path):
                     _third_party_finding(findings, material_id, "obligation_evidence file is missing or not a regular non-link file")
                 elif not _valid_sha256(item_hash) or _sha256_file(item_path) != item_hash:

@@ -10,8 +10,8 @@ Individual authority documents retain their own internal Version History and app
 
 | Document | Version | Status |
 |---|---:|---|
-| AI Engineering Usage Guide | v1.1.2 | Baseline |
-| Coordinator/Node Control Framework | v1.1.6 | Baseline |
+| AI Engineering Usage Guide | v1.1.3 | Baseline |
+| Coordinator/Node Control Framework | v1.1.7 | Baseline |
 | Framework Application Analysis Template | v1.1.9 | Baseline |
 | Protocol YAML Definition Guide | v1.1.7 | Baseline |
 | Protocol YAML Template | v1.1.1 | Baseline |
@@ -25,9 +25,9 @@ Individual authority documents retain their own internal Version History and app
 | Coordinator Testing Guide | v1.1.1 | Draft for Review |
 | Coordinator UI Engineering Guide | v1.1.2 | Baseline |
 | Node Software Engineering Rules | v1.1.0 | Draft for Review |
-| Embedded C Coding Rules | v1.0.18 | Final Baseline |
+| Embedded C Coding Rules | v1.0.19 | Final Baseline |
 | C# Coding Rules | v1.0.5 | Baseline |
-| Repository Validation Checklist | v1.1.2 | Baseline |
+| Repository Validation Checklist | v1.1.3 | Baseline |
 | Validation Evidence Guide | v1.1.0 | Draft for Review |
 | Protocol Validation Checklist | v1.1.6 | Draft for Review |
 | Framework Conformance Checklist | v1.1.5 | Draft for Review |
@@ -36,7 +36,11 @@ Individual authority documents retain their own internal Version History and app
 
 ### Current Review Changes
 
-- Corrected repository validation gaps without changing the frozen authority versions: explicit `node_model` profiles now require the complete common Protocol core; invalid-fixture rule sets are exact; third-party entries bind target, source, notice, approval, and obligation evidence bytes; all declared binary patterns and CODEOWNERS text integrity are checked; and Embedded C examples, a duplicate directory-index paragraph, and Framework revision metadata were repaired.
+- Promoted repository candidate v1.1.3-rc.2 to the formal v1.1.3 Baseline after explicit human freeze approval; promoted AI Engineering Usage Guide v1.1.3, Coordinator/Node Control Framework v1.1.7, Embedded C Coding Rules v1.0.19, and Repository Validation Checklist v1.1.3 to their formal statuses without further normative change.
+- Advanced the mutable repository review iteration to v1.1.3-rc.2; advanced AI Engineering Usage Guide to v1.1.3-rc.2, Coordinator/Node Control Framework to v1.1.7-rc.2, Embedded C Coding Rules to v1.0.19-rc.2, and Repository Validation Checklist to v1.1.3-rc.2 without removing RC status or declaring human freeze approval.
+- Advanced the mutable repository to v1.1.3-rc.1 after post-baseline corrections; promoted AI Engineering Usage Guide v1.1.3-rc.1, Coordinator/Node Control Framework v1.1.7-rc.1, Embedded C Coding Rules v1.0.19-rc.1, and Repository Validation Checklist v1.1.3-rc.1 to Draft for Review candidates while retaining v1.1.2 as the last human-approved repository baseline.
+- Hardened third-party target and evidence path handling against Windows drive paths, NTFS alternate data streams, reserved device names, `.git` metadata, trailing dot or space components, and parent-symlink containment escapes; added exact PY-CORE-001 fixture and regression coverage for whitespace-only explicit core fields.
+- Carried the earlier explicit `node_model` core validation, exact fixture-oracle, third-party byte/evidence binding, binary declaration, CODEOWNERS integrity, Embedded C example, directory-index, and Framework metadata corrections into the controlled RC versions above rather than treating modified Baseline bytes as unchanged frozen authorities.
 - Promoted Coordinator Software Engineering Rules v1.1.1, Coordinator Architecture Patterns v1.1.1, Coordinator UI Engineering Guide v1.1.2, and C# Coding Rules v1.0.5 to formal Baseline status after explicit human freeze approval; finalized replaceable Presentation and UI-framework isolation rules, reusable core boundaries, pragmatic framework-specific presentation code, project-owned UI service ports, migration scope, anti-patterns, and review checks.
 - Updated AI Engineering Usage Guide and Repository Validation Checklist to v1.1.2 Baseline, synchronized authority routing and regression expectations, and recorded explicit human freeze approval for repository baseline v1.1.2; immutable Git identity remains pending the final tag or controlled GitHub Release.
 - Added `.gitattributes` to enforce canonical LF text checkouts across Windows, Linux, and macOS and to protect common binary artifacts from line-ending normalization.

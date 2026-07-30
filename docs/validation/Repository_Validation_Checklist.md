@@ -1,9 +1,9 @@
 # Repository Validation Checklist
 
 **Canonical Filename:** `Repository_Validation_Checklist.md`
-**Document Version:** v1.1.2
+**Document Version:** v1.1.3
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.1
+**Supersedes Document Version:** v1.1.3-rc.2
 **Document Owner:** Ray Yang
 **Initial Release Date:** 2026-07-18
 **Language:** English
@@ -17,6 +17,9 @@ Copyright © 2026 Ray Yang. All rights reserved unless a repository-level licens
 
 | Version | Date | Status | Summary |
 |---|---|---|---|
+| v1.1.3 | 2026-07-30 | Baseline | Promoted v1.1.3-rc.2 to the formal Baseline after explicit human freeze approval; retained cross-platform repository path containment and direct PY-CORE-001 regression coverage without further validation-rule change. |
+| v1.1.3-rc.2 | 2026-07-30 | Draft for Review | Advanced the controlled review iteration from v1.1.3-rc.1; retained cross-platform path containment and direct PY-CORE-001 regression coverage without weakening or adding validation requirements; synchronized repository candidate identity; pending human freeze approval. |
+| v1.1.3-rc.1 | 2026-07-30 | Draft for Review | Added cross-platform third-party path syntax and resolved-containment checks for Windows drive paths, NTFS alternate data streams, reserved device names, `.git` metadata, trailing dot or space components, and parent-symlink escapes; added direct PY-CORE-001 fixture coverage and synchronized repository v1.1.3-rc.1 release-state markers; pending human freeze approval. |
 | v1.1.2 | 2026-07-29 | Baseline | Synchronized formal authority promotion, repository baseline v1.1.2 release-state markers, active authority snapshots, and regression expectations after explicit human freeze approval; no Product or architecture requirement changed. |
 | v1.1.1 | 2026-07-27 | Baseline | Added repository-controlled `.gitattributes`, canonical LF checkout enforcement, required binary declarations, complete CODEOWNERS coverage, and regression tests for missing or weakened line-ending policy; promoted after explicit human freeze approval. |
 | v1.1.0 | 2026-07-27 | Baseline | Added release-candidate document-version support, retained multi-digit semantic-version components, required RC status to remain Draft for Review, and defined explicit human freeze approval as the boundary for removing the RC suffix; promoted from v1.1.0-rc.1 after explicit human freeze approval. |
@@ -113,7 +116,7 @@ The automated validator shall check at least:
 - Validation Checklists contain the common non-authority statement and validation Repository Roles explicitly deny independent requirement authority.
 - `LICENSE` preserves the GitHub Terms limited-platform-rights carve-out, applicable-law exceptions, no-additional-rights boundary, no-warranty and liability terms, and lawfully authorized file-specific or third-party notice scope.
 - `CONTRIBUTING.md` states that external contributions require a separate prior written agreement and that unsolicited submissions do not create an inbound repository license or acceptance obligation.
-- `third-party-materials.yaml` uses the controlled root and policy schema; every accepted material entry has a unique ID, bounded scope, provenance, rights holder, exact notice identity, acceptance record, SHA-256 source identity, obligations, an existing target path, and the required visible material marker.
+- `third-party-materials.yaml` uses the controlled root and policy schema; every accepted material entry has a unique ID, bounded scope, provenance, rights holder, exact notice identity, acceptance record, SHA-256 source identity, obligations, an existing target path, and the required visible material marker. Target and evidence paths use canonical repository-relative POSIX syntax, reject Windows drive-qualified paths, NTFS alternate data streams, reserved device names, `.git` metadata, trailing dot or space components, and resolve within the repository root before any byte read.
 - `NOTICE.md` contains the required repository sections, limits file-specific notice precedence to lawfully authorized, manifest-registered, and visibly marked exceptions, distinguishes engineering evaluation from licensed implementation, and states that Framework conformance is the claim issuer's self-declaration rather than author or maintainer certification.
 - The Framework and Framework Conformance Checklist retain the scoped conformance-claim, authorized-deviation, and correction/revalidation/evidence restoration requirements.
 - `CHANGELOG.md` records each newly introduced governed document and synchronization of Registry, Manifest, NOTICE, and Validator behavior; its Current Authority Revision Snapshot exactly matches `authority-registry.yaml`.

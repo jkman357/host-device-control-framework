@@ -1,9 +1,9 @@
 # Embedded C Coding Rules
 
 **Document Name:** `Embedded_C_Coding_Rules.md`  
-**Document Version:** v1.0.18  
+**Document Version:** v1.0.19  
 **Status:** Final Baseline  
-**Supersedes Document Version:** v1.0.17  
+**Supersedes Document Version:** v1.0.19-rc.2  
 **Applicable Domain:** Coordinator/Node Framework - Embedded C Firmware  
 **Primary Narrative Language:** English  
 **Primary Programming Language:** C  
@@ -4112,6 +4112,9 @@ Record requirements:
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.0.19 | 2026-07-30 | Final Baseline | Promoted v1.0.19-rc.2 to the formal Final Baseline after explicit human freeze approval; retained the completed Function Header examples and made no further Embedded C rule change. |
+| v1.0.19-rc.2 | 2026-07-30 | Draft for Review | Advanced the controlled review iteration from v1.0.19-rc.1; retained the completed Function Header examples and changed no Embedded C rule requirement; synchronized repository candidate identity; pending human freeze approval. |
+| v1.0.19-rc.1 | 2026-07-30 | Draft for Review | Completed the mandatory Function Header structure in the host-test exit mapping, host main, and range-protected multiplication examples; no Embedded C rule requirement changed; pending human freeze approval. |
 | v1.0.18 | 2026-07-26 | Final Baseline | Normalized the governed Change History to strict descending semantic-version order required by repository validation; no Embedded C coding rule or implementation requirement changed. |
 | v1.0.17 | 2026-07-19 | Final Baseline | Added explicit Repository Role metadata and migrated legacy Change History to the governed Date/Status schema using Not recorded where historical values were unavailable; no normative Embedded C implementation requirements changed. |
 | v1.0.16 | Not recorded | Not recorded | Added explicit Supersedes metadata required by repository governance; no normative Embedded C implementation requirements changed. |

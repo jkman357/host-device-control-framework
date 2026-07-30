@@ -8,13 +8,14 @@ policy:
 documents:
 - display_name: AI Engineering Usage Guide
   path: docs/framework/AI_Engineering_Usage_Guide.md
-  version: v1.1.2
+  version: v1.1.3
   status: Baseline
   repository_role: Normative AI task-routing and repository-governance authority
   readme_purpose: AI entry point, authority routing, provider-independent work continuity,
-    Multi-Node-aware task workflows, evidence states, exact tested-candidate evidence routing,
-    Tester self-validation, and human approval boundary
-  routing_role: AI authority routing, operating controls, and provider-independent work continuity
+    Multi-Node-aware task workflows, evidence states, exact tested-candidate evidence
+    routing, Tester self-validation, and human approval boundary
+  routing_role: AI authority routing, operating controls, and provider-independent
+    work continuity
   applies_when: Any AI-assisted engineering task uses this repository or a detached
     authority-set package.
   authority_topics:
@@ -26,7 +27,7 @@ documents:
   prerequisite_documents: []
 - display_name: Coordinator/Node Control Framework
   path: docs/framework/Coordinator_Node_Control_Framework.md
-  version: v1.1.6
+  version: v1.1.7
   status: Baseline
   repository_role: Normative architecture and framework-governance authority
   readme_purpose: Generalized Single-Node and Multi-Node architecture, role and target
@@ -50,10 +51,11 @@ documents:
   status: Baseline
   repository_role: Normative framework-application analysis method
   readme_purpose: Method for applying the Framework to a Product, including topology,
-    identity, resources, Reuse Classification, canonical source identity, Protocol inputs,
-    independent Protocol Conformance Tester applicability, staged gates, exact tested
-    identities, evidence reconciliation, representative-target residual boundaries,
-    cross-field disposition consistency, Tester self-validation, risks, Gaps, MVP, and acceptance evidence
+    identity, resources, Reuse Classification, canonical source identity, Protocol
+    inputs, independent Protocol Conformance Tester applicability, staged gates, exact
+    tested identities, evidence reconciliation, representative-target residual boundaries,
+    cross-field disposition consistency, Tester self-validation, risks, Gaps, MVP,
+    and acceptance evidence
   routing_role: Application, topology, resource, and acceptance analysis method
   applies_when: The Framework is applied to a new Product, application, platform,
     or Product revision.
@@ -206,8 +208,8 @@ documents:
   path: docs/coordinator/Coordinator_Architecture_Patterns.md
   version: v1.1.1
   status: Baseline
-  repository_role: Topic-specific normative engineering authority for Coordinator architecture
-    patterns, subordinate to Coordinator Software Engineering Rules
+  repository_role: Topic-specific normative engineering authority for Coordinator
+    architecture patterns, subordinate to Coordinator Software Engineering Rules
   readme_purpose: Coordinator layering, replaceable Presentation adapters, Node Registry
     and Context, immutable target binding, per-Node state and resources, shared-bus
     scheduling, aggregate state, and multi-target patterns
@@ -301,12 +303,13 @@ documents:
   path: docs/coordinator/Coordinator_UI_Engineering_Guide.md
   version: v1.1.2
   status: Baseline
-  repository_role: Topic-specific normative engineering authority for Coordinator UI
-    implementation, subordinate to Coordinator Software Engineering Rules
+  repository_role: Topic-specific normative engineering authority for Coordinator
+    UI implementation, subordinate to Coordinator Software Engineering Rules
   readme_purpose: Replaceable UI-framework boundaries, Node selection and immutable
     operation binding, aggregate and per-Node views, partial results, stale state,
     responsiveness, visualization, and input safety
-  routing_role: Detailed replaceable Presentation, Multi-Node UI, and operation-binding rules
+  routing_role: Detailed replaceable Presentation, Multi-Node UI, and operation-binding
+    rules
   applies_when: A Coordinator UI presents Node state, issues commands, handles external
     content, visualizes data, or implements operational, service, production, or laboratory
     workflows.
@@ -345,7 +348,7 @@ documents:
   - docs/framework/Coordinator_Node_Control_Framework.md
 - display_name: Embedded C Coding Rules
   path: docs/coding-rules/Embedded_C_Coding_Rules.md
-  version: v1.0.18
+  version: v1.0.19
   status: Final Baseline
   repository_role: Normative language and implementation authority for Product-owned
     Embedded C code
@@ -366,9 +369,12 @@ documents:
   path: docs/coding-rules/CSharp_Coding_Rules.md
   version: v1.0.5
   status: Baseline
-  repository_role: Normative language and implementation authority for Product-owned C# code
-  readme_purpose: Product-owned C# language, .NET implementation, and UI-framework dependency-boundary rules
-  routing_role: Product-owned C# language, .NET implementation, and UI-framework boundary rules
+  repository_role: Normative language and implementation authority for Product-owned
+    C# code
+  readme_purpose: Product-owned C# language, .NET implementation, and UI-framework
+    dependency-boundary rules
+  routing_role: Product-owned C# language, .NET implementation, and UI-framework boundary
+    rules
   applies_when: Product-owned C# code is generated, modified, reviewed, or validated.
   authority_topics:
   - C# language rules
@@ -380,18 +386,19 @@ documents:
   - docs/framework/AI_Engineering_Usage_Guide.md
 - display_name: Repository Validation Checklist
   path: docs/validation/Repository_Validation_Checklist.md
-  version: v1.1.2
+  version: v1.1.3
   status: Baseline
   repository_role: Operational validation method; not a Product or architecture authority
-  readme_purpose: Repository structural and non-link path safety, canonical LF checkout policy,
-    complete CODEOWNERS coverage,
-    canonical registry paths, authority synchronization, canonical claim-source, commit-scoped
-    legal-baseline external-anchor verification, scoped release-state consistency, third-party
-    byte/evidence, executable Protocol schema/fixture, current Unreleased authority-revision
-    snapshot, evidence-state, and detached-package checks
-  routing_role: Repository path safety, canonical LF checkout policy, complete CODEOWNERS coverage,
-    authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification,
-    release-state, third-party byte/evidence, and evidence checks
+  readme_purpose: Repository structural and non-link path safety, canonical LF checkout
+    policy, complete CODEOWNERS coverage, canonical registry paths, authority synchronization,
+    canonical claim-source, commit-scoped legal-baseline external-anchor verification,
+    scoped release-state consistency, third-party byte/evidence, executable Protocol
+    schema/fixture, current Unreleased authority-revision snapshot, evidence-state,
+    and detached-package checks
+  routing_role: Repository path safety, canonical LF checkout policy, complete CODEOWNERS
+    coverage, authority synchronization, canonical claim-source, commit-scoped legal-baseline
+    external-anchor verification, release-state, third-party byte/evidence, and evidence
+    checks
   applies_when: Repository content, authority manifests, detached packages, or validation
     tooling are changed or reviewed.
   authority_topics:
@@ -438,7 +445,8 @@ documents:
   readme_purpose: Traceable Protocol YAML, node_model, topology, identity, security,
     compatibility, independent Protocol Conformance Tester applicability, staged gates,
     exact tested identities, evidence freshness, representative-target residual boundaries,
-    cross-field consistency, Tester self-validation, and interoperability evidence view
+    cross-field consistency, Tester self-validation, and interoperability evidence
+    view
   routing_role: Protocol and Multi-Node validation evidence-capture checklist
   applies_when: A Project Protocol definition or implementation is reviewed or validated
     against its governing authorities.

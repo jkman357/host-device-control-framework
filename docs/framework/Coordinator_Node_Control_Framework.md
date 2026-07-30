@@ -3,9 +3,9 @@
 
 **Document Name:** `Coordinator_Node_Control_Framework.md`
 **Document ID:** CNCF
-**Document Version:** v1.1.6
+**Document Version:** v1.1.7
 **Status:** Baseline
-**Supersedes Document Version:** v1.1.5
+**Supersedes Document Version:** v1.1.7-rc.2
 **Document Type:** Master Architecture and Engineering Governance Baseline
 **Primary Narrative Language:** English
 **Author:** Ray Yang
@@ -265,6 +265,9 @@ Markdown filename.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.7 | 2026-07-30 | Baseline | Promoted v1.1.7-rc.2 to the formal Baseline after explicit human freeze approval; retained the corrected revision metadata and made no further normative Framework architecture change. |
+| v1.1.7-rc.2 | 2026-07-30 | Draft for Review | Advanced the controlled review iteration from v1.1.7-rc.1 without changing any normative Framework architecture requirement; synchronized repository candidate identity and retained the post-baseline metadata correction; pending human freeze approval. |
+| v1.1.7-rc.1 | 2026-07-30 | Draft for Review | Entered the controlled release-candidate lifecycle after post-baseline metadata-byte correction; retained the corrected Last Revised date and changed no normative Framework architecture requirement; pending human freeze approval. |
 | v1.1.6 | 2026-07-26 | Baseline | Normalized Version History to strict descending semantic-version order to match repository validation governance; no normative Framework requirements changed. |
 | v1.1.5 | 2026-07-20 | Baseline | Required globally unambiguous Framework source identity in conformance records, bound the canonical example to the actual e516fa1/v1.1.4 source pair, and clarified that repository and legal-baseline freeze status exists only through externally verifiable immutable release or anchor evidence. |
 | v1.1.4 | 2026-07-20 | Baseline | Closed Scoped Conformance satisfaction and residual-deviation ambiguity; required a pre-validation claim-boundary baseline, claim lifecycle and invalidation records, and signatory-bounded assessment agreements. |

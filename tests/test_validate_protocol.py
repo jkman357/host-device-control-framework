@@ -75,6 +75,11 @@ class ProtocolValidatorTests(unittest.TestCase):
         rules = {issue.rule for issue in validate_path(path)}
         self.assertEqual({"PY-SCHEMA-001"}, rules)
 
+    def test_explicit_blank_core_text_reaches_semantic_validation(self) -> None:
+        path = ROOT / "tests/fixtures/protocol/invalid_explicit_blank_core_profile.yaml"
+        rules = {issue.rule for issue in validate_path(path)}
+        self.assertEqual({"PY-CORE-001"}, rules)
+
     def test_bounded_parallel_requires_limit(self) -> None:
         path = ROOT / "tests/fixtures/protocol/invalid_bounded_parallel_update.yaml"
         rules = {issue.rule for issue in validate_path(path)}

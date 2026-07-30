@@ -3,7 +3,7 @@
 
 **Document Name:** `AI_Engineering_Usage_Guide.md`
 **Document ID:** AIEUG
-**Document Version:** v1.1.2
+**Document Version:** v1.1.3
 **Status:** Baseline
 **Document Type:** AI Usage and Authority Routing Guide
 **Primary Narrative Language:** English
@@ -11,7 +11,7 @@
 **Maintainer:** Ray Yang
 **Repository:** `host-device-control-framework`
 **Repository Role:** Normative AI task-routing and repository-governance authority
-**Supersedes Document Version:** v1.1.1
+**Supersedes Document Version:** v1.1.3-rc.2
 **Related Documents:**
 - `Coordinator_Node_Control_Framework.md`
 - `Framework_Application_Analysis_Template.md`
@@ -100,6 +100,9 @@ materially rewritten by AI shall begin as `Draft for Review`.
 
 | Version | Date | Status | Description |
 | --- | --- | --- | --- |
+| v1.1.3 | 2026-07-30 | Baseline | Promoted repository candidate v1.1.3-rc.2 to the formal v1.1.3 Baseline after explicit human freeze approval; retained cross-platform path containment, explicit-core semantic regression coverage, synchronized authority routing, and the human approval boundary without further normative change. |
+| v1.1.3-rc.2 | 2026-07-30 | Draft for Review | Advanced the controlled review iteration from repository v1.1.3-rc.1 to v1.1.3-rc.2; synchronized active authority routing and release-state records without changing the validation, architecture, or coding-rule requirements introduced by rc.1; pending human freeze approval. |
+| v1.1.3-rc.1 | 2026-07-30 | Draft for Review | Routed repository v1.1.3-rc.1 validation hardening; synchronized Coordinator/Node Control Framework v1.1.7-rc.1, Embedded C Coding Rules v1.0.19-rc.1, Repository Validation Checklist v1.1.3-rc.1, cross-platform repository path containment, and explicit-core semantic regression coverage; pending human freeze approval. |
 | v1.1.2 | 2026-07-29 | Baseline | Promoted Coordinator Software Engineering Rules v1.1.1, Coordinator Architecture Patterns v1.1.1, Coordinator UI Engineering Guide v1.1.2, and C# Coding Rules v1.0.5 to formal Baseline status after explicit human freeze approval; synchronized active routing and Repository Validation Checklist v1.1.2 for repository baseline v1.1.2. |
 | v1.1.1 | 2026-07-27 | Baseline | Updated active routing for Repository Validation Checklist v1.1.1 after adding canonical LF checkout and `.gitattributes` governance; no Product, Framework, Protocol, role, or implementation requirement changed. |
 | v1.1.0 | 2026-07-27 | Baseline | Added provider-independent AI work continuity, interruption recovery, controlled handoff-package content, restart boundaries, cross-AI validation requirements, and the controlled release-candidate workflow; promoted from v1.1.0-rc.1 after explicit human freeze approval. |
@@ -152,8 +155,8 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 
 | Document | Canonical Repository Path | Active Version | Status | Routing Role |
 |---|---|---|---|---|
-| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.1.2` | Baseline | AI authority routing, operating controls, and provider-independent work continuity |
-| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.6` | Baseline | Generalized Single-Node and Multi-Node architecture and governance |
+| AI Engineering Usage Guide | `docs/framework/AI_Engineering_Usage_Guide.md` | `v1.1.3` | Baseline | AI authority routing, operating controls, and provider-independent work continuity |
+| Coordinator/Node Control Framework | `docs/framework/Coordinator_Node_Control_Framework.md` | `v1.1.7` | Baseline | Generalized Single-Node and Multi-Node architecture and governance |
 | Framework Application Analysis Template | `docs/framework/Framework_Application_Analysis_Template.md` | `v1.1.9` | Baseline | Application, topology, resource, and acceptance analysis method |
 | Protocol YAML Definition Guide | `docs/protocol/Protocol_YAML_Definition_Guide.md` | `v1.1.7` | Baseline | Protocol YAML representation and Multi-Node semantic-validation rules |
 | Protocol YAML Template | `docs/protocol/Protocol_YAML_Template.md` | `v1.1.1` | Baseline | Reusable Single-Node and Multi-Node Protocol starting structure |
@@ -167,9 +170,9 @@ The machine-readable `authority-registry.yaml` is the identity and routing-metad
 | Coordinator Testing Guide | `docs/coordinator/Coordinator_Testing_Guide.md` | `v1.1.1` | Draft for Review | Detailed Coordinator Multi-Node engineering-test and evidence rules |
 | Coordinator UI Engineering Guide | `docs/coordinator/Coordinator_UI_Engineering_Guide.md` | `v1.1.2` | Baseline | Detailed replaceable Presentation, Multi-Node UI, and operation-binding rules |
 | Node Software Engineering Rules | `docs/node/Node_Software_Engineering_Rules.md` | `v1.1.0` | Draft for Review | Cross-language Node identity, targeting, lifecycle, and engineering rules |
-| Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.18` | Final Baseline | Product-owned Embedded C implementation rules |
+| Embedded C Coding Rules | `docs/coding-rules/Embedded_C_Coding_Rules.md` | `v1.0.19` | Final Baseline | Product-owned Embedded C implementation rules |
 | C# Coding Rules | `docs/coding-rules/CSharp_Coding_Rules.md` | `v1.0.5` | Baseline | Product-owned C# language, .NET implementation, and UI-framework boundary rules |
-| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.1.2` | Baseline | Repository path safety, canonical LF checkout policy, complete CODEOWNERS coverage, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, release-state, third-party byte/evidence, and evidence checks |
+| Repository Validation Checklist | `docs/validation/Repository_Validation_Checklist.md` | `v1.1.3` | Baseline | Repository path safety, canonical LF checkout policy, complete CODEOWNERS coverage, authority synchronization, canonical claim-source, commit-scoped legal-baseline external-anchor verification, release-state, third-party byte/evidence, and evidence checks |
 | Validation Evidence Guide | `docs/validation/Validation_Evidence_Guide.md` | `v1.1.0` | Draft for Review | Validation evidence identity, execution-state, and adequacy method |
 | Protocol Validation Checklist | `docs/validation/Protocol_Validation_Checklist.md` | `v1.1.6` | Draft for Review | Protocol and Multi-Node validation evidence-capture checklist |
 | Framework Conformance Checklist | `docs/validation/Framework_Conformance_Checklist.md` | `v1.1.5` | Draft for Review | Framework and Multi-Node conformance, claim lifecycle, deviation, and restoration evidence-capture checklist |

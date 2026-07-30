@@ -16,6 +16,8 @@ invalid:
     - PY-MN-030
   invalid_explicit_empty_core_profile.yaml:
     - PY-SCHEMA-001
+  invalid_explicit_blank_core_profile.yaml:
+    - PY-CORE-001
   invalid_maximum_nodes_zero.yaml:
     - PY-MN-004
     - PY-MN-006
